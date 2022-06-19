@@ -1,9 +1,9 @@
-#include <xre/xr_dx11_handler.h>
+#include <xre/xre_dx11_handler.h>
 
-XrDx11Handler::XrDx11Handler() {
+XreDx11Handler::XreDx11Handler() {
 
 };
 
-XrDx11Handler::~XrDx11Handler() {
+XreDx11Handler::~XreDx11Handler() {
 
 };
