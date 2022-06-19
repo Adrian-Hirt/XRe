@@ -1,4 +1,4 @@
-#include "xre_application.h"
+#include <xre/xre_application.h>
 
 int main(int, char**) {
     XReApplication application = XReApplication();
