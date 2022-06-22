@@ -15,6 +15,7 @@
 
 // XRe includes
 #include <xre/utils.h>
+#include <xre/structs.h>
 #include <xre/xre_dx11_handler.h>
 
 // Other includes
@@ -26,6 +27,7 @@ public:
   XrOpenXrHandler();
   XrOpenXrHandler(const char *application_name);
   ~XrOpenXrHandler();
+  void poll_openxr_events(bool &loop_running, bool &xr_running);
 
 private:
   // Configs
@@ -42,12 +44,16 @@ private:
   std::vector<XrView> openxr_views;
   std::vector<XrViewConfigurationView> openxr_view_configuration_views;
 
+  // Swapchains
+  std::vector<swapchain_t> swapchains;
+
   // Pointers to ext functions we need to use
   PFN_xrGetD3D11GraphicsRequirementsKHR ext_xrGetD3D11GraphicsRequirementsKHR;
 
   // Handlers
-  XreDx11Handler xr_dx11_handler;
+  XreDx11Handler *xr_dx11_handler;
 
   // Methods
-  bool initialize_open_xr();
+  bool initialize_openxr();
+  bool initialize_openxr_actions();
 };

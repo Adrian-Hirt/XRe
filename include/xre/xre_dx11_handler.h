@@ -5,6 +5,7 @@
 
 // XRe includes
 #include <xre/utils.h>
+#include <xre/structs.h>
 
 class XreDx11Handler {
 public:
@@ -14,6 +15,9 @@ public:
 
   ID3D11Device* get_device();
   ID3D11DeviceContext* get_device_context();
+  swapchain_data_t create_render_targets(ID3D11Texture2D &texture);
+
+  DXGI_FORMAT d3d11_swapchain_format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 private:
   ID3D11Device *device;

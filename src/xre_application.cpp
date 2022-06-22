@@ -10,11 +10,20 @@ XReApplication::~XReApplication() {
 };
 
 void XReApplication::run() {
+  std::cout << "Hello from the run() method" << std::endl;
+
+  bool loop_running = true;
+  bool xr_running = false;
 
   // Main render loop
-  while(true) {
+  while(loop_running) {
+    // Poll the OpenXR events, and if OpenXR reports to still be running, keep going on
+    xre_open_xr_handler.poll_openxr_events(loop_running, xr_running);
 
-    // Just exit directly for now
-    break;
+    if (xr_running) {
+      // TODO:
+      // 1. Poll openXR actions
+      // 2. Render frame
+    }
   }
 }
