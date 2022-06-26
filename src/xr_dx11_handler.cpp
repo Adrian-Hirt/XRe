@@ -15,38 +15,23 @@ XreDx11Handler::XreDx11Handler(LUID &adapter_luid) {
 };
 
 //------------------------------------------------------------------------------------------------------
-// Default destructor
-//------------------------------------------------------------------------------------------------------
-XreDx11Handler::~XreDx11Handler() {
-  if(device != nullptr) {
-    device->Release();
-    device = nullptr;
-  }
-
-  if(device_context != nullptr) {
-    device_context->Release();
-    device_context = nullptr;
-  }
-};
-
-//------------------------------------------------------------------------------------------------------
 // Initialize the D3D11 device
 //------------------------------------------------------------------------------------------------------
 bool XreDx11Handler::initialize_device(LUID &adapter_luid) {
   HRESULT result;
-  IDXGIFactory *dxgi_factory;
+  IDXGIFactory1 *dxgi_factory;
 
   // Create the DXGI factory we're using to find the correct adapter
-  result = CreateDXGIFactory(__uuidof(IDXGIFactory), (void **)(&dxgi_factory));
+  result = CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void **)(&dxgi_factory));
   if(FAILED(result)) {
     return false;
   }
-  IDXGIAdapter *adapter = nullptr;
+  IDXGIAdapter1 *adapter = nullptr;
 
   // Loop over all the adapters the factory finds
-  for(size_t i = 0; dxgi_factory->EnumAdapters(i, &adapter) != DXGI_ERROR_NOT_FOUND; i++) {
-    DXGI_ADAPTER_DESC adapter_desc;
-    adapter->GetDesc(&adapter_desc);
+  for(size_t i = 0; dxgi_factory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND; i++) {
+    DXGI_ADAPTER_DESC1 adapter_desc;
+    adapter->GetDesc1(&adapter_desc);
 
     // check wether the LUID of the current adapter matches the one we're looking for
     if (memcmp(&adapter_desc.AdapterLuid, &adapter_luid, sizeof(&adapter_luid)) == 0) {
@@ -67,10 +52,20 @@ bool XreDx11Handler::initialize_device(LUID &adapter_luid) {
   }
 
   // Set the feature level we wish to use to directx 11
-  D3D_FEATURE_LEVEL feature_levels[] = {D3D_FEATURE_LEVEL_11_0};
+  D3D_FEATURE_LEVEL feature_levels[] = { D3D_FEATURE_LEVEL_11_0 };
 
   // Create the D3D11 device, but don't create any swapchains yet, we'll do that later
-  result = D3D11CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN, 0, 0, feature_levels, _countof(feature_levels), D3D11_SDK_VERSION, &device, nullptr, &device_context);
+  result = D3D11CreateDevice(
+    adapter,
+    D3D_DRIVER_TYPE_UNKNOWN,
+    0,
+    0,
+    feature_levels,
+    _countof(feature_levels),
+    D3D11_SDK_VERSION,
+    &device,
+    nullptr,
+    &device_context);
 
   // Check that we were successful
   if(FAILED(result)) {
@@ -116,7 +111,8 @@ ID3D11DeviceContext *XreDx11Handler::get_device_context() {
 // scene to render)
 //------------------------------------------------------------------------------------------------------
 swapchain_data_t XreDx11Handler::create_render_targets(ID3D11Texture2D &texture) {
-  swapchain_data_t result = {};
+  swapchain_data_t result_target = {};
+  HRESULT result;
 
   //----------------------------------------------------------------------------------
   // Create the backbuffer
@@ -131,7 +127,8 @@ swapchain_data_t XreDx11Handler::create_render_targets(ID3D11Texture2D &texture)
   D3D11_RENDER_TARGET_VIEW_DESC render_target_view_desc = {};
   render_target_view_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
   render_target_view_desc.Format = d3d11_swapchain_format;
-  device->CreateRenderTargetView(&texture, &render_target_view_desc, &result.back_buffer);
+  result = device->CreateRenderTargetView(&texture, &render_target_view_desc, &result_target.back_buffer);
+  check_hresult(result, "Could not create the render target view");
 
   //----------------------------------------------------------------------------------
   // Create a matching depth buffer (z-buffer)
@@ -154,17 +151,70 @@ swapchain_data_t XreDx11Handler::create_render_targets(ID3D11Texture2D &texture)
 
   // Create the depth buffer texture object
   ID3D11Texture2D *depth_buffer;
-  device->CreateTexture2D(&depth_buffer_desc, NULL, &depth_buffer);
+  result = device->CreateTexture2D(&depth_buffer_desc, NULL, &depth_buffer);
+  check_hresult(result, "Could not create the texture 2d");
 
   // Then use that depth buffer texture object to finally create the depth buffer itself
   D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc = {};
   depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
   depth_stencil_view_desc.Format = DXGI_FORMAT_D32_FLOAT; // Data format for the depth buffer itself is float
-  device->CreateDepthStencilView(depth_buffer, &depth_stencil_view_desc, &result.depth_buffer);
+  result = device->CreateDepthStencilView(depth_buffer, &depth_stencil_view_desc, &result_target.depth_buffer);
+  check_hresult(result, "Could not create the depth stencil view");
 
   // We don't need the ID3D11Texture2D object anymore. As it's a COM object, it should be freed by calling
   // Release() on it
   depth_buffer->Release();
 
-  return result;
+  return result_target;
+}
+
+
+//------------------------------------------------------------------------------------------------------
+// Returns the DirectX DeviceContext
+//------------------------------------------------------------------------------------------------------
+void XreDx11Handler::render_frame(XrCompositionLayerProjectionView& view, swapchain_data_t& swapchain_data) {
+  //----------------------------------------------------------------------------------
+	// Setup viewport
+	//----------------------------------------------------------------------------------
+	// For D3D11 to render correctly, we need to create a D3D11_VIEWPORT struct and
+	// set the top left XY coordinates of the viewport, as well as the width and height
+	// of the viewport.
+	// As this should match the size of the swapchain, we just use the size of the
+	// subimage we set previously
+	XrRect2Di& image_rect = view.subImage.imageRect;
+	D3D11_VIEWPORT viewport = {};
+	viewport.TopLeftX = (float)image_rect.offset.x;
+  viewport.TopLeftY = (float)image_rect.offset.y;
+  viewport.Width = (float)image_rect.extent.width;
+  viewport.Height = (float)image_rect.extent.height;
+  viewport.MinDepth = 0;
+  viewport.MaxDepth = 1;
+
+	// Now we can set the viewport of the device context
+	device_context->RSSetViewports(1, &viewport);
+
+	//----------------------------------------------------------------------------------
+	// Clear the Buffers
+	//----------------------------------------------------------------------------------
+	// It's usually nessecary to clear the backbuffer (as it usually still contains the
+	// data from the previous frame). This is usually done by setting all the data
+	// (pixels) to a single color.
+	float clear_color[] = { 0.0f, 0.2f, 0.4f, 1.0f };
+	device_context->ClearRenderTargetView(swapchain_data.back_buffer, clear_color);
+
+	// Also clear the depth buffer, such that it's ready for rendering
+	device_context->ClearDepthStencilView(swapchain_data.depth_buffer, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	//----------------------------------------------------------------------------------
+	// Set the render target
+	//----------------------------------------------------------------------------------
+	// Now we can set the target of all render operations to the backbuffer of the
+	// swapchain we're using.
+	// This will render all our content to that backbuffer.
+	device_context->OMSetRenderTargets(1, &swapchain_data.back_buffer, swapchain_data.depth_buffer);
+
+  //----------------------------------------------------------------------------------
+	// Draw the scene
+	//----------------------------------------------------------------------------------
+  // TODO: Actually draw the scene here
 }

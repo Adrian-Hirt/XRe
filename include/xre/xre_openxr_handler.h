@@ -28,6 +28,9 @@ public:
   XrOpenXrHandler(const char *application_name);
   ~XrOpenXrHandler();
   void poll_openxr_events(bool &loop_running, bool &xr_running);
+  void poll_openxr_actions();
+  void render_frame();
+  void render_layer(XrTime predicted_time, std::vector<XrCompositionLayerProjectionView>& views, XrCompositionLayerProjection& layer_projection);
 
 private:
   // Configs
@@ -51,7 +54,7 @@ private:
   PFN_xrGetD3D11GraphicsRequirementsKHR ext_xrGetD3D11GraphicsRequirementsKHR;
 
   // Handlers
-  XreDx11Handler *xr_dx11_handler;
+  XreDx11Handler xr_dx11_handler;
 
   // Methods
   bool initialize_openxr();

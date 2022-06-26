@@ -21,9 +21,11 @@ void XReApplication::run() {
     xre_open_xr_handler.poll_openxr_events(loop_running, xr_running);
 
     if (xr_running) {
-      // TODO:
-      // 1. Poll openXR actions
-      // 2. Render frame
+      // Poll openXR actions
+      xre_open_xr_handler.poll_openxr_actions();
+
+      // Render frame
+      xre_open_xr_handler.render_frame();
     }
   }
 }

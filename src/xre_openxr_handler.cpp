@@ -95,15 +95,13 @@ bool XrOpenXrHandler::initialize_openxr() {
 		return false;
 	}
 
-	// Create a new handler for the DirectX 11 related stuff. Somehow this does not work
-  // if we don't store it as a pointer to the actual handler.
-  XreDx11Handler handler = XreDx11Handler(graphics_requirements.adapterLuid);
-	this->xr_dx11_handler = &handler;
+	// Create a new handler for the DirectX 11 related stuff.
+ 	xr_dx11_handler = XreDx11Handler(graphics_requirements.adapterLuid);
 
 	// Create a binding for the D3D11 device
 	XrGraphicsBindingD3D11KHR graphics_binding = {};
 	graphics_binding.type = XR_TYPE_GRAPHICS_BINDING_D3D11_KHR;
-	graphics_binding.device = xr_dx11_handler->get_device();
+	graphics_binding.device = xr_dx11_handler.get_device();
 
 	// Create the session info struct
 	XrSessionCreateInfo session_create_info = {};
@@ -182,7 +180,7 @@ bool XrOpenXrHandler::initialize_openxr() {
 		swapchain_create_info.arraySize = 1; // Number of array layers
 		swapchain_create_info.mipCount = 1; // Only use one mipmap level, bigger numbers would only be useful for textures
 		swapchain_create_info.faceCount = 1; // Number of faces to render, 1 should be used, other option would be 6 for cubemaps
-		swapchain_create_info.format = xr_dx11_handler->d3d11_swapchain_format;
+		swapchain_create_info.format = xr_dx11_handler.d3d11_swapchain_format;
 		swapchain_create_info.width = current_view_configuration.recommendedImageRectWidth; // Just use the recommended width that the runtime gave us
 		swapchain_create_info.height = current_view_configuration.recommendedImageRectHeight; // Just use the recommended height that the runtime gave us
 		swapchain_create_info.sampleCount = current_view_configuration.recommendedSwapchainSampleCount; // Just use the recommended sample count that the runtime gave us
@@ -235,7 +233,7 @@ bool XrOpenXrHandler::initialize_openxr() {
     // We also directly release the texture object, as we don't need it anymore after we created the
     // render target with it
     for (uint32_t i = 0; i < swapchain_image_count; i++) {
-        swapchain.swapchain_data[i] = xr_dx11_handler->create_render_targets(*swapchain_images[i].texture);
+        swapchain.swapchain_data[i] = xr_dx11_handler.create_render_targets(*swapchain_images[i].texture);
         swapchain_images[i].texture->Release();
     }
 
@@ -325,3 +323,170 @@ void XrOpenXrHandler::poll_openxr_events(bool &loop_running, bool &xr_running) {
   }
 }
 
+//------------------------------------------------------------------------------------------------------
+// Poll the OpenXR actions
+//------------------------------------------------------------------------------------------------------
+void XrOpenXrHandler::poll_openxr_actions() {
+	// This is not doing anything for the moment
+}
+
+//------------------------------------------------------------------------------------------------------
+// Renders the next frame
+//------------------------------------------------------------------------------------------------------
+void XrOpenXrHandler::render_frame() {
+	XrResult result;
+
+	//------------------------------------------------------------------------------------------------------
+	// Setup the frame
+	//------------------------------------------------------------------------------------------------------
+	// The call to xrWait frame will fill in the frame_state struct, where the field we'll
+	// be interested in is the predictedDisplayTime field.
+	// That field stores a prediction when the next frame will be displayed. This can be used to
+	// place objects, viewpoints, controllers etc. in the view
+	XrFrameState xr_frame_state = {};
+	xr_frame_state.type = XR_TYPE_FRAME_STATE;
+	result = xrWaitFrame(openxr_session, NULL, &xr_frame_state);
+	if(XR_FAILED(result)) {
+		return;
+	}
+
+	//------------------------------------------------------------------------------------------------------
+	// Begin the frame
+	//------------------------------------------------------------------------------------------------------
+	result = xrBeginFrame(openxr_session, NULL);
+	if (XR_FAILED(result)) {
+		return;
+	}
+
+	//------------------------------------------------------------------------------------------------------
+	// Update simulation
+	//------------------------------------------------------------------------------------------------------
+	// TODO: here we'll need to update the simulation, not sure how yet though
+
+	//------------------------------------------------------------------------------------------------------
+	// Render the layer
+	//------------------------------------------------------------------------------------------------------
+	std::vector<XrCompositionLayerBaseHeader*> layers;
+	XrCompositionLayerProjection layer_projection = {};
+	layer_projection.type = XR_TYPE_COMPOSITION_LAYER_PROJECTION;
+	std::vector<XrCompositionLayerProjectionView> views;
+
+
+	// Check if the xrSession is in a state that we actually need to render. If the session isn't in the
+	// VISIBLE or in the FOCUSED state, we don't need to render the layer (e.g. when the user of the
+	// application takes off the vr headset while the application still is running. In that case,
+	// we need to keep the application (and the simulation) running, but there is no point in rendering
+	// anything.
+	if (xr_frame_state.shouldRender) {
+		render_layer(xr_frame_state.predictedDisplayTime, views, layer_projection);
+		layers.push_back((XrCompositionLayerBaseHeader *)&layer_projection);
+	}
+
+	//------------------------------------------------------------------------------------------------------
+	// Done rendeding the layer, send it to the display
+	//------------------------------------------------------------------------------------------------------
+	XrFrameEndInfo frame_end_info = {};
+	frame_end_info.type = XR_TYPE_FRAME_END_INFO;
+	frame_end_info.displayTime = xr_frame_state.predictedDisplayTime;
+	frame_end_info.environmentBlendMode = openxr_blend_mode;
+	frame_end_info.layerCount = layers.size();
+	frame_end_info.layers = layers.data();
+	xrEndFrame(openxr_session, &frame_end_info);
+}
+
+//------------------------------------------------------------------------------------------------------
+// Renders an OpenXR layer
+//------------------------------------------------------------------------------------------------------
+void XrOpenXrHandler::render_layer(XrTime predicted_time, std::vector<XrCompositionLayerProjectionView>& views, XrCompositionLayerProjection& layer_projection) {
+	XrResult result;
+
+	uint32_t view_count = 0;
+
+	//------------------------------------------------------------------------------------------------------
+	// Setup the views for the predicted rendering time
+	//------------------------------------------------------------------------------------------------------
+	// We got the predicted time from the OpenXR runtime at which it will render the next frame (i.e. the
+	// frame we're preparing to render right now.
+	// We can use this predicted time to call the method xrLocateViews, which will return the view and
+	// projection info for a particular time.
+	XrViewState view_state = {};
+	view_state.type = XR_TYPE_VIEW_STATE;
+
+	// Setup an info struct which we'll pass into the xrLocateView call with informations about the
+	// predicted time, the type of view we have and the xr space we're in
+	XrViewLocateInfo view_locate_info = {};
+	view_locate_info.type = XR_TYPE_VIEW_LOCATE_INFO;
+	view_locate_info.viewConfigurationType = application_view_type;
+	view_locate_info.displayTime = predicted_time;
+	view_locate_info.space = openxr_space;
+
+	// Call xrLocateViews, which will give us the number of views we have to render (stored in view_count), as
+	// well as fill in the xr_views vector with the predicted views (which is basically a struct containing
+	// the pose of the view, as well as the fov for that view. We'll use these two later to render with D3D11,
+	// as we need to modify the objects and the view before rendering.
+	result = xrLocateViews(openxr_session, &view_locate_info, &view_state, (uint32_t)openxr_views.size(), &view_count, openxr_views.data());
+	check_xr_result(result, "Could not locate views!");
+	views.resize(view_count);
+
+	//------------------------------------------------------------------------------------------------------
+	// Render the layer for each view
+	//------------------------------------------------------------------------------------------------------
+	for (uint32_t i = 0; i < view_count; i++) {
+		// First, we need to acquire a swapchain image, as we need a render target to render the data
+		// to. As a reminder (from the CreateSwapchainRenderTargets method), a swapchain image
+		// in the context of D3D11 is the buffer we want to render to.
+		// As we don't pass a swapchain_image_id into the xrAcquireSwapchainImage call, the runtime decides
+		// which swapchain image we'll get
+		uint32_t swapchain_image_id;
+		XrSwapchainImageAcquireInfo swapchain_acquire_info = {};
+		swapchain_acquire_info.type = XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO;
+		result = xrAcquireSwapchainImage(swapchains[i].handle, &swapchain_acquire_info, &swapchain_image_id);
+		check_xr_result(result, "Could not acquire swapchain image");
+
+		// We need to wait until the swapchain image is available for writing, as the compositor
+		// could still be reading from it (writing while the compositor is still reading could
+		// result in tearing or otherwise badly rendered frames).
+		// For now, we set the timeout to infinite, but one could also set another timeout
+		// by passing in an xrDuration
+		XrSwapchainImageWaitInfo swapchain_wait_info = {};
+		swapchain_wait_info.type = XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO;
+		swapchain_wait_info.timeout = XR_INFINITE_DURATION;
+		result = xrWaitSwapchainImage(swapchains[i].handle, &swapchain_wait_info);
+		check_xr_result(result, "Could not wait for the swapchain image");
+
+		// Setup the info we need to render the layer for the current view. The XrCompositionLayerProjectionView
+		// is a projection layer element, which has the pose of the current view (pose = location and orientation),
+		// the fov of the current view, and the swapchain sub image, which holds the data for the composition
+		// layer.
+		// The subimage is of type XrSwapchainSubImage, which has a field to the swapchain to display and an
+		// imageRect, which represents the valid portion of the image to use (in pixels)
+		views[i] = {};
+		views[i].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
+		views[i].pose = openxr_views[i].pose;
+		views[i].fov = openxr_views[i].fov;
+		views[i].subImage.swapchain = swapchains[i].handle;
+		views[i].subImage.imageRect.offset = { 0, 0 };
+		views[i].subImage.imageRect.extent = { swapchains[i].width, swapchains[i].height };
+
+		// Render the content to the swapchain, which is done by the D3D11 handler
+		xr_dx11_handler.render_frame(views[i], swapchains[i].swapchain_data[swapchain_image_id]);
+
+		// We're done rendering for the current view, so we can release the swapchain image (i.e. tell
+		// the OpenXR runtime that we're done with this swapchain image.
+		// We have to pass in a XrSwapchainImageReleaseInfo, but at the moment, this struct doesn't
+		// do anything special.
+		XrSwapchainImageReleaseInfo swapchain_release_info = {};
+		swapchain_release_info.type = XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO;
+		result = xrReleaseSwapchainImage(swapchains[i].handle, &swapchain_release_info);
+		check_xr_result(result, "Could not release the swapchain image");
+	}
+
+	//------------------------------------------------------------------------------------------------------
+	// Set the rendered data to be displayed
+	//------------------------------------------------------------------------------------------------------
+	// Now thta we're done rendering all views, we can update the layer projection we got passed into
+	// the method with the rendered views, such that we can display them.
+	layer_projection.space = openxr_space;
+	layer_projection.viewCount = (uint32_t)views.size();
+	layer_projection.views = views.data();
+}
