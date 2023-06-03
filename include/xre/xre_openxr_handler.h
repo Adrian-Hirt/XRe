@@ -21,6 +21,7 @@
 // Other includes
 #include <iostream>
 #include <vector>
+#include <functional>
 
 class XrOpenXrHandler {
 public:
@@ -29,8 +30,11 @@ public:
   ~XrOpenXrHandler();
   void poll_openxr_events(bool &loop_running, bool &xr_running);
   void poll_openxr_actions();
-  void render_frame();
-  void render_layer(XrTime predicted_time, std::vector<XrCompositionLayerProjectionView>& views, XrCompositionLayerProjection& layer_projection);
+  void render_frame(std::function<void(XrCompositionLayerProjectionView&)> draw_callback);
+  void render_layer(XrTime predicted_time,
+                    std::vector<XrCompositionLayerProjectionView>& views,
+                    XrCompositionLayerProjection& layer_projection,
+                    std::function<void(XrCompositionLayerProjectionView&)> draw_callback);
 
 private:
   // Configs

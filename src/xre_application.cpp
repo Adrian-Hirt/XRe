@@ -10,8 +10,6 @@ XReApplication::~XReApplication() {
 };
 
 void XReApplication::run() {
-  std::cout << "Hello from the run() method" << std::endl;
-
   bool loop_running = true;
   bool xr_running = false;
 
@@ -25,7 +23,11 @@ void XReApplication::run() {
       xre_open_xr_handler.poll_openxr_actions();
 
       // Render frame
-      xre_open_xr_handler.render_frame();
+      xre_open_xr_handler.render_frame(std::bind(&XReApplication::draw, this, std::placeholders::_1));
     }
   }
+}
+
+void XReApplication::draw(XrCompositionLayerProjectionView &view) {
+  // Override this method to draw some stuff
 }

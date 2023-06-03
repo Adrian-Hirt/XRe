@@ -333,7 +333,7 @@ void XrOpenXrHandler::poll_openxr_actions() {
 //------------------------------------------------------------------------------------------------------
 // Renders the next frame
 //------------------------------------------------------------------------------------------------------
-void XrOpenXrHandler::render_frame() {
+void XrOpenXrHandler::render_frame(std::function<void(XrCompositionLayerProjectionView&)> draw_callback) {
 	XrResult result;
 
 	//------------------------------------------------------------------------------------------------------
@@ -378,7 +378,7 @@ void XrOpenXrHandler::render_frame() {
 	// we need to keep the application (and the simulation) running, but there is no point in rendering
 	// anything.
 	if (xr_frame_state.shouldRender) {
-		render_layer(xr_frame_state.predictedDisplayTime, views, layer_projection);
+		render_layer(xr_frame_state.predictedDisplayTime, views, layer_projection, draw_callback);
 		layers.push_back((XrCompositionLayerBaseHeader *)&layer_projection);
 	}
 
@@ -397,7 +397,9 @@ void XrOpenXrHandler::render_frame() {
 //------------------------------------------------------------------------------------------------------
 // Renders an OpenXR layer
 //------------------------------------------------------------------------------------------------------
-void XrOpenXrHandler::render_layer(XrTime predicted_time, std::vector<XrCompositionLayerProjectionView>& views, XrCompositionLayerProjection& layer_projection) {
+void XrOpenXrHandler::render_layer(XrTime predicted_time, std::vector<XrCompositionLayerProjectionView>& views,
+																	 XrCompositionLayerProjection& layer_projection,
+																	 std::function<void(XrCompositionLayerProjectionView&)> draw_callback) {
 	XrResult result;
 
 	uint32_t view_count = 0;
@@ -469,7 +471,7 @@ void XrOpenXrHandler::render_layer(XrTime predicted_time, std::vector<XrComposit
 		views[i].subImage.imageRect.extent = { swapchains[i].width, swapchains[i].height };
 
 		// Render the content to the swapchain, which is done by the D3D11 handler
-		xr_dx11_handler.render_frame(views[i], swapchains[i].swapchain_data[swapchain_image_id]);
+		xr_dx11_handler.render_frame(views[i], swapchains[i].swapchain_data[swapchain_image_id], draw_callback);
 
 		// We're done rendering for the current view, so we can release the swapchain image (i.e. tell
 		// the OpenXR runtime that we're done with this swapchain image.

@@ -6,6 +6,7 @@
 
 // Other includes
 #include <iostream>
+#include <functional>
 
 class XReApplication {
 public:
@@ -13,6 +14,7 @@ public:
   ~XReApplication();
 
   void run();
+  virtual void draw(XrCompositionLayerProjectionView &view);
 
 private:
   XrOpenXrHandler xre_open_xr_handler;
