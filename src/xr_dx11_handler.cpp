@@ -170,7 +170,7 @@ swapchain_data_t XreDx11Handler::create_render_targets(ID3D11Texture2D &texture)
 
 
 //------------------------------------------------------------------------------------------------------
-// Returns the DirectX DeviceContext
+// Render a frame
 //------------------------------------------------------------------------------------------------------
 void XreDx11Handler::render_frame(XrCompositionLayerProjectionView& view,
                                   swapchain_data_t& swapchain_data,

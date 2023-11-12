@@ -474,7 +474,7 @@ void XrOpenXrHandler::render_layer(XrTime predicted_time, std::vector<XrComposit
 		xr_dx11_handler.render_frame(views[i], swapchains[i].swapchain_data[swapchain_image_id], draw_callback);
 
 		// We're done rendering for the current view, so we can release the swapchain image (i.e. tell
-		// the OpenXR runtime that we're done with this swapchain image.
+		// the OpenXR runtime that we're done with this swapchain image).
 		// We have to pass in a XrSwapchainImageReleaseInfo, but at the moment, this struct doesn't
 		// do anything special.
 		XrSwapchainImageReleaseInfo swapchain_release_info = {};
