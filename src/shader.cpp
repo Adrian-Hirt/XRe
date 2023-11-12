@@ -55,6 +55,9 @@ Shader::Shader(const char *shader_path, ID3D11Device *device, ID3D11DeviceContex
 };
 
 void Shader::render() {
+  // Activate the shader, as another shader might have been set to active
+  this->activate();
+
   // select which vertex buffer to display
   UINT stride = sizeof(vertex);
   UINT offset = 0;
