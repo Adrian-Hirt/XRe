@@ -4,8 +4,10 @@ class TestApp : public XReApplication {
 public:
   TestApp(const char *application_name) : XReApplication(application_name) {};
 
+  Shader shader = Shader(SHADERS_FOLDER "/triangle.hlsl", get_device(), get_device_context());
+
   void draw(XrCompositionLayerProjectionView &view) override {
-    std::cout << "Hello from Testapp" << std::endl;
+    shader.render(get_device_context());
   }
 };
 
