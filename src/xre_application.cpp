@@ -13,6 +13,9 @@ void XReApplication::run() {
   bool loop_running = true;
   bool xr_running = false;
 
+  // Call the setup mmethod
+  setup();
+
   // Main render loop
   while(loop_running) {
     // Poll the OpenXR events, and if OpenXR reports to still be running, keep going on
@@ -26,6 +29,10 @@ void XReApplication::run() {
       xre_open_xr_handler.render_frame(std::bind(&XReApplication::draw, this, std::placeholders::_1));
     }
   }
+}
+
+void XReApplication::setup() {
+  // Override this method to setup your scene etc.
 }
 
 void XReApplication::draw(XrCompositionLayerProjectionView &view) {

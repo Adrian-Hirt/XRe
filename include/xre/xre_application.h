@@ -15,6 +15,7 @@ public:
   ~XReApplication();
 
   void run();
+  virtual void setup();
   virtual void draw(XrCompositionLayerProjectionView &view);
 
   ID3D11Device* get_device();
