@@ -492,3 +492,11 @@ void XrOpenXrHandler::render_layer(XrTime predicted_time, std::vector<XrComposit
 	layer_projection.viewCount = (uint32_t)views.size();
 	layer_projection.views = views.data();
 }
+
+ID3D11Device* XrOpenXrHandler::get_device() {
+  return xr_dx11_handler.get_device();
+};
+
+ID3D11DeviceContext* XrOpenXrHandler::get_device_context() {
+  return xr_dx11_handler.get_device_context();
+};

@@ -36,6 +36,9 @@ public:
                     XrCompositionLayerProjection& layer_projection,
                     std::function<void(XrCompositionLayerProjectionView&)> draw_callback);
 
+  ID3D11Device* get_device();
+  ID3D11DeviceContext* get_device_context();
+
 private:
   // Configs
   const char *application_name;

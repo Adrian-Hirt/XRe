@@ -31,3 +31,11 @@ void XReApplication::run() {
 void XReApplication::draw(XrCompositionLayerProjectionView &view) {
   // Override this method to draw some stuff
 }
+
+ID3D11Device* XReApplication::get_device() {
+  return xre_open_xr_handler.get_device();
+};
+
+ID3D11DeviceContext* XReApplication::get_device_context() {
+  return xre_open_xr_handler.get_device_context();
+};

@@ -16,6 +16,9 @@ public:
   void run();
   virtual void draw(XrCompositionLayerProjectionView &view);
 
+  ID3D11Device* get_device();
+  ID3D11DeviceContext* get_device_context();
+
 private:
   XrOpenXrHandler xre_open_xr_handler;
 };
