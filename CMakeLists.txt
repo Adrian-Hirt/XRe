@@ -12,6 +12,9 @@ FILE(GLOB SRCFILES src/*)
 
 add_executable(${PROJECT_NAME} ${SRCFILES} main.cpp)
 
+set(SHADERS_FOLDER "\"${CMAKE_CURRENT_SOURCE_DIR}/shaders\"" STRING "")
+target_compile_definitions(${PROJECT_NAME} PUBLIC SHADERS_FOLDER=${SHADERS_FOLDER})
+
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include)
 target_link_libraries(${PROJECT_NAME} PUBLIC
   ${OPENXR}

@@ -2,6 +2,7 @@
 
 // XRe includes
 #include <xre/utils.h>
+#include <xre/shader.h>
 #include <xre/xre_openxr_handler.h>
 
 // Other includes
