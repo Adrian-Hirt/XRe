@@ -18,6 +18,8 @@ public:
   void setVertexData(vertex vertex_data[], size_t vertex_data_size);
   void cleanUp();
 
+  void updateConstantBuffer();
+
 private:
   // Shader objects
   ID3D11VertexShader *vertex_shader;
@@ -35,4 +37,8 @@ private:
 
   // Keep track of the currently activated shader
   inline static Shader *current_active_shader = NULL;
+
+  // Constant buffer pointer & the constant buffer itself
+  ID3D11Buffer *p_const_buffer;
+  const_buffer_t const_buffer;
 };

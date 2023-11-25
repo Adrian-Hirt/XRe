@@ -26,3 +26,10 @@ struct vertex {
   float x, y, z;
   DirectX::XMFLOAT4 color;
 };
+
+typedef struct const_buffer_t {
+  DirectX::XMMATRIX model;
+  DirectX::XMMATRIX view_projection;
+  DirectX::XMMATRIX normal_rotation;
+  DirectX::XMFLOAT4 color;
+} const_buffer_t;

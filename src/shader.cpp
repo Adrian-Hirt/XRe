@@ -52,6 +52,34 @@ Shader::Shader(const char *shader_path, ID3D11Device *device, ID3D11DeviceContex
 
   // Set input layout
   device_context->IASetInputLayout(input_layout);
+
+  // Create constant buffers for our shaders
+  D3D11_BUFFER_DESC const_buffer_desc;
+  ZeroMemory(&const_buffer_desc, sizeof(const_buffer_desc));
+
+  // Setup the const buffer description. Our constant buffer will have 3 4x4 float matrices (model, view_projection & normal_rotation
+  // matrix) and one 4-float value (color). 1 Float is 4 bytes, i.e. we have 3 (Matrices) * 16 (Values per matrix) * 4 (Bytes per value)
+  // + 4 * 4 (for the 4 float vect) = 208 bytes
+  const_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
+  const_buffer_desc.ByteWidth = 208;
+  const_buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+  HRESULT result;
+
+  result = device->CreateBuffer(&const_buffer_desc, NULL, &p_const_buffer);
+  check_hresult(result, "Could not create the const buffer");
+
+  // Initialize the constant buffer values to use identity matrices for all values.
+  // This allows us to use the shader directly, without having to manually set the
+  // values before rendering.
+  // device_context->VSSetConstantBuffers(0, 1, &p_const_buffer);
+  const_buffer.model = DirectX::XMMatrixIdentity();
+  const_buffer.view_projection = DirectX::XMMatrixIdentity();
+  const_buffer.normal_rotation = DirectX::XMMatrixIdentity();
+  const_buffer.color = {0.2f, 0.2f, 0.2f, 0.3f};
+
+  // Send the values to the const buffer
+  updateConstantBuffer();
 };
 
 void Shader::render() {
@@ -81,6 +109,9 @@ void Shader::activate() {
   this->device_context->VSSetShader(vertex_shader, 0, 0);
   this->device_context->PSSetShader(pixel_shader, 0, 0);
 
+  // Also make sure we're using the correct shader
+  this->device_context->VSSetConstantBuffers(0, 1, &p_const_buffer);
+
   // And keep track of current set shader
   Shader::current_active_shader = this;
 }
@@ -102,7 +133,12 @@ void Shader::setVertexData(vertex vertex_data[], size_t vertex_data_size) {
   device_context->Unmap(vertex_buffer, 0);                                // unmap the buffer
 }
 
+void Shader::updateConstantBuffer() {
+  device_context->UpdateSubresource(p_const_buffer, 0, 0, &const_buffer, 0, 0);
+}
+
 void Shader::cleanUp() {
+  p_const_buffer->Release();
   input_layout->Release();
   vertex_shader->Release();
   pixel_shader->Release();

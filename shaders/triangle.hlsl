@@ -3,10 +3,20 @@ struct VOut {
   float4 color : COLOR;
 };
 
+cbuffer ConstantBuffer{
+  float4x4 model;
+  float4x4 view_projection;
+  float4x4 rotation;
+  float4 mesh_color;
+};
+
 VOut VShader(float4 position : POSITION, float4 color : COLOR) {
   VOut output;
 
-  output.position = position;
+  // Calculate the position
+  output.position = mul(mul(position, model), view_projection);
+
+  // TODO: compute color based on normal vectors
   output.color = color;
 
   return output;
