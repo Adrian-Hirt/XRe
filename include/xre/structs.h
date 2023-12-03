@@ -22,10 +22,10 @@ struct swapchain_t {
   std::vector<swapchain_data_t> swapchain_data;
 };
 
-struct vertex {
+typedef struct vertex {
   float x, y, z;
   DirectX::XMFLOAT4 color;
-};
+} vertex;
 
 typedef struct const_buffer_t {
   DirectX::XMMATRIX model;

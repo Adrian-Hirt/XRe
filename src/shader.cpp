@@ -82,22 +82,6 @@ Shader::Shader(const char *shader_path, ID3D11Device *device, ID3D11DeviceContex
   updateConstantBuffer();
 };
 
-void Shader::render() {
-  // Activate the shader, as another shader might have been set to active
-  this->activate();
-
-  // select which vertex buffer to display
-  UINT stride = sizeof(vertex);
-  UINT offset = 0;
-  this->device_context->IASetVertexBuffers(0, 1, &vertex_buffer, &stride, &offset);
-
-  // select which primtive type we are using
-  this->device_context->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-  // draw the vertex buffer to the back buffer
-  this->device_context->Draw(3, 0);
-}
-
 void Shader::activate() {
   // Set both shaders to be active but only if the current
   // active shader is not already the present one
@@ -116,23 +100,6 @@ void Shader::activate() {
   Shader::current_active_shader = this;
 }
 
-void Shader::setVertexData(vertex vertex_data[], size_t vertex_data_size) {
-  D3D11_BUFFER_DESC bd;
-  ZeroMemory(&bd, sizeof(bd));
-
-  bd.Usage = D3D11_USAGE_DYNAMIC;             // write access access by CPU and read access by GPU
-  bd.ByteWidth = vertex_data_size;            // Size of the buffer we want to allocate
-  bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;    // use as a vertex buffer
-  bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE; // allow CPU to write in buffer
-
-  device->CreateBuffer(&bd, NULL, &vertex_buffer); // create the buffer
-
-  D3D11_MAPPED_SUBRESOURCE ms;
-  device_context->Map(vertex_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms); // map the buffer
-  memcpy(ms.pData, vertex_data, vertex_data_size);                        // copy the data
-  device_context->Unmap(vertex_buffer, 0);                                // unmap the buffer
-}
-
 void Shader::updateConstantBuffer() {
   device_context->UpdateSubresource(p_const_buffer, 0, 0, &const_buffer, 0, 0);
 }
@@ -142,5 +109,4 @@ void Shader::cleanUp() {
   input_layout->Release();
   vertex_shader->Release();
   pixel_shader->Release();
-  vertex_buffer->Release();
 }
