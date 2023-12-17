@@ -1,8 +1,11 @@
 #include <xre/application.h>
 
 Application::Application(const char *application_name) {
-  // create the handler
+  // create the XR handler
   open_xr_handler = OpenXrHandler(application_name);
+
+  // Create the model factory
+  model_factory = ModelFactory(getDevice(), getDeviceContext());
 };
 
 Application::~Application() {

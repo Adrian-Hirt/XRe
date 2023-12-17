@@ -7,6 +7,7 @@
 #include <xre/mesh.h>
 #include <xre/model.h>
 #include <xre/openxr_handler.h>
+#include <xre/model_factory.h>
 
 // Other includes
 #include <iostream>
@@ -23,6 +24,8 @@ public:
 
   ID3D11Device* getDevice();
   ID3D11DeviceContext* getDeviceContext();
+
+  ModelFactory model_factory;
 
 private:
   OpenXrHandler open_xr_handler;
