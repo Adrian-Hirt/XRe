@@ -46,7 +46,7 @@ public:
 
     // Compute the viewProjectionMatrix as well as the model matrix
     // and send them to the GPU
-    shader.setViewProjectionMatrix(computeViewProjectionMatrix(view));
+    shader.setViewProjectionMatrix(Geometry::computeViewProjectionMatrix(view));
     shader.setModelMatrix(cube_model.getTransformationMatrix());
     shader.updateConstantBuffer();
 

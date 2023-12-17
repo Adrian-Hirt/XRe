@@ -12,22 +12,22 @@ Shader::Shader(const char *shader_path, ID3D11Device *device, ID3D11DeviceContex
   this->device = device;
   this->device_context = device_context;
 
-  std::string obj_location = getFileLocation(shader_path);
-  std::wstring w_obj_location = stringToWString(obj_location);
+  std::string obj_location = Utils::getFileLocation(shader_path);
+  std::wstring w_obj_location = Utils::stringToWString(obj_location);
 
   // Load and compile the pixel and vertex shaders
   ID3D10Blob *vertex_shader_blob, *pixel_shader_blob, *errors_blob;
   D3DCompileFromFile(w_obj_location.c_str(), 0, 0, "VShader", "vs_4_0", D3DCOMPILE_OPTIMIZATION_LEVEL3, 0, &vertex_shader_blob, &errors_blob);
   if (errors_blob) {
     std::cout << reinterpret_cast<const char *>(errors_blob->GetBufferPointer()) << std::endl;
-    exitWithMessage("The vertex shader failed to compile.");
+    Utils::exitWithMessage("The vertex shader failed to compile.");
   }
 
   D3DCompileFromFile(w_obj_location.c_str(), 0, 0, "PShader", "ps_4_0", D3DCOMPILE_OPTIMIZATION_LEVEL3, 0, &pixel_shader_blob, &errors_blob);
 
   if (errors_blob) {
     std::cout << reinterpret_cast<const char *>(errors_blob->GetBufferPointer()) << std::endl;
-    exitWithMessage("The pixel shader failed to compile.");
+    Utils::exitWithMessage("The pixel shader failed to compile.");
   }
 
   // Encapsulate both shaders into shader objects
@@ -67,7 +67,7 @@ Shader::Shader(const char *shader_path, ID3D11Device *device, ID3D11DeviceContex
   HRESULT result;
 
   result = device->CreateBuffer(&const_buffer_desc, NULL, &p_const_buffer);
-  checkHresult(result, "Could not create the const buffer");
+  Utils::checkHresult(result, "Could not create the const buffer");
 
   // Initialize the constant buffer values to use identity matrices for all values.
   // This allows us to use the shader directly, without having to manually set the

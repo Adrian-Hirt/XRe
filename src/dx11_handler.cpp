@@ -11,7 +11,7 @@ Dx11Handler::Dx11Handler() {};
 Dx11Handler::Dx11Handler(LUID &adapter_luid) {
   // Initialize the D3D11 device
   bool device_initialized = initializeDevice(adapter_luid);
-  checkBoolResult(device_initialized, "Could not initialize the D3D11 device!");
+  Utils::checkBoolResult(device_initialized, "Could not initialize the D3D11 device!");
 };
 
 //------------------------------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ bool Dx11Handler::initializeDevice(LUID &adapter_luid) {
 //------------------------------------------------------------------------------------------------------
 ID3D11Device* Dx11Handler::getDevice() {
   if (this->device == nullptr) {
-    exitWithMessage("You need to initialize the Dx11Handler with a LUID to be able to access the device");
+    Utils::exitWithMessage("You need to initialize the Dx11Handler with a LUID to be able to access the device");
     return NULL;
   }
   else {
@@ -97,7 +97,7 @@ ID3D11Device* Dx11Handler::getDevice() {
 //------------------------------------------------------------------------------------------------------
 ID3D11DeviceContext *Dx11Handler::getDeviceContext() {
   if (this->device_context == nullptr) {
-    exitWithMessage("You need to initialize the Dx11Handler with a LUID to be able to access the device");
+    Utils::exitWithMessage("You need to initialize the Dx11Handler with a LUID to be able to access the device");
     return NULL;
   }
   else {
@@ -128,7 +128,7 @@ swapchain_data_t Dx11Handler::createRenderTargets(ID3D11Texture2D &texture) {
   render_target_view_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
   render_target_view_desc.Format = d3d11_swapchain_format;
   result = device->CreateRenderTargetView(&texture, &render_target_view_desc, &result_target.back_buffer);
-  checkHresult(result, "Could not create the render target view");
+  Utils::checkHresult(result, "Could not create the render target view");
 
   //----------------------------------------------------------------------------------
   // Create a matching depth buffer (z-buffer)
@@ -152,14 +152,14 @@ swapchain_data_t Dx11Handler::createRenderTargets(ID3D11Texture2D &texture) {
   // Create the depth buffer texture object
   ID3D11Texture2D *depth_buffer;
   result = device->CreateTexture2D(&depth_buffer_desc, NULL, &depth_buffer);
-  checkHresult(result, "Could not create the texture 2d");
+  Utils::checkHresult(result, "Could not create the texture 2d");
 
   // Then use that depth buffer texture object to finally create the depth buffer itself
   D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc = {};
   depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
   depth_stencil_view_desc.Format = DXGI_FORMAT_D32_FLOAT; // Data format for the depth buffer itself is float
   result = device->CreateDepthStencilView(depth_buffer, &depth_stencil_view_desc, &result_target.depth_buffer);
-  checkHresult(result, "Could not create the depth stencil view");
+  Utils::checkHresult(result, "Could not create the depth stencil view");
 
   // We don't need the ID3D11Texture2D object anymore. As it's a COM object, it should be freed by calling
   // Release() on it

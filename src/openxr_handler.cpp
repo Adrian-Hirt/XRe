@@ -17,13 +17,13 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
   result = initializeOpenxr();
 
   // Check if we were successful in creating the openxr system.
-  checkBoolResult(result, "Initializing OpenXR failed!");
+  Utils::checkBoolResult(result, "Initializing OpenXR failed!");
 
   // Instruct the handler to initialize the xr actions
   result = initializeOpenxrActions();
 
   // Check if we were successful in creating the openxr actions.
-  checkBoolResult(result, "Initializing the OpenXR actions failed!");
+  Utils::checkBoolResult(result, "Initializing the OpenXR actions failed!");
 };
 
 //------------------------------------------------------------------------------------------------------
@@ -292,14 +292,14 @@ void OpenXrHandler::pollOpenxrEvents(bool &loop_running, bool &xr_running) {
 					// Start the session. If the call was successful, set the xr_running flag
 					// to true
 					result = xrBeginSession(openxr_session, &session_begin_info);
-          checkXrResult(result, "Couldn't begin the XR session.");
+          Utils::checkXrResult(result, "Couldn't begin the XR session.");
           xr_running = true;
 					break;
         }
         case XR_SESSION_STATE_STOPPING: {
           // In STOPPING state, i.e. we need to end the session
           result = xrEndSession(openxr_session);
-          checkXrResult(result, "Couldn't end the XR session.");
+          Utils::checkXrResult(result, "Couldn't end the XR session.");
           xr_running = false;
           break;
         }
@@ -427,7 +427,7 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 	// the pose of the view, as well as the fov for that view. We'll use these two later to render with D3D11,
 	// as we need to modify the objects and the view before rendering.
 	result = xrLocateViews(openxr_session, &view_locate_info, &view_state, (uint32_t)openxr_views.size(), &view_count, openxr_views.data());
-	checkXrResult(result, "Could not locate views!");
+	Utils::checkXrResult(result, "Could not locate views!");
 	views.resize(view_count);
 
 	//------------------------------------------------------------------------------------------------------
@@ -443,7 +443,7 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 		XrSwapchainImageAcquireInfo swapchain_acquire_info = {};
 		swapchain_acquire_info.type = XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO;
 		result = xrAcquireSwapchainImage(swapchains[i].handle, &swapchain_acquire_info, &swapchain_image_id);
-		checkXrResult(result, "Could not acquire swapchain image");
+		Utils::checkXrResult(result, "Could not acquire swapchain image");
 
 		// We need to wait until the swapchain image is available for writing, as the compositor
 		// could still be reading from it (writing while the compositor is still reading could
@@ -454,7 +454,7 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 		swapchain_wait_info.type = XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO;
 		swapchain_wait_info.timeout = XR_INFINITE_DURATION;
 		result = xrWaitSwapchainImage(swapchains[i].handle, &swapchain_wait_info);
-		checkXrResult(result, "Could not wait for the swapchain image");
+		Utils::checkXrResult(result, "Could not wait for the swapchain image");
 
 		// Setup the info we need to render the layer for the current view. The XrCompositionLayerProjectionView
 		// is a projection layer element, which has the pose of the current view (pose = location and orientation),
@@ -480,7 +480,7 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 		XrSwapchainImageReleaseInfo swapchain_release_info = {};
 		swapchain_release_info.type = XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO;
 		result = xrReleaseSwapchainImage(swapchains[i].handle, &swapchain_release_info);
-		checkXrResult(result, "Could not release the swapchain image");
+		Utils::checkXrResult(result, "Could not release the swapchain image");
 	}
 
 	//------------------------------------------------------------------------------------------------------

@@ -37,7 +37,7 @@ Mesh::Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vecto
   // Create the buffer and copy the vertices into it
   D3D11_SUBRESOURCE_DATA vertex_buffer_data = { vertices.data() };
   result = device->CreateBuffer(&buffer_desc, &vertex_buffer_data, &vertex_buffer);
-  checkHresult(result, "Could not create the vertex buffer!");
+  Utils::checkHresult(result, "Could not create the vertex buffer!");
 
   // Similarly, set up the indices buffer
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
@@ -50,7 +50,7 @@ Mesh::Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vecto
   // Create the buffer and copy the indices into it
   D3D11_SUBRESOURCE_DATA index_buffer_data = { indices.data() };
   result = device->CreateBuffer(&buffer_desc, &index_buffer_data, &index_buffer);
-  checkHresult(result, "Could not create the vertex buffer!");
+  Utils::checkHresult(result, "Could not create the vertex buffer!");
 }
 
 void Mesh::render() {
