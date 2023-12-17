@@ -37,3 +37,17 @@ Model ModelFactory::createCube(DirectX::XMFLOAT4 color) {
   Mesh cube_mesh = Mesh(this->device, this->device_context, cube_vertices, cube_indices);
   return Model(this->device, this->device_context, { cube_mesh });
 };
+
+Model ModelFactory::createGround(float extent) {
+  std::vector<vertex> vertices = {
+    { -extent, 0.0f, -extent, DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f)},
+    { -extent, 0.0f,  extent, DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f)},
+    {  extent, 0.0f,  extent, DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f)},
+    {  extent, 0.0f, -extent, DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f)}
+  };
+
+  std::vector<unsigned int> indices = {0, 2, 1, 0, 3, 2};
+
+  Mesh ground_mesh = Mesh(this->device, this->device_context, vertices, indices);
+  return Model(this->device, this->device_context, { ground_mesh });
+};
