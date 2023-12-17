@@ -61,9 +61,11 @@ public:
   }
 
   void draw(XrCompositionLayerProjectionView &view) override {
+    // Compute the viewProjectionMatrix and send it to the GPU
     shader.setViewProjectionMatrix(computeViewProjectionMatrix(view));
     shader.updateConstantBuffer();
 
+    // Render the cube model
     cube.render();
   }
 };
