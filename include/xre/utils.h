@@ -68,5 +68,3 @@ inline std::wstring stringToWString(std::string string) {
   MultiByteToWideChar(CP_UTF8, 0, string.c_str(), -1, &result[0], string_size_needed);
   return result;
 }
-
-

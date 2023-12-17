@@ -30,7 +30,7 @@ Mesh::Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vecto
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
 
   buffer_desc.Usage = D3D11_USAGE_DYNAMIC;                    // write access access by CPU and read access by GPU
-  buffer_desc.ByteWidth = sizeof(vertices) * vertices.size(); // Size of the buffer we want to allocate
+  buffer_desc.ByteWidth = sizeof(vertex) * vertices.size(); // Size of the buffer we want to allocate
   buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;           // use as a vertex buffer
   buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;        // allow CPU to write in buffer
 
@@ -48,7 +48,7 @@ Mesh::Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vecto
   buffer_desc.MiscFlags = 0;
 
   // Create the buffer and copy the indices into it
-  D3D11_SUBRESOURCE_DATA index_buffer_data = {indices.data()};
+  D3D11_SUBRESOURCE_DATA index_buffer_data = { indices.data() };
   result = device->CreateBuffer(&buffer_desc, &index_buffer_data, &index_buffer);
   check_hresult(result, "Could not create the vertex buffer!");
 }

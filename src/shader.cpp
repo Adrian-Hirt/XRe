@@ -110,3 +110,7 @@ void Shader::cleanUp() {
   vertex_shader->Release();
   pixel_shader->Release();
 }
+
+void Shader::setViewProjectionMatrix(DirectX::XMMATRIX view_projection) {
+  const_buffer.view_projection = view_projection;
+}

@@ -17,6 +17,8 @@ public:
   void cleanUp();
   void updateConstantBuffer();
 
+  void setViewProjectionMatrix(DirectX::XMMATRIX view_projection);
+
 private:
   // Shader objects
   ID3D11VertexShader *vertex_shader;
