@@ -101,7 +101,7 @@ bool XrOpenXrHandler::initialize_openxr() {
 	// Create a binding for the D3D11 device
 	XrGraphicsBindingD3D11KHR graphics_binding = {};
 	graphics_binding.type = XR_TYPE_GRAPHICS_BINDING_D3D11_KHR;
-	graphics_binding.device = dx11_handler.get_device();
+	graphics_binding.device = dx11_handler.getDevice();
 
 	// Create the session info struct
 	XrSessionCreateInfo session_create_info = {};
@@ -233,7 +233,7 @@ bool XrOpenXrHandler::initialize_openxr() {
     // We also directly release the texture object, as we don't need it anymore after we created the
     // render target with it
     for (uint32_t i = 0; i < swapchain_image_count; i++) {
-        swapchain.swapchain_data[i] = dx11_handler.create_render_targets(*swapchain_images[i].texture);
+        swapchain.swapchain_data[i] = dx11_handler.createRenderTargets(*swapchain_images[i].texture);
         swapchain_images[i].texture->Release();
     }
 
@@ -471,7 +471,7 @@ void XrOpenXrHandler::render_layer(XrTime predicted_time, std::vector<XrComposit
 		views[i].subImage.imageRect.extent = { swapchains[i].width, swapchains[i].height };
 
 		// Render the content to the swapchain, which is done by the D3D11 handler
-		dx11_handler.render_frame(views[i], swapchains[i].swapchain_data[swapchain_image_id], draw_callback);
+		dx11_handler.renderFrame(views[i], swapchains[i].swapchain_data[swapchain_image_id], draw_callback);
 
 		// We're done rendering for the current view, so we can release the swapchain image (i.e. tell
 		// the OpenXR runtime that we're done with this swapchain image).
@@ -494,9 +494,9 @@ void XrOpenXrHandler::render_layer(XrTime predicted_time, std::vector<XrComposit
 }
 
 ID3D11Device* XrOpenXrHandler::get_device() {
-  return dx11_handler.get_device();
+  return dx11_handler.getDevice();
 };
 
 ID3D11DeviceContext* XrOpenXrHandler::get_device_context() {
-  return dx11_handler.get_device_context();
+  return dx11_handler.getDeviceContext();
 };

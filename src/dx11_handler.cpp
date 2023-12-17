@@ -10,14 +10,14 @@ Dx11Handler::Dx11Handler() {};
 //------------------------------------------------------------------------------------------------------
 Dx11Handler::Dx11Handler(LUID &adapter_luid) {
   // Initialize the D3D11 device
-  bool device_initialized = initialize_device(adapter_luid);
+  bool device_initialized = initializeDevice(adapter_luid);
   check_bool_result(device_initialized, "Could not initialize the D3D11 device!");
 };
 
 //------------------------------------------------------------------------------------------------------
 // Initialize the D3D11 device
 //------------------------------------------------------------------------------------------------------
-bool Dx11Handler::initialize_device(LUID &adapter_luid) {
+bool Dx11Handler::initializeDevice(LUID &adapter_luid) {
   HRESULT result;
   IDXGIFactory1 *dxgi_factory;
 
@@ -82,7 +82,7 @@ bool Dx11Handler::initialize_device(LUID &adapter_luid) {
 //------------------------------------------------------------------------------------------------------
 // Returns the DirectX Device
 //------------------------------------------------------------------------------------------------------
-ID3D11Device* Dx11Handler::get_device() {
+ID3D11Device* Dx11Handler::getDevice() {
   if (this->device == nullptr) {
     exit_with_message("You need to initialize the Dx11Handler with a LUID to be able to access the device");
     return NULL;
@@ -95,7 +95,7 @@ ID3D11Device* Dx11Handler::get_device() {
 //------------------------------------------------------------------------------------------------------
 // Returns the DirectX DeviceContext
 //------------------------------------------------------------------------------------------------------
-ID3D11DeviceContext *Dx11Handler::get_device_context() {
+ID3D11DeviceContext *Dx11Handler::getDeviceContext() {
   if (this->device_context == nullptr) {
     exit_with_message("You need to initialize the Dx11Handler with a LUID to be able to access the device");
     return NULL;
@@ -110,7 +110,7 @@ ID3D11DeviceContext *Dx11Handler::get_device_context() {
 // image information) as well as the matching z-buffer (which stores the depth-information of the
 // scene to render)
 //------------------------------------------------------------------------------------------------------
-swapchain_data_t Dx11Handler::create_render_targets(ID3D11Texture2D &texture) {
+swapchain_data_t Dx11Handler::createRenderTargets(ID3D11Texture2D &texture) {
   swapchain_data_t result_target = {};
   HRESULT result;
 
@@ -172,7 +172,7 @@ swapchain_data_t Dx11Handler::create_render_targets(ID3D11Texture2D &texture) {
 //------------------------------------------------------------------------------------------------------
 // Render a frame
 //------------------------------------------------------------------------------------------------------
-void Dx11Handler::render_frame(XrCompositionLayerProjectionView& view,
+void Dx11Handler::renderFrame(XrCompositionLayerProjectionView& view,
                                   swapchain_data_t& swapchain_data,
                                   std::function<void(XrCompositionLayerProjectionView&)> draw_callback) {
   //----------------------------------------------------------------------------------
