@@ -6,6 +6,8 @@
 // XRe includes
 #include <xre/utils.h>
 #include <xre/structs.h>
+#include <xre/shader.h>
+#include <xre/geometry.h>
 
 // Other includes
 #include <functional>

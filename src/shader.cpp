@@ -93,7 +93,7 @@ void Shader::activate() {
   this->device_context->VSSetShader(vertex_shader, 0, 0);
   this->device_context->PSSetShader(pixel_shader, 0, 0);
 
-  // Also make sure we're using the correct shader
+  // Also make sure we're using the correct constant buffer
   this->device_context->VSSetConstantBuffers(0, 1, &p_const_buffer);
 
   // And keep track of current set shader
@@ -101,6 +101,9 @@ void Shader::activate() {
 }
 
 void Shader::updateConstantBuffer() {
+  // Update the constant buffer with the viewProjection matrix
+  const_buffer.view_projection = view_projection;
+
   device_context->UpdateSubresource(p_const_buffer, 0, 0, &const_buffer, 0, 0);
 }
 
@@ -112,7 +115,9 @@ void Shader::cleanUp() {
 }
 
 void Shader::setViewProjectionMatrix(DirectX::XMMATRIX view_projection) {
-  const_buffer.view_projection = view_projection;
+  // Update the view_projection static variable, as this
+  // is shared between all shaders
+  Shader::view_projection = view_projection;
 }
 
 void Shader::setModelMatrix(DirectX::XMMATRIX model_matrix) {

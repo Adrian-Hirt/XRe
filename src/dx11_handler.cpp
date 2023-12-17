@@ -216,6 +216,13 @@ void Dx11Handler::renderFrame(XrCompositionLayerProjectionView& view,
 	device_context->OMSetRenderTargets(1, &swapchain_data.back_buffer, swapchain_data.depth_buffer);
 
   //----------------------------------------------------------------------------------
+	// Update the shader constant buffers
+	//----------------------------------------------------------------------------------
+  // Compute the viewProjectionMatrix as well as the model matrix
+  // and send them to the GPU
+  Shader::setViewProjectionMatrix(Geometry::computeViewProjectionMatrix(view));
+
+  //----------------------------------------------------------------------------------
 	// Draw the scene
 	//----------------------------------------------------------------------------------
   draw_callback(view);

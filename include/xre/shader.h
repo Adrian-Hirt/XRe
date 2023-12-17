@@ -17,7 +17,7 @@ public:
   void cleanUp();
   void updateConstantBuffer();
 
-  void setViewProjectionMatrix(DirectX::XMMATRIX view_projection);
+  static void setViewProjectionMatrix(DirectX::XMMATRIX view_projection);
   void setModelMatrix(DirectX::XMMATRIX model_matrix);
 
   inline static Shader* getCurrentActiveShader() { return current_active_shader; };
@@ -36,6 +36,10 @@ private:
 
   // Keep track of the currently activated shader
   inline static Shader *current_active_shader = NULL;
+
+  // Keep track of the current ViewProjection matrix, which
+  // is shared between all shaders
+  inline static DirectX::XMMATRIX view_projection = DirectX::XMMatrixIdentity();
 
   // Constant buffer pointer & the constant buffer itself
   ID3D11Buffer *p_const_buffer;
