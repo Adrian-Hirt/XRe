@@ -18,6 +18,7 @@ public:
   void updateConstantBuffer();
 
   void setViewProjectionMatrix(DirectX::XMMATRIX view_projection);
+  void setModelMatrix(DirectX::XMMATRIX model_matrix);
 
 private:
   // Shader objects

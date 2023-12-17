@@ -114,3 +114,7 @@ void Shader::cleanUp() {
 void Shader::setViewProjectionMatrix(DirectX::XMMATRIX view_projection) {
   const_buffer.view_projection = view_projection;
 }
+
+void Shader::setModelMatrix(DirectX::XMMATRIX model_matrix) {
+  const_buffer.model = model_matrix;
+}
