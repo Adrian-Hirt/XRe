@@ -5,6 +5,7 @@
 #include <xre/geometry.h>
 #include <xre/shader.h>
 #include <xre/mesh.h>
+#include <xre/model.h>
 #include <xre/xre_openxr_handler.h>
 
 // Other includes

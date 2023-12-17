@@ -5,7 +5,7 @@ public:
   TestApp(const char *application_name) : XReApplication(application_name) {};
 
   Shader shader = Shader(SHADERS_FOLDER "/triangle.hlsl", get_device(), get_device_context());
-  Mesh cube;
+  Model cube_model;
 
   void setup() override {
     shader.activate();
@@ -57,16 +57,22 @@ public:
       23, 21, 20
     };
 
-    cube = Mesh(get_device(), get_device_context(), cube_vertices, cube_indices);
+    Mesh cube_mesh = Mesh(get_device(), get_device_context(), cube_vertices, cube_indices);
+    cube_model = Model(get_device(), get_device_context(), { cube_mesh });
   }
 
   void draw(XrCompositionLayerProjectionView &view) override {
-    // Compute the viewProjectionMatrix and send it to the GPU
+    // Rotate the cube
+    cube_model.rotate(0.0f, 0.0f, 0.01f);
+
+    // Compute the viewProjectionMatrix as well as the model matrix
+    // and send them to the GPU
     shader.setViewProjectionMatrix(computeViewProjectionMatrix(view));
+    shader.setModelMatrix(cube_model.getTransformationMatrix());
     shader.updateConstantBuffer();
 
     // Render the cube model
-    cube.render();
+    cube_model.render();
   }
 };
 
