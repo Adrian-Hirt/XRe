@@ -1,10 +1,10 @@
-#include <xre/xre_application.h>
+#include <xre/application.h>
 
-class TestApp : public XReApplication {
+class TestApp : public Application {
 public:
-  TestApp(const char *application_name) : XReApplication(application_name) {};
+  TestApp(const char *application_name) : Application(application_name) {};
 
-  Shader shader = Shader(SHADERS_FOLDER "/triangle.hlsl", get_device(), get_device_context());
+  Shader shader = Shader(SHADERS_FOLDER "/triangle.hlsl", getDevice(), getDeviceContext());
   Model cube_model;
 
   void setup() override {
@@ -57,8 +57,8 @@ public:
       23, 21, 20
     };
 
-    Mesh cube_mesh = Mesh(get_device(), get_device_context(), cube_vertices, cube_indices);
-    cube_model = Model(get_device(), get_device_context(), { cube_mesh });
+    Mesh cube_mesh = Mesh(getDevice(), getDeviceContext(), cube_vertices, cube_indices);
+    cube_model = Model(getDevice(), getDeviceContext(), { cube_mesh });
   }
 
   void draw(XrCompositionLayerProjectionView &view) override {

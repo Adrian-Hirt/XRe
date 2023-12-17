@@ -6,24 +6,24 @@
 #include <xre/shader.h>
 #include <xre/mesh.h>
 #include <xre/model.h>
-#include <xre/xre_openxr_handler.h>
+#include <xre/openxr_handler.h>
 
 // Other includes
 #include <iostream>
 #include <functional>
 
-class XReApplication {
+class Application {
 public:
-  XReApplication(const char *application_name);
-  ~XReApplication();
+  Application(const char *application_name);
+  ~Application();
 
   void run();
   virtual void setup();
   virtual void draw(XrCompositionLayerProjectionView &view);
 
-  ID3D11Device* get_device();
-  ID3D11DeviceContext* get_device_context();
+  ID3D11Device* getDevice();
+  ID3D11DeviceContext* getDeviceContext();
 
 private:
-  XrOpenXrHandler xre_open_xr_handler;
+  OpenXrHandler open_xr_handler;
 };
