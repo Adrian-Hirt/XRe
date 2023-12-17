@@ -16,7 +16,7 @@
 // XRe includes
 #include <xre/utils.h>
 #include <xre/structs.h>
-#include <xre/xre_dx11_handler.h>
+#include <xre/dx11_handler.h>
 
 // Other includes
 #include <iostream>
@@ -61,7 +61,7 @@ private:
   PFN_xrGetD3D11GraphicsRequirementsKHR ext_xrGetD3D11GraphicsRequirementsKHR;
 
   // Handlers
-  XreDx11Handler xr_dx11_handler;
+  Dx11Handler dx11_handler;
 
   // Methods
   bool initialize_openxr();
