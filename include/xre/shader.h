@@ -20,6 +20,8 @@ public:
   void setViewProjectionMatrix(DirectX::XMMATRIX view_projection);
   void setModelMatrix(DirectX::XMMATRIX model_matrix);
 
+  inline static Shader* getCurrentActiveShader() { return current_active_shader; };
+
 private:
   // Shader objects
   ID3D11VertexShader *vertex_shader;

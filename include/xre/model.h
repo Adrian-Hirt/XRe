@@ -19,7 +19,7 @@ public:
   // Two different rendering methods, one where the user can pass in
   // a shader to use for this model
   void render();
-  void render(Shader shader);
+  void render(Shader *shader);
 
   DirectX::XMMATRIX getTransformationMatrix();
 

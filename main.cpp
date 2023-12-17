@@ -25,15 +25,17 @@ public:
 
     // Compute the viewProjectionMatrix as well as the model matrix
     // and send them to the GPU
+    // TODO: this should probably happen before the draw method in
+    // the openxr handler, and set a static value in the shader class
+    // which is shader among the shaders.
     shader.setViewProjectionMatrix(Geometry::computeViewProjectionMatrix(view));
-    shader.setModelMatrix(cube_model.getTransformationMatrix());
     shader.updateConstantBuffer();
 
     // Render the cube model
     cube_model.render();
 
     // Render the ground
-    // ground.render();
+    ground.render();
   }
 };
 

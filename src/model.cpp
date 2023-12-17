@@ -19,19 +19,23 @@ Model::Model(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vec
 }
 
 void Model::render() {
-  // TODO: update shader with position, scaling & rotation
+  // Get the current active shader
+  Shader* shader = Shader::getCurrentActiveShader();
+
+  render(shader);
+}
+
+void Model::render(Shader *shader) {
+  // Activate the shader
+  shader->activate();
+
+  // Update the shader with the model matrix
+  shader->setModelMatrix(getTransformationMatrix());
+  shader->updateConstantBuffer();
 
   for (Mesh &mesh : meshes) {
     mesh.render();
   }
-}
-
-void Model::render(Shader shader) {
-  // Activate the shader
-  shader.activate();
-
-  // Use the normal render function
-  render();
 }
 
 DirectX::XMMATRIX Model::getTransformationMatrix() {
