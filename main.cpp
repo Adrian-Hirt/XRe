@@ -11,35 +11,14 @@ public:
     shader.activate();
 
     std::vector<vertex> cube_vertices {
-      {-1.0f, -1.0f, 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-      {1.0f, -1.0f, 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-      {-1.0f, 1.0f, 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-      {1.0f, 1.0f, 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-
+      {-1.0f, -1.0f,  1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
+      { 1.0f, -1.0f,  1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
+      {-1.0f,  1.0f,  1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
+      { 1.0f,  1.0f,  1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
       {-1.0f, -1.0f, -1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-      {-1.0f, 1.0f, -1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-      {1.0f, -1.0f, -1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-      {1.0f, 1.0f, -1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-
-      {-1.0f, 1.0f, -1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-      {-1.0f, 1.0f, 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-      {1.0f, 1.0f, -1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-      {1.0f, 1.0f, 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-
-      {-1.0f, -1.0f, -1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-      {1.0f, -1.0f, -1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-      {-1.0f, -1.0f, 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-      {1.0f, -1.0f, 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-
-      {1.0f, -1.0f, -1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-      {1.0f, 1.0f, -1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-      {1.0f, -1.0f, 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-      {1.0f, 1.0f, 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-
-      {-1.0f, -1.0f, -1.0f, DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},
-      {-1.0f, -1.0f, 1.0f, DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)},
-      {-1.0f, 1.0f, -1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
-      {-1.0f, 1.0f, 1.0f, DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)}
+      {-1.0f,  1.0f, -1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
+      { 1.0f, -1.0f, -1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
+      { 1.0f,  1.0f, -1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
     };
 
     std::vector<unsigned int> cube_indices{
@@ -47,14 +26,14 @@ public:
       3, 1, 2,
       6, 5, 4,    // side 2
       7, 5, 6,
-      10, 9, 8,    // side 3
-      11, 9, 10,
-      14, 13, 12,    // side 4
-      15, 13, 14,
-      18, 17, 16,    // side 5
-      19, 17, 18,
-      20, 22, 23,    // side 6
-      23, 21, 20
+      7, 2, 5,    // side 3
+      3, 2, 7,
+      0, 6, 4,    // side 4
+      1, 6, 0,
+      1, 7, 6,    // side 5
+      3, 7, 1,
+      4, 5, 2,    // side 6
+      2, 0, 4
     };
 
     Mesh cube_mesh = Mesh(getDevice(), getDeviceContext(), cube_vertices, cube_indices);
