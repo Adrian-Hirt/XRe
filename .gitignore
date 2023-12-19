@@ -6,3 +6,6 @@ cmake-build-release
 # Editors
 .vscode
 .idea
+
+# Personal todo list
+TODO.md
