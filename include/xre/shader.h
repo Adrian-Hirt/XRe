@@ -19,6 +19,7 @@ public:
 
   static void setViewProjectionMatrix(DirectX::XMMATRIX view_projection);
   void setModelMatrix(DirectX::XMMATRIX model_matrix);
+  void setNormalRotationMatrix(DirectX::XMMATRIX rotation_matrix);
 
   inline static Shader* getCurrentActiveShader() { return current_active_shader; };
 

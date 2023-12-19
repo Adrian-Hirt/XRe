@@ -25,11 +25,14 @@ struct swapchain_t {
 typedef struct vertex {
   float x, y, z;
   DirectX::XMFLOAT4 color;
+  float xn, yn, zn;
 } vertex;
 
 typedef struct const_buffer_t {
   DirectX::XMMATRIX model;
   DirectX::XMMATRIX view_projection;
   DirectX::XMMATRIX normal_rotation;
-  DirectX::XMFLOAT4 color;
+  DirectX::XMFLOAT4 light_vector;
+  DirectX::XMFLOAT4 light_color;
+  DirectX::XMFLOAT4 ambient_color;
 } const_buffer_t;

@@ -31,6 +31,7 @@ void Model::render(Shader *shader) {
 
   // Update the shader with the model matrix
   shader->setModelMatrix(getTransformationMatrix());
+  shader->setNormalRotationMatrix(getRotationMatrix());
   shader->updateConstantBuffer();
 
   for (Mesh &mesh : meshes) {
@@ -45,6 +46,10 @@ DirectX::XMMATRIX Model::getTransformationMatrix() {
          rotation,
          translation));
 
+}
+
+DirectX::XMMATRIX Model::getRotationMatrix() {
+  return DirectX::XMMatrixRotationQuaternion(this->rotation);
 }
 
 void Model::rotate(float roll, float pitch, float yaw) {

@@ -4,7 +4,7 @@ class TestApp : public Application {
 public:
   TestApp(const char *application_name) : Application(application_name) {};
 
-  Shader shader = Shader(SHADERS_FOLDER "/triangle.hlsl", getDevice(), getDeviceContext());
+  Shader shader = Shader(SHADERS_FOLDER "/ambient.hlsl", getDevice(), getDeviceContext());
   Model cube_model = model_factory.createCube();
   Model ground = model_factory.createGround();
 

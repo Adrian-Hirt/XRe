@@ -39,16 +39,17 @@ Shader::Shader(const char *shader_path, ID3D11Device *device, ID3D11DeviceContex
   //  2. Semantic index (if we have multiple same semantics, e.g. multiple colors)
   //  3. Format of the data  (needs to match what we have in the data)
   //  4. Input slot, leave at 0 for now
-  //  5. Offset in bytes in the vertex data struct (may also use `D3D11_INPUT_ELEMENT_DESC` to align directly after previous element)
+  //  5. Offset in bytes in the vertex data struct (may also use `D3D11_APPEND_ALIGNED_ELEMENT` to align directly after previous element)
   //  6. Input slot class, the data we have is per vertex
   //  7. Mut be zero when using per vertex data
   D3D11_INPUT_ELEMENT_DESC input_element_description[] = {
     {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-    {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+    {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+    {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
   };
 
   // Create input layout
-  device->CreateInputLayout(input_element_description, 2, vertex_shader_blob->GetBufferPointer(), vertex_shader_blob->GetBufferSize(), &input_layout);
+  device->CreateInputLayout(input_element_description, 3, vertex_shader_blob->GetBufferPointer(), vertex_shader_blob->GetBufferSize(), &input_layout);
 
   // Set input layout
   device_context->IASetInputLayout(input_layout);
@@ -58,10 +59,10 @@ Shader::Shader(const char *shader_path, ID3D11Device *device, ID3D11DeviceContex
   ZeroMemory(&const_buffer_desc, sizeof(const_buffer_desc));
 
   // Setup the const buffer description. Our constant buffer will have 3 4x4 float matrices (model, view_projection & normal_rotation
-  // matrix) and one 4-float value (color). 1 Float is 4 bytes, i.e. we have 3 (Matrices) * 16 (Values per matrix) * 4 (Bytes per value)
-  // + 4 * 4 (for the 4 float vect) = 208 bytes
+  // matrix) and one 3-float values. 1 Float is 4 bytes, i.e. we have 3 (Matrices) * 16 (Values per matrix) * 4 (Bytes per value)
+  // + 3 (vectors) * 4 (values per vector) * 4 (Bytes per value) = 240 bytes
   const_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-  const_buffer_desc.ByteWidth = 208;
+  const_buffer_desc.ByteWidth = 240;
   const_buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
   HRESULT result;
@@ -69,14 +70,17 @@ Shader::Shader(const char *shader_path, ID3D11Device *device, ID3D11DeviceContex
   result = device->CreateBuffer(&const_buffer_desc, NULL, &p_const_buffer);
   Utils::checkHresult(result, "Could not create the const buffer");
 
-  // Initialize the constant buffer values to use identity matrices for all values.
+  // Initialize the constant buffer values to use identity matrices for all matrix values.
   // This allows us to use the shader directly, without having to manually set the
   // values before rendering.
-  // device_context->VSSetConstantBuffers(0, 1, &p_const_buffer);
   const_buffer.model = DirectX::XMMatrixIdentity();
   const_buffer.view_projection = DirectX::XMMatrixIdentity();
   const_buffer.normal_rotation = DirectX::XMMatrixIdentity();
-  const_buffer.color = {0.2f, 0.2f, 0.2f, 0.3f};
+
+  // Initialize the color values to some sensible defaults
+  const_buffer.ambient_color = { 0.2f, 0.2f, 0.2f, 0.3f };
+  const_buffer.light_vector = { 1.0f, 1.0f, 1.0f, 0.0f };
+  const_buffer.light_color = { 0.5f, 0.5f, 0.5f, 1.0f };
 
   // Send the values to the const buffer
   updateConstantBuffer();
@@ -122,4 +126,8 @@ void Shader::setViewProjectionMatrix(DirectX::XMMATRIX view_projection) {
 
 void Shader::setModelMatrix(DirectX::XMMATRIX model_matrix) {
   const_buffer.model = model_matrix;
+}
+
+void Shader::setNormalRotationMatrix(DirectX::XMMATRIX rotation_matrix) {
+  const_buffer.normal_rotation = rotation_matrix;
 }

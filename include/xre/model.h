@@ -22,6 +22,7 @@ public:
   void render(Shader *shader);
 
   DirectX::XMMATRIX getTransformationMatrix();
+  DirectX::XMMATRIX getRotationMatrix();
 
   // These methods apply the rotation / translation / scaling
   // to the values we already have, e.g. to simply double the
