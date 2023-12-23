@@ -3,7 +3,7 @@
 // DirectX includes
 #include <d3d11.h>
 
-// Include vector header
+// Include other headers
 #include <vector>
 
 // XRe includes
@@ -15,6 +15,7 @@ class Model {
 public:
   Model();
   Model(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<Mesh> meshes);
+  Model(ID3D11Device *device, ID3D11DeviceContext *device_context, const char *model_path);
 
   // Two different rendering methods, one where the user can pass in
   // a shader to use for this model
@@ -60,4 +61,6 @@ private:
   DirectX::XMVECTOR translation = DirectX::XMVECTORF32({0.0f, 0.0f, 0.0f});
   // The rotation of the model
   DirectX::XMVECTOR rotation = DirectX::XMQuaternionIdentity();
+
+  void loadObj(const char *model_path);
 };

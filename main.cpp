@@ -10,6 +10,7 @@ public:
   Model cube = model_factory.createCube();
   Model ground_cube = model_factory.createCube(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
   Model ground = model_factory.createGround();
+  Model sphere = Model(getDevice(), getDeviceContext(), DATA_FOLDER "/models/sphere.obj");
 
   void setup() override {
     // Scale the cube down a bit
@@ -37,6 +38,9 @@ public:
 
     // Render the ground
     ground.render(&texture_shader);
+
+    // Render the sphere
+    sphere.render(&color_shader);
   }
 };
 
