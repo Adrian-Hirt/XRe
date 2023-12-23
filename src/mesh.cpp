@@ -14,6 +14,31 @@ Mesh::Mesh() {};
 //  4) Vector with the incides of the mesh
 //------------------------------------------------------------------------------------------------------
 Mesh::Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex> vertices, std::vector<unsigned int> indices) {
+  // Call general initialize method
+  initialize(device, device_context, vertices, indices);
+};
+
+//------------------------------------------------------------------------------------------------------
+// Initialize the mesh.
+// Arguments:
+//  1) DirectX Device
+//  2) DirectX DeviceContext
+//  3) Vector with the vertices of the mesh
+//  4) Vector with the incides of the mesh
+//  5) Path to the file holding the texture to be applied
+//------------------------------------------------------------------------------------------------------
+Mesh::Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex> vertices, std::vector<unsigned int> indices, const char *texture_path) {
+  // Call general initialize method
+  initialize(device, device_context, vertices, indices);
+
+  // Load the texture
+  std::wstring filepath = Utils::stringToWString(texture_path);
+  HRESULT result = DirectX::CreateWICTextureFromFile(device, device_context, filepath.c_str(), &p_texture, &p_texture_view);
+  Utils::checkHresult(result, "Failed to load the texture"); // TODO: output the filename that was not found
+}
+
+// Function to initialize the "common" data of a mesh, to avoid code-duplication
+void Mesh::initialize(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex> vertices, std::vector<unsigned int> indices) {
   // Set the data we got passed in
   this->device = device;
   this->device_context = device_context;
@@ -59,6 +84,15 @@ void Mesh::render() {
   UINT offset = 0;
   device_context->IASetVertexBuffers(0, 1, &vertex_buffer, &stride, &offset);
   device_context->IASetIndexBuffer(index_buffer, DXGI_FORMAT_R32_UINT, 0);
+
+  // Set the texture if it exists, otherwise remove any previously added textures
+  if (p_texture_view) {
+    device_context->PSSetShaderResources(0, 1, &p_texture_view);
+  }
+  else {
+    ID3D11ShaderResourceView *nulltexture = NULL;
+    device_context->PSSetShaderResources(0, 1, &nulltexture);
+  }
 
   // We'll be rendering a triangle list, so we need to tell the GPU
   // to render the vertices as such.

@@ -9,35 +9,35 @@ ModelFactory::ModelFactory(ID3D11Device *device, ID3D11DeviceContext *device_con
 
 Model ModelFactory::createCube(DirectX::XMFLOAT4 color) {
   std::vector<vertex> cube_vertices {
-    {-1.0f, -1.0f, 1.0f, color, 0.0f, 0.0f, 1.0f},
-    {1.0f, -1.0f, 1.0f, color, 0.0f, 0.0f, 1.0f},
-    {-1.0f, 1.0f, 1.0f, color, 0.0f, 0.0f, 1.0f},
-    {1.0f, 1.0f, 1.0f, color, 0.0f, 0.0f, 1.0f},
+    { DirectX::XMFLOAT3(-1.0f, -1.0f, 1.0f), color, DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f), DirectX::XMFLOAT2(0.0f, 0.0f) },
+    { DirectX::XMFLOAT3( 1.0f, -1.0f, 1.0f), color, DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f), DirectX::XMFLOAT2(1.0f, 0.0f) },
+    { DirectX::XMFLOAT3(-1.0f, 1.0f, 1.0f),  color, DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f), DirectX::XMFLOAT2(0.0f, 1.0f) },
+    { DirectX::XMFLOAT3( 1.0f, 1.0f, 1.0f),  color, DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f), DirectX::XMFLOAT2(1.0f, 1.0f) },
 
-    {-1.0f, -1.0f, -1.0f, color, 0.0f, 0.0f, -1.0f},
-    {-1.0f, 1.0f, -1.0f, color, 0.0f, 0.0f, -1.0f},
-    {1.0f, -1.0f, -1.0f, color, 0.0f, 0.0f, -1.0f},
-    {1.0f, 1.0f, -1.0f, color, 0.0f, 0.0f, -1.0f},
+    { DirectX::XMFLOAT3(-1.0f, -1.0f, -1.0f), color, DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f), DirectX::XMFLOAT2(0.0f, 0.0f) },
+    { DirectX::XMFLOAT3(-1.0f,  1.0f, -1.0f), color, DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f), DirectX::XMFLOAT2(1.0f, 0.0f) },
+    { DirectX::XMFLOAT3( 1.0f, -1.0f, -1.0f), color, DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f), DirectX::XMFLOAT2(0.0f, 1.0f) },
+    { DirectX::XMFLOAT3( 1.0f,  1.0f, -1.0f), color, DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f), DirectX::XMFLOAT2(1.0f, 1.0f) },
 
-    {-1.0f, 1.0f, -1.0f, color, 0.0f, 1.0f, 0.0f},
-    {-1.0f, 1.0f, 1.0f, color, 0.0f, 1.0f, 0.0f},
-    {1.0f, 1.0f, -1.0f, color, 0.0f, 1.0f, 0.0f},
-    {1.0f, 1.0f, 1.0f, color, 0.0f, 1.0f, 0.0f},
+    { DirectX::XMFLOAT3(-1.0f, 1.0f, -1.0f), color, DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),  DirectX::XMFLOAT2(0.0f, 0.0f) },
+    { DirectX::XMFLOAT3(-1.0f, 1.0f,  1.0f), color, DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),  DirectX::XMFLOAT2(1.0f, 0.0f) },
+    { DirectX::XMFLOAT3( 1.0f, 1.0f, -1.0f), color, DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),  DirectX::XMFLOAT2(0.0f, 1.0f) },
+    { DirectX::XMFLOAT3( 1.0f, 1.0f,  1.0f), color, DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),  DirectX::XMFLOAT2(1.0f, 1.0f) },
 
-    {-1.0f, -1.0f, -1.0f, color, 0.0f, -1.0f, 0.0f},
-    {1.0f, -1.0f, -1.0f, color, 0.0f, -1.0f, 0.0f},
-    {-1.0f, -1.0f, 1.0f, color, 0.0f, -1.0f, 0.0f},
-    {1.0f, -1.0f, 1.0f, color, 0.0f, -1.0f, 0.0f},
+    { DirectX::XMFLOAT3(-1.0f, -1.0f, -1.0f), color, DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f),  DirectX::XMFLOAT2(0.0f, 0.0f) },
+    { DirectX::XMFLOAT3( 1.0f, -1.0f, -1.0f), color, DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f),  DirectX::XMFLOAT2(1.0f, 0.0f) },
+    { DirectX::XMFLOAT3(-1.0f, -1.0f,  1.0f), color, DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f),  DirectX::XMFLOAT2(0.0f, 1.0f) },
+    { DirectX::XMFLOAT3( 1.0f, -1.0f,  1.0f), color, DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f),  DirectX::XMFLOAT2(1.0f, 1.0f) },
 
-    {1.0f, -1.0f, -1.0f, color, 1.0f, 0.0f, 0.0f},
-    {1.0f, 1.0f, -1.0f, color, 1.0f, 0.0f, 0.0f},
-    {1.0f, -1.0f, 1.0f, color, 1.0f, 0.0f, 0.0f},
-    {1.0f, 1.0f, 1.0f, color, 1.0f, 0.0f, 0.0f},
+    { DirectX::XMFLOAT3(1.0f, -1.0f, -1.0f), color, DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT2(0.0f, 0.0f) },
+    { DirectX::XMFLOAT3(1.0f,  1.0f, -1.0f), color, DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT2(1.0f, 0.0f) },
+    { DirectX::XMFLOAT3(1.0f, -1.0f,  1.0f), color, DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT2(0.0f, 1.0f) },
+    { DirectX::XMFLOAT3(1.0f,  1.0f,  1.0f), color, DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT2(1.0f, 1.0f) },
 
-    {-1.0f, -1.0f, -1.0f, color, -1.0f, 0.0f, 0.0f},
-    {-1.0f, -1.0f, 1.0f, color, -1.0f, 0.0f, 0.0f},
-    {-1.0f, 1.0f, -1.0f, color, -1.0f, 0.0f, 0.0f},
-    {-1.0f, 1.0f, 1.0f, color, -1.0f, 0.0f, 0.0f}
+    { DirectX::XMFLOAT3(-1.0f, -1.0f, -1.0f), color, DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT2(0.0f, 0.0f) },
+    { DirectX::XMFLOAT3(-1.0f, -1.0f,  1.0f), color, DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT2(1.0f, 0.0f) },
+    { DirectX::XMFLOAT3(-1.0f,  1.0f, -1.0f), color, DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT2(0.0f, 1.0f) },
+    { DirectX::XMFLOAT3(-1.0f,  1.0f,  1.0f), color, DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT2(1.0f, 1.0f) }
   };
 
   std::vector<unsigned int> cube_indices{
@@ -61,14 +61,14 @@ Model ModelFactory::createCube(DirectX::XMFLOAT4 color) {
 
 Model ModelFactory::createGround(float extent) {
   std::vector<vertex> vertices = {
-    { -extent, 0.0f, -extent, DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f), 0.0f, 1.0f, 0.0f },
-    { -extent, 0.0f,  extent, DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f), 0.0f, 1.0f, 0.0f },
-    {  extent, 0.0f,  extent, DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f), 0.0f, 1.0f, 0.0f },
-    {  extent, 0.0f, -extent, DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f), 0.0f, 1.0f, 0.0f }
+    {  DirectX::XMFLOAT3(-extent, 0.0f, -extent), DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f),  DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(0.0f, 0.0f) },
+    {  DirectX::XMFLOAT3(-extent, 0.0f,  extent), DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f),  DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 0.0f) },
+    {  DirectX::XMFLOAT3( extent, 0.0f,  extent), DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f),  DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(0.0f, 1.0f) },
+    {  DirectX::XMFLOAT3( extent, 0.0f, -extent), DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f),  DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f) }
   };
 
   std::vector<unsigned int> indices = {0, 2, 1, 0, 3, 2};
 
-  Mesh ground_mesh = Mesh(this->device, this->device_context, vertices, indices);
+  Mesh ground_mesh = Mesh(this->device, this->device_context, vertices, indices, DATA_FOLDER "/textures/wood.jpg");
   return Model(this->device, this->device_context, { ground_mesh });
 };

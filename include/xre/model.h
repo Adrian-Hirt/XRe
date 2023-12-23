@@ -2,7 +2,6 @@
 
 // DirectX includes
 #include <d3d11.h>
-#include <DirectXTex/WICTextureLoader11.h>
 
 // Include vector header
 #include <vector>

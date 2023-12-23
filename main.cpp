@@ -6,26 +6,37 @@ public:
 
   Shader ambient_shader = Shader(SHADERS_FOLDER "/ambient.hlsl", getDevice(), getDeviceContext());
   Shader color_shader = Shader(SHADERS_FOLDER "/color.hlsl", getDevice(), getDeviceContext());
-  Model cube_model = model_factory.createCube();
+  Shader texture_shader = Shader(SHADERS_FOLDER "/texture.hlsl", getDevice(), getDeviceContext());
+  Model cube = model_factory.createCube();
+  Model ground_cube = model_factory.createCube(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
   Model ground = model_factory.createGround();
 
   void setup() override {
     // Scale the cube down a bit
-    cube_model.scale(0.33f, 0.33f, 0.33f);
+    cube.scale(0.33f, 0.33f, 0.33f);
 
     // And translate the cube up a bit
-    cube_model.translate(0.0f, 4.0f, 0.0f);
+    cube.translate(0.0f, 4.0f, 0.0f);
+
+    // Translate the ground cube up a bit and to the left
+    ground_cube.translate(-2.0f, 0.5f, 0.0f);
+
+    // Squish the ground cube
+    ground_cube.scale(1.0f, 0.3f, 1.0f);
   }
 
   void draw(XrCompositionLayerProjectionView &view) override {
     // Rotate the cube
-    cube_model.rotate(0.0f, 0.0f, 0.01f);
+    cube.rotate(0.0f, 0.0f, 0.01f);
 
     // Render the cube model
-    cube_model.render(&color_shader);
+    cube.render(&ambient_shader);
+
+    // Render the cube at the ground
+    ground_cube.render(&color_shader);
 
     // Render the ground
-    ground.render(&ambient_shader);
+    ground.render(&texture_shader);
   }
 };
 
