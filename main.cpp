@@ -4,14 +4,12 @@ class TestApp : public Application {
 public:
   TestApp(const char *application_name) : Application(application_name) {};
 
-  Shader shader = Shader(SHADERS_FOLDER "/ambient.hlsl", getDevice(), getDeviceContext());
+  Shader ambient_shader = Shader(SHADERS_FOLDER "/ambient.hlsl", getDevice(), getDeviceContext());
+  Shader color_shader = Shader(SHADERS_FOLDER "/color.hlsl", getDevice(), getDeviceContext());
   Model cube_model = model_factory.createCube();
   Model ground = model_factory.createGround();
 
   void setup() override {
-    // Activate the shader
-    shader.activate();
-
     // Scale the cube down a bit
     cube_model.scale(0.33f, 0.33f, 0.33f);
 
@@ -24,10 +22,10 @@ public:
     cube_model.rotate(0.0f, 0.0f, 0.01f);
 
     // Render the cube model
-    cube_model.render();
+    cube_model.render(&color_shader);
 
     // Render the ground
-    ground.render();
+    ground.render(&ambient_shader);
   }
 };
 

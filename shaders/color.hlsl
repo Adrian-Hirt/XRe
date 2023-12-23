@@ -24,11 +24,8 @@ VOut VShader(float4 position : POSITION, float4 color : COLOR, float4 normal : N
   // Calculate the position
   output.position = mul(mul(position, model), view_projection);
 
-  // Compute color based on normal vectors
-  output.color = ambient_color;
-  float4 norm = normalize(mul(rotation, normal));
-	float diffuse_brightness = saturate(dot(norm, light_vector));
-	output.color += saturate(light_color * diffuse_brightness * color);
+  // Simply use the color we got passed in as the color
+	output.color = color;
 
   return output;
 }

@@ -8,6 +8,7 @@
 
 // Other includes
 #include <iostream>
+#include <comdef.h>
 
 // small header-only file which contains some utility functions
 
@@ -20,6 +21,9 @@ namespace Utils {
 
   inline void checkHresult(HRESULT result, const char *errorString){
     if (FAILED(result)) {
+      _com_error err(result);
+      LPCTSTR errMsg = err.ErrorMessage();
+      std::cout << errMsg << std::endl;
       exitWithMessage(errorString);
     }
   }

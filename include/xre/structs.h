@@ -28,11 +28,17 @@ typedef struct vertex {
   float xn, yn, zn;
 } vertex;
 
-typedef struct const_buffer_t {
-  DirectX::XMMATRIX model;
+typedef struct per_frame_const_buffer_t {
   DirectX::XMMATRIX view_projection;
-  DirectX::XMMATRIX normal_rotation;
+} per_frame_const_buffer_t;
+
+typedef struct lighting_const_buffer_t {
   DirectX::XMFLOAT4 light_vector;
   DirectX::XMFLOAT4 light_color;
   DirectX::XMFLOAT4 ambient_color;
-} const_buffer_t;
+} lighting_const_buffer_t;
+
+typedef struct per_model_const_buffer_t {
+  DirectX::XMMATRIX model;
+  DirectX::XMMATRIX normal_rotation;
+} per_model_const_buffer_t;

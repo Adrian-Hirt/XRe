@@ -12,6 +12,9 @@ Dx11Handler::Dx11Handler(LUID &adapter_luid) {
   // Initialize the D3D11 device
   bool device_initialized = initializeDevice(adapter_luid);
   Utils::checkBoolResult(device_initialized, "Could not initialize the D3D11 device!");
+
+  // Initialize the global buffers for the shaders
+  Shader::createGlobalBuffers(device, device_context);
 };
 
 //------------------------------------------------------------------------------------------------------
@@ -220,7 +223,7 @@ void Dx11Handler::renderFrame(XrCompositionLayerProjectionView& view,
 	//----------------------------------------------------------------------------------
   // Compute the viewProjectionMatrix as well as the model matrix
   // and send them to the GPU
-  Shader::setViewProjectionMatrix(Geometry::computeViewProjectionMatrix(view));
+  Shader::updateViewProjectionMatrix(Geometry::computeViewProjectionMatrix(view), device_context);
 
   //----------------------------------------------------------------------------------
 	// Draw the scene

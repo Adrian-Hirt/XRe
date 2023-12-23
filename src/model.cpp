@@ -32,7 +32,7 @@ void Model::render(Shader *shader) {
   // Update the shader with the model matrix
   shader->setModelMatrix(getTransformationMatrix());
   shader->setNormalRotationMatrix(getRotationMatrix());
-  shader->updateConstantBuffer();
+  shader->updatePerModelConstantBuffer();
 
   for (Mesh &mesh : meshes) {
     mesh.render();
