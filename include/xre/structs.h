@@ -2,7 +2,7 @@
 
 // DirectX includes
 #include <d3d11.h>
-#include <directxmath.h>
+#include <DirectXMath/directxmath.h>
 
 // OpenXR includes
 #include <open_xr/openxr.h>

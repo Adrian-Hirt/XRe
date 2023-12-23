@@ -5,7 +5,7 @@
 
 // DirectX includes
 #include <d3d11.h>
-#include <directxmath.h>
+#include <DirectXMath/directxmath.h>
 
 namespace Geometry {
   inline DirectX::XMMATRIX computeViewProjectionMatrix(XrCompositionLayerProjectionView &view) {
