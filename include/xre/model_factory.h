@@ -10,8 +10,8 @@ public:
   ModelFactory(ID3D11Device *device, ID3D11DeviceContext *device_context);
 
   Model createCube(DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-  Model createGround(float extent);
-  Model createGround(float extent, const char *texture_path);
+  Model createGroundPlane(float extent);
+  Model createGroundPlane(float extent, const char *texture_path);
 
 private:
   // D3D11 device and device context

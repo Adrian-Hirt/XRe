@@ -59,14 +59,14 @@ Model ModelFactory::createCube(DirectX::XMFLOAT4 color) {
   return Model(this->device, this->device_context, { cube_mesh });
 };
 
-Model ModelFactory::createGround(float extent) {
+Model ModelFactory::createGroundPlane(float extent) {
   auto [vertices, indices] = getGroundVerticesAndIndices(extent);
 
   Mesh ground_mesh = Mesh(this->device, this->device_context, vertices, indices);
   return Model(this->device, this->device_context, { ground_mesh });
 };
 
-Model ModelFactory::createGround(float extent, const char *texture_path) {
+Model ModelFactory::createGroundPlane(float extent, const char *texture_path) {
   auto [vertices, indices] = getGroundVerticesAndIndices(extent);
 
   Mesh ground_mesh = Mesh(this->device, this->device_context, vertices, indices, texture_path);
