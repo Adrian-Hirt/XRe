@@ -25,9 +25,15 @@ public:
   DXGI_FORMAT d3d11_swapchain_format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 private:
+  // Device and device context from DirectX 11
   ID3D11Device *device;
   ID3D11DeviceContext *device_context;
 
+  // Device states
+  ID3D11RasterizerState *p_rasterizer_state_default;
+  ID3D11RasterizerState *p_rasterizer_state_wireframe;
+
   // Methods
-  bool initializeDevice(LUID &adapter_luid);
+  void initializeDevice(LUID &adapter_luid);
+  void initializeDeviceStates();
 };

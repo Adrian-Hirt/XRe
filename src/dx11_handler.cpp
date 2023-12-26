@@ -10,22 +10,23 @@ Dx11Handler::Dx11Handler() {};
 //------------------------------------------------------------------------------------------------------
 Dx11Handler::Dx11Handler(LUID &adapter_luid) {
   // Initialize the D3D11 device
-  bool device_initialized = initializeDevice(adapter_luid);
-  Utils::checkBoolResult(device_initialized, "Could not initialize the D3D11 device!");
+  initializeDevice(adapter_luid);
+
+  // Initialize the device states
+  initializeDeviceStates();
 };
 
 //------------------------------------------------------------------------------------------------------
 // Initialize the D3D11 device
 //------------------------------------------------------------------------------------------------------
-bool Dx11Handler::initializeDevice(LUID &adapter_luid) {
+void Dx11Handler::initializeDevice(LUID &adapter_luid) {
   HRESULT result;
   IDXGIFactory1 *dxgi_factory;
 
   // Create the DXGI factory we're using to find the correct adapter
   result = CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void **)(&dxgi_factory));
-  if(FAILED(result)) {
-    return false;
-  }
+  Utils::checkHresult(result, "Could not create the DXGI factory!");
+
   IDXGIAdapter1 *adapter = nullptr;
 
   // Loop over all the adapters the factory finds
@@ -48,7 +49,7 @@ bool Dx11Handler::initializeDevice(LUID &adapter_luid) {
 
   // If we did not find an adapter, we can exit the function
   if(adapter == nullptr) {
-    return false;
+    Utils::exitWithMessage("Did not find an adapter to create the device with!");
   }
 
   // Set the feature level we wish to use to directx 11
@@ -68,15 +69,42 @@ bool Dx11Handler::initializeDevice(LUID &adapter_luid) {
     &device_context);
 
   // Check that we were successful
-  if(FAILED(result)) {
-    return false;
-  }
+  Utils::checkHresult(result, "Creating the device and device_context failed");
 
   // Releae the adapter
   adapter->Release();
 
   // And we're done
-  return true;
+}
+
+void Dx11Handler::initializeDeviceStates() {
+  HRESULT result;
+
+  // First, build the default device state for the rasterizer,
+  // where we cull the back and fill the triangles with solid color.
+  // Also, we use antialiazing for lines.
+  D3D11_RASTERIZER_DESC rasterizer_description;
+  ZeroMemory(&rasterizer_description, sizeof(rasterizer_description));
+  rasterizer_description.FillMode = D3D11_FILL_SOLID;
+  rasterizer_description.CullMode = D3D11_CULL_BACK;
+  rasterizer_description.AntialiasedLineEnable = TRUE;
+
+  result = device->CreateRasterizerState(&rasterizer_description, &p_rasterizer_state_default);
+  Utils::checkHresult(result, "Failed to create the rasterizer state for default mode");
+
+  // Then build the wireframe device state for the rasterizer,
+  // where we cull the back, only render the wireframe lines,
+  // disable multisampling but use antialiasing on the lines
+  ZeroMemory(&rasterizer_description, sizeof(rasterizer_description));
+  rasterizer_description.FillMode = D3D11_FILL_WIREFRAME;
+  rasterizer_description.CullMode = D3D11_CULL_BACK;
+  rasterizer_description.AntialiasedLineEnable = TRUE;
+
+  result = device->CreateRasterizerState(&rasterizer_description, &p_rasterizer_state_wireframe);
+  Utils::checkHresult(result, "Failed to create the rasterizer state for wireframe mode");
+
+  // Use the default state for now
+  device_context->RSSetState(p_rasterizer_state_default);
 }
 
 //------------------------------------------------------------------------------------------------------
