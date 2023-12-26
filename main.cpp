@@ -9,7 +9,7 @@ public:
   Shader texture_shader = Shader(SHADERS_FOLDER "/texture.hlsl", getDevice(), getDeviceContext());
   Model cube = model_factory.createCube();
   Model ground_cube = model_factory.createCube(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
-  Model ground = model_factory.createGround();
+  Model ground = model_factory.createGround(10, DATA_FOLDER "/textures/wood.jpg");
   Model sphere = Model(getDevice(), getDeviceContext(), DATA_FOLDER "/models/sphere.obj");
 
   void setup() override {

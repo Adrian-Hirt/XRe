@@ -60,6 +60,20 @@ Model ModelFactory::createCube(DirectX::XMFLOAT4 color) {
 };
 
 Model ModelFactory::createGround(float extent) {
+  auto [vertices, indices] = getGroundVerticesAndIndices(extent);
+
+  Mesh ground_mesh = Mesh(this->device, this->device_context, vertices, indices);
+  return Model(this->device, this->device_context, { ground_mesh });
+};
+
+Model ModelFactory::createGround(float extent, const char *texture_path) {
+  auto [vertices, indices] = getGroundVerticesAndIndices(extent);
+
+  Mesh ground_mesh = Mesh(this->device, this->device_context, vertices, indices, texture_path);
+  return Model(this->device, this->device_context, { ground_mesh });
+};
+
+std::tuple<std::vector<vertex>, std::vector<unsigned int>> ModelFactory::getGroundVerticesAndIndices(float extent) {
   std::vector<vertex> vertices = {
     {  DirectX::XMFLOAT3(-extent, 0.0f, -extent), DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f),  DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(0.0f, 0.0f) },
     {  DirectX::XMFLOAT3(-extent, 0.0f,  extent), DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f),  DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 0.0f) },
@@ -69,6 +83,5 @@ Model ModelFactory::createGround(float extent) {
 
   std::vector<unsigned int> indices = {0, 2, 1, 0, 3, 2};
 
-  Mesh ground_mesh = Mesh(this->device, this->device_context, vertices, indices, DATA_FOLDER "/textures/wood.jpg");
-  return Model(this->device, this->device_context, { ground_mesh });
+  return { vertices, indices };
 };
