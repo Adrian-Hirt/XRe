@@ -87,10 +87,23 @@ void Dx11Handler::initializeDeviceStates() {
   ZeroMemory(&rasterizer_description, sizeof(rasterizer_description));
   rasterizer_description.FillMode = D3D11_FILL_SOLID;
   rasterizer_description.CullMode = D3D11_CULL_BACK;
-  rasterizer_description.AntialiasedLineEnable = TRUE;
+  rasterizer_description.AntialiasedLineEnable = true;
+  rasterizer_description.FrontCounterClockwise = false;
 
-  result = device->CreateRasterizerState(&rasterizer_description, &p_rasterizer_state_default);
-  Utils::checkHresult(result, "Failed to create the rasterizer state for default mode");
+  result = device->CreateRasterizerState(&rasterizer_description, &p_rasterizer_state_default_cw);
+  Utils::checkHresult(result, "Failed to create the rasterizer state for default CW mode");
+
+  // Build the same state again, but this time use counter-clockwise
+  // culling. This is needed to draw transparent objects twice, such
+  // that the backside of the object also appears in the view
+  ZeroMemory(&rasterizer_description, sizeof(rasterizer_description));
+  rasterizer_description.FillMode = D3D11_FILL_SOLID;
+  rasterizer_description.CullMode = D3D11_CULL_BACK;
+  rasterizer_description.AntialiasedLineEnable = true;
+  rasterizer_description.FrontCounterClockwise = true;
+
+  result = device->CreateRasterizerState(&rasterizer_description, &p_rasterizer_state_default_ccw);
+  Utils::checkHresult(result, "Failed to create the rasterizer state for default CW mode");
 
   // Then build the wireframe device state for the rasterizer,
   // where we cull the back, only render the wireframe lines,
@@ -98,13 +111,13 @@ void Dx11Handler::initializeDeviceStates() {
   ZeroMemory(&rasterizer_description, sizeof(rasterizer_description));
   rasterizer_description.FillMode = D3D11_FILL_WIREFRAME;
   rasterizer_description.CullMode = D3D11_CULL_BACK;
-  rasterizer_description.AntialiasedLineEnable = TRUE;
+  rasterizer_description.AntialiasedLineEnable = true;
 
   result = device->CreateRasterizerState(&rasterizer_description, &p_rasterizer_state_wireframe);
   Utils::checkHresult(result, "Failed to create the rasterizer state for wireframe mode");
 
   // Use the default state for now
-  device_context->RSSetState(p_rasterizer_state_default);
+  device_context->RSSetState(p_rasterizer_state_default_cw);
 
   // Next, we setup the texture sampler state
   D3D11_SAMPLER_DESC sampler_description;
@@ -121,6 +134,24 @@ void Dx11Handler::initializeDeviceStates() {
   result = device->CreateSamplerState(&sampler_description, &p_sampler_state);
   Utils::checkHresult(result, "Failed to create the sampler state");
   device_context->PSSetSamplers(0, 1, &p_sampler_state);
+
+  // Next, we setup the blend state
+  D3D11_BLEND_DESC blend_description;
+  ZeroMemory(&blend_description, sizeof(blend_description));
+  blend_description.RenderTarget[0].BlendEnable = true; // Enable blending (alpha values)
+  blend_description.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD; // Add destination color to the source color
+  blend_description.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA; // Use the alpha value of the source to set its value
+  blend_description.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA; // And use 1-src_alpha for the dest alpha
+  blend_description.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD; // Use default method of add
+  blend_description.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE; // Use the full source alpha
+  blend_description.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO; // And use no destination alpha
+  blend_description.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL; // Draw RGBA values
+  blend_description.IndependentBlendEnable = true; // Only use the first render target
+  blend_description.AlphaToCoverageEnable = false; // Improve quality of transparent textures
+
+  result = device->CreateBlendState(&blend_description, &p_blend_state);
+  Utils::checkHresult(result, "Failed to create the blend state");
+  device_context->OMSetBlendState(p_blend_state, 0, 0xffffffff);
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -271,3 +302,16 @@ void Dx11Handler::renderFrame(XrCompositionLayerProjectionView& view,
 	//----------------------------------------------------------------------------------
   draw_callback(view);
 }
+
+void Dx11Handler::useDefaultRasterizer(bool use_clockwise) {
+  if (use_clockwise) {
+    device_context->RSSetState(p_rasterizer_state_default_cw);
+  }
+  else {
+    device_context->RSSetState(p_rasterizer_state_default_ccw);
+  }
+};
+
+void Dx11Handler::useWireframeRasterizer() {
+  device_context->RSSetState(p_rasterizer_state_wireframe);
+};

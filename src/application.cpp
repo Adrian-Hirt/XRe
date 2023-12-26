@@ -3,6 +3,7 @@
 Application::Application(const char *application_name) {
   // create the XR handler
   open_xr_handler = OpenXrHandler(application_name);
+  dx11_handler = open_xr_handler.dx11_handler;
 
   // Create the model factory
   model_factory = ModelFactory();
@@ -16,9 +17,7 @@ Application::Application(const char *application_name) {
   Model::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
 };
 
-Application::~Application() {
-
-};
+Application::~Application() {};
 
 void Application::run() {
   bool loop_running = true;
@@ -40,15 +39,15 @@ void Application::run() {
       open_xr_handler.renderFrame(std::bind(&Application::draw, this, std::placeholders::_1));
     }
   }
-}
+};
 
 void Application::setup() {
   // Override this method to setup your scene etc.
-}
+};
 
 void Application::draw(XrCompositionLayerProjectionView &view) {
   // Override this method to draw some stuff
-}
+};
 
 ID3D11Device* Application::getDevice() {
   return open_xr_handler.getDevice();
@@ -56,4 +55,16 @@ ID3D11Device* Application::getDevice() {
 
 ID3D11DeviceContext* Application::getDeviceContext() {
   return open_xr_handler.getDeviceContext();
+};
+
+void Application::setCcwCullMode() {
+  dx11_handler.useDefaultRasterizer(false);
+};
+
+void Application::setCwCullMode() {
+  dx11_handler.useDefaultRasterizer(true);
+};
+
+void Application::setWireframeMode() {
+  dx11_handler.useWireframeRasterizer();
 };

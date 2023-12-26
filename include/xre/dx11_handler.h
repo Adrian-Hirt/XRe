@@ -24,15 +24,20 @@ public:
 
   DXGI_FORMAT d3d11_swapchain_format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
+  void useDefaultRasterizer(bool use_clockwise);
+  void useWireframeRasterizer();
+
 private:
   // Device and device context from DirectX 11
   ID3D11Device *device;
   ID3D11DeviceContext *device_context;
 
   // Device states
-  ID3D11RasterizerState *p_rasterizer_state_default;
+  ID3D11RasterizerState *p_rasterizer_state_default_cw;
+  ID3D11RasterizerState *p_rasterizer_state_default_ccw;
   ID3D11RasterizerState *p_rasterizer_state_wireframe;
   ID3D11SamplerState *p_sampler_state;
+  ID3D11BlendState *p_blend_state;
 
   // Methods
   void initializeDevice(LUID &adapter_luid);

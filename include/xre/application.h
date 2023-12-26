@@ -26,8 +26,14 @@ public:
   ID3D11Device* getDevice();
   ID3D11DeviceContext* getDeviceContext();
 
+  void setCcwCullMode();
+  void setCwCullMode();
+  void setWireframeMode();
+
   ModelFactory model_factory;
 
 private:
+  // Handlers
   OpenXrHandler open_xr_handler;
+  Dx11Handler dx11_handler;
 };

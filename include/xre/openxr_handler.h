@@ -39,6 +39,9 @@ public:
   ID3D11Device* getDevice();
   ID3D11DeviceContext* getDeviceContext();
 
+  // Handlers
+  Dx11Handler dx11_handler;
+
 private:
   // Configs
   const char *application_name;
@@ -59,9 +62,6 @@ private:
 
   // Pointers to ext functions we need to use
   PFN_xrGetD3D11GraphicsRequirementsKHR ext_xrGetD3D11GraphicsRequirementsKHR;
-
-  // Handlers
-  Dx11Handler dx11_handler;
 
   // Methods
   bool initializeOpenxr();
