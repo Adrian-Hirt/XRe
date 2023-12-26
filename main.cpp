@@ -7,7 +7,7 @@ public:
   // Create shaders
   Shader ambient_shader = Shader(SHADERS_FOLDER "/ambient.hlsl");
   Shader color_shader = Shader(SHADERS_FOLDER "/color.hlsl");
-  Shader texture_shader = Shader(SHADERS_FOLDER "/texture.hlsl");
+  Shader texture_shader = Shader(SHADERS_FOLDER "/ambient_texture.hlsl");
 
   // Create models with the model_factors
   Model cube = model_factory.createCube();
