@@ -22,12 +22,12 @@ struct swapchain_t {
   std::vector<swapchain_data_t> swapchain_data;
 };
 
-typedef struct vertex {
+typedef struct vertex_t {
   DirectX::XMFLOAT3 coordinates;
   DirectX::XMFLOAT4 color;
   DirectX::XMFLOAT3 normal;
   DirectX::XMFLOAT2 texture_coordinates;
-} vertex;
+} vertex_t;
 
 typedef struct per_frame_const_buffer_t {
   DirectX::XMMATRIX view_projection;

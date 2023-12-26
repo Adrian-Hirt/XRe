@@ -123,7 +123,7 @@ void Model::loadObj(const char *model_path) {
 
   // Loop over the shapes (i.e. meshes) of the loaded model
   for (tinyobj::shape_t shape : shapes) {
-    std::vector<vertex> mesh_vertices;
+    std::vector<vertex_t> mesh_vertices;
     std::vector<unsigned int> mesh_indices;
 
     size_t index_offset = 0;
@@ -134,7 +134,7 @@ void Model::loadObj(const char *model_path) {
       // Loop over the vertices of the face
       for (unsigned int vertex_index = 0; vertex_index < face_vertices_count; vertex_index++) {
         tinyobj::index_t index = shape.mesh.indices[index_offset + vertex_index];
-        vertex current_vertex;
+        vertex_t current_vertex;
 
         // Load the X, Y, Z coordinates of the current vertex
         tinyobj::real_t vertex_x = attrib.vertices[3 * index.vertex_index + 0];

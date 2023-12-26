@@ -13,7 +13,7 @@ Mesh::Mesh() {};
 //  3) Vector with the vertices of the mesh
 //  4) Vector with the incides of the mesh
 //------------------------------------------------------------------------------------------------------
-Mesh::Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex> vertices, std::vector<unsigned int> indices) {
+Mesh::Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex_t> vertices, std::vector<unsigned int> indices) {
   // Call general initialize method
   initialize(device, device_context, vertices, indices);
 };
@@ -27,7 +27,7 @@ Mesh::Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vecto
 //  4) Vector with the incides of the mesh
 //  5) Path to the file holding the texture to be applied
 //------------------------------------------------------------------------------------------------------
-Mesh::Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex> vertices, std::vector<unsigned int> indices, const char *texture_path) {
+Mesh::Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex_t> vertices, std::vector<unsigned int> indices, const char *texture_path) {
   // Call general initialize method
   initialize(device, device_context, vertices, indices);
 
@@ -38,7 +38,7 @@ Mesh::Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vecto
 }
 
 // Function to initialize the "common" data of a mesh, to avoid code-duplication
-void Mesh::initialize(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex> vertices, std::vector<unsigned int> indices) {
+void Mesh::initialize(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex_t> vertices, std::vector<unsigned int> indices) {
   // Set the data we got passed in
   this->device = device;
   this->device_context = device_context;
@@ -55,7 +55,7 @@ void Mesh::initialize(ID3D11Device *device, ID3D11DeviceContext *device_context,
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
 
   buffer_desc.Usage = D3D11_USAGE_DYNAMIC;                    // write access access by CPU and read access by GPU
-  buffer_desc.ByteWidth = sizeof(vertex) * vertices.size(); // Size of the buffer we want to allocate
+  buffer_desc.ByteWidth = sizeof(vertex_t) * vertices.size(); // Size of the buffer we want to allocate
   buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;           // use as a vertex buffer
   buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;        // allow CPU to write in buffer
 
@@ -80,7 +80,7 @@ void Mesh::initialize(ID3D11Device *device, ID3D11DeviceContext *device_context,
 
 void Mesh::render() {
   // Set vertex and index buffers on the GPU to be the ones of this mesh
-  UINT stride = sizeof(vertex);
+  UINT stride = sizeof(vertex_t);
   UINT offset = 0;
   device_context->IASetVertexBuffers(0, 1, &vertex_buffer, &stride, &offset);
   device_context->IASetIndexBuffer(index_buffer, DXGI_FORMAT_R32_UINT, 0);

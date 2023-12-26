@@ -18,5 +18,5 @@ private:
   ID3D11Device *device;
   ID3D11DeviceContext *device_context;
 
-  std::tuple<std::vector<vertex>, std::vector<unsigned int>> getGroundVerticesAndIndices(float extent);
+  std::tuple<std::vector<vertex_t>, std::vector<unsigned int>> getGroundVerticesAndIndices(float extent);
 };

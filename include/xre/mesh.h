@@ -15,8 +15,8 @@
 class Mesh {
 public:
   Mesh();
-  Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex> vertices, std::vector<unsigned int> indices);
-  Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex> vertices, std::vector<unsigned int> indices, const char *texture_path);
+  Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex_t> vertices, std::vector<unsigned int> indices);
+  Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex_t> vertices, std::vector<unsigned int> indices, const char *texture_path);
 
   void render();
   void render(Shader shader);
@@ -34,5 +34,5 @@ private:
   size_t vertex_count;
   size_t index_count;
 
-  void initialize(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex> vertices, std::vector<unsigned int> indices);
+  void initialize(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex_t> vertices, std::vector<unsigned int> indices);
 };
