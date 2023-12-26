@@ -1,23 +1,17 @@
 #include <xre/line.h>
 
-Line::Line(ID3D11Device *device, ID3D11DeviceContext *device_context, DirectX::XMFLOAT4 color) {
-  this->device = device;
-  this->device_context = device_context;
-
+Line::Line(DirectX::XMFLOAT4 color) {
   std::vector<vertex_t> vertices = verticesFromPoints({0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, color);
   std::vector<unsigned int> indices = {0, 1};
 
-  initialize(device, device_context, vertices, indices);
+  initialize(vertices, indices);
 };
 
-Line::Line(ID3D11Device *device, ID3D11DeviceContext *device_context, DirectX::XMFLOAT3 line_start, DirectX::XMFLOAT3 line_end, DirectX::XMFLOAT4 color) {
-  this->device = device;
-  this->device_context = device_context;
-
+Line::Line(DirectX::XMFLOAT3 line_start, DirectX::XMFLOAT3 line_end, DirectX::XMFLOAT4 color) {
   std::vector<vertex_t> vertices = verticesFromPoints(line_start, line_end, color);
   std::vector<unsigned int> indices = {0, 1};
 
-  initialize(device, device_context, vertices, indices);
+  initialize(vertices, indices);
 };
 
 void Line::render() {

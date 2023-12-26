@@ -2,11 +2,6 @@
 
 ModelFactory::ModelFactory() {};
 
-ModelFactory::ModelFactory(ID3D11Device *device, ID3D11DeviceContext *device_context) {
-  this->device = device;
-  this->device_context = device_context;
-};
-
 Model ModelFactory::createCube(DirectX::XMFLOAT4 color) {
   std::vector<vertex_t> cube_vertices {
     { DirectX::XMFLOAT3(-1.0f, -1.0f, 1.0f), color, DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f), DirectX::XMFLOAT2(0.0f, 0.0f) },
@@ -55,22 +50,22 @@ Model ModelFactory::createCube(DirectX::XMFLOAT4 color) {
     23, 21, 20
   };
 
-  Mesh cube_mesh = Mesh(this->device, this->device_context, cube_vertices, cube_indices);
-  return Model(this->device, this->device_context, { cube_mesh });
+  Mesh cube_mesh = Mesh(cube_vertices, cube_indices);
+  return Model({ cube_mesh });
 };
 
 Model ModelFactory::createGroundPlane(float extent) {
   auto [vertices, indices] = getGroundVerticesAndIndices(extent);
 
-  Mesh ground_mesh = Mesh(this->device, this->device_context, vertices, indices);
-  return Model(this->device, this->device_context, { ground_mesh });
+  Mesh ground_mesh = Mesh(vertices, indices);
+  return Model({ ground_mesh });
 };
 
 Model ModelFactory::createGroundPlane(float extent, const char *texture_path) {
   auto [vertices, indices] = getGroundVerticesAndIndices(extent);
 
-  Mesh ground_mesh = Mesh(this->device, this->device_context, vertices, indices, texture_path);
-  return Model(this->device, this->device_context, { ground_mesh });
+  Mesh ground_mesh = Mesh(vertices, indices, texture_path);
+  return Model({ ground_mesh });
 };
 
 std::tuple<std::vector<vertex_t>, std::vector<unsigned int>> ModelFactory::getGroundVerticesAndIndices(float extent) {

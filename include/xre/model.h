@@ -14,8 +14,8 @@
 class Model {
 public:
   Model();
-  Model(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<Mesh> meshes);
-  Model(ID3D11Device *device, ID3D11DeviceContext *device_context, const char *model_path);
+  Model(std::vector<Mesh> meshes);
+  Model(const char *model_path);
 
   // Two different rendering methods, one where the user can pass in
   // a shader to use for this model
@@ -44,12 +44,14 @@ public:
   void setPosition(float x, float y, float z);
   void setPosition(DirectX::XMVECTOR position);
 
+  static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);
+
 private:
   // Pointers to the D3D11 device and device_context which we might
   // need if we want to create meshes in the model class (e.g. when
   // loading a model from a .obj file)
-  ID3D11Device *device;
-  ID3D11DeviceContext *device_context;
+  inline static ID3D11Device *device = NULL;
+  inline static ID3D11DeviceContext *device_context = NULL;
 
   // Vector holding all the meshes of this model
   std::vector<Mesh> meshes;

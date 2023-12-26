@@ -11,7 +11,7 @@
 class Shader {
 public:
   Shader();
-  Shader(const char *shader_path, ID3D11Device *device, ID3D11DeviceContext *device_context);
+  Shader(const char *shader_path);
 
   void activate();
   void cleanUp();
@@ -22,7 +22,8 @@ public:
 
   inline static Shader* getCurrentActiveShader() { return current_active_shader; };
   static void createGlobalBuffers(ID3D11Device *device, ID3D11DeviceContext *device_context);
-  static void updateViewProjectionMatrix(DirectX::XMMATRIX view_projection, ID3D11DeviceContext *device_context);
+  static void updateViewProjectionMatrix(DirectX::XMMATRIX view_projection);
+  static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);
 
 private:
   // Shader objects
@@ -33,8 +34,8 @@ private:
   ID3D11InputLayout *input_layout;
 
   // D3D11 device and device context
-  ID3D11Device *device;
-  ID3D11DeviceContext *device_context;
+  inline static ID3D11Device *device = NULL;
+  inline static ID3D11DeviceContext *device_context = NULL;
 
   // Keep track of the currently activated shader
   inline static Shader *current_active_shader = NULL;

@@ -4,14 +4,21 @@ class TestApp : public Application {
 public:
   TestApp(const char *application_name) : Application(application_name) {};
 
-  Shader ambient_shader = Shader(SHADERS_FOLDER "/ambient.hlsl", getDevice(), getDeviceContext());
-  Shader color_shader = Shader(SHADERS_FOLDER "/color.hlsl", getDevice(), getDeviceContext());
-  Shader texture_shader = Shader(SHADERS_FOLDER "/texture.hlsl", getDevice(), getDeviceContext());
+  // Create shaders
+  Shader ambient_shader = Shader(SHADERS_FOLDER "/ambient.hlsl");
+  Shader color_shader = Shader(SHADERS_FOLDER "/color.hlsl");
+  Shader texture_shader = Shader(SHADERS_FOLDER "/texture.hlsl");
+
+  // Create models with the model_factors
   Model cube = model_factory.createCube();
   Model ground_cube = model_factory.createCube(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
   Model ground = model_factory.createGroundPlane(10, DATA_FOLDER "/textures/wood.jpg");
-  Model sphere = Model(getDevice(), getDeviceContext(), DATA_FOLDER "/models/sphere.obj");
-  Line line = Line(getDevice(), getDeviceContext(), {0.0f, 0.0f, 0.0f}, {10.0f, 10.0f, 5.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
+
+  // Create custom models
+  Model sphere = Model(DATA_FOLDER "/models/sphere.obj");
+
+  // Create a line
+  Line line = Line({0.0f, 0.0f, 0.0f}, {10.0f, 10.0f, 5.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
 
   void setup() override {
     // Scale the cube down a bit

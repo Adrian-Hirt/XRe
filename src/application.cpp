@@ -5,7 +5,15 @@ Application::Application(const char *application_name) {
   open_xr_handler = OpenXrHandler(application_name);
 
   // Create the model factory
-  model_factory = ModelFactory(getDevice(), getDeviceContext());
+  model_factory = ModelFactory();
+
+  // Initialize the global buffers for the shaders
+  Shader::createGlobalBuffers(getDevice(), getDeviceContext());
+
+  // Register the device & device_context with the classes that need them
+  Shader::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
+  Mesh::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
+  Model::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
 };
 
 Application::~Application() {

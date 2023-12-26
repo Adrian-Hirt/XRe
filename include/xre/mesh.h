@@ -15,14 +15,16 @@
 class Mesh {
 public:
   Mesh();
-  Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex_t> vertices, std::vector<unsigned int> indices);
-  Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex_t> vertices, std::vector<unsigned int> indices, const char *texture_path);
+  Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices);
+  Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, const char *texture_path);
 
   virtual void render();
 
+  static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);
+
 protected:
-  ID3D11Device *device;
-  ID3D11DeviceContext *device_context;
+  inline static ID3D11Device *device = NULL;
+  inline static ID3D11DeviceContext *device_context = NULL;
 
   ID3D11Buffer *vertex_buffer; // Vertex buffer
   ID3D11Buffer *index_buffer;  // Index buffer
@@ -33,5 +35,5 @@ protected:
   size_t vertex_count;
   size_t index_count;
 
-  void initialize(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex_t> vertices, std::vector<unsigned int> indices);
+  void initialize(std::vector<vertex_t> vertices, std::vector<unsigned int> indices);
 };

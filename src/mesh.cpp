@@ -8,41 +8,33 @@ Mesh::Mesh() {};
 //------------------------------------------------------------------------------------------------------
 // Initialize the mesh.
 // Arguments:
-//  1) DirectX Device
-//  2) DirectX DeviceContext
-//  3) Vector with the vertices of the mesh
-//  4) Vector with the incides of the mesh
+//  1) Vector with the vertices of the mesh
+//  2) Vector with the incides of the mesh
 //------------------------------------------------------------------------------------------------------
-Mesh::Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex_t> vertices, std::vector<unsigned int> indices) {
+Mesh::Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices) {
   // Call general initialize method
-  initialize(device, device_context, vertices, indices);
+  initialize(vertices, indices);
 };
 
 //------------------------------------------------------------------------------------------------------
 // Initialize the mesh.
 // Arguments:
-//  1) DirectX Device
-//  2) DirectX DeviceContext
-//  3) Vector with the vertices of the mesh
-//  4) Vector with the incides of the mesh
-//  5) Path to the file holding the texture to be applied
+//  1) Vector with the vertices of the mesh
+//  2) Vector with the incides of the mesh
+//  3) Path to the file holding the texture to be applied
 //------------------------------------------------------------------------------------------------------
-Mesh::Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex_t> vertices, std::vector<unsigned int> indices, const char *texture_path) {
+Mesh::Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, const char *texture_path) {
   // Call general initialize method
-  initialize(device, device_context, vertices, indices);
+  initialize(vertices, indices);
 
   // Load the texture
   std::wstring filepath = Utils::stringToWString(texture_path);
   HRESULT result = DirectX::CreateWICTextureFromFile(device, device_context, filepath.c_str(), &p_texture, &p_texture_view);
   Utils::checkHresult(result, "Failed to load the texture"); // TODO: output the filename that was not found
-}
+};
 
 // Function to initialize the "common" data of a mesh, to avoid code-duplication
-void Mesh::initialize(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex_t> vertices, std::vector<unsigned int> indices) {
-  // Set the data we got passed in
-  this->device = device;
-  this->device_context = device_context;
-
+void Mesh::initialize(std::vector<vertex_t> vertices, std::vector<unsigned int> indices) {
   // Setup the mesh
   HRESULT result;
 
@@ -101,4 +93,9 @@ void Mesh::render() {
   // And finally, we can call the actual draw method, which will draw all the
   // indices of this mesh.
   device_context->DrawIndexed(index_count, 0, 0);
+}
+
+void Mesh::registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context) {
+  Mesh::device = device;
+  Mesh::device_context = device_context;
 }

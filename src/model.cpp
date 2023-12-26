@@ -11,19 +11,13 @@ Model::Model() {};
 //------------------------------------------------------------------------------------------------------
 // Initialize the model.
 // Arguments:
-//  1) DirectX Device
-//  2) DirectX DeviceContext
-//  3) Vector of meshes for this model
+//  1) Vector of meshes for this model
 //------------------------------------------------------------------------------------------------------
-Model::Model(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<Mesh> meshes) {
-  this->device = device;
-  this->device_context = device_context;
+Model::Model(std::vector<Mesh> meshes) {
   this->meshes = meshes;
 }
 
-Model::Model(ID3D11Device *device, ID3D11DeviceContext *device_context, const char *model_path) {
-  this->device = device;
-  this->device_context = device_context;
+Model::Model(const char *model_path) {
   loadObj(model_path);
 }
 
@@ -182,6 +176,11 @@ void Model::loadObj(const char *model_path) {
       index_offset += face_vertices_count;
     }
 
-    meshes.push_back(Mesh(device, device_context, mesh_vertices, mesh_indices));
+    meshes.push_back(Mesh(mesh_vertices, mesh_indices));
   };
+}
+
+void Model::registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context) {
+  Model::device = device;
+  Model::device_context = device_context;
 }

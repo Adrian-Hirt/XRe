@@ -8,10 +8,7 @@ Shader::Shader() {};
 //------------------------------------------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------------------------------------------
-Shader::Shader(const char *shader_path, ID3D11Device *device, ID3D11DeviceContext *device_context) {
-  this->device = device;
-  this->device_context = device_context;
-
+Shader::Shader(const char *shader_path) {
   std::string obj_location = Utils::getFileLocation(shader_path);
   std::wstring w_obj_location = Utils::stringToWString(obj_location);
 
@@ -119,7 +116,7 @@ void Shader::createGlobalBuffers(ID3D11Device *device, ID3D11DeviceContext *devi
   device_context->UpdateSubresource(p_lighting_const_buffer, 0, 0, &lighting_const_buffer, 0, 0);
 };
 
-void Shader::updateViewProjectionMatrix(DirectX::XMMATRIX view_projection, ID3D11DeviceContext *device_context) {
+void Shader::updateViewProjectionMatrix(DirectX::XMMATRIX view_projection) {
   global_per_frame_const_buffer.view_projection = view_projection;
   device_context->UpdateSubresource(p_global_per_frame_const_buffer, 0, 0, &global_per_frame_const_buffer, 0, 0);
 }
@@ -132,11 +129,11 @@ void Shader::activate() {
   }
 
   // Tell the GPU to use this shader
-  this->device_context->VSSetShader(vertex_shader, 0, 0);
-  this->device_context->PSSetShader(pixel_shader, 0, 0);
+  device_context->VSSetShader(vertex_shader, 0, 0);
+  device_context->PSSetShader(pixel_shader, 0, 0);
 
   // Also make sure we're using the correct constant buffer
-  this->device_context->VSSetConstantBuffers(1, 1, &p_per_model_const_buffer);
+  device_context->VSSetConstantBuffers(1, 1, &p_per_model_const_buffer);
 
   // And keep track of current set shader
   Shader::current_active_shader = this;
@@ -159,4 +156,9 @@ void Shader::setModelMatrix(DirectX::XMMATRIX model_matrix) {
 
 void Shader::setNormalRotationMatrix(DirectX::XMMATRIX rotation_matrix) {
   per_model_const_buffer.normal_rotation = rotation_matrix;
+}
+
+void Shader::registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context) {
+  Shader::device = device;
+  Shader::device_context = device_context;
 }
