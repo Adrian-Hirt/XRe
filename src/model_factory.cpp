@@ -70,8 +70,8 @@ Model ModelFactory::createGroundPlane(float extent, const char *texture_path) {
 
 std::tuple<std::vector<vertex_t>, std::vector<unsigned int>> ModelFactory::getGroundVerticesAndIndices(float extent) {
   std::vector<vertex_t> vertices = {
-    {  DirectX::XMFLOAT3(-extent, 0.0f, -extent), DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f),  DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(0.0f, 0.0f) },
-    {  DirectX::XMFLOAT3(-extent, 0.0f,  extent), DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f),  DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 0.0f) },
+    {  DirectX::XMFLOAT3(-extent, 0.0f, -extent), DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f),  DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 0.0f) },
+    {  DirectX::XMFLOAT3(-extent, 0.0f,  extent), DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f),  DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(0.0f, 0.0f) },
     {  DirectX::XMFLOAT3( extent, 0.0f,  extent), DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f),  DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(0.0f, 1.0f) },
     {  DirectX::XMFLOAT3( extent, 0.0f, -extent), DirectX::XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f),  DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f) }
   };

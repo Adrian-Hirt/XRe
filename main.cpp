@@ -12,7 +12,7 @@ public:
   // Create models with the model_factors
   Model cube = model_factory.createCube();
   Model ground_cube = model_factory.createCube(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
-  Model ground = model_factory.createGroundPlane(10, DATA_FOLDER "/textures/wood.jpg");
+  Model ground = model_factory.createGroundPlane(10, DATA_FOLDER "/textures/Tiles012_2K-JPG_Color.jpg");
 
   // Create custom models
   Model sphere = Model(DATA_FOLDER "/models/sphere.obj");
@@ -39,10 +39,10 @@ public:
     cube.rotate(0.0f, 0.0f, 0.01f);
 
     // Render the cube model
-    cube.render(&ambient_shader);
+    cube.render(&texture_shader);
 
     // Render the cube at the ground
-    ground_cube.render(&color_shader);
+    ground_cube.render(&texture_shader);
 
     // Render the ground
     ground.render(&texture_shader);
