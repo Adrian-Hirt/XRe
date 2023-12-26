@@ -30,11 +30,11 @@ public:
   ~OpenXrHandler();
   void pollOpenxrEvents(bool &loop_running, bool &xr_running);
   void pollOpenxrActions();
-  void renderFrame(std::function<void(XrCompositionLayerProjectionView&)> draw_callback);
+  void renderFrame(std::function<void()> draw_callback, std::function<void(XrTime)> update_simulation_callback);
   void renderLayer(XrTime predicted_time,
                     std::vector<XrCompositionLayerProjectionView>& views,
                     XrCompositionLayerProjection& layer_projection,
-                    std::function<void(XrCompositionLayerProjectionView&)> draw_callback);
+                    std::function<void()> draw_callback);
 
   ID3D11Device* getDevice();
   ID3D11DeviceContext* getDeviceContext();

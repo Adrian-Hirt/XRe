@@ -333,7 +333,7 @@ void OpenXrHandler::pollOpenxrActions() {
 //------------------------------------------------------------------------------------------------------
 // Renders the next frame
 //------------------------------------------------------------------------------------------------------
-void OpenXrHandler::renderFrame(std::function<void(XrCompositionLayerProjectionView&)> draw_callback) {
+void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::function<void(XrTime)> update_simulation_callback) {
 	XrResult result;
 
 	//------------------------------------------------------------------------------------------------------
@@ -361,7 +361,7 @@ void OpenXrHandler::renderFrame(std::function<void(XrCompositionLayerProjectionV
 	//------------------------------------------------------------------------------------------------------
 	// Update simulation
 	//------------------------------------------------------------------------------------------------------
-	// TODO: here we'll need to update the simulation, not sure how yet though
+	update_simulation_callback(xr_frame_state.predictedDisplayTime);
 
 	//------------------------------------------------------------------------------------------------------
 	// Render the layer
@@ -399,7 +399,7 @@ void OpenXrHandler::renderFrame(std::function<void(XrCompositionLayerProjectionV
 //------------------------------------------------------------------------------------------------------
 void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrCompositionLayerProjectionView>& views,
 																	 XrCompositionLayerProjection& layer_projection,
-																	 std::function<void(XrCompositionLayerProjectionView&)> draw_callback) {
+																	 std::function<void()> draw_callback) {
 	XrResult result;
 
 	uint32_t view_count = 0;

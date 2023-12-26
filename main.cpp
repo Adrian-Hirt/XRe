@@ -32,12 +32,14 @@ public:
 
     // Squish the ground cube
     ground_cube.scale(1.0f, 0.3f, 1.0f);
-  }
+  };
 
-  void draw(XrCompositionLayerProjectionView &view) override {
+  void updateSimulation(XrTime predicted_time) override {
     // Rotate the cube
     cube.rotate(0.0f, 0.0f, 0.01f);
+  };
 
+  void draw() override {
     // Render the ground
     ground.render(&texture_shader);
 
@@ -58,7 +60,7 @@ public:
     setCwCullMode();
     cube.render(&ambient_shader);
 
-  }
+  };
 };
 
 int main(int, char**) {
@@ -67,4 +69,4 @@ int main(int, char**) {
   application.run();
 
   return 0;
-}
+};

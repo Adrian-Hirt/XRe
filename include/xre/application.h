@@ -21,7 +21,8 @@ public:
 
   void run();
   virtual void setup();
-  virtual void draw(XrCompositionLayerProjectionView &view);
+  virtual void draw();
+  virtual void updateSimulation(XrTime predicted_time);
 
   ID3D11Device* getDevice();
   ID3D11DeviceContext* getDeviceContext();

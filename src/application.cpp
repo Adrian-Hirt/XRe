@@ -36,7 +36,7 @@ void Application::run() {
       open_xr_handler.pollOpenxrActions();
 
       // Render frame
-      open_xr_handler.renderFrame(std::bind(&Application::draw, this, std::placeholders::_1));
+      open_xr_handler.renderFrame(std::bind(&Application::draw, this), std::bind(&Application::updateSimulation, this, std::placeholders::_1));
     }
   }
 };
@@ -45,9 +45,14 @@ void Application::setup() {
   // Override this method to setup your scene etc.
 };
 
-void Application::draw(XrCompositionLayerProjectionView &view) {
+void Application::draw() {
   // Override this method to draw some stuff
 };
+
+void Application::updateSimulation(XrTime predicted_time) {
+  // Override this method to update the simulation based
+  // on the predicted time the frame will be rendered
+}
 
 ID3D11Device* Application::getDevice() {
   return open_xr_handler.getDevice();

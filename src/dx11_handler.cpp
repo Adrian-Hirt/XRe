@@ -249,7 +249,7 @@ swapchain_data_t Dx11Handler::createRenderTargets(ID3D11Texture2D &texture) {
 //------------------------------------------------------------------------------------------------------
 void Dx11Handler::renderFrame(XrCompositionLayerProjectionView& view,
                                   swapchain_data_t& swapchain_data,
-                                  std::function<void(XrCompositionLayerProjectionView&)> draw_callback) {
+                                  std::function<void()> draw_callback) {
   //----------------------------------------------------------------------------------
 	// Setup viewport
 	//----------------------------------------------------------------------------------
@@ -300,7 +300,7 @@ void Dx11Handler::renderFrame(XrCompositionLayerProjectionView& view,
   //----------------------------------------------------------------------------------
 	// Draw the scene
 	//----------------------------------------------------------------------------------
-  draw_callback(view);
+  draw_callback();
 }
 
 void Dx11Handler::useDefaultRasterizer(bool use_clockwise) {
