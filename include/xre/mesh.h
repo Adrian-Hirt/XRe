@@ -18,10 +18,9 @@ public:
   Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex_t> vertices, std::vector<unsigned int> indices);
   Mesh(ID3D11Device *device, ID3D11DeviceContext *device_context, std::vector<vertex_t> vertices, std::vector<unsigned int> indices, const char *texture_path);
 
-  void render();
-  void render(Shader shader);
+  virtual void render();
 
-private:
+protected:
   ID3D11Device *device;
   ID3D11DeviceContext *device_context;
 

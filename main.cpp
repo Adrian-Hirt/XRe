@@ -11,6 +11,7 @@ public:
   Model ground_cube = model_factory.createCube(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
   Model ground = model_factory.createGroundPlane(10, DATA_FOLDER "/textures/wood.jpg");
   Model sphere = Model(getDevice(), getDeviceContext(), DATA_FOLDER "/models/sphere.obj");
+  Line line = Line(getDevice(), getDeviceContext(), {0.0f, 0.0f, 0.0f}, {10.0f, 10.0f, 5.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
 
   void setup() override {
     // Scale the cube down a bit
@@ -41,6 +42,9 @@ public:
 
     // Render the sphere
     sphere.render(&color_shader);
+
+    // Render the line
+    line.render(&color_shader);
   }
 };
 

@@ -4,6 +4,7 @@
 #include <xre/utils.h>
 #include <xre/geometry.h>
 #include <xre/shader.h>
+#include <xre/line.h>
 #include <xre/mesh.h>
 #include <xre/model.h>
 #include <xre/openxr_handler.h>

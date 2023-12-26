@@ -102,11 +102,3 @@ void Mesh::render() {
   // indices of this mesh.
   device_context->DrawIndexed(index_count, 0, 0);
 }
-
-void Mesh::render(Shader shader) {
-  // Activate the shader
-  shader.activate();
-
-  // Use the normal render function
-  render();
-}
