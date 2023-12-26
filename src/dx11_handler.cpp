@@ -105,6 +105,22 @@ void Dx11Handler::initializeDeviceStates() {
 
   // Use the default state for now
   device_context->RSSetState(p_rasterizer_state_default);
+
+  // Next, we setup the texture sampler state
+  D3D11_SAMPLER_DESC sampler_description;
+  ZeroMemory(&sampler_description, sizeof(sampler_description));
+  sampler_description.Filter = D3D11_FILTER_ANISOTROPIC; // Use anisotropic filtering
+  sampler_description.MaxAnisotropy = 8; // And set anisotropic filter to x8
+  // Repeat the texture in U, V and W directions
+  sampler_description.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+  sampler_description.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+  sampler_description.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+  sampler_description.MinLOD = 0; // Use level 0 (normal texture) as the min MipMap level
+  sampler_description.MaxLOD = FLT_MAX; // And allow any arbitrary high MipMap level
+
+  result = device->CreateSamplerState(&sampler_description, &p_sampler_state);
+  Utils::checkHresult(result, "Failed to create the sampler state");
+  device_context->PSSetSamplers(0, 1, &p_sampler_state);
 }
 
 //------------------------------------------------------------------------------------------------------

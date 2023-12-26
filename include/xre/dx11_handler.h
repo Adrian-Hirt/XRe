@@ -32,6 +32,7 @@ private:
   // Device states
   ID3D11RasterizerState *p_rasterizer_state_default;
   ID3D11RasterizerState *p_rasterizer_state_wireframe;
+  ID3D11SamplerState *p_sampler_state;
 
   // Methods
   void initializeDevice(LUID &adapter_luid);

@@ -39,10 +39,10 @@ public:
     cube.rotate(0.0f, 0.0f, 0.01f);
 
     // Render the cube model
-    cube.render(&texture_shader);
+    cube.render(&ambient_shader);
 
     // Render the cube at the ground
-    ground_cube.render(&texture_shader);
+    ground_cube.render(&ambient_shader);
 
     // Render the ground
     ground.render(&texture_shader);
