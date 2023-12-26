@@ -22,6 +22,13 @@ cbuffer LightContstantBuffer {
 Texture2D Texture;
 SamplerState Sampler;
 
+float InverseGammaCorrect(float value) {
+  if (value <= 0.04045) {
+    return value * 1.0 / 12.92;
+  }
+
+  return pow(abs((value + 0.0550) * 1.0 / 1.055), 2.4f);
+}
 
 VOut VShader(float4 position : POSITION, float4 color : COLOR, float4 normal : NORMAL, float2 texcoord : TEXCOORD) {
   VOut output;
@@ -41,5 +48,11 @@ VOut VShader(float4 position : POSITION, float4 color : COLOR, float4 normal : N
 }
 
 float4 PShader(float4 position : SV_POSITION, float4 color : COLOR, float2 texcoord : TEXCOORD) : SV_TARGET {
-  return color * Texture.Sample(Sampler, texcoord);
+  float4 texture_color = Texture.Sample(Sampler, texcoord);
+
+  texture_color.r = InverseGammaCorrect(texture_color.r);
+  texture_color.g = InverseGammaCorrect(texture_color.g);
+  texture_color.b = InverseGammaCorrect(texture_color.b);
+
+  return texture_color * color;
 }
