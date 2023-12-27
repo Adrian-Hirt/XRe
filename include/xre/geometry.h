@@ -49,5 +49,9 @@ namespace Geometry {
 
     // Return the transposed product of the view and the perspective matrix
     return DirectX::XMMatrixTranspose(view_matrix * perspective_matrix);
-  }
+  };
+
+  inline XrPosef XrPoseIdentity() {
+    return {{0, 0, 0, 1}, {0, 0, 0}};
+  };
 }

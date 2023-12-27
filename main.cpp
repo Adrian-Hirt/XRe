@@ -10,9 +10,9 @@ public:
   Shader texture_shader = Shader(SHADERS_FOLDER "/ambient_texture.hlsl");
 
   // Create models with the model_factors
-  Model cube = model_factory.createCube({1.0f, 0.0f, 0.0f, 0.25f});
-  Model ground_cube = model_factory.createCube(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
-  Model ground = model_factory.createGroundPlane(10, DATA_FOLDER "/textures/Tiles012_2K-JPG_Color.jpg");
+  Model cube = ModelFactory::createCube({1.0f, 0.0f, 0.0f, 0.25f});
+  Model ground_cube = ModelFactory::createCube(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
+  Model ground = ModelFactory::createGroundPlane(10, DATA_FOLDER "/textures/Tiles012_2K-JPG_Color.jpg");
 
   // Create custom models
   Model sphere = Model(DATA_FOLDER "/models/sphere.obj");

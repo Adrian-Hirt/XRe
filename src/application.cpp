@@ -4,17 +4,6 @@ Application::Application(const char *application_name) {
   // create the XR handler
   open_xr_handler = OpenXrHandler(application_name);
   dx11_handler = open_xr_handler.dx11_handler;
-
-  // Create the model factory
-  model_factory = ModelFactory();
-
-  // Initialize the global buffers for the shaders
-  Shader::createGlobalBuffers(getDevice(), getDeviceContext());
-
-  // Register the device & device_context with the classes that need them
-  Shader::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
-  Mesh::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
-  Model::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
 };
 
 Application::~Application() {};
@@ -32,9 +21,6 @@ void Application::run() {
     open_xr_handler.pollOpenxrEvents(loop_running, xr_running);
 
     if (xr_running) {
-      // Poll openXR actions
-      open_xr_handler.pollOpenxrActions();
-
       // Render frame
       open_xr_handler.renderFrame(std::bind(&Application::draw, this), std::bind(&Application::updateSimulation, this, std::placeholders::_1));
     }

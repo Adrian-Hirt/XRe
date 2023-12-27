@@ -17,6 +17,7 @@
 #include <xre/utils.h>
 #include <xre/structs.h>
 #include <xre/dx11_handler.h>
+#include <xre/controller.h>
 
 // Other includes
 #include <iostream>
@@ -29,7 +30,6 @@ public:
   OpenXrHandler(const char *application_name);
   ~OpenXrHandler();
   void pollOpenxrEvents(bool &loop_running, bool &xr_running);
-  void pollOpenxrActions();
   void renderFrame(std::function<void()> draw_callback, std::function<void(XrTime)> update_simulation_callback);
   void renderLayer(XrTime predicted_time,
                     std::vector<XrCompositionLayerProjectionView>& views,
@@ -63,7 +63,17 @@ private:
   // Pointers to ext functions we need to use
   PFN_xrGetD3D11GraphicsRequirementsKHR ext_xrGetD3D11GraphicsRequirementsKHR;
 
+  // Controllers
+  Controller left_controller;
+  Controller right_controller;
+
+  // Actions
+  XrActionSet default_action_set;
+  XrAction controller_pose_action;
+
   // Methods
   bool initializeOpenxr();
-  bool initializeOpenxrActions();
+  void initializeOpenxrActions();
+  void pollOpenxrActions(XrTime predicted_time);
+  void updateControllerStates(Controller *controller, XrTime predicted_time);
 };

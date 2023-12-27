@@ -30,9 +30,6 @@ public:
   void setCcwCullMode();
   void setCwCullMode();
   void setWireframeMode();
-
-  ModelFactory model_factory;
-
 private:
   // Handlers
   OpenXrHandler open_xr_handler;

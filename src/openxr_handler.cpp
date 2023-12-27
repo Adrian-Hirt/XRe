@@ -19,11 +19,16 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
   // Check if we were successful in creating the openxr system.
   Utils::checkBoolResult(result, "Initializing OpenXR failed!");
 
-  // Instruct the handler to initialize the xr actions
-  result = initializeOpenxrActions();
+	// Initialize the global buffers for the shaders
+  Shader::createGlobalBuffers(getDevice(), getDeviceContext());
 
-  // Check if we were successful in creating the openxr actions.
-  Utils::checkBoolResult(result, "Initializing the OpenXR actions failed!");
+  // Register the device & device_context with the classes that need them
+  Shader::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
+  Mesh::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
+  Model::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
+
+  // Instruct the handler to initialize the xr actions
+  initializeOpenxrActions();
 };
 
 //------------------------------------------------------------------------------------------------------
@@ -248,9 +253,100 @@ bool OpenXrHandler::initializeOpenxr() {
 //------------------------------------------------------------------------------------------------------
 // Initialize the OpenXR actions
 //------------------------------------------------------------------------------------------------------
-bool OpenXrHandler::initializeOpenxrActions() {
-  // TODO: implement some basic actions
-  return true;
+void OpenXrHandler::initializeOpenxrActions() {
+	XrResult result;
+
+	// Create controllers for left and right hands
+	left_controller = Controller(1);
+	right_controller = Controller(1);
+
+	// Create the action set for the application. Currently, we're only using
+	// a single action set for the whole application, later on we might add
+	// more action sets, e.g. one for gameplay and one for menu interactions.
+	XrActionSetCreateInfo action_set_create_info = {};
+	action_set_create_info.type = XR_TYPE_ACTION_SET_CREATE_INFO;
+	strcpy_s(action_set_create_info.actionSetName, "default");
+	strcpy_s(action_set_create_info.localizedActionSetName, "Default Action Set");
+	result = xrCreateActionSet(openxr_instance, &action_set_create_info, &default_action_set);
+	Utils::checkXrResult(result, "Could not create the default action set");
+
+	// Setup controller paths for the left and right hand, as we need these to
+	// get the poses of both hands.
+	result = xrStringToPath(openxr_instance, "/user/hand/left", &(left_controller.controller_path));
+	Utils::checkXrResult(result, "Coult not create path from string for left hand");
+	result = xrStringToPath(openxr_instance, "/user/hand/right", &(right_controller.controller_path));
+	Utils::checkXrResult(result, "Coult not create path from string for right hand");
+
+	XrPath controller_paths[2] = { left_controller.controller_path, right_controller.controller_path };
+
+	// Create the action for tracking of the controllers, such that we can get
+	// the position and orientation of each controller, render models and setup
+	// interactions with the scene based on the position of the controllers.
+	XrActionCreateInfo pose_action_create_info = {};
+	pose_action_create_info.type = XR_TYPE_ACTION_CREATE_INFO;			 					// Set the type of the create info
+	strcpy_s(pose_action_create_info.actionName, "controller_pose"); 					// Set a name for the action
+	strcpy_s(pose_action_create_info.localizedActionName, "Controller Pose"); // Add a "localized" name for the action
+	pose_action_create_info.countSubactionPaths = 2;                 				  // We'll be using two subaction paths (left / right controller)
+	pose_action_create_info.subactionPaths = controller_paths;       					// Pass in the controller paths
+	pose_action_create_info.actionType = XR_ACTION_TYPE_POSE_INPUT;  					// Finally, tell OpenXR that this input is a pose input
+
+	result = xrCreateAction(default_action_set, &pose_action_create_info, &controller_pose_action);
+	Utils::checkXrResult(result, "Coult not create the controller pose action");
+
+	// Bind the previously added actions to the controllers. We'll be using the "simple controller"
+	// interaction path from Khronos, as this is a generic profile that should work with most
+	// input controllers that we'll encounter.
+	XrPath controller_profile_path;
+	result = xrStringToPath(openxr_instance, "/interaction_profiles/khr/simple_controller", &controller_profile_path);
+	Utils::checkXrResult(result, "Coult not create path from string for the simple controller interaction profile");
+
+	// Create the paths for the pose of the controller for both the left and the right input
+	result = xrStringToPath(openxr_instance, "/user/hand/left/input/grip/pose", &(left_controller.pose_path));
+	Utils::checkXrResult(result, "Coult not create path from string for the left input pose");
+
+	result = xrStringToPath(openxr_instance, "/user/hand/right/input/grip/pose", &(right_controller.pose_path));
+	Utils::checkXrResult(result, "Coult not create path from string for the right input pose");
+
+	// // Setup the suggested bindings, i.e. we suggest the runtime what path we want to
+	// bind a specific action to. As the name says, this is only a suggestion and the
+	// runtime may change a binding, e.g. if a user re-maps inputs on their device.
+	XrActionSuggestedBinding suggested_action_bindings[2];
+	suggested_action_bindings[0].action = controller_pose_action;
+	suggested_action_bindings[0].binding = left_controller.pose_path;
+	suggested_action_bindings[1].action = controller_pose_action;
+	suggested_action_bindings[1].binding = right_controller.pose_path;
+
+	XrInteractionProfileSuggestedBinding suggested_binding = {};
+	suggested_binding.type = XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING;					// Set type for the struct
+	suggested_binding.interactionProfile = controller_profile_path;									// Set our previously created interaction profile
+	suggested_binding.countSuggestedBindings = _countof(suggested_action_bindings);	// Set the number of suggested bindings
+	suggested_binding.suggestedBindings = suggested_action_bindings;								// And finally, set the previously defined suggested bindings
+	result = xrSuggestInteractionProfileBindings(openxr_instance, &suggested_binding);
+	Utils::checkXrResult(result, "Failed to suggest the interaction profile bindings");
+
+	// Create the pose spaces for both controllers
+	XrActionSpaceCreateInfo grip_pose_space_create_info = {};
+	grip_pose_space_create_info.type = XR_TYPE_ACTION_SPACE_CREATE_INFO;
+	grip_pose_space_create_info.action = controller_pose_action;
+	grip_pose_space_create_info.poseInActionSpace = Geometry::XrPoseIdentity();
+
+	// Create the space for the left controller
+	grip_pose_space_create_info.subactionPath = left_controller.controller_path;
+	result = xrCreateActionSpace(openxr_session, &grip_pose_space_create_info, &(left_controller.pose_space));
+	Utils::checkXrResult(result, "Failed to create the action space for pose of the left controller");
+
+	// Create the space for the right controller
+	grip_pose_space_create_info.subactionPath = right_controller.controller_path;
+	result = xrCreateActionSpace(openxr_session, &grip_pose_space_create_info, &(right_controller.pose_space));
+	Utils::checkXrResult(result, "Failed to create the action space for pose of the right controller");
+
+	// Attach the action set that was created to the session
+	XrSessionActionSetsAttachInfo session_action_set_attach_info = {};
+	session_action_set_attach_info.type = XR_TYPE_SESSION_ACTION_SETS_ATTACH_INFO;
+	session_action_set_attach_info.countActionSets = 1;
+	session_action_set_attach_info.actionSets = &default_action_set;
+	result = xrAttachSessionActionSets(openxr_session, &session_action_set_attach_info);
+	Utils::checkXrResult(result, "Failed to attach the action set to the session");
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -326,8 +422,60 @@ void OpenXrHandler::pollOpenxrEvents(bool &loop_running, bool &xr_running) {
 //------------------------------------------------------------------------------------------------------
 // Poll the OpenXR actions
 //------------------------------------------------------------------------------------------------------
-void OpenXrHandler::pollOpenxrActions() {
-	// This is not doing anything for the moment
+void OpenXrHandler::pollOpenxrActions(XrTime predicted_time) {
+	XrResult result;
+
+	// Sync active action set, currently we only have one action set, so we
+	// can always use that action set.
+	XrActiveActionSet active_action_set = {};
+	active_action_set.actionSet = default_action_set;
+	active_action_set.subactionPath = XR_NULL_PATH;
+
+  XrActionsSyncInfo actions_sync_info = {};
+	actions_sync_info.type = XR_TYPE_ACTIONS_SYNC_INFO;
+  actions_sync_info.countActiveActionSets = 1;
+  actions_sync_info.activeActionSets = &active_action_set;
+  result = xrSyncActions(openxr_session, &actions_sync_info);
+	Utils::checkXrResult(result, "Could not sync the openxr actions");
+
+	// Update the states of the controllers, in a separate method to avoid
+	// having to code this twice
+	updateControllerStates(&left_controller, predicted_time);
+	updateControllerStates(&right_controller, predicted_time);
+}
+
+void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predicted_time) {
+	XrResult result;
+
+	// Setup the struct that we'll be using to get the state of the controller
+	// for the pose action.
+	XrActionStateGetInfo controller_state_get_info = {};
+	controller_state_get_info.type = XR_TYPE_ACTION_STATE_GET_INFO;
+	controller_state_get_info.action = controller_pose_action;
+	controller_state_get_info.subactionPath = controller->controller_path;
+
+	// Get the pose of the controller
+	XrActionStatePose controller_pose_state = {};
+	controller_pose_state.type = XR_TYPE_ACTION_STATE_POSE;
+	result = xrGetActionStatePose(openxr_session, &controller_state_get_info, &controller_pose_state);
+	Utils::checkXrResult(result, "Can't get the pose of the controller");
+
+	// Check if the controller is active and store the value on the controller
+	controller->active = controller_pose_state.isActive;
+
+	// If the controller is active, we'll also get its position & orientation,
+	// such that we can use this for simulation & rendering.
+	if (controller->active) {
+		// Setup the struct to pass to the `xrLocateSpace` calls below.
+		XrSpaceLocation space_location = {};
+		space_location.type = XR_TYPE_SPACE_LOCATION;
+
+		// Update pose of the controller
+		result = xrLocateSpace(controller->pose_space, openxr_space, predicted_time, &space_location);
+		Utils::checkXrResult(result, "Can't get the grip pose of the controller");
+
+		controller->pose = space_location.pose;
+	}
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -357,6 +505,11 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
 	if (XR_FAILED(result)) {
 		return;
 	}
+
+	//------------------------------------------------------------------------------------------------------
+	// Poll the openxr actions for this frame
+	//------------------------------------------------------------------------------------------------------
+	pollOpenxrActions(xr_frame_state.predictedDisplayTime);
 
 	//------------------------------------------------------------------------------------------------------
 	// Update simulation
@@ -472,6 +625,10 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 
 		// Render the content to the swapchain, which is done by the D3D11 handler
 		dx11_handler.renderFrame(views[i], swapchains[i].swapchain_data[swapchain_image_id], draw_callback);
+
+		// Render the controllers
+		left_controller.render();
+		right_controller.render();
 
 		// We're done rendering for the current view, so we can release the swapchain image (i.e. tell
 		// the OpenXR runtime that we're done with this swapchain image).
