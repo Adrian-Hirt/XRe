@@ -10,6 +10,7 @@
 #include <xre/model.h>
 #include <xre/openxr_handler.h>
 #include <xre/model_factory.h>
+#include <xre/text.h>
 
 // Other includes
 #include <iostream>

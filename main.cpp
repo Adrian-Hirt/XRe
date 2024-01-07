@@ -21,7 +21,9 @@ public:
   Line line = Line({0.0f, 0.0f, 0.0f}, {10.0f, 10.0f, 5.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
 
   // Create bitmaps
-  Bitmap quad = Bitmap(-0.95f, 0.95f, 0.25, 0.25, DATA_FOLDER "/textures/MetalWalkway013_2K-PNG_Color_Opacity.png");
+  Bitmap quad = Bitmap(0.70f, 0.95f, 0.25, 0.25, DATA_FOLDER "/textures/MetalWalkway013_2K-PNG_Color_Opacity.png");
+
+  Text text = Text();
 
   void setup() override {
     // Scale the cube down a bit
@@ -35,6 +37,8 @@ public:
 
     // Squish the ground cube
     ground_cube.scale(1.0f, 0.3f, 1.0f);
+
+    text.buildMeshesFromSentence("This is a sample text :)");
   };
 
   void updateSimulation(XrTime predicted_time) override {
@@ -66,6 +70,8 @@ public:
     cube.render(&ambient_shader);
 
     quad.render();
+
+    text.render();
   };
 };
 

@@ -43,3 +43,10 @@ typedef struct per_model_const_buffer_t {
   DirectX::XMMATRIX model;
   DirectX::XMMATRIX normal_rotation;
 } per_model_const_buffer_t;
+
+typedef struct text_char_t {
+  float left;
+  float right;
+  float top;
+  float bottom;
+} text_char_t;
