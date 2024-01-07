@@ -28,11 +28,6 @@ public:
   XrPath aim_path;
   XrSpace aim_space;
 
-  // Keep track wether the controller is active or not
-  bool active;
-
-  Shader controller_shader;
-
   // Pose of the controller
   XrPosef pose;
 
@@ -40,8 +35,9 @@ public:
   XrPosef aim;
 
 private:
-  // Model for the controller
+  // Model and shader for the controller
   Model model;
+  Shader controller_shader;
 
   // Line for visualizing the aim direction
   Line aim_line;

@@ -499,12 +499,9 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
 	result = xrGetActionStatePose(openxr_session, &controller_state_get_info, &controller_pose_state);
 	Utils::checkXrResult(result, "Can't get the pose of the controller");
 
-	// Check if the controller is active and store the value on the controller
-	controller->active = controller_pose_state.isActive;
-
 	// If the controller is active, we'll also get its position & orientation,
 	// such that we can use this for simulation & rendering.
-	if (controller->active) {
+	if (controller_pose_state.isActive) {
 		// Setup the struct to pass to the `xrLocateSpace` calls below.
 		XrSpaceLocation space_location = {};
 		space_location.type = XR_TYPE_SPACE_LOCATION;
