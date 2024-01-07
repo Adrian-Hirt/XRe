@@ -7,6 +7,7 @@
 #include <xre/model.h>
 #include <xre/shader.h>
 #include <xre/model_factory.h>
+#include <xre/line.h>
 
 class Controller {
 public:
@@ -23,6 +24,10 @@ public:
   XrPath pose_path;
   XrSpace pose_space;
 
+  // Path and space for the aim action
+  XrPath aim_path;
+  XrSpace aim_space;
+
   // Keep track wether the controller is active or not
   bool active;
 
@@ -31,7 +36,13 @@ public:
   // Pose of the controller
   XrPosef pose;
 
+  // Aim of the controller
+  XrPosef aim;
+
 private:
   // Model for the controller
   Model model;
+
+  // Line for visualizing the aim direction
+  Line aim_line;
 };

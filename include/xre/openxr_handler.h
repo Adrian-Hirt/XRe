@@ -70,6 +70,7 @@ private:
   // Actions
   XrActionSet default_action_set;
   XrAction controller_pose_action;
+  XrAction controller_aim_action;
 
   // Methods
   bool initializeOpenxr();

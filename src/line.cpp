@@ -43,6 +43,31 @@ void Line::render(Shader *shader) {
   device_context->DrawIndexed(index_count, 0, 0);
 };
 
+void Line::updateLineFromXrPose(XrPosef pose) {
+  // The start of the line is simply the position of the pose
+  DirectX::XMFLOAT3 line_start = *((DirectX::XMFLOAT3 *)&pose.position);
+
+  // For the end of the line, we assume that we're aiming in negative z direction initially. As such,
+  // we first take a vector in negative z direction, and then rotate it with the quaternion
+  // given in the XrPosef struct
+  DirectX::XMVECTOR orientation = DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&pose.orientation);
+  DirectX::XMVECTOR direction = DirectX::XMVector3Rotate(DirectX::XMVECTORF32({0.0f, 0.0f, -1.5f}), orientation);
+  DirectX::XMVECTOR line_end_vec = DirectX::XMVectorAdd(direction, DirectX::XMLoadFloat3(&line_start));
+
+  // Store the vector in an xmfloat3
+  DirectX::XMFLOAT3 line_end;
+  DirectX::XMStoreFloat3(&line_end, line_end_vec);
+
+  // Create the new vertices
+  std::vector<vertex_t> vertices = verticesFromPoints(line_start, line_end,  {1.0f, 1.0f, 1.0f, 1.0f});
+
+  // Update the vertex buffer
+  D3D11_MAPPED_SUBRESOURCE resource;
+  device_context->Map(vertex_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+  memcpy(resource.pData, vertices.data(), sizeof(vertex_t) * vertices.size());
+  device_context->Unmap(vertex_buffer, 0);
+}
+
 std::vector<vertex_t> Line::verticesFromPoints(DirectX::XMFLOAT3 start, DirectX::XMFLOAT3 end, DirectX::XMFLOAT4 color) {
   std::vector<vertex_t> vertices = {
     {  start, color,  DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(0.0f, 0.0f) },

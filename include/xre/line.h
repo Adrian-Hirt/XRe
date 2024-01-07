@@ -9,6 +9,7 @@ public:
 
   void render() override;
   void render(Shader *shader);
+  void updateLineFromXrPose(XrPosef pose);
 
 private:
   std::vector<vertex_t> verticesFromPoints(DirectX::XMFLOAT3 start, DirectX::XMFLOAT3 end, DirectX::XMFLOAT4 color);
