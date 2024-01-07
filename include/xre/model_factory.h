@@ -86,4 +86,18 @@ namespace ModelFactory {
     Mesh ground_mesh = Mesh(vertices, indices, texture_path);
     return Model({ ground_mesh });
   }
+
+  inline Model createHudQuad(float top_left_position_x, float top_left_position_y, float x_extend, float y_extend, DirectX::XMFLOAT4 color = { 0.2f, 0.2f, 0.2f, 1.0f }) {
+    std::vector<vertex_t> vertices = {
+      {  DirectX::XMFLOAT3(top_left_position_x,            top_left_position_y,            0.0f), color, DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f), DirectX::XMFLOAT2(1.0f, 0.0f) },
+      {  DirectX::XMFLOAT3(top_left_position_x + x_extend, top_left_position_y,            0.0f), color, DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f), DirectX::XMFLOAT2(0.0f, 0.0f) },
+      {  DirectX::XMFLOAT3(top_left_position_x + x_extend, top_left_position_y - y_extend, 0.0f), color, DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f), DirectX::XMFLOAT2(0.0f, 1.0f) },
+      {  DirectX::XMFLOAT3(top_left_position_x,            top_left_position_y - y_extend, 0.0f), color, DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f), DirectX::XMFLOAT2(1.0f, 1.0f) }
+    };
+
+    std::vector<unsigned int> indices = {0, 1, 2, 3, 0, 2};
+
+    Mesh quad_mesh = Mesh(vertices, indices);
+    return Model({ quad_mesh });
+  }
 };

@@ -7,12 +7,15 @@ public:
   // Create shaders
   Shader ambient_shader = Shader(SHADERS_FOLDER "/ambient.hlsl");
   Shader color_shader = Shader(SHADERS_FOLDER "/color.hlsl");
+  Shader two_dimensional_shader = Shader(SHADERS_FOLDER "/two_dimensional.hlsl");
   Shader texture_shader = Shader(SHADERS_FOLDER "/ambient_texture.hlsl");
 
   // Create models with the model_factors
   Model cube = ModelFactory::createCube({1.0f, 0.0f, 0.0f, 0.25f});
   Model ground_cube = ModelFactory::createCube(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
   Model ground = ModelFactory::createGroundPlane(10, DATA_FOLDER "/textures/Tiles012_2K-JPG_Color.jpg");
+
+  Model quad = ModelFactory::createHudQuad(-0.95f, 0.95f, 0.25, 0.25, {0.2f, 0.2f, 0.2f, 0.5f});
 
   // Create custom models
   Model sphere = Model(DATA_FOLDER "/models/sphere.obj");
@@ -36,6 +39,8 @@ public:
 
   void updateSimulation(XrTime predicted_time) override {
     // Rotate the cube
+    // TODO: we should interpolate the rotation value such that it's
+    // not coupled to the framerate
     cube.rotate(0.0f, 0.0f, 0.01f);
   };
 
@@ -60,6 +65,7 @@ public:
     setCwCullMode();
     cube.render(&ambient_shader);
 
+    quad.render(&two_dimensional_shader);
   };
 };
 
