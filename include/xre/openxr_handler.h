@@ -64,8 +64,8 @@ private:
   PFN_xrGetD3D11GraphicsRequirementsKHR ext_xrGetD3D11GraphicsRequirementsKHR;
 
   // Controllers
-  Controller left_controller;
-  Controller right_controller;
+  Controller *left_controller = NULL;
+  Controller *right_controller = NULL;
 
   // Actions
   XrActionSet default_action_set;

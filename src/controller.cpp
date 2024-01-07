@@ -1,9 +1,6 @@
 #include <xre/controller.h>
 
 Controller::Controller() {
-}
-
-Controller::Controller(unsigned int) {
   model = ModelFactory::createCube({0.67f, 0.84f, 0.9f, 1.0f});
   model.scale(0.03f, 0.03f, 0.075f);
 

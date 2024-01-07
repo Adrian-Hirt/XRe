@@ -257,8 +257,8 @@ void OpenXrHandler::initializeOpenxrActions() {
 	XrResult result;
 
 	// Create controllers for left and right hands
-	left_controller = Controller(1);
-	right_controller = Controller(1);
+	left_controller = new Controller();
+	right_controller = new Controller();
 
 	// Create the action set for the application. Currently, we're only using
 	// a single action set for the whole application, later on we might add
@@ -272,12 +272,12 @@ void OpenXrHandler::initializeOpenxrActions() {
 
 	// Setup controller paths for the left and right hand, as we need these to
 	// get the poses of both hands.
-	result = xrStringToPath(openxr_instance, "/user/hand/left", &(left_controller.controller_path));
+	result = xrStringToPath(openxr_instance, "/user/hand/left", &(left_controller->controller_path));
 	Utils::checkXrResult(result, "Coult not create path from string for left hand");
-	result = xrStringToPath(openxr_instance, "/user/hand/right", &(right_controller.controller_path));
+	result = xrStringToPath(openxr_instance, "/user/hand/right", &(right_controller->controller_path));
 	Utils::checkXrResult(result, "Coult not create path from string for right hand");
 
-	XrPath controller_paths[2] = { left_controller.controller_path, right_controller.controller_path };
+	XrPath controller_paths[2] = { left_controller->controller_path, right_controller->controller_path };
 
 	// Create the action for tracking of the controllers, such that we can get
 	// the position and orientation of each controller, render models and setup
@@ -301,10 +301,10 @@ void OpenXrHandler::initializeOpenxrActions() {
 	Utils::checkXrResult(result, "Coult not create path from string for the simple controller interaction profile");
 
 	// Create the paths for the pose of the controller for both the left and the right input
-	result = xrStringToPath(openxr_instance, "/user/hand/left/input/grip/pose", &(left_controller.pose_path));
+	result = xrStringToPath(openxr_instance, "/user/hand/left/input/grip/pose", &(left_controller->pose_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the left input pose");
 
-	result = xrStringToPath(openxr_instance, "/user/hand/right/input/grip/pose", &(right_controller.pose_path));
+	result = xrStringToPath(openxr_instance, "/user/hand/right/input/grip/pose", &(right_controller->pose_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the right input pose");
 
 	// // Setup the suggested bindings, i.e. we suggest the runtime what path we want to
@@ -312,9 +312,9 @@ void OpenXrHandler::initializeOpenxrActions() {
 	// runtime may change a binding, e.g. if a user re-maps inputs on their device.
 	XrActionSuggestedBinding suggested_action_bindings[2];
 	suggested_action_bindings[0].action = controller_pose_action;
-	suggested_action_bindings[0].binding = left_controller.pose_path;
+	suggested_action_bindings[0].binding = left_controller->pose_path;
 	suggested_action_bindings[1].action = controller_pose_action;
-	suggested_action_bindings[1].binding = right_controller.pose_path;
+	suggested_action_bindings[1].binding = right_controller->pose_path;
 
 	XrInteractionProfileSuggestedBinding suggested_binding = {};
 	suggested_binding.type = XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING;					// Set type for the struct
@@ -331,13 +331,13 @@ void OpenXrHandler::initializeOpenxrActions() {
 	grip_pose_space_create_info.poseInActionSpace = Geometry::XrPoseIdentity();
 
 	// Create the space for the left controller
-	grip_pose_space_create_info.subactionPath = left_controller.controller_path;
-	result = xrCreateActionSpace(openxr_session, &grip_pose_space_create_info, &(left_controller.pose_space));
+	grip_pose_space_create_info.subactionPath = left_controller->controller_path;
+	result = xrCreateActionSpace(openxr_session, &grip_pose_space_create_info, &(left_controller->pose_space));
 	Utils::checkXrResult(result, "Failed to create the action space for pose of the left controller");
 
 	// Create the space for the right controller
-	grip_pose_space_create_info.subactionPath = right_controller.controller_path;
-	result = xrCreateActionSpace(openxr_session, &grip_pose_space_create_info, &(right_controller.pose_space));
+	grip_pose_space_create_info.subactionPath = right_controller->controller_path;
+	result = xrCreateActionSpace(openxr_session, &grip_pose_space_create_info, &(right_controller->pose_space));
 	Utils::checkXrResult(result, "Failed to create the action space for pose of the right controller");
 
 	// Attach the action set that was created to the session
@@ -440,8 +440,8 @@ void OpenXrHandler::pollOpenxrActions(XrTime predicted_time) {
 
 	// Update the states of the controllers, in a separate method to avoid
 	// having to code this twice
-	updateControllerStates(&left_controller, predicted_time);
-	updateControllerStates(&right_controller, predicted_time);
+	updateControllerStates(left_controller, predicted_time);
+	updateControllerStates(right_controller, predicted_time);
 }
 
 void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predicted_time) {
@@ -627,8 +627,8 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 		dx11_handler.renderFrame(views[i], swapchains[i].swapchain_data[swapchain_image_id], draw_callback);
 
 		// Render the controllers
-		left_controller.render();
-		right_controller.render();
+		left_controller->render();
+		right_controller->render();
 
 		// We're done rendering for the current view, so we can release the swapchain image (i.e. tell
 		// the OpenXR runtime that we're done with this swapchain image).

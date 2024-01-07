@@ -12,7 +12,6 @@ class Controller {
 public:
   // Constructor
   Controller();
-  Controller(unsigned int);
 
   // render a controller
   void render();
