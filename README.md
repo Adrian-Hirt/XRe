@@ -6,4 +6,4 @@ Please note that XRe is a WIP project and mainly intended for me to learn more a
 
 ## Acknowledgements
 
-* The textures in `data/textures` were downloaded from https://ambientcg.com/
+* The textures in `data/textures` were downloaded from https://ambientcg.com/, licensed under the Creative Commons CC0 1.0 Universal License.
