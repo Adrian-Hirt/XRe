@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------------------------------
 // Empty default constructor which we need
 //------------------------------------------------------------------------------------------------------
-Shader::Shader() {};
+Shader::Shader() {}
 
 //------------------------------------------------------------------------------------------------------
 // Constructor
@@ -70,7 +70,7 @@ Shader::Shader(const char *shader_path) {
   // Initialize the two matrices for the per model matrix to identity matrices
   per_model_const_buffer.model = DirectX::XMMatrixIdentity();
   per_model_const_buffer.normal_rotation = DirectX::XMMatrixIdentity();
-};
+}
 
 void Shader::createGlobalBuffers(ID3D11Device *device, ID3D11DeviceContext *device_context) {
   HRESULT result;
@@ -114,7 +114,7 @@ void Shader::createGlobalBuffers(ID3D11Device *device, ID3D11DeviceContext *devi
   // it before the model buffer).
   device_context->VSSetConstantBuffers(2, 1, &p_lighting_const_buffer);
   device_context->UpdateSubresource(p_lighting_const_buffer, 0, 0, &lighting_const_buffer, 0, 0);
-};
+}
 
 void Shader::updateViewProjectionMatrix(DirectX::XMMATRIX view_projection) {
   global_per_frame_const_buffer.view_projection = view_projection;

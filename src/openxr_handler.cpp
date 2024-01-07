@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------------------------------
 // Empty default constructor
 //------------------------------------------------------------------------------------------------------
-OpenXrHandler::OpenXrHandler() {};
+OpenXrHandler::OpenXrHandler() {}
 
 //------------------------------------------------------------------------------------------------------
 // Constructor
@@ -29,12 +29,12 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
 
   // Instruct the handler to initialize the xr actions
   initializeOpenxrActions();
-};
+}
 
 //------------------------------------------------------------------------------------------------------
 // Destructor
 //------------------------------------------------------------------------------------------------------
-OpenXrHandler::~OpenXrHandler() {};
+OpenXrHandler::~OpenXrHandler() {}
 
 //------------------------------------------------------------------------------------------------------
 // Initialize the general OpenXR stuff
@@ -696,8 +696,8 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 
 ID3D11Device* OpenXrHandler::getDevice() {
   return dx11_handler.getDevice();
-};
+}
 
 ID3D11DeviceContext* OpenXrHandler::getDeviceContext() {
   return dx11_handler.getDeviceContext();
-};
+}

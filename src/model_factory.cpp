@@ -52,21 +52,21 @@ Model ModelFactory::createCube(DirectX::XMFLOAT4 color) {
 
   Mesh cube_mesh = Mesh(cube_vertices, cube_indices);
   return Model({ cube_mesh });
-};
+}
 
 Model ModelFactory::createGroundPlane(float extent) {
   auto [vertices, indices] = getGroundVerticesAndIndices(extent);
 
   Mesh ground_mesh = Mesh(vertices, indices);
   return Model({ ground_mesh });
-};
+}
 
 Model ModelFactory::createGroundPlane(float extent, const char *texture_path) {
   auto [vertices, indices] = getGroundVerticesAndIndices(extent);
 
   Mesh ground_mesh = Mesh(vertices, indices, texture_path);
   return Model({ ground_mesh });
-};
+}
 
 std::tuple<std::vector<vertex_t>, std::vector<unsigned int>> ModelFactory::getGroundVerticesAndIndices(float extent) {
   std::vector<vertex_t> vertices = {
@@ -79,4 +79,4 @@ std::tuple<std::vector<vertex_t>, std::vector<unsigned int>> ModelFactory::getGr
   std::vector<unsigned int> indices = {0, 2, 1, 0, 3, 2};
 
   return { vertices, indices };
-};
+}

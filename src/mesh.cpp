@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------------------------------
 // Empty default constructor which we need
 //------------------------------------------------------------------------------------------------------
-Mesh::Mesh() {};
+Mesh::Mesh() {}
 
 //------------------------------------------------------------------------------------------------------
 // Initialize the mesh.
@@ -14,7 +14,7 @@ Mesh::Mesh() {};
 Mesh::Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices) {
   // Call general initialize method
   initialize(vertices, indices);
-};
+}
 
 //------------------------------------------------------------------------------------------------------
 // Initialize the mesh.
@@ -31,7 +31,7 @@ Mesh::Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, co
   std::wstring filepath = Utils::stringToWString(texture_path);
   HRESULT result = DirectX::CreateWICTextureFromFile(device, device_context, filepath.c_str(), &p_texture, &p_texture_view);
   Utils::checkHresult(result, "Failed to load the texture"); // TODO: output the filename that was not found
-};
+}
 
 // Function to initialize the "common" data of a mesh, to avoid code-duplication
 void Mesh::initialize(std::vector<vertex_t> vertices, std::vector<unsigned int> indices) {

@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------------------------------
 // Empty default constructor which we need
 //------------------------------------------------------------------------------------------------------
-Dx11Handler::Dx11Handler() {};
+Dx11Handler::Dx11Handler() {}
 
 //------------------------------------------------------------------------------------------------------
 // Constructor
@@ -14,7 +14,7 @@ Dx11Handler::Dx11Handler(LUID &adapter_luid) {
 
   // Initialize the device states
   initializeDeviceStates();
-};
+}
 
 //------------------------------------------------------------------------------------------------------
 // Initialize the D3D11 device
@@ -165,7 +165,7 @@ ID3D11Device* Dx11Handler::getDevice() {
   else {
     return this->device;
   }
-};
+}
 
 //------------------------------------------------------------------------------------------------------
 // Returns the DirectX DeviceContext
@@ -178,7 +178,7 @@ ID3D11DeviceContext *Dx11Handler::getDeviceContext() {
   else {
     return this->device_context;
   }
-};
+}
 
 //------------------------------------------------------------------------------------------------------
 // Create the targets for DirectX to render to. This method creates a back-buffer (which stores the
@@ -310,8 +310,8 @@ void Dx11Handler::useDefaultRasterizer(bool use_clockwise) {
   else {
     device_context->RSSetState(p_rasterizer_state_default_ccw);
   }
-};
+}
 
 void Dx11Handler::useWireframeRasterizer() {
   device_context->RSSetState(p_rasterizer_state_wireframe);
-};
+}

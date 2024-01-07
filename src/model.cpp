@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------------------------------
 // Empty default constructor which we need
 //------------------------------------------------------------------------------------------------------
-Model::Model() {};
+Model::Model() {}
 
 //------------------------------------------------------------------------------------------------------
 // Initialize the model.
@@ -58,51 +58,51 @@ DirectX::XMMATRIX Model::getRotationMatrix() {
 void Model::rotate(float roll, float pitch, float yaw) {
   DirectX::XMVECTOR rotation = DirectX::XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
   rotate(rotation);
-};
+}
 
 void Model::rotate(DirectX::XMVECTOR rotation) {
   this->rotation = DirectX::XMQuaternionMultiply(this->rotation, rotation);
-};
+}
 
 void Model::translate(float x, float y, float z) {
   DirectX::XMVECTOR translation = DirectX::XMVECTORF32({x, y, z});
   translate(translation);
-};
+}
 
 void Model::translate(DirectX::XMVECTOR translation) {
   this->translation = DirectX::XMVectorAdd(this->translation, translation);
-};
+}
 
 void Model::scale(float x, float y, float z) {
   DirectX::XMVECTOR scaling = DirectX::XMVECTORF32({x, y, z});
   scale(scaling);
-};
+}
 
 void Model::scale(DirectX::XMVECTOR scaling) {
 this->scaling = DirectX::XMVectorMultiply(this->scaling, scaling);
-};
+}
 
 void Model::setRotation(DirectX::XMVECTOR rotation) {
   this->rotation = rotation;
-};
+}
 
 void Model::setScale(float x, float y, float z) {
   DirectX::XMVECTOR scaling = DirectX::XMVECTORF32({x, y, z});
   setPosition(scaling);
-};
+}
 
 void Model::setScale(DirectX::XMVECTOR scaling) {
   this->scaling = scaling;
-};
+}
 
 void Model::setPosition(float x, float y, float z) {
   DirectX::XMVECTOR position = DirectX::XMVECTORF32({x, y, z});
   setPosition(position);
-};
+}
 
 void Model::setPosition(DirectX::XMVECTOR position) {
   this->translation = position;
-};
+}
 
 void Model::loadObj(const char *model_path) {
   tinyobj::attrib_t attrib;

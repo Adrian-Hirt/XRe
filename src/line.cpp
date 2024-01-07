@@ -5,14 +5,14 @@ Line::Line(DirectX::XMFLOAT4 color) {
   std::vector<unsigned int> indices = {0, 1};
 
   initialize(vertices, indices);
-};
+}
 
 Line::Line(DirectX::XMFLOAT3 line_start, DirectX::XMFLOAT3 line_end, DirectX::XMFLOAT4 color) {
   std::vector<vertex_t> vertices = verticesFromPoints(line_start, line_end, color);
   std::vector<unsigned int> indices = {0, 1};
 
   initialize(vertices, indices);
-};
+}
 
 void Line::render() {
   // Get the current active shader
@@ -41,7 +41,7 @@ void Line::render(Shader *shader) {
   // And finally, we can call the actual draw method, which will draw all the
   // indices of this line.
   device_context->DrawIndexed(index_count, 0, 0);
-};
+}
 
 void Line::updateLineFromXrPose(XrPosef pose) {
   // The start of the line is simply the position of the pose
@@ -75,4 +75,4 @@ std::vector<vertex_t> Line::verticesFromPoints(DirectX::XMFLOAT3 start, DirectX:
   };
 
   return vertices;
-};
+}
