@@ -15,14 +15,20 @@
 
 class Text {
 public:
-  Text();
+  Text(const char* sentence);
 
-  void buildMeshesFromSentence(const char* sentence);
   void render();
 
 private:
-  text_char_t *font;
-  std::vector<Bitmap> bitmaps;
-
+  // Using the extendes ASCII charset for now, which has 224 characters (skipping control character)
   const int CHAR_COUNT = 224;
+
+  // Steps for going through the texture
+  const float x_step = 1.0f / 32.0f;
+  const float y_step = 1.0f / 7.0f;
+
+  Bitmap bitmap;
+
+  void buildMeshesFromSentence(const char* sentence);
+  inline text_char_t computeTextureOffsets(int letter);
 };

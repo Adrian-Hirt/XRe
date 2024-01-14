@@ -29,7 +29,6 @@ protected:
   ID3D11Buffer *vertex_buffer; // Vertex buffer
   ID3D11Buffer *index_buffer;  // Index buffer
 
-  ID3D11Resource *p_texture = NULL;
   ID3D11ShaderResourceView *p_texture_view = NULL;
 
   size_t vertex_count;

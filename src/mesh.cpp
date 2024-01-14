@@ -29,7 +29,8 @@ Mesh::Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, co
 
   // Load the texture
   std::wstring filepath = Utils::stringToWString(texture_path);
-  HRESULT result = DirectX::CreateWICTextureFromFile(device, device_context, filepath.c_str(), &p_texture, &p_texture_view);
+  ID3D11Resource *texture; // Throwaway variable
+  HRESULT result = DirectX::CreateWICTextureFromFile(device, device_context, filepath.c_str(), &texture, &p_texture_view);
   Utils::checkHresult(result, "Failed to load the texture"); // TODO: output the filename that was not found
 }
 

@@ -23,7 +23,7 @@ public:
   // Create bitmaps
   Bitmap quad = Bitmap(0.70f, 0.95f, 0.25, 0.25, DATA_FOLDER "/textures/MetalWalkway013_2K-PNG_Color_Opacity.png");
 
-  Text text = Text();
+  Text text = Text("This is a sample text :) カタカナ");
 
   void setup() override {
     // Scale the cube down a bit
@@ -37,8 +37,6 @@ public:
 
     // Squish the ground cube
     ground_cube.scale(1.0f, 0.3f, 1.0f);
-
-    text.buildMeshesFromSentence("This is a sample text :) カタカナ");
   };
 
   void updateSimulation(XrTime predicted_time) override {
