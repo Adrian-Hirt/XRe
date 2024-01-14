@@ -38,7 +38,7 @@ public:
     // Squish the ground cube
     ground_cube.scale(1.0f, 0.3f, 1.0f);
 
-    text.buildMeshesFromSentence("This is a sample text :)");
+    text.buildMeshesFromSentence("This is a sample text :) カタカナ");
   };
 
   void updateSimulation(XrTime predicted_time) override {

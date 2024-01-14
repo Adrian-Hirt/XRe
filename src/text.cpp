@@ -1,21 +1,21 @@
 #include <xre/text.h>
 
 Text::Text() {
-  // Using the extendes ASCII charset for now, which has 255 characters
-  font = new text_char_t[255];
+  // Using the extendes ASCII charset for now, which has 224 characters (skipping control character)
+  font = new text_char_t[CHAR_COUNT];
 
-  // Grid is 16x16
-  float step = 1.0f / 16.0f;
-  float halfstep = step / 2;
+  // Grid is 7x32
+  float x_step = 1.0f / 32.0f;
+  float y_step = 1.0f / 7.0f;
 
-  for(int i = 0; i < 255; i++) {
-    int row = i / 16;
-    int column = i % 16;
+  for(int i = 0; i < CHAR_COUNT; i++) {
+    int row = i / 32;
+    int column = i % 32;
 
-    float left = column * step;
-    float right = left + halfstep;
-    float top = row * step;
-    float bottom = top + step;
+    float left = column * x_step;
+    float right = left + x_step;
+    float top = row * y_step;
+    float bottom = top + y_step;
 
     font[i].left = left;
     font[i].right = right;
@@ -40,7 +40,13 @@ void Text::buildMeshesFromSentence(const char* sentence) {
   for (int i = 0; i < lenght; i++) {
     int letter = ((int) sentence[i]) - 32;
 
+    if (letter < 0 || letter > CHAR_COUNT) {
+      // Invalid character, put a question mark
+      letter = 31;
+    }
+
     if (letter == 0) {
+      // Space, just create a space between the meshes
       x_offset += char_width;
     }
     else {
@@ -58,7 +64,7 @@ void Text::buildMeshesFromSentence(const char* sentence) {
 
       std::vector<unsigned int> indices = {0, 1, 2, 3, 0, 2};
 
-      bitmaps.push_back(Bitmap(vertices, indices, DATA_FOLDER "/fonts/DejaVuSansMono32.png"));
+      bitmaps.push_back(Bitmap(vertices, indices, DATA_FOLDER "/fonts/DejaVuSansMono128NoAA.png"));
     }
   }
 }

@@ -23,4 +23,6 @@ public:
 private:
   text_char_t *font;
   std::vector<Bitmap> bitmaps;
+
+  const int CHAR_COUNT = 224;
 };
