@@ -305,6 +305,18 @@ void OpenXrHandler::initializeOpenxrActions() {
 	result = xrCreateAction(default_action_set, &aim_action_create_info, &controller_aim_action);
 	Utils::checkXrResult(result, "Coult not create the controller aim action");
 
+  // Create the action for grabbing with the controllers.
+	XrActionCreateInfo grab_action_create_info = {};
+	grab_action_create_info.type = XR_TYPE_ACTION_CREATE_INFO;                // Set the type of the create info
+	strcpy_s(grab_action_create_info.actionName, "controller_grab");          // Set a name for the action
+	strcpy_s(grab_action_create_info.localizedActionName, "Controller Grab"); // Add a "localized" name for the action
+	grab_action_create_info.countSubactionPaths = 2;                          // We'll be using two subaction paths (left / right controller)
+	grab_action_create_info.subactionPaths = controller_paths;                // Pass in the controller paths
+	grab_action_create_info.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;        // Finally, tell OpenXR that this input is a boolean input
+
+	result = xrCreateAction(default_action_set, &grab_action_create_info, &controller_grab_action);
+	Utils::checkXrResult(result, "Coult not create the grab action");
+
 	// Bind the previously added actions to the controllers. We'll be using the "simple controller"
 	// interaction path from Khronos, as this is a generic profile that should work with most
 	// input controllers that we'll encounter.
@@ -315,29 +327,40 @@ void OpenXrHandler::initializeOpenxrActions() {
 	// Create the paths for the pose of the controller for both the left and the right input
 	result = xrStringToPath(openxr_instance, "/user/hand/left/input/grip/pose", &(left_controller->pose_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the left input pose");
-
 	result = xrStringToPath(openxr_instance, "/user/hand/right/input/grip/pose", &(right_controller->pose_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the right input pose");
 
 	// Create the paths for the aim of the controller for both the left and the right input
 	result = xrStringToPath(openxr_instance, "/user/hand/left/input/aim/pose", &(left_controller->aim_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the left input pose");
-
 	result = xrStringToPath(openxr_instance, "/user/hand/right/input/aim/pose", &(right_controller->aim_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the right input pose");
+
+  // Create the paths for the grab action for both the left and the right controller
+	result = xrStringToPath(openxr_instance, "/user/hand/left/input/select/click", &(left_controller->grab_path));
+	Utils::checkXrResult(result, "Coult not create path from string for the left grab pose");
+	result = xrStringToPath(openxr_instance, "/user/hand/right/input/select/click", &(right_controller->grab_path));
+	Utils::checkXrResult(result, "Coult not create path from string for the right grab pose");
 
 	// // Setup the suggested bindings, i.e. we suggest the runtime what path we want to
 	// bind a specific action to. As the name says, this is only a suggestion and the
 	// runtime may change a binding, e.g. if a user re-maps inputs on their device.
-	XrActionSuggestedBinding suggested_action_bindings[4];
+	XrActionSuggestedBinding suggested_action_bindings[6];
+  // Pose
 	suggested_action_bindings[0].action = controller_pose_action;
 	suggested_action_bindings[0].binding = left_controller->pose_path;
 	suggested_action_bindings[1].action = controller_pose_action;
 	suggested_action_bindings[1].binding = right_controller->pose_path;
+  // Aim
 	suggested_action_bindings[2].action = controller_aim_action;
 	suggested_action_bindings[2].binding = left_controller->aim_path;
 	suggested_action_bindings[3].action = controller_aim_action;
 	suggested_action_bindings[3].binding = right_controller->aim_path;
+  // Grab
+  suggested_action_bindings[4].action = controller_grab_action;
+	suggested_action_bindings[4].binding = left_controller->grab_path;
+	suggested_action_bindings[5].action = controller_grab_action;
+	suggested_action_bindings[5].binding = right_controller->grab_path;
 
 	XrInteractionProfileSuggestedBinding suggested_binding = {};
 	suggested_binding.type = XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING;					// Set type for the struct
@@ -519,6 +542,15 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
 		result = xrLocateSpace(controller->aim_space, openxr_space, predicted_time, &space_location);
 		Utils::checkXrResult(result, "Can't get the grip pose of the controller");
     controller->aim = space_location.pose;
+
+    // Get the "grab" action
+    XrActionStateBoolean grab_state = {};
+    grab_state.type = XR_TYPE_ACTION_STATE_BOOLEAN;
+    controller_state_get_info.action = controller_grab_action;
+    result = xrGetActionStateBoolean(openxr_session, &controller_state_get_info, &grab_state);
+    Utils::checkXrResult(result, "Can't get the grab state of the controller");
+    controller->grabbing = grab_state.currentState && grab_state.changedSinceLastSync;
+
 	}
 }
 

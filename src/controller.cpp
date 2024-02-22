@@ -20,6 +20,11 @@ void Controller::render() {
   model.setPosition(controller_position);
   model.setRotation(controller_orientation);
 
+  if (grabbing) {
+    // TODO: color the model a different color
+    std::cout << "Grabbing" << std::endl;
+  }
+
   model.render(&controller_shader);
 
   // Update the aim line and render it

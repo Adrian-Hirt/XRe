@@ -30,6 +30,7 @@ namespace Utils {
 
   inline void checkXrResult(XrResult result, const char *errorString){
     if (XR_FAILED(result)) {
+      std::cout << result << std::endl;
       exitWithMessage(errorString);
     }
   };

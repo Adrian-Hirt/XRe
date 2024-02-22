@@ -28,6 +28,10 @@ public:
   XrPath aim_path;
   XrSpace aim_space;
 
+  // Path and space for the grab action
+  XrPath grab_path;
+  bool grabbing;
+
   // Pose of the controller
   XrPosef pose;
 
