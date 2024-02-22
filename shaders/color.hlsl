@@ -1,8 +1,3 @@
-struct VOut {
-  float4 position : SV_POSITION;
-  float4 color : COLOR;
-};
-
 cbuffer PerFrameConstantBuffer{
   float4x4 view_projection;
 };
@@ -16,6 +11,11 @@ cbuffer LightContstantBuffer {
   float4 light_vector;
 	float4 light_color;
 	float4 ambient_color;
+};
+
+struct VOut {
+  float4 position : SV_POSITION;
+  float4 color : COLOR;
 };
 
 VOut VShader(float4 position : POSITION, float4 color : COLOR, float4 normal : NORMAL) {

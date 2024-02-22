@@ -1,9 +1,3 @@
-struct VOut {
-  float4 position : SV_POSITION;
-  float4 color : COLOR;
-  float2 texcoord : TEXCOORD;
-};
-
 cbuffer PerFrameConstantBuffer{
   float4x4 view_projection;
 };
@@ -17,6 +11,12 @@ cbuffer LightContstantBuffer {
   float4 light_vector;
 	float4 light_color;
 	float4 ambient_color;
+};
+
+struct VOut {
+  float4 position : SV_POSITION;
+  float4 color : COLOR;
+  float2 texcoord : TEXCOORD;
 };
 
 Texture2D Texture;
