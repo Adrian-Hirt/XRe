@@ -11,6 +11,7 @@ cbuffer PerFrameConstantBuffer{
 cbuffer PerModelConstantBuffer{
   float4x4 model;
   float4x4 rotation;
+  float4 model_color;
 };
 
 // Struct holding the data for lighting, which currently is only

@@ -19,6 +19,7 @@ public:
 
   void setModelMatrix(DirectX::XMMATRIX model_matrix);
   void setNormalRotationMatrix(DirectX::XMMATRIX rotation_matrix);
+  void setModelColor(DirectX::XMFLOAT4 color);
 
   inline static Shader* getCurrentActiveShader() { return current_active_shader; };
   static void createGlobalBuffers(ID3D11Device *device, ID3D11DeviceContext *device_context);

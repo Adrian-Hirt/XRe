@@ -14,8 +14,8 @@
 class Model {
 public:
   Model();
-  Model(std::vector<Mesh> meshes);
-  Model(const char *model_path);
+  Model(std::vector<Mesh> meshes, DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f));
+  Model(const char *model_path, DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f));
 
   // Two different rendering methods, one where the user can pass in
   // a shader to use for this model
@@ -44,6 +44,8 @@ public:
   void setPosition(float x, float y, float z);
   void setPosition(DirectX::XMVECTOR position);
 
+  void setColor(DirectX::XMFLOAT4 color);
+
   static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);
 
 private:
@@ -63,6 +65,9 @@ private:
   DirectX::XMVECTOR translation = DirectX::XMVECTORF32({0.0f, 0.0f, 0.0f});
   // The rotation of the model
   DirectX::XMVECTOR rotation = DirectX::XMQuaternionIdentity();
+
+  // Color of the model, which will be applied to all meshes
+  DirectX::XMFLOAT4 model_color;
 
   void loadObj(const char *model_path);
 };

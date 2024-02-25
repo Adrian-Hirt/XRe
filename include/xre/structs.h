@@ -41,6 +41,7 @@ typedef struct lighting_const_buffer_t {
 typedef struct per_model_const_buffer_t {
   DirectX::XMMATRIX model;
   DirectX::XMMATRIX normal_rotation;
+  DirectX::XMFLOAT4 color;
 } per_model_const_buffer_t;
 
 typedef struct text_char_t {

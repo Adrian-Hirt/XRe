@@ -17,4 +17,6 @@ public:
 
 private:
   Shader shader;
+
+  DirectX::XMFLOAT4 bitmap_color;
 };

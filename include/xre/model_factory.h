@@ -6,7 +6,6 @@
 
 namespace ModelFactory {
   inline Model createCube(DirectX::XMFLOAT4 color) {
-    // TODO: Set color of model / meshes
     std::vector<vertex_t> cube_vertices {
       { DirectX::XMFLOAT3(-1.0f, -1.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f), DirectX::XMFLOAT2(0.0f, 0.0f) },
       { DirectX::XMFLOAT3( 1.0f, -1.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f), DirectX::XMFLOAT2(1.0f, 0.0f) },
@@ -55,7 +54,7 @@ namespace ModelFactory {
     };
 
     Mesh cube_mesh = Mesh(cube_vertices, cube_indices);
-    return Model({ cube_mesh });
+    return Model({ cube_mesh }, color);
   }
 
   // "Private" method using an anonymous namespace

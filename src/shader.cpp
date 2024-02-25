@@ -59,8 +59,9 @@ Shader::Shader(const char *shader_path) {
   ZeroMemory(&const_buffer_desc, sizeof(const_buffer_desc));
 
   // Setup the const buffer description. The per model const buffer has 2 4x4 matrices
+  // plus a 4 value vector
   const_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-  const_buffer_desc.ByteWidth = 128;
+  const_buffer_desc.ByteWidth = 144;
   const_buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
   result = device->CreateBuffer(&const_buffer_desc, NULL, &p_per_model_const_buffer);
@@ -69,6 +70,9 @@ Shader::Shader(const char *shader_path) {
   // Initialize the two matrices for the per model matrix to identity matrices
   per_model_const_buffer.model = DirectX::XMMatrixIdentity();
   per_model_const_buffer.normal_rotation = DirectX::XMMatrixIdentity();
+
+  // Initialize with red color for now
+  per_model_const_buffer.color = { 1.0f, 0.0f, 0.0f, 1.0f };
 }
 
 void Shader::createGlobalBuffers(ID3D11Device *device, ID3D11DeviceContext *device_context) {
@@ -139,7 +143,6 @@ void Shader::activate() {
 }
 
 void Shader::updatePerModelConstantBuffer() {
-  // TODO: set color
   device_context->UpdateSubresource(p_per_model_const_buffer, 0, 0, &per_model_const_buffer, 0, 0);
 }
 
@@ -156,6 +159,10 @@ void Shader::setModelMatrix(DirectX::XMMATRIX model_matrix) {
 
 void Shader::setNormalRotationMatrix(DirectX::XMMATRIX rotation_matrix) {
   per_model_const_buffer.normal_rotation = rotation_matrix;
+}
+
+void Shader::setModelColor(DirectX::XMFLOAT4 color) {
+  per_model_const_buffer.color = color;
 }
 
 void Shader::registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context) {

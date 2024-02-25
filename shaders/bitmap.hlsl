@@ -9,7 +9,8 @@ VOut VShader(VIn input) {
   // Set the position to the incoming position as we're not doing any projection
   output.position = input.position;
 
-  // Simply use white as the color for now
+  // Simply use white as the color for now as we're discarding
+  // the color anyway
 	output.color = color_white;
 
   // Set texture coordinates

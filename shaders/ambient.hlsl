@@ -12,7 +12,7 @@ VOut VShader(VIn input) {
 	float diffuse_brightness = saturate(dot(norm, light_vector));
   float4 resulting_light = light_color * diffuse_brightness;
   resulting_light.a = 1.0f;
-	output.color += saturate(resulting_light * color_white);
+	output.color += saturate(resulting_light * model_color);
 
   // No texture coordinates
   output.texcoord = null_texture_coords;

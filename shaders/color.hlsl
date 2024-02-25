@@ -6,8 +6,8 @@ VOut VShader(VIn input) {
   // Calculate the position
   output.position = mul(mul(input.position, model), view_projection);
 
-  // Simply use white as the color for now
-	output.color = color_white;
+  // Simply use the model color for the color
+	output.color = model_color;
 
   // No texture coordinates
   output.texcoord = null_texture_coords;

@@ -20,9 +20,13 @@ void Controller::render() {
   model.setPosition(controller_position);
   model.setRotation(controller_orientation);
 
+  // Color the model a different color depending on the "grab"
+  // state of the controller
   if (grabbing) {
-    // TODO: color the model a different color
-    std::cout << "Grabbing" << std::endl;
+    model.setColor({1.0f, 0.0f, 0.0f, 1.0f});
+  }
+  else {
+    model.setColor({0.67f, 0.84f, 0.9f, 1.0f});
   }
 
   model.render(&controller_shader);

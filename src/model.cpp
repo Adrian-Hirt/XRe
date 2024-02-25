@@ -12,13 +12,16 @@ Model::Model() {}
 // Initialize the model.
 // Arguments:
 //  1) Vector of meshes for this model
+//  2) Color of the model
 //------------------------------------------------------------------------------------------------------
-Model::Model(std::vector<Mesh> meshes) {
+Model::Model(std::vector<Mesh> meshes, DirectX::XMFLOAT4 color) {
   this->meshes = meshes;
+  this->model_color = color;
 }
 
-Model::Model(const char *model_path) {
+Model::Model(const char *model_path, DirectX::XMFLOAT4 color) {
   loadObj(model_path);
+  this->model_color = color;
 }
 
 void Model::render() {
@@ -35,6 +38,7 @@ void Model::render(Shader *shader) {
   // Update the shader with the model matrix
   shader->setModelMatrix(getTransformationMatrix());
   shader->setNormalRotationMatrix(getRotationMatrix());
+  shader->setModelColor(model_color);
   shader->updatePerModelConstantBuffer();
 
   for (Mesh &mesh : meshes) {
@@ -102,6 +106,10 @@ void Model::setPosition(float x, float y, float z) {
 
 void Model::setPosition(DirectX::XMVECTOR position) {
   this->translation = position;
+}
+
+void Model::setColor(DirectX::XMFLOAT4 color) {
+  model_color = color;
 }
 
 void Model::loadObj(const char *model_path) {

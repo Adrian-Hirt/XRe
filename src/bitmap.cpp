@@ -3,7 +3,6 @@
 Bitmap::Bitmap() {}
 
 Bitmap::Bitmap(float top_left_position_x, float top_left_position_y, float x_extend, float y_extend, const char *texture_path) {
-  DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f};
   DirectX::XMFLOAT3 normal = { 0.0f, 0.0f, 1.0f };
 
   std::vector<vertex_t> vertices = {
@@ -15,7 +14,9 @@ Bitmap::Bitmap(float top_left_position_x, float top_left_position_y, float x_ext
 
   std::vector<unsigned int> indices = {0, 1, 2, 3, 0, 2};
 
-  // TODO: set color of mesh
+  // Set color to white, which will be discarded anyway
+  bitmap_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
   // Call general initialize method
   initialize(vertices, indices);
 
@@ -43,5 +44,7 @@ Bitmap::Bitmap(std::vector<vertex_t> vertices, std::vector<unsigned int> indices
 
 void Bitmap::render() {
   shader.activate();
+  shader.setModelColor(bitmap_color);
+  shader.updatePerModelConstantBuffer();
   Mesh::render();
 }
