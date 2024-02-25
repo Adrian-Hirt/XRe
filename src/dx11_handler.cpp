@@ -196,9 +196,9 @@ swapchain_data_t Dx11Handler::createRenderTargets(ID3D11Texture2D &texture) {
   // a Render target view desc and add the format of the swapchain, as well as the view dimension
   // to that description struct.
   // The swapchain image that OpenXR created uses a TYPELESS format, however, we need a "typed"
-  // format. As such, we use the DXGI_FORMAT_R8G8B8A8_UNORM format, which is "A four-component, 32-bit
-  // unsigned-normalized-integer format that supports 8 bits per channel including alpha" (according
-  // to MSDN. That way, we can specify the colors with RGBA values between 0 and 255.
+  // format. As such, we use the DXGI_FORMAT_R8G8B8A8_UNORM_SRGB  format, which is "A four-component,
+  // 32-bit unsigned-normalized integer sRGB format that supports 8 bits per channel including alpha." (according
+  // to MSDN. That way, we can specify the colors with sRGBA values between 0 and 255.
   D3D11_RENDER_TARGET_VIEW_DESC render_target_view_desc = {};
   render_target_view_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
   render_target_view_desc.Format = d3d11_swapchain_format;

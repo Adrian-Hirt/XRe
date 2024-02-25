@@ -22,7 +22,7 @@ public:
   swapchain_data_t createRenderTargets(ID3D11Texture2D &texture);
   void renderFrame(XrCompositionLayerProjectionView& view, swapchain_data_t& swapchain_data, std::function<void()> draw_callback);
 
-  DXGI_FORMAT d3d11_swapchain_format = DXGI_FORMAT_R8G8B8A8_UNORM;
+  DXGI_FORMAT d3d11_swapchain_format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
   void useDefaultRasterizer(bool use_clockwise);
   void useWireframeRasterizer();

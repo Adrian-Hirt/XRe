@@ -30,7 +30,22 @@ Mesh::Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, co
   // Load the texture
   std::wstring filepath = Utils::stringToWString(texture_path);
   ID3D11Resource *texture; // Throwaway variable
-  HRESULT result = DirectX::CreateWICTextureFromFile(device, device_context, filepath.c_str(), &texture, &p_texture_view);
+  // Use the `Ex` variant, which allows us to set the loader to assume that
+  // the passed in texture is already sRGB.
+  HRESULT result = DirectX::CreateWICTextureFromFileEx(
+    device,
+    device_context,
+    filepath.c_str(),
+    0,
+    D3D11_USAGE_DEFAULT,
+    D3D11_BIND_SHADER_RESOURCE,
+    0,
+    0,
+    DirectX::WIC_LOADER_SRGB_DEFAULT,
+    &texture,
+    &p_texture_view
+  );
+
   Utils::checkHresult(result, "Failed to load the texture"); // TODO: output the filename that was not found
 }
 
