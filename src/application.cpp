@@ -1,6 +1,10 @@
 #include <xre/application.h>
 
 Application::Application(const char *application_name) {
+  // Initialize the COM library
+  HRESULT result = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+  Utils::checkHresult(result, "Could not initialize COM library");
+
   // create the XR handler
   open_xr_handler = OpenXrHandler(application_name);
   dx11_handler = open_xr_handler.dx11_handler;
