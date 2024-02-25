@@ -41,7 +41,6 @@ Shader::Shader(const char *shader_path) {
   //  7. Mut be zero when using per vertex data
   D3D11_INPUT_ELEMENT_DESC input_element_description[] = {
     {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-    {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
     {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
     {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
   };
@@ -140,6 +139,7 @@ void Shader::activate() {
 }
 
 void Shader::updatePerModelConstantBuffer() {
+  // TODO: set color
   device_context->UpdateSubresource(p_per_model_const_buffer, 0, 0, &per_model_const_buffer, 0, 0);
 }
 

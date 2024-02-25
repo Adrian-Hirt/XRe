@@ -35,6 +35,7 @@ Mesh::Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, co
 }
 
 // Function to initialize the "common" data of a mesh, to avoid code-duplication
+// TODO: set color of mesh
 void Mesh::initialize(std::vector<vertex_t> vertices, std::vector<unsigned int> indices) {
   // Setup the mesh
   HRESULT result;

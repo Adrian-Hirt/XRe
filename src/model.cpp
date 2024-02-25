@@ -159,12 +159,6 @@ void Model::loadObj(const char *model_path) {
           current_vertex.texture_coordinates = DirectX::XMFLOAT2(0.0f, 0.0f);
         }
 
-        // Load the color, tinyobjloader falls back to white if there is no color
-        tinyobj::real_t vertex_r = attrib.colors[3 * index.vertex_index + 0];
-        tinyobj::real_t vertex_g = attrib.colors[3 * index.vertex_index + 1];
-        tinyobj::real_t vertex_b = attrib.colors[3 * index.vertex_index + 2];
-        current_vertex.color = DirectX::XMFLOAT4(vertex_r, vertex_g, vertex_b, 1.0f);
-
         // Add the newly created vertex to the vector of vertices
         mesh_vertices.push_back(current_vertex);
 

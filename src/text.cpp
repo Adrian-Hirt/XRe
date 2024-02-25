@@ -32,7 +32,6 @@ void Text::buildMeshesFromSentence(const char* sentence) {
   float char_height = 0.1;
   float char_width = 0.05f;
 
-  DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f};
   DirectX::XMFLOAT3 normal = { 0.0f, 0.0f, 1.0f };
 
   std::vector<vertex_t> vertices;
@@ -56,10 +55,10 @@ void Text::buildMeshesFromSentence(const char* sentence) {
       text_char_t text_character = computeTextureOffsets(letter);
 
       // Build vertices, for now with a "default" size and position
-      vertices.push_back({  DirectX::XMFLOAT3(x_offset,              0.95f,               0.0f), color, normal, DirectX::XMFLOAT2(text_character.left, text_character.top) });
-      vertices.push_back({  DirectX::XMFLOAT3(x_offset + char_width, 0.95f,               0.0f), color, normal, DirectX::XMFLOAT2(text_character.right, text_character.top) });
-      vertices.push_back({  DirectX::XMFLOAT3(x_offset + char_width, 0.95f - char_height, 0.0f), color, normal, DirectX::XMFLOAT2(text_character.right, text_character.bottom) });
-      vertices.push_back({  DirectX::XMFLOAT3(x_offset,              0.95f - char_height, 0.0f), color, normal, DirectX::XMFLOAT2(text_character.left, text_character.bottom) });
+      vertices.push_back({  DirectX::XMFLOAT3(x_offset,              0.95f,               0.0f), normal, DirectX::XMFLOAT2(text_character.left, text_character.top) });
+      vertices.push_back({  DirectX::XMFLOAT3(x_offset + char_width, 0.95f,               0.0f), normal, DirectX::XMFLOAT2(text_character.right, text_character.top) });
+      vertices.push_back({  DirectX::XMFLOAT3(x_offset + char_width, 0.95f - char_height, 0.0f), normal, DirectX::XMFLOAT2(text_character.right, text_character.bottom) });
+      vertices.push_back({  DirectX::XMFLOAT3(x_offset,              0.95f - char_height, 0.0f), normal, DirectX::XMFLOAT2(text_character.left, text_character.bottom) });
 
       x_offset += char_width;
 

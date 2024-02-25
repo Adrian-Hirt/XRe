@@ -24,7 +24,6 @@ struct swapchain_t {
 
 typedef struct vertex_t {
   DirectX::XMFLOAT3 coordinates;
-  DirectX::XMFLOAT4 color;
   DirectX::XMFLOAT3 normal;
   DirectX::XMFLOAT2 texture_coordinates;
 } vertex_t;

@@ -1,16 +1,18 @@
 #include <xre/line.h>
 
 Line::Line(DirectX::XMFLOAT4 color) {
-  std::vector<vertex_t> vertices = verticesFromPoints({0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, color);
+  std::vector<vertex_t> vertices = verticesFromPoints({0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f});
   std::vector<unsigned int> indices = {0, 1};
 
+  // TODO: set color of mesh
   initialize(vertices, indices);
 }
 
 Line::Line(DirectX::XMFLOAT3 line_start, DirectX::XMFLOAT3 line_end, DirectX::XMFLOAT4 color) {
-  std::vector<vertex_t> vertices = verticesFromPoints(line_start, line_end, color);
+  std::vector<vertex_t> vertices = verticesFromPoints(line_start, line_end);
   std::vector<unsigned int> indices = {0, 1};
 
+  // TODO: set color of mesh
   initialize(vertices, indices);
 }
 
@@ -59,7 +61,7 @@ void Line::updateLineFromXrPose(XrPosef pose) {
   DirectX::XMStoreFloat3(&line_end, line_end_vec);
 
   // Create the new vertices
-  std::vector<vertex_t> vertices = verticesFromPoints(line_start, line_end,  {1.0f, 1.0f, 1.0f, 1.0f});
+  std::vector<vertex_t> vertices = verticesFromPoints(line_start, line_end);
 
   // Update the vertex buffer
   D3D11_MAPPED_SUBRESOURCE resource;
@@ -68,10 +70,10 @@ void Line::updateLineFromXrPose(XrPosef pose) {
   device_context->Unmap(vertex_buffer, 0);
 }
 
-std::vector<vertex_t> Line::verticesFromPoints(DirectX::XMFLOAT3 start, DirectX::XMFLOAT3 end, DirectX::XMFLOAT4 color) {
+std::vector<vertex_t> Line::verticesFromPoints(DirectX::XMFLOAT3 start, DirectX::XMFLOAT3 end) {
   std::vector<vertex_t> vertices = {
-    {  start, color,  DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(0.0f, 0.0f) },
-    {  end,   color,  DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 0.0f) }
+    {  start, DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(0.0f, 0.0f) },
+    {  end,   DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 0.0f) }
   };
 
   return vertices;
