@@ -30,11 +30,14 @@ float InverseGammaCorrect(float value) {
   return pow(abs((value + 0.0550) * 1.0 / 1.055), 2.4f);
 }
 
-VOut VShader(float4 position : POSITION, float4 color : COLOR, float4 normal : NORMAL, float2 texcoord : TEXCOORD) {
+VOut VShader(float4 position : POSITION, float4 normal : NORMAL, float2 texcoord : TEXCOORD) {
   VOut output;
 
   // Calculate the position
   output.position = mul(mul(position, model), view_projection);
+
+  // Simply white as the color for now
+  float4 white = { 1.0f, 1.0f, 1.0f, 1.0f };
 
   // Compute color based on normal vectors
 	output.color = ambient_color;
@@ -42,7 +45,7 @@ VOut VShader(float4 position : POSITION, float4 color : COLOR, float4 normal : N
 	float diffuse_brightness = saturate(dot(norm, light_vector));
   float4 resulting_light = light_color * diffuse_brightness;
   resulting_light.a = 1.0f;
-	output.color += saturate(resulting_light * color);
+	output.color += saturate(resulting_light * white);
 
   output.texcoord = texcoord;
 
