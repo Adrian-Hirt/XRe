@@ -24,7 +24,9 @@ Bitmap::Bitmap(float top_left_position_x, float top_left_position_y, float x_ext
   std::wstring filepath = Utils::stringToWString(texture_path);
   ID3D11Resource *texture; // Throwaway variable
   HRESULT result = DirectX::CreateWICTextureFromFile(device, device_context, filepath.c_str(), &texture, &p_texture_view);
-  Utils::checkHresult(result, "Failed to load the texture"); // TODO: output the filename that was not found
+  std::string error_string = "Failed to load the texture ";
+  error_string += texture_path;
+  Utils::checkHresult(result, error_string.c_str());
 
   shader = Shader(SHADERS_FOLDER "/bitmap.hlsl");
 }

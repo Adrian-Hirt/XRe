@@ -46,7 +46,9 @@ Mesh::Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, co
     &p_texture_view
   );
 
-  Utils::checkHresult(result, "Failed to load the texture"); // TODO: output the filename that was not found
+  std::string error_string = "Failed to load the texture ";
+  error_string += texture_path;
+  Utils::checkHresult(result, error_string.c_str());
 }
 
 // Function to initialize the "common" data of a mesh, to avoid code-duplication
