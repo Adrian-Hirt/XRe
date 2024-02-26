@@ -73,6 +73,9 @@ private:
   XrAction controller_aim_action;
   XrAction controller_grab_action;
 
+  // For checking if the pose of a controller is valid
+  const static XrSpaceLocationFlags pose_valid_flags = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
+
   // Methods
   bool initializeOpenxr();
   void initializeOpenxrActions();

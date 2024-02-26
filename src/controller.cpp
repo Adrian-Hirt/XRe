@@ -13,6 +13,11 @@ Controller::Controller() {
 }
 
 void Controller::render() {
+  // Return early if the controller should not be rendered alltogether
+  if (!shouldRender) {
+    return;
+  }
+
   DirectX::XMVECTOR controller_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&pose.position);
   DirectX::XMVECTOR controller_orientation = DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&pose.orientation);
 

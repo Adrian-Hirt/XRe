@@ -509,49 +509,48 @@ void OpenXrHandler::pollOpenxrActions(XrTime predicted_time) {
 void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predicted_time) {
 	XrResult result;
 
-	// Setup the struct that we'll be using to get the state of the controller
-	// for the pose action.
-	XrActionStateGetInfo controller_state_get_info = {};
+  // Setup the struct to pass to the `xrLocateSpace` calls below.
+  XrSpaceLocation space_location = {};
+  space_location.type = XR_TYPE_SPACE_LOCATION;
+
+  // Update pose of the controller
+  result = xrLocateSpace(controller->pose_space, openxr_space, predicted_time, &space_location);
+  Utils::checkXrResult(result, "Can't get the grip pose of the controller");
+
+  // Check wether the controller should be rendered or not.
+  controller->shouldRender = (space_location.locationFlags & pose_valid_flags) == pose_valid_flags;
+
+  // If the controller should not be rendered, we can return early
+  if (!controller->shouldRender) {
+    return;
+  }
+
+  // Otherwise update the pose of the controller
+  controller->pose = space_location.pose;
+
+  // Reset struct
+  space_location = {};
+  space_location.type = XR_TYPE_SPACE_LOCATION;
+
+  // Update aim of the controller
+  result = xrLocateSpace(controller->aim_space, openxr_space, predicted_time, &space_location);
+  Utils::checkXrResult(result, "Can't get the grip pose of the controller");
+  controller->aim = space_location.pose;
+
+  // Setup get info for the "grab" action
+  XrActionStateGetInfo controller_state_get_info = {};
 	controller_state_get_info.type = XR_TYPE_ACTION_STATE_GET_INFO;
-	controller_state_get_info.action = controller_pose_action;
+	controller_state_get_info.action = controller_grab_action;
 	controller_state_get_info.subactionPath = controller->controller_path;
 
-	// Get the pose of the controller
-	XrActionStatePose controller_pose_state = {};
-	controller_pose_state.type = XR_TYPE_ACTION_STATE_POSE;
-	result = xrGetActionStatePose(openxr_session, &controller_state_get_info, &controller_pose_state);
-	Utils::checkXrResult(result, "Can't get the pose of the controller");
+  // Get the "grab" action
+  XrActionStateBoolean grab_state = {};
+  grab_state.type = XR_TYPE_ACTION_STATE_BOOLEAN;
+  result = xrGetActionStateBoolean(openxr_session, &controller_state_get_info, &grab_state);
+  Utils::checkXrResult(result, "Can't get the grab state of the controller");
 
-	// If the controller is active, we'll also get its position & orientation,
-	// such that we can use this for simulation & rendering.
-	if (controller_pose_state.isActive) {
-		// Setup the struct to pass to the `xrLocateSpace` calls below.
-		XrSpaceLocation space_location = {};
-		space_location.type = XR_TYPE_SPACE_LOCATION;
-
-		// Update pose of the controller
-		result = xrLocateSpace(controller->pose_space, openxr_space, predicted_time, &space_location);
-		Utils::checkXrResult(result, "Can't get the grip pose of the controller");
-		controller->pose = space_location.pose;
-
-    // Reset struct
-    space_location = {};
-		space_location.type = XR_TYPE_SPACE_LOCATION;
-
-    // Update aim of the controller
-		result = xrLocateSpace(controller->aim_space, openxr_space, predicted_time, &space_location);
-		Utils::checkXrResult(result, "Can't get the grip pose of the controller");
-    controller->aim = space_location.pose;
-
-    // Get the "grab" action
-    XrActionStateBoolean grab_state = {};
-    grab_state.type = XR_TYPE_ACTION_STATE_BOOLEAN;
-    controller_state_get_info.action = controller_grab_action;
-    result = xrGetActionStateBoolean(openxr_session, &controller_state_get_info, &grab_state);
-    Utils::checkXrResult(result, "Can't get the grab state of the controller");
-    controller->grabbing = grab_state.currentState && grab_state.changedSinceLastSync;
-
-	}
+  // Update whether the controller is grabbing or not
+  controller->grabbing = grab_state.isActive && grab_state.currentState;
 }
 
 //------------------------------------------------------------------------------------------------------

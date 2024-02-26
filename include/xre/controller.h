@@ -17,6 +17,9 @@ public:
   // render a controller
   void render();
 
+  // Whether the controller should be rendered or not
+  bool shouldRender;
+
   // Path for the controller, e.g. `/user/hand/left`
   XrPath controller_path;
 
