@@ -2,6 +2,7 @@
 
 // DirectX includes
 #include <d3d11.h>
+#include <DirectXMath/DirectXCollision.h>
 
 // Include other headers
 #include <vector>

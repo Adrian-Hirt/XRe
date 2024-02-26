@@ -2154,7 +2154,7 @@ inline XMVECTOR XM_CALLCONV XMVectorInBoundsR
 
 //------------------------------------------------------------------------------
 
-#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__INTEL_COMPILER)
 #pragma float_control(push)
 #pragma float_control(precise, on)
 #endif
@@ -2172,17 +2172,37 @@ inline XMVECTOR XM_CALLCONV XMVectorIsNaN(FXMVECTOR V) noexcept
     return Control.v;
 
 #elif defined(_XM_ARM_NEON_INTRINSICS_)
+    #if defined(__clang__) && defined(__FINITE_MATH_ONLY__)
+    XMVECTORU32 vResult = { { {
+        isnan(vgetq_lane_f32(V, 0)) ? 0xFFFFFFFFU : 0,
+        isnan(vgetq_lane_f32(V, 1)) ? 0xFFFFFFFFU : 0,
+        isnan(vgetq_lane_f32(V, 2)) ? 0xFFFFFFFFU : 0,
+        isnan(vgetq_lane_f32(V, 3)) ? 0xFFFFFFFFU : 0 } } };
+    return vResult.v;
+    #else
     // Test against itself. NaN is always not equal
     uint32x4_t vTempNan = vceqq_f32(V, V);
     // Flip results
     return vreinterpretq_f32_u32(vmvnq_u32(vTempNan));
+    #endif
 #elif defined(_XM_SSE_INTRINSICS_)
+    #if defined(__clang__) && defined(__FINITE_MATH_ONLY__)
+    XM_ALIGNED_DATA(16) float tmp[4];
+    _mm_store_ps(tmp, V);
+    XMVECTORU32 vResult = { { {
+        isnan(tmp[0]) ? 0xFFFFFFFFU : 0,
+        isnan(tmp[1]) ? 0xFFFFFFFFU : 0,
+        isnan(tmp[2]) ? 0xFFFFFFFFU : 0,
+        isnan(tmp[3]) ? 0xFFFFFFFFU : 0 } } };
+    return vResult.v;
+    #else
     // Test against itself. NaN is always not equal
     return _mm_cmpneq_ps(V, V);
+    #endif
 #endif
 }
 
-#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__INTEL_COMPILER)
 #pragma float_control(pop)
 #endif
 
@@ -2296,7 +2316,7 @@ namespace Internal
     }
 }
 
-#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__INTEL_COMPILER)
 #pragma float_control(push)
 #pragma float_control(precise, on)
 #endif
@@ -2341,7 +2361,7 @@ inline XMVECTOR XM_CALLCONV XMVectorRound(FXMVECTOR V) noexcept
 #endif
 }
 
-#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__INTEL_COMPILER)
 #pragma float_control(pop)
 #endif
 
@@ -6608,7 +6628,7 @@ inline bool XM_CALLCONV XMVector2InBounds
 
 //------------------------------------------------------------------------------
 
-#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__INTEL_COMPILER)
 #pragma float_control(push)
 #pragma float_control(precise, on)
 #endif
@@ -6619,20 +6639,30 @@ inline bool XM_CALLCONV XMVector2IsNaN(FXMVECTOR V) noexcept
     return (XMISNAN(V.vector4_f32[0]) ||
         XMISNAN(V.vector4_f32[1]));
 #elif defined(_XM_ARM_NEON_INTRINSICS_)
+    #if defined(__clang__) && defined(__FINITE_MATH_ONLY__)
+    return isnan(vgetq_lane_f32(V, 0)) || isnan(vgetq_lane_f32(V, 1));
+    #else
     float32x2_t VL = vget_low_f32(V);
     // Test against itself. NaN is always not equal
     uint32x2_t vTempNan = vceq_f32(VL, VL);
     // If x or y are NaN, the mask is zero
     return (vget_lane_u64(vreinterpret_u64_u32(vTempNan), 0) != 0xFFFFFFFFFFFFFFFFU);
+    #endif
 #elif defined(_XM_SSE_INTRINSICS_)
+    #if defined(__clang__) && defined(__FINITE_MATH_ONLY__)
+    XM_ALIGNED_DATA(16) float tmp[4];
+    _mm_store_ps(tmp, V);
+    return isnan(tmp[0]) || isnan(tmp[1]);
+    #else
     // Test against itself. NaN is always not equal
     XMVECTOR vTempNan = _mm_cmpneq_ps(V, V);
     // If x or y are NaN, the mask is non-zero
     return ((_mm_movemask_ps(vTempNan) & 3) != 0);
+    #endif
 #endif
 }
 
-#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__INTEL_COMPILER)
 #pragma float_control(pop)
 #endif
 
@@ -9360,7 +9390,7 @@ inline bool XM_CALLCONV XMVector3InBounds
 
 //------------------------------------------------------------------------------
 
-#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__INTEL_COMPILER)
 #pragma float_control(push)
 #pragma float_control(precise, on)
 #endif
@@ -9374,21 +9404,31 @@ inline bool XM_CALLCONV XMVector3IsNaN(FXMVECTOR V) noexcept
         XMISNAN(V.vector4_f32[2]));
 
 #elif defined(_XM_ARM_NEON_INTRINSICS_)
+    #if defined(__clang__) && defined(__FINITE_MATH_ONLY__)
+    return isnan(vgetq_lane_f32(V, 0)) || isnan(vgetq_lane_f32(V, 1)) || isnan(vgetq_lane_f32(V, 2));
+    #else
     // Test against itself. NaN is always not equal
     uint32x4_t vTempNan = vceqq_f32(V, V);
     uint8x8x2_t vTemp = vzip_u8(vget_low_u8(vreinterpretq_u8_u32(vTempNan)), vget_high_u8(vreinterpretq_u8_u32(vTempNan)));
     uint16x4x2_t vTemp2 = vzip_u16(vreinterpret_u16_u8(vTemp.val[0]), vreinterpret_u16_u8(vTemp.val[1]));
     // If x or y or z are NaN, the mask is zero
     return ((vget_lane_u32(vreinterpret_u32_u16(vTemp2.val[1]), 1) & 0xFFFFFFU) != 0xFFFFFFU);
+    #endif
 #elif defined(_XM_SSE_INTRINSICS_)
+    #if defined(__clang__) && defined(__FINITE_MATH_ONLY__)
+    XM_ALIGNED_DATA(16) float tmp[4];
+    _mm_store_ps(tmp, V);
+    return isnan(tmp[0]) || isnan(tmp[1]) || isnan(tmp[2]);
+    #else
     // Test against itself. NaN is always not equal
     XMVECTOR vTempNan = _mm_cmpneq_ps(V, V);
     // If x or y or z are NaN, the mask is non-zero
     return ((_mm_movemask_ps(vTempNan) & 7) != 0);
+    #endif
 #endif
 }
 
-#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__INTEL_COMPILER)
 #pragma float_control(pop)
 #endif
 
@@ -13242,7 +13282,7 @@ inline bool XM_CALLCONV XMVector4InBounds
 
 //------------------------------------------------------------------------------
 
-#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__INTEL_COMPILER)
 #pragma float_control(push)
 #pragma float_control(precise, on)
 #endif
@@ -13255,21 +13295,31 @@ inline bool XM_CALLCONV XMVector4IsNaN(FXMVECTOR V) noexcept
         XMISNAN(V.vector4_f32[2]) ||
         XMISNAN(V.vector4_f32[3]));
 #elif defined(_XM_ARM_NEON_INTRINSICS_)
+    #if defined(__clang__) && defined(__FINITE_MATH_ONLY__)
+    return isnan(vgetq_lane_f32(V, 0)) || isnan(vgetq_lane_f32(V, 1)) || isnan(vgetq_lane_f32(V, 2)) || isnan(vgetq_lane_f32(V, 3));
+    #else
     // Test against itself. NaN is always not equal
     uint32x4_t vTempNan = vceqq_f32(V, V);
     uint8x8x2_t vTemp = vzip_u8(vget_low_u8(vreinterpretq_u8_u32(vTempNan)), vget_high_u8(vreinterpretq_u8_u32(vTempNan)));
     uint16x4x2_t vTemp2 = vzip_u16(vreinterpret_u16_u8(vTemp.val[0]), vreinterpret_u16_u8(vTemp.val[1]));
     // If any are NaN, the mask is zero
     return (vget_lane_u32(vreinterpret_u32_u16(vTemp2.val[1]), 1) != 0xFFFFFFFFU);
+    #endif
 #elif defined(_XM_SSE_INTRINSICS_)
+    #if defined(__clang__) && defined(__FINITE_MATH_ONLY__)
+    XM_ALIGNED_DATA(16) float tmp[4];
+    _mm_store_ps(tmp, V);
+    return isnan(tmp[0]) || isnan(tmp[1]) || isnan(tmp[2]) || isnan(tmp[3]);
+    #else
     // Test against itself. NaN is always not equal
     XMVECTOR vTempNan = _mm_cmpneq_ps(V, V);
     // If any are NaN, the mask is non-zero
     return (_mm_movemask_ps(vTempNan) != 0);
+    #endif
 #endif
 }
 
-#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#if !defined(_XM_NO_INTRINSICS_) && defined(_MSC_VER) && !defined(__INTEL_COMPILER)
 #pragma float_control(pop)
 #endif
 

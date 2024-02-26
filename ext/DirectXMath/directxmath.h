@@ -13,7 +13,7 @@
 #error DirectX Math requires C++
 #endif
 
-#define DIRECTX_MATH_VERSION 318
+#define DIRECTX_MATH_VERSION 319
 
 #if defined(_MSC_VER) && (_MSC_VER < 1910)
 #error DirectX Math requires Visual C++ 2017 or later.
@@ -114,11 +114,15 @@
 #pragma warning(push)
 #pragma warning(disable : 4987)
 // C4987: Off by default noise
+#endif
+#if defined(_MSC_VER) || defined(__MINGW32__)
 #include <intrin.h>
+#endif
+#ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
-#if (defined(__clang__) || defined(__GNUC__)) && (__x86_64__ || __i386__)
+#if (defined(__clang__) || defined(__GNUC__)) && (__x86_64__ || __i386__) && !defined(__MINGW32__)
 #include <cpuid.h>
 #endif
 
@@ -2266,10 +2270,10 @@ namespace DirectX
 #endif
     }
 
-#include "directxmathconvert.inl"
-#include "directxmathvector.inl"
-#include "directxmathmatrix.inl"
-#include "directxmathmisc.inl"
+#include "DirectXMathConvert.inl"
+#include "DirectXMathVector.inl"
+#include "DirectXMathMatrix.inl"
+#include "DirectXMathMisc.inl"
 
 #ifdef __clang__
 #pragma clang diagnostic pop
