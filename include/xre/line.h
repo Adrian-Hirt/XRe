@@ -12,6 +12,9 @@ public:
   void updateLineFromXrPose(XrPosef pose);
 
 private:
+  // A line does not have a bounding box
+  inline bool hasBoundingBox() { return false; }
+
   std::vector<vertex_t> verticesFromPoints(DirectX::XMFLOAT3 start, DirectX::XMFLOAT3 end);
 
   DirectX::XMFLOAT4 line_color;

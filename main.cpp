@@ -23,6 +23,7 @@ public:
   // Create bitmaps
   Bitmap quad = Bitmap(0.70f, 0.95f, 0.25, 0.25, DATA_FOLDER "/textures/MetalWalkway013_2K-PNG_Color_Opacity.png");
 
+  // Create some text with some valid and some invalid characters
   Text text = Text("This is a sample text :) カタカナ");
 
   void setup() override {

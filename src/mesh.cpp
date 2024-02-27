@@ -57,34 +57,36 @@ void Mesh::initialize(std::vector<vertex_t> vertices, std::vector<unsigned int> 
   vertex_count = vertices.size();
   index_count = indices.size();
 
-  // Store vertex positions temporary
-  DirectX::XMFLOAT3 vertex_positions[vertex_count];
-
-  for(int i = 0; i < vertex_count; i++) {
-    vertex_positions[i] = vertices[i].coordinates;
-  }
-
   createVertexBuffer(vertices, &vertex_buffer);
   createIndexBuffer(indices, &index_buffer);
 
-  // Create the bounding box for this mesh
-  DirectX::BoundingOrientedBox::CreateFromPoints(bounding_box, vertex_count, vertex_positions, sizeof(DirectX::XMFLOAT3));
-  DirectX::XMFLOAT3 corners[bounding_box.CORNER_COUNT];
-  bounding_box.GetCorners(corners);
-  std::vector<vertex_t> bounding_box_vertices;
-  std::vector<unsigned int> bounding_box_indices = {
-    0, 1, 2, 3, 0, 3, 1, 2,
-    4, 5, 6, 7, 4, 7, 5, 6,
-    0, 4, 1, 5, 2, 6, 3, 7
-  };
+  if (hasBoundingBox()) {
+    // Store vertex positions temporary
+    DirectX::XMFLOAT3 vertex_positions[vertex_count];
 
-  // Create vertices from the corners of the bounding box
-  for (int i = 0; i < bounding_box.CORNER_COUNT; i++) {
-    bounding_box_vertices.push_back({ corners[i], { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
+    for(int i = 0; i < vertex_count; i++) {
+      vertex_positions[i] = vertices[i].coordinates;
+    }
+
+    // Create the bounding box for this mesh
+    DirectX::BoundingOrientedBox::CreateFromPoints(bounding_box, vertex_count, vertex_positions, sizeof(DirectX::XMFLOAT3));
+    DirectX::XMFLOAT3 corners[bounding_box.CORNER_COUNT];
+    bounding_box.GetCorners(corners);
+    std::vector<vertex_t> bounding_box_vertices;
+    std::vector<unsigned int> bounding_box_indices = {
+      0, 1, 2, 3, 0, 3, 1, 2,
+      4, 5, 6, 7, 4, 7, 5, 6,
+      0, 4, 1, 5, 2, 6, 3, 7
+    };
+
+    // Create vertices from the corners of the bounding box
+    for (int i = 0; i < bounding_box.CORNER_COUNT; i++) {
+      bounding_box_vertices.push_back({ corners[i], { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
+    }
+
+    createVertexBuffer(bounding_box_vertices, &bounding_box_vertex_buffer);
+    createIndexBuffer(bounding_box_indices, &bounding_box_index_buffer);
   }
-
-  createVertexBuffer(bounding_box_vertices, &bounding_box_vertex_buffer);
-  createIndexBuffer(bounding_box_indices, &bounding_box_index_buffer);
 }
 
 void Mesh::render() {
@@ -110,12 +112,14 @@ void Mesh::render() {
   // indices of this mesh.
   device_context->DrawIndexed(index_count, 0, 0);
 
-  // Next, draw the bounding box
-  device_context->IASetVertexBuffers(0, 1, &bounding_box_vertex_buffer, &stride, &offset);
-  device_context->IASetIndexBuffer(bounding_box_index_buffer, DXGI_FORMAT_R32_UINT, 0);
-  device_context->PSSetShaderResources(0, 1, &nulltexture);
-  device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-  device_context->DrawIndexed(24, 0, 0);
+  // Next, draw the bounding box, if the class has a bounding box
+  if(hasBoundingBox()) {
+    device_context->IASetVertexBuffers(0, 1, &bounding_box_vertex_buffer, &stride, &offset);
+    device_context->IASetIndexBuffer(bounding_box_index_buffer, DXGI_FORMAT_R32_UINT, 0);
+    device_context->PSSetShaderResources(0, 1, &nulltexture);
+    device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+    device_context->DrawIndexed(24, 0, 0);
+  }
 }
 
 void Mesh::registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context) {
@@ -151,5 +155,9 @@ void Mesh::createIndexBuffer(std::vector<unsigned int> data, ID3D11Buffer **targ
   D3D11_SUBRESOURCE_DATA index_buffer_data = { data.data() };
   HRESULT result = device->CreateBuffer(&buffer_desc, &index_buffer_data, target_buffer);
   Utils::checkHresult(result, "Could not create the vertex buffer!");
+}
+
+bool Mesh::intersects(DirectX::BoundingOrientedBox other) {
+  return bounding_box.Intersects(other);
 }
 

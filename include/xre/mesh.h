@@ -20,6 +20,7 @@ public:
   Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, const char *texture_path);
 
   virtual void render();
+  bool intersects(DirectX::BoundingOrientedBox other);
 
   static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);
 
@@ -27,6 +28,10 @@ protected:
   inline static ID3D11Device *device = NULL;
   inline static ID3D11DeviceContext *device_context = NULL;
   inline static ID3D11ShaderResourceView *nulltexture = NULL;
+
+  // A mesh has a bounding box by default. Subclasses which do not
+  // can override this method to disable bounding boxes.
+  virtual inline bool hasBoundingBox() { return true; };
 
   // vertex and index buffers
   ID3D11Buffer *vertex_buffer;
