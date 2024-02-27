@@ -26,6 +26,7 @@ public:
 protected:
   inline static ID3D11Device *device = NULL;
   inline static ID3D11DeviceContext *device_context = NULL;
+  inline static ID3D11ShaderResourceView *nulltexture = NULL;
 
   // vertex and index buffers
   ID3D11Buffer *vertex_buffer;
@@ -47,4 +48,6 @@ protected:
   DirectX::BoundingOrientedBox bounding_box;
 
   void initialize(std::vector<vertex_t> vertices, std::vector<unsigned int> indices);
+  void createVertexBuffer(std::vector<vertex_t> data, ID3D11Buffer **target_buffer);
+  void createIndexBuffer(std::vector<unsigned int> data, ID3D11Buffer **target_buffer);
 };
