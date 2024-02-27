@@ -13,6 +13,8 @@
 #include <xre/structs.h>
 #include <xre/shader.h>
 
+// Mesh class, usually not used directly, but either as a part of a `Model` class instance,
+// or as a a subclass, e.g. Bitmap or Line.
 class Mesh {
 public:
   Mesh();
