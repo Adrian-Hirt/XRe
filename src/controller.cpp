@@ -40,3 +40,17 @@ void Controller::render() {
   aim_line.updateLineFromXrPose(aim);
   aim_line.render();
 }
+
+void Controller::sceneModelInteractions() {
+  if(!shouldRender) {
+    return;
+  }
+
+  DirectX::BoundingOrientedBox controller_bounding_box = model.getTransformedBoundingBox();
+
+  for(Model *model : Model::interactable_instances) {
+    if(model->intersects(controller_bounding_box)) {
+      std::cout << "Intersection with " << model->name << " " << rand() << std::endl;
+    }
+  }
+}

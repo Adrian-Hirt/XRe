@@ -22,7 +22,7 @@ public:
   Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, const char *texture_path);
 
   virtual void render();
-  bool intersects(DirectX::BoundingOrientedBox other);
+  DirectX::BoundingOrientedBox getBoundingBox();
 
   static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);
 

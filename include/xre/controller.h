@@ -17,6 +17,9 @@ public:
   // render a controller
   void render();
 
+  // Check whether the controller interacts with any models
+  void sceneModelInteractions();
+
   // Whether the controller should be rendered or not
   bool shouldRender;
 

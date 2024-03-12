@@ -16,6 +16,7 @@ public:
   Model();
   Model(std::vector<Mesh> meshes, DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f));
   Model(const char *model_path, DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f));
+  const char *name;
 
   // Two different rendering methods, one where the user can pass in
   // a shader to use for this model
@@ -44,9 +45,21 @@ public:
   void setPosition(float x, float y, float z);
   void setPosition(DirectX::XMVECTOR position);
 
+  // Set the color of the model
   void setColor(DirectX::XMFLOAT4 color);
 
+  // Check whether a model intersects with a bounding box
+  bool intersects(DirectX::BoundingOrientedBox other);
+
+  // Get the bounding box with the transformation already applied
+  DirectX::BoundingOrientedBox getTransformedBoundingBox();
+
+  // Mark a model as interactable
+  void makeInteractable();
+
   static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);
+
+  inline static std::vector<Model*> interactable_instances;
 
 private:
   // Pointers to the D3D11 device and device_context which we might
@@ -69,5 +82,12 @@ private:
   // Color of the model, which will be applied to all meshes
   DirectX::XMFLOAT4 model_color;
 
+  // The bounding box of this model, used to quickly check
+  // whether we need to check intersection with the meshes
+  // (if the bounding box of the model does not intersect,
+  // the bounding boxes of the meshes definitely will not).
+  DirectX::BoundingOrientedBox bounding_box;
+
   void loadObj(const char *model_path);
+  void buildBoundingBox();
 };

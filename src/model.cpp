@@ -17,11 +17,15 @@ Model::Model() {}
 Model::Model(std::vector<Mesh> meshes, DirectX::XMFLOAT4 color) {
   this->meshes = meshes;
   this->model_color = color;
+
+  buildBoundingBox();
 }
 
 Model::Model(const char *model_path, DirectX::XMFLOAT4 color) {
   loadObj(model_path);
   this->model_color = color;
+
+  buildBoundingBox();
 }
 
 void Model::render() {
@@ -185,4 +189,40 @@ void Model::loadObj(const char *model_path) {
 void Model::registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context) {
   Model::device = device;
   Model::device_context = device_context;
+}
+
+void Model::buildBoundingBox() {
+  size_t points_count = meshes.size() * 8;
+  DirectX::XMFLOAT3 all_corners[points_count];
+  size_t idx = 0;
+
+  // Get all bounding boxes of all meshes, and put the
+  // corners into the previously defined array
+  for(Mesh mesh : meshes) {
+    DirectX::XMFLOAT3 corners[8];
+    mesh.getBoundingBox().GetCorners(corners);
+
+    for (size_t j = 0; j < 8; j++) {
+      all_corners[idx++] = corners[j];
+    }
+  }
+
+  // Build the bounding box
+  DirectX::BoundingOrientedBox::CreateFromPoints(bounding_box, points_count, all_corners, sizeof(DirectX::XMFLOAT3));
+}
+
+bool Model::intersects(DirectX::BoundingOrientedBox other) {
+  // TODO: if intersects, check all "child bounding boxes"
+  // for increased accuracy
+  return getTransformedBoundingBox().Intersects(other);
+}
+
+DirectX::BoundingOrientedBox Model::getTransformedBoundingBox() {
+  DirectX::BoundingOrientedBox transformed;
+  bounding_box.Transform(transformed, 1.0f, rotation, translation);
+  return transformed;
+}
+
+void Model::makeInteractable() {
+  Model::interactable_instances.push_back(this);
 }

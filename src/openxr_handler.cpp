@@ -586,6 +586,12 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
 	//------------------------------------------------------------------------------------------------------
 	pollOpenxrActions(xr_frame_state.predictedDisplayTime);
 
+  //------------------------------------------------------------------------------------------------------
+	// Update the interactions of the controllers with the scene
+	//------------------------------------------------------------------------------------------------------
+  left_controller->sceneModelInteractions();
+  right_controller->sceneModelInteractions();
+
 	//------------------------------------------------------------------------------------------------------
 	// Update simulation
 	//------------------------------------------------------------------------------------------------------

@@ -157,7 +157,7 @@ void Mesh::createIndexBuffer(std::vector<unsigned int> data, ID3D11Buffer **targ
   Utils::checkHresult(result, "Could not create the vertex buffer!");
 }
 
-bool Mesh::intersects(DirectX::BoundingOrientedBox other) {
-  return bounding_box.Intersects(other);
+DirectX::BoundingOrientedBox Mesh::getBoundingBox() {
+  return bounding_box;
 }
 

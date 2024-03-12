@@ -29,12 +29,20 @@ public:
   void setup() override {
     // Scale the cube down a bit
     cube.scale(0.33f, 0.33f, 0.33f);
+    cube.name = "Cube";
 
     // And translate the cube up a bit
     cube.translate(0.0f, 4.0f, 0.0f);
+    cube.makeInteractable();
+
+    ground.name = "Ground";
+    sphere.name = "Sphere";
+    sphere.makeInteractable();
 
     // Translate the ground cube up a bit and to the left
     ground_cube.translate(-2.0f, 0.5f, 0.0f);
+    ground_cube.makeInteractable();
+    ground_cube.name = "Ground Cube";
 
     // Squish the ground cube
     ground_cube.scale(1.0f, 0.3f, 1.0f);
