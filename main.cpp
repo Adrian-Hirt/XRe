@@ -5,9 +5,9 @@ public:
   TestApp(const char *application_name) : Application(application_name) {};
 
   // Create shaders
-  Shader ambient_shader = Shader(SHADERS_FOLDER "/ambient.hlsl");
-  Shader color_shader = Shader(SHADERS_FOLDER "/color.hlsl");
-  Shader texture_shader = Shader(SHADERS_FOLDER "/ambient_texture.hlsl");
+  Shader ambient_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient.hlsl");
+  Shader color_shader = Shader::loadOrCreate(SHADERS_FOLDER "/color.hlsl");
+  Shader texture_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient_texture.hlsl");
 
   // Create models with the ModelFactory
   Model cube = ModelFactory::createCube({1.0f, 0.0f, 0.0f, 0.25f});

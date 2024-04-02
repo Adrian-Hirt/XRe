@@ -75,6 +75,18 @@ Shader::Shader(const char *shader_path) {
   per_model_const_buffer.color = { 1.0f, 0.0f, 0.0f, 1.0f };
 }
 
+Shader Shader::loadOrCreate(const char *shader_path) {
+  // Check if the shader is in the map
+  if(shader_instances.find(shader_path) == shader_instances.end()) {
+    Shader new_shader = Shader(shader_path);
+    shader_instances[shader_path] = new_shader;
+    return new_shader;
+  }
+  else {
+    return shader_instances[shader_path];
+  }
+}
+
 void Shader::createGlobalBuffers(ID3D11Device *device, ID3D11DeviceContext *device_context) {
   HRESULT result;
 

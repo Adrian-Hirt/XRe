@@ -8,10 +8,19 @@
 #include <xre/utils.h>
 #include <xre/structs.h>
 
+// Other includes
+#include <unordered_map>
+
 class Shader {
 public:
   Shader();
   Shader(const char *shader_path);
+
+  // Can be used to lookup the shader by its name in a lookup table,
+  // and directly use it if it's already instantiated. That way, for shaders
+  // which are used often (e.g. for scenes with a lot of text), we only
+  // have one instance per shader.
+  static Shader loadOrCreate(const char *shader_path);
 
   void activate();
   void cleanUp();
@@ -55,4 +64,8 @@ private:
   // Constant buffer pointers & the constant buffers themselfes.
   ID3D11Buffer *p_per_model_const_buffer;
   per_model_const_buffer_t per_model_const_buffer;
+
+  // Lookup table for shader name -> shader instance, such that we only
+  // instantiate each shader once.
+  inline static std::unordered_map<std::string, Shader> shader_instances = {};
 };
