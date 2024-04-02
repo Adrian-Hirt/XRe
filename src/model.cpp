@@ -17,6 +17,7 @@ Model::Model() {}
 Model::Model(std::vector<Mesh> meshes, DirectX::XMFLOAT4 color) {
   this->meshes = meshes;
   this->model_color = color;
+  this->original_model_color = color;
 
   buildBoundingBox();
 }
@@ -24,6 +25,7 @@ Model::Model(std::vector<Mesh> meshes, DirectX::XMFLOAT4 color) {
 Model::Model(const char *model_path, DirectX::XMFLOAT4 color) {
   loadObj(model_path);
   this->model_color = color;
+  this->original_model_color = color;
 
   buildBoundingBox();
 }
@@ -117,6 +119,10 @@ void Model::setPosition(DirectX::XMVECTOR position) {
 
 void Model::setColor(DirectX::XMFLOAT4 color) {
   model_color = color;
+}
+
+void Model::resetColor() {
+  model_color = original_model_color;
 }
 
 void Model::loadObj(const char *model_path) {

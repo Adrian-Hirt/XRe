@@ -48,6 +48,7 @@ public:
 
   // Set the color of the model
   void setColor(DirectX::XMFLOAT4 color);
+  void resetColor();
 
   // Check whether a model intersects with a bounding box
   bool intersects(DirectX::BoundingOrientedBox other);
@@ -82,6 +83,9 @@ private:
 
   // Color of the model, which will be applied to all meshes
   DirectX::XMFLOAT4 model_color;
+
+  // Store the original color
+  DirectX::XMFLOAT4 original_model_color;
 
   // The bounding box of this model, used to quickly check
   // whether we need to check intersection with the meshes
