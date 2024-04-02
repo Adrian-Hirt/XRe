@@ -48,13 +48,21 @@ void Controller::sceneModelInteractions() {
 
   DirectX::BoundingOrientedBox controller_bounding_box = model.getTransformedBoundingBox();
 
-  for(Model *model : Model::interactable_instances) {
+  for(Model *current_model : Model::interactable_instances) {
     // TODO: maybe set a bit a better indicator that an object is intersecting, e.g. a glow effect
-    if(model->intersects(controller_bounding_box)) {
-      model->setColor({1.0f, 0.0f, 0.0f, 1.0f});
+    if(current_model->intersects(controller_bounding_box)) {
+      // Set a different color if the controller is intersecting another model
+      current_model->setColor({1.0f, 0.0f, 0.0f, 1.0f});
+
+      // Also, if the controller is grabbing, set the position and the rotation of the
+      // model to those of the controller
+      if (grabbing) {
+        current_model->setPosition(model.getPosition());
+        current_model->setRotation(model.getRotation());
+      }
     }
     else {
-      model->resetColor();
+      current_model->resetColor();
     }
   }
 }

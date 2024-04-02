@@ -46,6 +46,11 @@ public:
   void setPosition(float x, float y, float z);
   void setPosition(DirectX::XMVECTOR position);
 
+  // Getters for position, scale and rotation
+  DirectX::XMVECTOR getRotation();
+  DirectX::XMVECTOR getScale();
+  DirectX::XMVECTOR getPosition();
+
   // Set the color of the model
   void setColor(DirectX::XMFLOAT4 color);
   void resetColor();
@@ -61,6 +66,7 @@ public:
 
   static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);
 
+  // List of all instances we marked as interactable
   inline static std::vector<Model*> interactable_instances;
 
 private:

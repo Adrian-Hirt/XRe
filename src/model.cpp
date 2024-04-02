@@ -117,6 +117,18 @@ void Model::setPosition(DirectX::XMVECTOR position) {
   this->translation = position;
 }
 
+DirectX::XMVECTOR Model::getRotation() {
+  return rotation;
+}
+
+DirectX::XMVECTOR Model::getScale() {
+  return scaling;
+}
+
+DirectX::XMVECTOR Model::getPosition() {
+  return translation;
+}
+
 void Model::setColor(DirectX::XMFLOAT4 color) {
   model_color = color;
 }
