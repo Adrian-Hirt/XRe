@@ -73,19 +73,11 @@ void Mesh::initialize(std::vector<vertex_t> vertices, std::vector<unsigned int> 
     DirectX::XMFLOAT3 corners[bounding_box.CORNER_COUNT];
     bounding_box.GetCorners(corners);
     std::vector<vertex_t> bounding_box_vertices;
-    std::vector<unsigned int> bounding_box_indices = {
-      0, 1, 2, 3, 0, 3, 1, 2,
-      4, 5, 6, 7, 4, 7, 5, 6,
-      0, 4, 1, 5, 2, 6, 3, 7
-    };
 
     // Create vertices from the corners of the bounding box
     for (int i = 0; i < bounding_box.CORNER_COUNT; i++) {
       bounding_box_vertices.push_back({ corners[i], { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
     }
-
-    createVertexBuffer(bounding_box_vertices, &bounding_box_vertex_buffer);
-    createIndexBuffer(bounding_box_indices, &bounding_box_index_buffer);
   }
 }
 
@@ -111,15 +103,6 @@ void Mesh::render() {
   // And finally, we can call the actual draw method, which will draw all the
   // indices of this mesh.
   device_context->DrawIndexed(index_count, 0, 0);
-
-  // Next, draw the bounding box, if the class has a bounding box
-  if(hasBoundingBox()) {
-    device_context->IASetVertexBuffers(0, 1, &bounding_box_vertex_buffer, &stride, &offset);
-    device_context->IASetIndexBuffer(bounding_box_index_buffer, DXGI_FORMAT_R32_UINT, 0);
-    device_context->PSSetShaderResources(0, 1, &nulltexture);
-    device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-    device_context->DrawIndexed(24, 0, 0);
-  }
 }
 
 void Mesh::registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context) {

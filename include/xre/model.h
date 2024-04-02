@@ -10,6 +10,7 @@
 #include <xre/utils.h>
 #include <xre/structs.h>
 #include <xre/mesh.h>
+#include <xre/bounding_box_mesh.h>
 
 class Model {
 public:
@@ -87,6 +88,9 @@ private:
   // (if the bounding box of the model does not intersect,
   // the bounding boxes of the meshes definitely will not).
   DirectX::BoundingOrientedBox bounding_box;
+
+  // Bounding box "mesh"
+  BoundingBoxMesh bounding_box_mesh;
 
   void loadObj(const char *model_path);
   void buildBoundingBox();

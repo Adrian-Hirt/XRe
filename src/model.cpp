@@ -48,6 +48,9 @@ void Model::render(Shader *shader) {
   for (Mesh &mesh : meshes) {
     mesh.render();
   }
+
+  // Next, render the bounding box
+  bounding_box_mesh.render();
 }
 
 DirectX::XMMATRIX Model::getTransformationMatrix() {
@@ -209,6 +212,18 @@ void Model::buildBoundingBox() {
 
   // Build the bounding box
   DirectX::BoundingOrientedBox::CreateFromPoints(bounding_box, points_count, all_corners, sizeof(DirectX::XMFLOAT3));
+
+  // Create the bounding box mesh, such that we can render it
+  DirectX::XMFLOAT3 corners[bounding_box.CORNER_COUNT];
+  bounding_box.GetCorners(corners);
+  std::vector<vertex_t> bounding_box_vertices;
+
+  // Create vertices from the corners of the bounding box
+  for (int i = 0; i < bounding_box.CORNER_COUNT; i++) {
+    bounding_box_vertices.push_back({ corners[i], { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
+  }
+
+  bounding_box_mesh = BoundingBoxMesh(bounding_box_vertices);
 }
 
 bool Model::intersects(DirectX::BoundingOrientedBox other) {
@@ -219,7 +234,23 @@ bool Model::intersects(DirectX::BoundingOrientedBox other) {
 
 DirectX::BoundingOrientedBox Model::getTransformedBoundingBox() {
   DirectX::BoundingOrientedBox transformed;
-  bounding_box.Transform(transformed, 1.0f, rotation, translation);
+
+  // This method does not work with scaling in different x, y and z scales, and
+  // therefore we need to build a transformation matrix with just scaling and
+  // apply that one. Also, the method that uses a transformation matrix ignores
+  // translations. We therefore build a matrix only for scaling, apply it, and
+  // then apply rotation and translation.
+  DirectX::XMFLOAT3 scalingVect;
+  DirectX::XMStoreFloat3(&scalingVect, scaling);
+  DirectX::XMMATRIX scaling = DirectX::XMMatrixScaling(scalingVect.x, scalingVect.y, scalingVect.z);
+
+  // Apply the scaling
+  bounding_box.Transform(transformed, scaling);
+
+  // Apply rotation and translation
+  transformed.Transform(transformed, 1.0f, rotation, translation);
+
+  // Done
   return transformed;
 }
 
