@@ -15,17 +15,17 @@ Model::Model() {}
 //  2) Color of the model
 //------------------------------------------------------------------------------------------------------
 Model::Model(std::vector<Mesh> meshes, DirectX::XMFLOAT4 color) {
-  this->meshes = meshes;
-  this->model_color = color;
-  this->original_model_color = color;
+  m_meshes = meshes;
+  m_model_color = color;
+  m_original_model_color = color;
 
   buildBoundingBox();
 }
 
 Model::Model(const char *model_path, DirectX::XMFLOAT4 color) {
   loadObj(model_path);
-  this->model_color = color;
-  this->original_model_color = color;
+  m_model_color = color;
+  m_original_model_color = color;
 
   buildBoundingBox();
 }
@@ -44,28 +44,28 @@ void Model::render(Shader *shader) {
   // Update the shader with the model matrix
   shader->setModelMatrix(getTransformationMatrix());
   shader->setNormalRotationMatrix(getRotationMatrix());
-  shader->setModelColor(model_color);
+  shader->setModelColor(m_model_color);
   shader->updatePerModelConstantBuffer();
 
-  for (Mesh &mesh : meshes) {
+  for (Mesh &mesh : m_meshes) {
     mesh.render();
   }
 
   // Next, render the bounding box
-  bounding_box_mesh.render();
+  m_bounding_box_mesh.render();
 }
 
 DirectX::XMMATRIX Model::getTransformationMatrix() {
   return DirectX::XMMatrixTranspose(DirectX::XMMatrixAffineTransformation(
-         scaling,
+         m_scaling,
          DirectX::g_XMZero,
-         rotation,
-         translation));
+         m_rotation,
+         m_translation));
 
 }
 
 DirectX::XMMATRIX Model::getRotationMatrix() {
-  return DirectX::XMMatrixRotationQuaternion(this->rotation);
+  return DirectX::XMMatrixRotationQuaternion(m_rotation);
 }
 
 void Model::rotate(float roll, float pitch, float yaw) {
@@ -74,7 +74,7 @@ void Model::rotate(float roll, float pitch, float yaw) {
 }
 
 void Model::rotate(DirectX::XMVECTOR rotation) {
-  this->rotation = DirectX::XMQuaternionMultiply(this->rotation, rotation);
+  m_rotation = DirectX::XMQuaternionMultiply(m_rotation, rotation);
 }
 
 void Model::translate(float x, float y, float z) {
@@ -83,7 +83,7 @@ void Model::translate(float x, float y, float z) {
 }
 
 void Model::translate(DirectX::XMVECTOR translation) {
-  this->translation = DirectX::XMVectorAdd(this->translation, translation);
+  m_translation = DirectX::XMVectorAdd(m_translation, translation);
 }
 
 void Model::scale(float x, float y, float z) {
@@ -92,11 +92,11 @@ void Model::scale(float x, float y, float z) {
 }
 
 void Model::scale(DirectX::XMVECTOR scaling) {
-this->scaling = DirectX::XMVectorMultiply(this->scaling, scaling);
+m_scaling = DirectX::XMVectorMultiply(m_scaling, scaling);
 }
 
 void Model::setRotation(DirectX::XMVECTOR rotation) {
-  this->rotation = rotation;
+  m_rotation = rotation;
 }
 
 void Model::setScale(float x, float y, float z) {
@@ -105,7 +105,7 @@ void Model::setScale(float x, float y, float z) {
 }
 
 void Model::setScale(DirectX::XMVECTOR scaling) {
-  this->scaling = scaling;
+  m_scaling = scaling;
 }
 
 void Model::setPosition(float x, float y, float z) {
@@ -114,27 +114,27 @@ void Model::setPosition(float x, float y, float z) {
 }
 
 void Model::setPosition(DirectX::XMVECTOR position) {
-  this->translation = position;
+  m_translation = position;
 }
 
 DirectX::XMVECTOR Model::getRotation() {
-  return rotation;
+  return m_rotation;
 }
 
 DirectX::XMVECTOR Model::getScale() {
-  return scaling;
+  return m_scaling;
 }
 
 DirectX::XMVECTOR Model::getPosition() {
-  return translation;
+  return m_translation;
 }
 
 void Model::setColor(DirectX::XMFLOAT4 color) {
-  model_color = color;
+  m_model_color = color;
 }
 
 void Model::resetColor() {
-  model_color = original_model_color;
+  m_model_color = m_original_model_color;
 }
 
 void Model::loadObj(const char *model_path) {
@@ -203,23 +203,23 @@ void Model::loadObj(const char *model_path) {
       index_offset += face_vertices_count;
     }
 
-    meshes.push_back(Mesh(mesh_vertices, mesh_indices));
+    m_meshes.push_back(Mesh(mesh_vertices, mesh_indices));
   };
 }
 
 void Model::registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context) {
-  Model::device = device;
-  Model::device_context = device_context;
+  Model::m_device = device;
+  Model::m_device_context = device_context;
 }
 
 void Model::buildBoundingBox() {
-  size_t points_count = meshes.size() * 8;
+  size_t points_count = m_meshes.size() * 8;
   DirectX::XMFLOAT3 all_corners[points_count];
   size_t idx = 0;
 
   // Get all bounding boxes of all meshes, and put the
   // corners into the previously defined array
-  for(Mesh mesh : meshes) {
+  for(Mesh mesh : m_meshes) {
     DirectX::XMFLOAT3 corners[8];
     mesh.getBoundingBox().GetCorners(corners);
 
@@ -229,19 +229,19 @@ void Model::buildBoundingBox() {
   }
 
   // Build the bounding box
-  DirectX::BoundingOrientedBox::CreateFromPoints(bounding_box, points_count, all_corners, sizeof(DirectX::XMFLOAT3));
+  DirectX::BoundingOrientedBox::CreateFromPoints(m_bounding_box, points_count, all_corners, sizeof(DirectX::XMFLOAT3));
 
   // Create the bounding box mesh, such that we can render it
-  DirectX::XMFLOAT3 corners[bounding_box.CORNER_COUNT];
-  bounding_box.GetCorners(corners);
+  DirectX::XMFLOAT3 corners[m_bounding_box.CORNER_COUNT];
+  m_bounding_box.GetCorners(corners);
   std::vector<vertex_t> bounding_box_vertices;
 
   // Create vertices from the corners of the bounding box
-  for (int i = 0; i < bounding_box.CORNER_COUNT; i++) {
+  for (int i = 0; i < m_bounding_box.CORNER_COUNT; i++) {
     bounding_box_vertices.push_back({ corners[i], { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
   }
 
-  bounding_box_mesh = BoundingBoxMesh(bounding_box_vertices);
+  m_bounding_box_mesh = BoundingBoxMesh(bounding_box_vertices);
 }
 
 bool Model::intersects(DirectX::BoundingOrientedBox other) {
@@ -254,7 +254,7 @@ bool Model::intersects(DirectX::BoundingOrientedBox other) {
   // Otherwise, we need to iterate over the meshes of the model and
   // check for each mesh whether it intersects with `other`. If we find
   // one such box, we can directly return true.
-  for(Mesh mesh : meshes) {
+  for(Mesh mesh : m_meshes) {
     if (applyTransformToBoundingBox(mesh.getBoundingBox()).Intersects(other)){
       return true;
     }
@@ -264,7 +264,7 @@ bool Model::intersects(DirectX::BoundingOrientedBox other) {
 }
 
 DirectX::BoundingOrientedBox Model::getTransformedBoundingBox() {
-  return applyTransformToBoundingBox(bounding_box);
+  return applyTransformToBoundingBox(m_bounding_box);
 }
 
 DirectX::BoundingOrientedBox Model::applyTransformToBoundingBox(DirectX::BoundingOrientedBox input_bounding_box) {
@@ -276,19 +276,19 @@ DirectX::BoundingOrientedBox Model::applyTransformToBoundingBox(DirectX::Boundin
   // translations. We therefore build a matrix only for scaling, apply it, and
   // then apply rotation and translation.
   DirectX::XMFLOAT3 scalingVect;
-  DirectX::XMStoreFloat3(&scalingVect, scaling);
+  DirectX::XMStoreFloat3(&scalingVect, m_scaling);
   DirectX::XMMATRIX scaling = DirectX::XMMatrixScaling(scalingVect.x, scalingVect.y, scalingVect.z);
 
   // Apply the scaling
   input_bounding_box.Transform(transformed, scaling);
 
   // Apply rotation and translation
-  transformed.Transform(transformed, 1.0f, rotation, translation);
+  transformed.Transform(transformed, 1.0f, m_rotation, m_translation);
 
   // Done
   return transformed;
 }
 
 void Model::makeInteractable() {
-  Model::interactable_instances.push_back(this);
+  Model::m_interactable_instances.push_back(this);
 }

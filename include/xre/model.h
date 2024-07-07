@@ -17,7 +17,6 @@ public:
   Model();
   Model(std::vector<Mesh> meshes, DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f));
   Model(const char *model_path, DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f));
-  const char *name;
 
   // Two different rendering methods, one where the user can pass in
   // a shader to use for this model
@@ -67,40 +66,40 @@ public:
   static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);
 
   // List of all instances we marked as interactable
-  inline static std::vector<Model*> interactable_instances;
+  inline static std::vector<Model*> m_interactable_instances;
 
 private:
   // Pointers to the D3D11 device and device_context which we might
   // need if we want to create meshes in the model class (e.g. when
   // loading a model from a .obj file)
-  inline static ID3D11Device *device = NULL;
-  inline static ID3D11DeviceContext *device_context = NULL;
+  inline static ID3D11Device *m_device = NULL;
+  inline static ID3D11DeviceContext *m_device_context = NULL;
 
   // Vector holding all the meshes of this model
-  std::vector<Mesh> meshes;
+  std::vector<Mesh> m_meshes;
 
   // Position, scale and rotation of the model
   // Scale factors, initialize to use the scale of 1 for X, Y and Z
-  DirectX::XMVECTOR scaling = DirectX::XMVECTORF32({1.0f, 1.0f, 1.0f});
+  DirectX::XMVECTOR m_scaling = DirectX::XMVECTORF32({1.0f, 1.0f, 1.0f});
   // The position of the object in world coordinates
-  DirectX::XMVECTOR translation = DirectX::XMVECTORF32({0.0f, 0.0f, 0.0f});
+  DirectX::XMVECTOR m_translation = DirectX::XMVECTORF32({0.0f, 0.0f, 0.0f});
   // The rotation of the model
-  DirectX::XMVECTOR rotation = DirectX::XMQuaternionIdentity();
+  DirectX::XMVECTOR m_rotation = DirectX::XMQuaternionIdentity();
 
   // Color of the model, which will be applied to all meshes
-  DirectX::XMFLOAT4 model_color;
+  DirectX::XMFLOAT4 m_model_color;
 
   // Store the original color
-  DirectX::XMFLOAT4 original_model_color;
+  DirectX::XMFLOAT4 m_original_model_color;
 
   // The bounding box of this model, used to quickly check
   // whether we need to check intersection with the meshes
   // (if the bounding box of the model does not intersect,
   // the bounding boxes of the meshes definitely will not).
-  DirectX::BoundingOrientedBox bounding_box;
+  DirectX::BoundingOrientedBox m_bounding_box;
 
   // Bounding box "mesh"
-  BoundingBoxMesh bounding_box_mesh;
+  BoundingBoxMesh m_bounding_box_mesh;
 
   void loadObj(const char *model_path);
   void buildBoundingBox();
