@@ -38,16 +38,16 @@ void Line::render(Shader *shader) {
   // Set vertex and index buffers on the GPU to be the ones of this line
   UINT stride = sizeof(vertex_t);
   UINT offset = 0;
-  m_device_context->IASetVertexBuffers(0, 1, &m_vertex_buffer, &stride, &offset);
-  m_device_context->IASetIndexBuffer(m_index_buffer, DXGI_FORMAT_R32_UINT, 0);
+  s_device_context->IASetVertexBuffers(0, 1, &m_vertex_buffer, &stride, &offset);
+  s_device_context->IASetIndexBuffer(m_index_buffer, DXGI_FORMAT_R32_UINT, 0);
 
   // We'll be rendering a line list, so we need to tell the GPU
   // to render the vertices as such.
-  m_device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+  s_device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
   // And finally, we can call the actual draw method, which will draw all the
   // indices of this line.
-  m_device_context->DrawIndexed(m_index_count, 0, 0);
+  s_device_context->DrawIndexed(m_index_count, 0, 0);
 }
 
 void Line::updateLineFromXrPose(XrPosef pose) {
@@ -70,9 +70,9 @@ void Line::updateLineFromXrPose(XrPosef pose) {
 
   // Update the vertex buffer
   D3D11_MAPPED_SUBRESOURCE resource;
-  m_device_context->Map(m_vertex_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+  s_device_context->Map(m_vertex_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
   memcpy(resource.pData, vertices.data(), sizeof(vertex_t) * vertices.size());
-  m_device_context->Unmap(m_vertex_buffer, 0);
+  s_device_context->Unmap(m_vertex_buffer, 0);
 }
 
 std::vector<vertex_t> Line::verticesFromPoints(DirectX::XMFLOAT3 start, DirectX::XMFLOAT3 end) {

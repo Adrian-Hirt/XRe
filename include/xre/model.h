@@ -66,14 +66,14 @@ public:
   static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);
 
   // List of all instances we marked as interactable
-  inline static std::vector<Model*> m_interactable_instances;
+  inline static std::vector<Model*> s_interactable_instances;
 
 private:
   // Pointers to the D3D11 device and device_context which we might
   // need if we want to create meshes in the model class (e.g. when
   // loading a model from a .obj file)
-  inline static ID3D11Device *m_device = NULL;
-  inline static ID3D11DeviceContext *m_device_context = NULL;
+  inline static ID3D11Device *s_device = NULL;
+  inline static ID3D11DeviceContext *s_device_context = NULL;
 
   // Vector holding all the meshes of this model
   std::vector<Mesh> m_meshes;

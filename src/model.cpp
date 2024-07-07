@@ -208,8 +208,8 @@ void Model::loadObj(const char *model_path) {
 }
 
 void Model::registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context) {
-  Model::m_device = device;
-  Model::m_device_context = device_context;
+  Model::s_device = device;
+  Model::s_device_context = device_context;
 }
 
 void Model::buildBoundingBox() {
@@ -290,5 +290,5 @@ DirectX::BoundingOrientedBox Model::applyTransformToBoundingBox(DirectX::Boundin
 }
 
 void Model::makeInteractable() {
-  Model::m_interactable_instances.push_back(this);
+  Model::s_interactable_instances.push_back(this);
 }

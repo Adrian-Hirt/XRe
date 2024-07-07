@@ -23,9 +23,9 @@ void BoundingBoxMesh::render() {
   UINT stride = sizeof(vertex_t);
   UINT offset = 0;
 
-  m_device_context->IASetVertexBuffers(0, 1, &m_vertex_buffer, &stride, &offset);
-  m_device_context->IASetIndexBuffer(m_index_buffer, DXGI_FORMAT_R32_UINT, 0);
-  m_device_context->PSSetShaderResources(0, 1, &m_nulltexture);
-  m_device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-  m_device_context->DrawIndexed(24, 0, 0);
+  s_device_context->IASetVertexBuffers(0, 1, &m_vertex_buffer, &stride, &offset);
+  s_device_context->IASetIndexBuffer(m_index_buffer, DXGI_FORMAT_R32_UINT, 0);
+  s_device_context->PSSetShaderResources(0, 1, &s_nulltexture);
+  s_device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+  s_device_context->DrawIndexed(24, 0, 0);
 }

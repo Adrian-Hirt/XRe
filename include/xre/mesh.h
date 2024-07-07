@@ -27,9 +27,9 @@ public:
   static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);
 
 protected:
-  inline static ID3D11Device *m_device = NULL;
-  inline static ID3D11DeviceContext *m_device_context = NULL;
-  inline static ID3D11ShaderResourceView *m_nulltexture = NULL;
+  inline static ID3D11Device *s_device = NULL;
+  inline static ID3D11DeviceContext *s_device_context = NULL;
+  inline static ID3D11ShaderResourceView *s_nulltexture = NULL;
 
   // A mesh has a bounding box by default. Subclasses which do not
   // can override this method to disable bounding boxes.
