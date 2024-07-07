@@ -185,7 +185,7 @@ bool OpenXrHandler::initializeOpenxr() {
 		swapchain_create_info.arraySize = 1; // Number of array layers
 		swapchain_create_info.mipCount = 1; // Only use one mipmap level, bigger numbers would only be useful for textures
 		swapchain_create_info.faceCount = 1; // Number of faces to render, 1 should be used, other option would be 6 for cubemaps
-		swapchain_create_info.format = m_dx11_handler.d3d11_swapchain_format;
+		swapchain_create_info.format = m_dx11_handler.m_d3d11_swapchain_format;
 		swapchain_create_info.width = current_view_configuration.recommendedImageRectWidth; // Just use the recommended width that the runtime gave us
 		swapchain_create_info.height = current_view_configuration.recommendedImageRectHeight; // Just use the recommended height that the runtime gave us
 		swapchain_create_info.sampleCount = current_view_configuration.recommendedSwapchainSampleCount; // Just use the recommended sample count that the runtime gave us

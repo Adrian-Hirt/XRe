@@ -64,9 +64,9 @@ void Dx11Handler::initializeDevice(LUID &adapter_luid) {
     feature_levels,
     _countof(feature_levels),
     D3D11_SDK_VERSION,
-    &device,
+    &m_device,
     nullptr,
-    &device_context);
+    &m_device_context);
 
   // Check that we were successful
   Utils::checkHresult(result, "Creating the device and device_context failed");
@@ -90,7 +90,7 @@ void Dx11Handler::initializeDeviceStates() {
   rasterizer_description.AntialiasedLineEnable = true;
   rasterizer_description.FrontCounterClockwise = false;
 
-  result = device->CreateRasterizerState(&rasterizer_description, &p_rasterizer_state_default_cw);
+  result = m_device->CreateRasterizerState(&rasterizer_description, &m_rasterizer_state_default_cw);
   Utils::checkHresult(result, "Failed to create the rasterizer state for default CW mode");
 
   // Build the same state again, but this time use counter-clockwise
@@ -102,7 +102,7 @@ void Dx11Handler::initializeDeviceStates() {
   rasterizer_description.AntialiasedLineEnable = true;
   rasterizer_description.FrontCounterClockwise = true;
 
-  result = device->CreateRasterizerState(&rasterizer_description, &p_rasterizer_state_default_ccw);
+  result = m_device->CreateRasterizerState(&rasterizer_description, &m_rasterizer_state_default_ccw);
   Utils::checkHresult(result, "Failed to create the rasterizer state for default CW mode");
 
   // Then build the wireframe device state for the rasterizer,
@@ -113,11 +113,11 @@ void Dx11Handler::initializeDeviceStates() {
   rasterizer_description.CullMode = D3D11_CULL_BACK;
   rasterizer_description.AntialiasedLineEnable = true;
 
-  result = device->CreateRasterizerState(&rasterizer_description, &p_rasterizer_state_wireframe);
+  result = m_device->CreateRasterizerState(&rasterizer_description, &m_rasterizer_state_wireframe);
   Utils::checkHresult(result, "Failed to create the rasterizer state for wireframe mode");
 
   // Use the default state for now
-  device_context->RSSetState(p_rasterizer_state_default_cw);
+  m_device_context->RSSetState(m_rasterizer_state_default_cw);
 
   // Next, we setup the texture sampler state
   D3D11_SAMPLER_DESC sampler_description;
@@ -131,9 +131,9 @@ void Dx11Handler::initializeDeviceStates() {
   sampler_description.MinLOD = 0; // Use level 0 (normal texture) as the min MipMap level
   sampler_description.MaxLOD = FLT_MAX; // And allow any arbitrary high MipMap level
 
-  result = device->CreateSamplerState(&sampler_description, &p_sampler_state);
+  result = m_device->CreateSamplerState(&sampler_description, &m_sampler_state);
   Utils::checkHresult(result, "Failed to create the sampler state");
-  device_context->PSSetSamplers(0, 1, &p_sampler_state);
+  m_device_context->PSSetSamplers(0, 1, &m_sampler_state);
 
   // Next, we setup the blend state
   D3D11_BLEND_DESC blend_description;
@@ -149,21 +149,21 @@ void Dx11Handler::initializeDeviceStates() {
   blend_description.IndependentBlendEnable = true; // Only use the first render target
   blend_description.AlphaToCoverageEnable = false; // Improve quality of transparent textures
 
-  result = device->CreateBlendState(&blend_description, &p_blend_state);
+  result = m_device->CreateBlendState(&blend_description, &m_blend_state);
   Utils::checkHresult(result, "Failed to create the blend state");
-  device_context->OMSetBlendState(p_blend_state, 0, 0xffffffff);
+  m_device_context->OMSetBlendState(m_blend_state, 0, 0xffffffff);
 }
 
 //------------------------------------------------------------------------------------------------------
 // Returns the DirectX Device
 //------------------------------------------------------------------------------------------------------
 ID3D11Device* Dx11Handler::getDevice() {
-  if (this->device == nullptr) {
+  if (this->m_device == nullptr) {
     Utils::exitWithMessage("You need to initialize the Dx11Handler with a LUID to be able to access the device");
     return NULL;
   }
   else {
-    return this->device;
+    return this->m_device;
   }
 }
 
@@ -171,12 +171,12 @@ ID3D11Device* Dx11Handler::getDevice() {
 // Returns the DirectX DeviceContext
 //------------------------------------------------------------------------------------------------------
 ID3D11DeviceContext *Dx11Handler::getDeviceContext() {
-  if (this->device_context == nullptr) {
+  if (this->m_device_context == nullptr) {
     Utils::exitWithMessage("You need to initialize the Dx11Handler with a LUID to be able to access the device");
     return NULL;
   }
   else {
-    return this->device_context;
+    return this->m_device_context;
   }
 }
 
@@ -201,8 +201,8 @@ swapchain_data_t Dx11Handler::createRenderTargets(ID3D11Texture2D &texture) {
   // to MSDN. That way, we can specify the colors with sRGBA values between 0 and 255.
   D3D11_RENDER_TARGET_VIEW_DESC render_target_view_desc = {};
   render_target_view_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-  render_target_view_desc.Format = d3d11_swapchain_format;
-  result = device->CreateRenderTargetView(&texture, &render_target_view_desc, &result_target.back_buffer);
+  render_target_view_desc.Format = m_d3d11_swapchain_format;
+  result = m_device->CreateRenderTargetView(&texture, &render_target_view_desc, &result_target.back_buffer);
   Utils::checkHresult(result, "Could not create the render target view");
 
   //----------------------------------------------------------------------------------
@@ -226,14 +226,14 @@ swapchain_data_t Dx11Handler::createRenderTargets(ID3D11Texture2D &texture) {
 
   // Create the depth buffer texture object
   ID3D11Texture2D *depth_buffer;
-  result = device->CreateTexture2D(&depth_buffer_desc, NULL, &depth_buffer);
+  result = m_device->CreateTexture2D(&depth_buffer_desc, NULL, &depth_buffer);
   Utils::checkHresult(result, "Could not create the texture 2d");
 
   // Then use that depth buffer texture object to finally create the depth buffer itself
   D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc = {};
   depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
   depth_stencil_view_desc.Format = DXGI_FORMAT_D32_FLOAT; // Data format for the depth buffer itself is float
-  result = device->CreateDepthStencilView(depth_buffer, &depth_stencil_view_desc, &result_target.depth_buffer);
+  result = m_device->CreateDepthStencilView(depth_buffer, &depth_stencil_view_desc, &result_target.depth_buffer);
   Utils::checkHresult(result, "Could not create the depth stencil view");
 
   // We don't need the ID3D11Texture2D object anymore. As it's a COM object, it should be freed by calling
@@ -268,7 +268,7 @@ void Dx11Handler::renderFrame(XrCompositionLayerProjectionView& view,
   viewport.MaxDepth = 1;
 
 	// Now we can set the viewport of the device context
-	device_context->RSSetViewports(1, &viewport);
+	m_device_context->RSSetViewports(1, &viewport);
 
 	//----------------------------------------------------------------------------------
 	// Clear the Buffers
@@ -277,10 +277,10 @@ void Dx11Handler::renderFrame(XrCompositionLayerProjectionView& view,
 	// data from the previous frame). This is usually done by setting all the data
 	// (pixels) to a single color.
 	float clear_color[] = { 0.0f, 0.2f, 0.4f, 1.0f };
-	device_context->ClearRenderTargetView(swapchain_data.back_buffer, clear_color);
+	m_device_context->ClearRenderTargetView(swapchain_data.back_buffer, clear_color);
 
 	// Also clear the depth buffer, such that it's ready for rendering
-	device_context->ClearDepthStencilView(swapchain_data.depth_buffer, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_device_context->ClearDepthStencilView(swapchain_data.depth_buffer, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	//----------------------------------------------------------------------------------
 	// Set the render target
@@ -288,7 +288,7 @@ void Dx11Handler::renderFrame(XrCompositionLayerProjectionView& view,
 	// Now we can set the target of all render operations to the backbuffer of the
 	// swapchain we're using.
 	// This will render all our content to that backbuffer.
-	device_context->OMSetRenderTargets(1, &swapchain_data.back_buffer, swapchain_data.depth_buffer);
+	m_device_context->OMSetRenderTargets(1, &swapchain_data.back_buffer, swapchain_data.depth_buffer);
 
   //----------------------------------------------------------------------------------
 	// Update the shader constant buffers
@@ -305,13 +305,13 @@ void Dx11Handler::renderFrame(XrCompositionLayerProjectionView& view,
 
 void Dx11Handler::useDefaultRasterizer(bool use_clockwise) {
   if (use_clockwise) {
-    device_context->RSSetState(p_rasterizer_state_default_cw);
+    m_device_context->RSSetState(m_rasterizer_state_default_cw);
   }
   else {
-    device_context->RSSetState(p_rasterizer_state_default_ccw);
+    m_device_context->RSSetState(m_rasterizer_state_default_ccw);
   }
 }
 
 void Dx11Handler::useWireframeRasterizer() {
-  device_context->RSSetState(p_rasterizer_state_wireframe);
+  m_device_context->RSSetState(m_rasterizer_state_wireframe);
 }

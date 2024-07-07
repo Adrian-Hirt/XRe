@@ -22,22 +22,22 @@ public:
   swapchain_data_t createRenderTargets(ID3D11Texture2D &texture);
   void renderFrame(XrCompositionLayerProjectionView& view, swapchain_data_t& swapchain_data, std::function<void()> draw_callback);
 
-  DXGI_FORMAT d3d11_swapchain_format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+  DXGI_FORMAT m_d3d11_swapchain_format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
   void useDefaultRasterizer(bool use_clockwise);
   void useWireframeRasterizer();
 
 private:
   // Device and device context from DirectX 11
-  ID3D11Device *device;
-  ID3D11DeviceContext *device_context;
+  ID3D11Device *m_device;
+  ID3D11DeviceContext *m_device_context;
 
   // Device states
-  ID3D11RasterizerState *p_rasterizer_state_default_cw;
-  ID3D11RasterizerState *p_rasterizer_state_default_ccw;
-  ID3D11RasterizerState *p_rasterizer_state_wireframe;
-  ID3D11SamplerState *p_sampler_state;
-  ID3D11BlendState *p_blend_state;
+  ID3D11RasterizerState *m_rasterizer_state_default_cw;
+  ID3D11RasterizerState *m_rasterizer_state_default_ccw;
+  ID3D11RasterizerState *m_rasterizer_state_wireframe;
+  ID3D11SamplerState *m_sampler_state;
+  ID3D11BlendState *m_blend_state;
 
   // Methods
   void initializeDevice(LUID &adapter_luid);
