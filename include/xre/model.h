@@ -104,4 +104,7 @@ private:
 
   void loadObj(const char *model_path);
   void buildBoundingBox();
+
+  // Apply the transform of the model to another bounding box (e.g. the bounding box of a child mesh)
+  DirectX::BoundingOrientedBox applyTransformToBoundingBox(DirectX::BoundingOrientedBox input_bounding_box);
 };

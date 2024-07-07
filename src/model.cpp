@@ -245,12 +245,29 @@ void Model::buildBoundingBox() {
 }
 
 bool Model::intersects(DirectX::BoundingOrientedBox other) {
-  // TODO: if intersects, check all "child bounding boxes"
-  // for increased accuracy
-  return getTransformedBoundingBox().Intersects(other);
+  // If the `other` does not intersect the bounding box of the model,
+  // we can directly return false.
+  if (!getTransformedBoundingBox().Intersects(other)) {
+    return false;
+  }
+
+  // Otherwise, we need to iterate over the meshes of the model and
+  // check for each mesh whether it intersects with `other`. If we find
+  // one such box, we can directly return true.
+  for(Mesh mesh : meshes) {
+    if (applyTransformToBoundingBox(mesh.getBoundingBox()).Intersects(other)){
+      return true;
+    }
+  };
+
+  return false;
 }
 
 DirectX::BoundingOrientedBox Model::getTransformedBoundingBox() {
+  return applyTransformToBoundingBox(bounding_box);
+}
+
+DirectX::BoundingOrientedBox Model::applyTransformToBoundingBox(DirectX::BoundingOrientedBox input_bounding_box) {
   DirectX::BoundingOrientedBox transformed;
 
   // This method does not work with scaling in different x, y and z scales, and
@@ -263,7 +280,7 @@ DirectX::BoundingOrientedBox Model::getTransformedBoundingBox() {
   DirectX::XMMATRIX scaling = DirectX::XMMatrixScaling(scalingVect.x, scalingVect.y, scalingVect.z);
 
   // Apply the scaling
-  bounding_box.Transform(transformed, scaling);
+  input_bounding_box.Transform(transformed, scaling);
 
   // Apply rotation and translation
   transformed.Transform(transformed, 1.0f, rotation, translation);
