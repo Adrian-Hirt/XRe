@@ -64,13 +64,8 @@ public:
     // Render the line
     line.render(&color_shader);
 
-    // Render the cube model twice, once with Counterclockwise
-    // cull mode, once with the normal clockwise cull mode, such
-    // that the transparency works correctly.
-    setCcwCullMode();
-    cube.render(&ambient_shader);
-    setCwCullMode();
-    cube.render(&ambient_shader);
+    // Render a transparent looking cube
+    cube.renderTransparent(&ambient_shader);
 
     quad.render();
 

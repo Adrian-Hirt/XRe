@@ -55,6 +55,16 @@ void Model::render(Shader *shader) {
   m_bounding_box_mesh.render();
 }
 
+void Model::renderTransparent(Shader *shader) {
+  // Render the model twice, once with Counterclockwise
+  // cull mode, once with the normal clockwise cull mode, such
+  // that the transparency works correctly.
+  s_dx11_handler->useDefaultRasterizer(false);
+  render(shader);
+  s_dx11_handler->useDefaultRasterizer(true);
+  render(shader);
+}
+
 DirectX::XMMATRIX Model::getTransformationMatrix() {
   return DirectX::XMMatrixTranspose(DirectX::XMMatrixAffineTransformation(
          m_scaling,
@@ -210,6 +220,10 @@ void Model::loadObj(const char *model_path) {
 void Model::registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context) {
   Model::s_device = device;
   Model::s_device_context = device_context;
+}
+
+void Model::registerDx11Handler(Dx11Handler *handler) {
+  Model::s_dx11_handler = handler;
 }
 
 void Model::buildBoundingBox() {

@@ -9,6 +9,7 @@
 // XRe includes
 #include <xre/utils.h>
 #include <xre/structs.h>
+#include <xre/dx11_handler.h>
 #include <xre/mesh.h>
 #include <xre/bounding_box_mesh.h>
 
@@ -22,6 +23,7 @@ public:
   // a shader to use for this model
   void render();
   void render(Shader *shader);
+  void renderTransparent(Shader *shader);
 
   DirectX::XMMATRIX getTransformationMatrix();
   DirectX::XMMATRIX getRotationMatrix();
@@ -64,6 +66,7 @@ public:
   void makeInteractable();
 
   static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);
+  static void registerDx11Handler(Dx11Handler *handler);
 
   // List of all instances we marked as interactable
   inline static std::vector<Model*> s_interactable_instances;
@@ -74,6 +77,9 @@ private:
   // loading a model from a .obj file)
   inline static ID3D11Device *s_device = NULL;
   inline static ID3D11DeviceContext *s_device_context = NULL;
+
+  // Pointer to the Dx11 handler
+  inline static Dx11Handler *s_dx11_handler = NULL;
 
   // Vector holding all the meshes of this model
   std::vector<Mesh> m_meshes;
