@@ -102,7 +102,7 @@ void Model::scale(float x, float y, float z) {
 }
 
 void Model::scale(DirectX::XMVECTOR scaling) {
-m_scaling = DirectX::XMVectorMultiply(m_scaling, scaling);
+  m_scaling = DirectX::XMVectorMultiply(m_scaling, scaling);
 }
 
 void Model::setRotation(DirectX::XMVECTOR rotation) {
@@ -215,11 +215,6 @@ void Model::loadObj(const char *model_path) {
 
     m_meshes.push_back(Mesh(mesh_vertices, mesh_indices));
   };
-}
-
-void Model::registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context) {
-  Model::s_device = device;
-  Model::s_device_context = device_context;
 }
 
 void Model::registerDx11Handler(Dx11Handler *handler) {

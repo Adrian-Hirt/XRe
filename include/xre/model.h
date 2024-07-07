@@ -65,19 +65,12 @@ public:
   // Mark a model as interactable
   void makeInteractable();
 
-  static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);
   static void registerDx11Handler(Dx11Handler *handler);
 
   // List of all instances we marked as interactable
   inline static std::vector<Model*> s_interactable_instances;
 
 private:
-  // Pointers to the D3D11 device and device_context which we might
-  // need if we want to create meshes in the model class (e.g. when
-  // loading a model from a .obj file)
-  inline static ID3D11Device *s_device = NULL;
-  inline static ID3D11DeviceContext *s_device_context = NULL;
-
   // Pointer to the Dx11 handler
   inline static Dx11Handler *s_dx11_handler = NULL;
 
