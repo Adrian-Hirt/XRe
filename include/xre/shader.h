@@ -30,42 +30,42 @@ public:
   void setNormalRotationMatrix(DirectX::XMMATRIX rotation_matrix);
   void setModelColor(DirectX::XMFLOAT4 color);
 
-  inline static Shader* getCurrentActiveShader() { return current_active_shader; };
+  inline static Shader* getCurrentActiveShader() { return s_current_active_shader; };
   static void createGlobalBuffers(ID3D11Device *device, ID3D11DeviceContext *device_context);
   static void updateViewProjectionMatrix(DirectX::XMMATRIX view_projection);
   static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);
 
 private:
   // Shader objects
-  ID3D11VertexShader *vertex_shader;
-  ID3D11PixelShader *pixel_shader;
+  ID3D11VertexShader *m_vertex_shader;
+  ID3D11PixelShader *m_pixel_shader;
 
   // Input layout
-  ID3D11InputLayout *input_layout;
+  ID3D11InputLayout *m_input_layout;
 
   // D3D11 device and device context
-  inline static ID3D11Device *device = NULL;
-  inline static ID3D11DeviceContext *device_context = NULL;
+  inline static ID3D11Device *s_device = NULL;
+  inline static ID3D11DeviceContext *s_device_context = NULL;
 
   // Keep track of the currently activated shader
-  inline static Shader *current_active_shader = NULL;
+  inline static Shader *s_current_active_shader = NULL;
 
   // Global buffer to keep the viewprojection matrix, which should
   // only be updated once per frame, regardless of the number of
   // shaders
-  inline static per_frame_const_buffer_t global_per_frame_const_buffer = {};
-  inline static ID3D11Buffer *p_global_per_frame_const_buffer = NULL;
+  inline static per_frame_const_buffer_t s_global_per_frame_const_buffer = {};
+  inline static ID3D11Buffer *s_p_global_per_frame_const_buffer = NULL;
 
   // Global buffer to keep the lighting, which only should be updated
   // when the lighting changes.
-  inline static lighting_const_buffer_t lighting_const_buffer = {};
-  inline static ID3D11Buffer *p_lighting_const_buffer = NULL;
+  inline static lighting_const_buffer_t s_lighting_const_buffer = {};
+  inline static ID3D11Buffer *s_p_lighting_const_buffer = NULL;
 
   // Constant buffer pointers & the constant buffers themselfes.
-  ID3D11Buffer *p_per_model_const_buffer;
-  per_model_const_buffer_t per_model_const_buffer;
+  ID3D11Buffer *m_p_per_model_const_buffer;
+  per_model_const_buffer_t m_per_model_const_buffer;
 
   // Lookup table for shader name -> shader instance, such that we only
   // instantiate each shader once.
-  inline static std::unordered_map<std::string, Shader> shader_instances = {};
+  inline static std::unordered_map<std::string, Shader> s_shader_instances = {};
 };

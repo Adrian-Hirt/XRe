@@ -28,8 +28,8 @@ Shader::Shader(const char *shader_path) {
   }
 
   // Encapsulate both shaders into shader objects
-  device->CreateVertexShader(vertex_shader_blob->GetBufferPointer(), vertex_shader_blob->GetBufferSize(), NULL, &vertex_shader);
-  device->CreatePixelShader(pixel_shader_blob->GetBufferPointer(), pixel_shader_blob->GetBufferSize(), NULL, &pixel_shader);
+  s_device->CreateVertexShader(vertex_shader_blob->GetBufferPointer(), vertex_shader_blob->GetBufferSize(), NULL, &m_vertex_shader);
+  s_device->CreatePixelShader(pixel_shader_blob->GetBufferPointer(), pixel_shader_blob->GetBufferSize(), NULL, &m_pixel_shader);
 
   // D3D11_INPUT_ELEMENT_DESC:
   //  1. Semantic => Describes what the data is used for, e.g. "COLOR"
@@ -46,10 +46,10 @@ Shader::Shader(const char *shader_path) {
   };
 
   // Create input layout
-  device->CreateInputLayout(input_element_description, _countof(input_element_description), vertex_shader_blob->GetBufferPointer(), vertex_shader_blob->GetBufferSize(), &input_layout);
+  s_device->CreateInputLayout(input_element_description, _countof(input_element_description), vertex_shader_blob->GetBufferPointer(), vertex_shader_blob->GetBufferSize(), &m_input_layout);
 
   // Set input layout
-  device_context->IASetInputLayout(input_layout);
+  s_device_context->IASetInputLayout(m_input_layout);
 
   // Create constant buffers for our shaders
   HRESULT result;
@@ -64,26 +64,26 @@ Shader::Shader(const char *shader_path) {
   const_buffer_desc.ByteWidth = 144;
   const_buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
-  result = device->CreateBuffer(&const_buffer_desc, NULL, &p_per_model_const_buffer);
+  result = s_device->CreateBuffer(&const_buffer_desc, NULL, &m_p_per_model_const_buffer);
   Utils::checkHresult(result, "Could not create the per model const buffer");
 
   // Initialize the two matrices for the per model matrix to identity matrices
-  per_model_const_buffer.model = DirectX::XMMatrixIdentity();
-  per_model_const_buffer.normal_rotation = DirectX::XMMatrixIdentity();
+  m_per_model_const_buffer.model = DirectX::XMMatrixIdentity();
+  m_per_model_const_buffer.normal_rotation = DirectX::XMMatrixIdentity();
 
   // Initialize with red color for now
-  per_model_const_buffer.color = { 1.0f, 0.0f, 0.0f, 1.0f };
+  m_per_model_const_buffer.color = { 1.0f, 0.0f, 0.0f, 1.0f };
 }
 
 Shader Shader::loadOrCreate(const char *shader_path) {
   // Check if the shader is in the map
-  if(shader_instances.find(shader_path) == shader_instances.end()) {
+  if(s_shader_instances.find(shader_path) == s_shader_instances.end()) {
     Shader new_shader = Shader(shader_path);
-    shader_instances[shader_path] = new_shader;
+    s_shader_instances[shader_path] = new_shader;
     return new_shader;
   }
   else {
-    return shader_instances[shader_path];
+    return s_shader_instances[shader_path];
   }
 }
 
@@ -99,15 +99,15 @@ void Shader::createGlobalBuffers(ID3D11Device *device, ID3D11DeviceContext *devi
   const_buffer_desc.ByteWidth = 64;
   const_buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
-  result = device->CreateBuffer(&const_buffer_desc, NULL, &p_global_per_frame_const_buffer);
+  result = device->CreateBuffer(&const_buffer_desc, NULL, &s_p_global_per_frame_const_buffer);
   Utils::checkHresult(result, "Could not create the per frame const buffer");
 
   // Set a default value for the view projection matrix
-  global_per_frame_const_buffer.view_projection = DirectX::XMMatrixIdentity();
+  s_global_per_frame_const_buffer.view_projection = DirectX::XMMatrixIdentity();
 
   // Set the per frame constant buffer to slot 0
-  device_context->VSSetConstantBuffers(0, 1, &p_global_per_frame_const_buffer);
-  device_context->UpdateSubresource(p_global_per_frame_const_buffer, 0, 0, &global_per_frame_const_buffer, 0, 0);
+  device_context->VSSetConstantBuffers(0, 1, &s_p_global_per_frame_const_buffer);
+  device_context->UpdateSubresource(s_p_global_per_frame_const_buffer, 0, 0, &s_global_per_frame_const_buffer, 0, 0);
 
 
   // Create the lighting buffer
@@ -117,67 +117,67 @@ void Shader::createGlobalBuffers(ID3D11Device *device, ID3D11DeviceContext *devi
   const_buffer_desc.ByteWidth = 48;
   const_buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
-  result = device->CreateBuffer(&const_buffer_desc, NULL, &p_lighting_const_buffer);
+  result = device->CreateBuffer(&const_buffer_desc, NULL, &s_p_lighting_const_buffer);
   Utils::checkHresult(result, "Could not create the lighting const buffer");
 
   // Initialize the color values to some sensible defaults
-  lighting_const_buffer.ambient_color = { 0.2f, 0.2f, 0.2f, 0.3f };
-  lighting_const_buffer.light_vector = { 1.0f, 1.0f, 1.0f, 0.0f };
-  lighting_const_buffer.light_color = { 0.5f, 0.5f, 0.5f, 1.0f };
+  s_lighting_const_buffer.ambient_color = { 0.2f, 0.2f, 0.2f, 0.3f };
+  s_lighting_const_buffer.light_vector = { 1.0f, 1.0f, 1.0f, 0.0f };
+  s_lighting_const_buffer.light_color = { 0.5f, 0.5f, 0.5f, 1.0f };
 
   // Light buffer is in slot 2 as otherwise we would need to pad it to 16 bytes (if we'd want to put
   // it before the model buffer).
-  device_context->VSSetConstantBuffers(2, 1, &p_lighting_const_buffer);
-  device_context->UpdateSubresource(p_lighting_const_buffer, 0, 0, &lighting_const_buffer, 0, 0);
+  device_context->VSSetConstantBuffers(2, 1, &s_p_lighting_const_buffer);
+  device_context->UpdateSubresource(s_p_lighting_const_buffer, 0, 0, &s_lighting_const_buffer, 0, 0);
 }
 
 void Shader::updateViewProjectionMatrix(DirectX::XMMATRIX view_projection) {
-  global_per_frame_const_buffer.view_projection = view_projection;
-  device_context->UpdateSubresource(p_global_per_frame_const_buffer, 0, 0, &global_per_frame_const_buffer, 0, 0);
+  s_global_per_frame_const_buffer.view_projection = view_projection;
+  s_device_context->UpdateSubresource(s_p_global_per_frame_const_buffer, 0, 0, &s_global_per_frame_const_buffer, 0, 0);
 }
 
 void Shader::activate() {
   // Set both shaders to be active but only if the current
   // active shader is not already the present one
-  if (Shader::current_active_shader == this) {
+  if (Shader::s_current_active_shader == this) {
     return;
   }
 
   // Tell the GPU to use this shader
-  device_context->VSSetShader(vertex_shader, 0, 0);
-  device_context->PSSetShader(pixel_shader, 0, 0);
+  s_device_context->VSSetShader(m_vertex_shader, 0, 0);
+  s_device_context->PSSetShader(m_pixel_shader, 0, 0);
 
   // Also make sure we're using the correct constant buffer
-  device_context->VSSetConstantBuffers(1, 1, &p_per_model_const_buffer);
+  s_device_context->VSSetConstantBuffers(1, 1, &m_p_per_model_const_buffer);
 
   // And keep track of current set shader
-  Shader::current_active_shader = this;
+  Shader::s_current_active_shader = this;
 }
 
 void Shader::updatePerModelConstantBuffer() {
-  device_context->UpdateSubresource(p_per_model_const_buffer, 0, 0, &per_model_const_buffer, 0, 0);
+  s_device_context->UpdateSubresource(m_p_per_model_const_buffer, 0, 0, &m_per_model_const_buffer, 0, 0);
 }
 
 void Shader::cleanUp() {
-  p_per_model_const_buffer->Release();
-  input_layout->Release();
-  vertex_shader->Release();
-  pixel_shader->Release();
+  m_p_per_model_const_buffer->Release();
+  m_input_layout->Release();
+  m_vertex_shader->Release();
+  m_pixel_shader->Release();
 }
 
 void Shader::setModelMatrix(DirectX::XMMATRIX model_matrix) {
-  per_model_const_buffer.model = model_matrix;
+  m_per_model_const_buffer.model = model_matrix;
 }
 
 void Shader::setNormalRotationMatrix(DirectX::XMMATRIX rotation_matrix) {
-  per_model_const_buffer.normal_rotation = rotation_matrix;
+  m_per_model_const_buffer.normal_rotation = rotation_matrix;
 }
 
 void Shader::setModelColor(DirectX::XMFLOAT4 color) {
-  per_model_const_buffer.color = color;
+  m_per_model_const_buffer.color = color;
 }
 
 void Shader::registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context) {
-  Shader::device = device;
-  Shader::device_context = device_context;
+  Shader::s_device = device;
+  Shader::s_device_context = device_context;
 }
