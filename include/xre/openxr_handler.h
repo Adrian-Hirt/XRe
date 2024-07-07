@@ -44,37 +44,37 @@ public:
 
 private:
   // Configs
-  const char *application_name;
-  XrFormFactor application_form_factor = XR_FORM_FACTOR_HEAD_MOUNTED_DISPLAY; // Using a HMD
-  XrViewConfigurationType application_view_type = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO; // The HMD has a stereo view, one display for each eye
+  const char *m_application_name;
+  XrFormFactor m_application_form_factor = XR_FORM_FACTOR_HEAD_MOUNTED_DISPLAY; // Using a HMD
+  XrViewConfigurationType m_application_view_type = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO; // The HMD has a stereo view, one display for each eye
 
   // OpenXR variables we'll need through the application
-  XrInstance openxr_instance; // OpenXR instance
-  XrSystemId openxr_system_id = XR_NULL_SYSTEM_ID; // The ID of the OpenXR system
-  XrSession openxr_session;
-  XrEnvironmentBlendMode openxr_blend_mode; // Blend mode (opaque / transparent) to use
-  XrSpace openxr_space;
-  std::vector<XrView> openxr_views;
-  std::vector<XrViewConfigurationView> openxr_view_configuration_views;
+  XrInstance m_openxr_instance; // OpenXR instance
+  XrSystemId m_openxr_system_id = XR_NULL_SYSTEM_ID; // The ID of the OpenXR system
+  XrSession m_openxr_session;
+  XrEnvironmentBlendMode m_openxr_blend_mode; // Blend mode (opaque / transparent) to use
+  XrSpace m_openxr_space;
+  std::vector<XrView> m_openxr_views;
+  std::vector<XrViewConfigurationView> m_openxr_view_configuration_views;
 
   // Swapchains
-  std::vector<swapchain_t> swapchains;
+  std::vector<swapchain_t> m_swapchains;
 
   // Pointers to ext functions we need to use
-  PFN_xrGetD3D11GraphicsRequirementsKHR ext_xrGetD3D11GraphicsRequirementsKHR;
+  PFN_xrGetD3D11GraphicsRequirementsKHR m_ext_xrGetD3D11GraphicsRequirementsKHR;
 
   // Controllers
-  Controller *left_controller = NULL;
-  Controller *right_controller = NULL;
+  Controller *m_left_controller = NULL;
+  Controller *m_right_controller = NULL;
 
   // Actions
-  XrActionSet default_action_set;
-  XrAction controller_pose_action;
-  XrAction controller_aim_action;
-  XrAction controller_grab_action;
+  XrActionSet m_default_action_set;
+  XrAction m_controller_pose_action;
+  XrAction m_controller_aim_action;
+  XrAction m_controller_grab_action;
 
   // For checking if the pose of a controller is valid
-  const static XrSpaceLocationFlags pose_valid_flags = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
+  const static XrSpaceLocationFlags m_pose_valid_flags = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
 
   // Methods
   bool initializeOpenxr();

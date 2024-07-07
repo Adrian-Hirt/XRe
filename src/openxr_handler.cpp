@@ -9,7 +9,7 @@ OpenXrHandler::OpenXrHandler() {}
 // Constructor
 //------------------------------------------------------------------------------------------------------
 OpenXrHandler::OpenXrHandler(const char *application_name) {
-  this->application_name = application_name;
+  m_application_name = application_name;
 
   bool result;
 
@@ -55,9 +55,9 @@ bool OpenXrHandler::initializeOpenxr() {
 	instance_create_info.enabledExtensionCount = 1;
 	instance_create_info.enabledExtensionNames = extensions;
 	instance_create_info.applicationInfo.apiVersion = XR_CURRENT_API_VERSION;
-	strcpy_s(instance_create_info.applicationInfo.applicationName, 128, this->application_name);
+	strcpy_s(instance_create_info.applicationInfo.applicationName, 128, m_application_name);
 
-	result = xrCreateInstance(&instance_create_info, &openxr_instance);
+	result = xrCreateInstance(&instance_create_info, &m_openxr_instance);
 	if (XR_FAILED(result)) {
 		return false;
 	}
@@ -68,8 +68,8 @@ bool OpenXrHandler::initializeOpenxr() {
 	// Next, setup the OpenXR system, which is rather simple
 	XrSystemGetInfo system_get_info = {};
 	system_get_info.type = XR_TYPE_SYSTEM_GET_INFO;
-	system_get_info.formFactor = application_form_factor;
-	result = xrGetSystem(openxr_instance, &system_get_info, &openxr_system_id);
+	system_get_info.formFactor = m_application_form_factor;
+	result = xrGetSystem(m_openxr_instance, &system_get_info, &m_openxr_system_id);
 	if (XR_FAILED(result)) {
 		return false;
 	}
@@ -80,14 +80,14 @@ bool OpenXrHandler::initializeOpenxr() {
 	// Get the blend modes for the XR device. As the function call to xrEnumerateEnvironmentBlendModes
 	// should return the blend modes in order of preference of the runtime, we can just pick the first one
 	uint32_t blend_count = 0; // Throwaway variable, but we need to pass in a pointer to a uint32_t, or the function call fails
-	result = xrEnumerateEnvironmentBlendModes(openxr_instance, openxr_system_id, application_view_type, 1, &blend_count, &openxr_blend_mode);
+	result = xrEnumerateEnvironmentBlendModes(m_openxr_instance, m_openxr_system_id, m_application_view_type, 1, &blend_count, &m_openxr_blend_mode);
 	if (XR_FAILED(result)) {
 		return false;
 	}
 
 	// Get the address of the "xrGetD3D11GraphicsRequirementsKHR" function and store it, such that we can
 	// call the function. As of now, it seems it's not yet possible to directly call the function
-	xrGetInstanceProcAddr(openxr_instance, "xrGetD3D11GraphicsRequirementsKHR", (PFN_xrVoidFunction*)(&ext_xrGetD3D11GraphicsRequirementsKHR));
+	xrGetInstanceProcAddr(m_openxr_instance, "xrGetD3D11GraphicsRequirementsKHR", (PFN_xrVoidFunction*)(&m_ext_xrGetD3D11GraphicsRequirementsKHR));
 
 	XrGraphicsRequirementsD3D11KHR graphics_requirements = {};
 	graphics_requirements.type = XR_TYPE_GRAPHICS_REQUIREMENTS_D3D11_KHR;
@@ -95,7 +95,7 @@ bool OpenXrHandler::initializeOpenxr() {
 	// The graphics_requirements param is a XrGraphicsRequirementsD3D11KHR struct, where
 	// the field "adapterLuid" identifies the graphics device to be used, and the field "minFeatureLevel" specifies
 	// the minimum feature level the D3D11 device must be initialized with
-	result = ext_xrGetD3D11GraphicsRequirementsKHR(openxr_instance, openxr_system_id, &graphics_requirements);
+	result = m_ext_xrGetD3D11GraphicsRequirementsKHR(m_openxr_instance, m_openxr_system_id, &graphics_requirements);
 	if (XR_FAILED(result)) {
 		return false;
 	}
@@ -112,10 +112,10 @@ bool OpenXrHandler::initializeOpenxr() {
 	XrSessionCreateInfo session_create_info = {};
 	session_create_info.type = XR_TYPE_SESSION_CREATE_INFO;
 	session_create_info.next = &graphics_binding;
-	session_create_info.systemId = openxr_system_id;
+	session_create_info.systemId = m_openxr_system_id;
 
 	// And finally create the openxr session
-	result = xrCreateSession(openxr_instance, &session_create_info, &openxr_session);
+	result = xrCreateSession(m_openxr_instance, &session_create_info, &m_openxr_session);
 	if (XR_FAILED(result)) {
 		return false;
 	}
@@ -131,7 +131,7 @@ bool OpenXrHandler::initializeOpenxr() {
 	reference_space_create_info.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_STAGE;
 
 	// Create the reference space
-	result = xrCreateReferenceSpace(openxr_session, &reference_space_create_info, &openxr_space);
+	result = xrCreateReferenceSpace(m_openxr_session, &reference_space_create_info, &m_openxr_space);
 	if (XR_FAILED(result)) {
 		return false;
 	}
@@ -148,7 +148,7 @@ bool OpenXrHandler::initializeOpenxr() {
 	// the xrEnumerateViewConfigurationViews function call to zero, it will retrieve the required
 	// number of viewports and store it in the 5th param
 	uint32_t viewport_count = 0;
-	result = xrEnumerateViewConfigurationViews(openxr_instance, openxr_system_id, application_view_type, 0, &viewport_count, NULL);
+	result = xrEnumerateViewConfigurationViews(m_openxr_instance, m_openxr_system_id, m_application_view_type, 0, &viewport_count, NULL);
 	if (XR_FAILED(result)) {
 		return false;
 	}
@@ -157,13 +157,13 @@ bool OpenXrHandler::initializeOpenxr() {
 	// configurations (each XrViewConfigurationView specifies properties related to rendering an
 	// individual view) and the vector containing the views (each XrView specifies the pose and
 	// the fov of the view. Basically, a XrView is a view matrix in "traditional" rendering).
-	openxr_view_configuration_views.resize(viewport_count, { XR_TYPE_VIEW_CONFIGURATION_VIEW });
-	openxr_views.resize(viewport_count, { XR_TYPE_VIEW });
+	m_openxr_view_configuration_views.resize(viewport_count, { XR_TYPE_VIEW_CONFIGURATION_VIEW });
+	m_openxr_views.resize(viewport_count, { XR_TYPE_VIEW });
 
 	// Now we again call xrEnumerateViewConfigurationViews, this time we set the 4th param
 	// to the number of our viewports, such that the method fills the xr_view_configurations
 	// vector with the actual view configurations
-	result = xrEnumerateViewConfigurationViews(openxr_instance, openxr_system_id, application_view_type, viewport_count, &viewport_count, openxr_view_configuration_views.data());
+	result = xrEnumerateViewConfigurationViews(m_openxr_instance, m_openxr_system_id, m_application_view_type, viewport_count, &viewport_count, m_openxr_view_configuration_views.data());
 	if (XR_FAILED(result)) {
 		return false;
 	}
@@ -177,7 +177,7 @@ bool OpenXrHandler::initializeOpenxr() {
 	// to the screen) should not occur
 	for (uint32_t i = 0; i < viewport_count; i++) {
 		// Get the current view configuration we're interested in
-		XrViewConfigurationView& current_view_configuration = openxr_view_configuration_views[i];
+		XrViewConfigurationView& current_view_configuration = m_openxr_view_configuration_views[i];
 
 		// Create a create info struct to create the swapchain
 		XrSwapchainCreateInfo swapchain_create_info = {};
@@ -193,7 +193,7 @@ bool OpenXrHandler::initializeOpenxr() {
 
 		// Create the OpenXR swapchain
 		XrSwapchain swapchain_handle;
-		result = xrCreateSwapchain(openxr_session, &swapchain_create_info, &swapchain_handle);
+		result = xrCreateSwapchain(m_openxr_session, &swapchain_create_info, &swapchain_handle);
 		if (XR_FAILED(result)) {
 			return false;
 		}
@@ -244,7 +244,7 @@ bool OpenXrHandler::initializeOpenxr() {
 
     // We're done creating that swapchain, we can now add it to the vector of our swapchains (as we have multiple,
     // as mentioned before one for each view
-    swapchains.push_back(swapchain);
+    m_swapchains.push_back(swapchain);
 	}
 
   return true;
@@ -257,8 +257,8 @@ void OpenXrHandler::initializeOpenxrActions() {
 	XrResult result;
 
 	// Create controllers for left and right hands
-	left_controller = new Controller();
-	right_controller = new Controller();
+	m_left_controller = new Controller();
+	m_right_controller = new Controller();
 
 	// Create the action set for the application. Currently, we're only using
 	// a single action set for the whole application, later on we might add
@@ -267,17 +267,17 @@ void OpenXrHandler::initializeOpenxrActions() {
 	action_set_create_info.type = XR_TYPE_ACTION_SET_CREATE_INFO;
 	strcpy_s(action_set_create_info.actionSetName, "default");
 	strcpy_s(action_set_create_info.localizedActionSetName, "Default Action Set");
-	result = xrCreateActionSet(openxr_instance, &action_set_create_info, &default_action_set);
+	result = xrCreateActionSet(m_openxr_instance, &action_set_create_info, &m_default_action_set);
 	Utils::checkXrResult(result, "Could not create the default action set");
 
 	// Setup controller paths for the left and right hand, as we need these to
 	// get the poses of both hands.
-	result = xrStringToPath(openxr_instance, "/user/hand/left", &(left_controller->m_controller_path));
+	result = xrStringToPath(m_openxr_instance, "/user/hand/left", &(m_left_controller->m_controller_path));
 	Utils::checkXrResult(result, "Coult not create path from string for left hand");
-	result = xrStringToPath(openxr_instance, "/user/hand/right", &(right_controller->m_controller_path));
+	result = xrStringToPath(m_openxr_instance, "/user/hand/right", &(m_right_controller->m_controller_path));
 	Utils::checkXrResult(result, "Coult not create path from string for right hand");
 
-	XrPath controller_paths[2] = { left_controller->m_controller_path, right_controller->m_controller_path };
+	XrPath controller_paths[2] = { m_left_controller->m_controller_path, m_right_controller->m_controller_path };
 
 	// Create the action for tracking the pose of the controllers, such that we can get
 	// the position and orientation of each controller, render models and setup
@@ -290,7 +290,7 @@ void OpenXrHandler::initializeOpenxrActions() {
 	pose_action_create_info.subactionPaths = controller_paths;       					// Pass in the controller paths
 	pose_action_create_info.actionType = XR_ACTION_TYPE_POSE_INPUT;  					// Finally, tell OpenXR that this input is a pose input
 
-	result = xrCreateAction(default_action_set, &pose_action_create_info, &controller_pose_action);
+	result = xrCreateAction(m_default_action_set, &pose_action_create_info, &m_controller_pose_action);
 	Utils::checkXrResult(result, "Coult not create the controller pose action");
 
 	// Create the action for tracking the aim of the controllers.
@@ -302,7 +302,7 @@ void OpenXrHandler::initializeOpenxrActions() {
 	aim_action_create_info.subactionPaths = controller_paths;               // Pass in the controller paths
 	aim_action_create_info.actionType = XR_ACTION_TYPE_POSE_INPUT;          // Finally, tell OpenXR that this input is a pose input
 
-	result = xrCreateAction(default_action_set, &aim_action_create_info, &controller_aim_action);
+	result = xrCreateAction(m_default_action_set, &aim_action_create_info, &m_controller_aim_action);
 	Utils::checkXrResult(result, "Coult not create the controller aim action");
 
   // Create the action for grabbing with the controllers.
@@ -314,32 +314,32 @@ void OpenXrHandler::initializeOpenxrActions() {
 	grab_action_create_info.subactionPaths = controller_paths;                // Pass in the controller paths
 	grab_action_create_info.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;        // Finally, tell OpenXR that this input is a boolean input
 
-	result = xrCreateAction(default_action_set, &grab_action_create_info, &controller_grab_action);
+	result = xrCreateAction(m_default_action_set, &grab_action_create_info, &m_controller_grab_action);
 	Utils::checkXrResult(result, "Coult not create the grab action");
 
 	// Bind the previously added actions to the controllers. We'll be using the "simple controller"
 	// interaction path from Khronos, as this is a generic profile that should work with most
 	// input controllers that we'll encounter.
 	XrPath controller_profile_path;
-	result = xrStringToPath(openxr_instance, "/interaction_profiles/khr/simple_controller", &controller_profile_path);
+	result = xrStringToPath(m_openxr_instance, "/interaction_profiles/khr/simple_controller", &controller_profile_path);
 	Utils::checkXrResult(result, "Coult not create path from string for the simple controller interaction profile");
 
 	// Create the paths for the pose of the controller for both the left and the right input
-	result = xrStringToPath(openxr_instance, "/user/hand/left/input/grip/pose", &(left_controller->m_pose_path));
+	result = xrStringToPath(m_openxr_instance, "/user/hand/left/input/grip/pose", &(m_left_controller->m_pose_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the left input pose");
-	result = xrStringToPath(openxr_instance, "/user/hand/right/input/grip/pose", &(right_controller->m_pose_path));
+	result = xrStringToPath(m_openxr_instance, "/user/hand/right/input/grip/pose", &(m_right_controller->m_pose_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the right input pose");
 
 	// Create the paths for the aim of the controller for both the left and the right input
-	result = xrStringToPath(openxr_instance, "/user/hand/left/input/aim/pose", &(left_controller->m_aim_path));
+	result = xrStringToPath(m_openxr_instance, "/user/hand/left/input/aim/pose", &(m_left_controller->m_aim_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the left input pose");
-	result = xrStringToPath(openxr_instance, "/user/hand/right/input/aim/pose", &(right_controller->m_aim_path));
+	result = xrStringToPath(m_openxr_instance, "/user/hand/right/input/aim/pose", &(m_right_controller->m_aim_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the right input pose");
 
   // Create the paths for the grab action for both the left and the right controller
-	result = xrStringToPath(openxr_instance, "/user/hand/left/input/select/click", &(left_controller->m_grab_path));
+	result = xrStringToPath(m_openxr_instance, "/user/hand/left/input/select/click", &(m_left_controller->m_grab_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the left grab pose");
-	result = xrStringToPath(openxr_instance, "/user/hand/right/input/select/click", &(right_controller->m_grab_path));
+	result = xrStringToPath(m_openxr_instance, "/user/hand/right/input/select/click", &(m_right_controller->m_grab_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the right grab pose");
 
 	// // Setup the suggested bindings, i.e. we suggest the runtime what path we want to
@@ -347,67 +347,67 @@ void OpenXrHandler::initializeOpenxrActions() {
 	// runtime may change a binding, e.g. if a user re-maps inputs on their device.
 	XrActionSuggestedBinding suggested_action_bindings[6];
   // Pose
-	suggested_action_bindings[0].action = controller_pose_action;
-	suggested_action_bindings[0].binding = left_controller->m_pose_path;
-	suggested_action_bindings[1].action = controller_pose_action;
-	suggested_action_bindings[1].binding = right_controller->m_pose_path;
+	suggested_action_bindings[0].action = m_controller_pose_action;
+	suggested_action_bindings[0].binding = m_left_controller->m_pose_path;
+	suggested_action_bindings[1].action = m_controller_pose_action;
+	suggested_action_bindings[1].binding = m_right_controller->m_pose_path;
   // Aim
-	suggested_action_bindings[2].action = controller_aim_action;
-	suggested_action_bindings[2].binding = left_controller->m_aim_path;
-	suggested_action_bindings[3].action = controller_aim_action;
-	suggested_action_bindings[3].binding = right_controller->m_aim_path;
+	suggested_action_bindings[2].action = m_controller_aim_action;
+	suggested_action_bindings[2].binding = m_left_controller->m_aim_path;
+	suggested_action_bindings[3].action = m_controller_aim_action;
+	suggested_action_bindings[3].binding = m_right_controller->m_aim_path;
   // Grab
-  suggested_action_bindings[4].action = controller_grab_action;
-	suggested_action_bindings[4].binding = left_controller->m_grab_path;
-	suggested_action_bindings[5].action = controller_grab_action;
-	suggested_action_bindings[5].binding = right_controller->m_grab_path;
+  suggested_action_bindings[4].action = m_controller_grab_action;
+	suggested_action_bindings[4].binding = m_left_controller->m_grab_path;
+	suggested_action_bindings[5].action = m_controller_grab_action;
+	suggested_action_bindings[5].binding = m_right_controller->m_grab_path;
 
 	XrInteractionProfileSuggestedBinding suggested_binding = {};
 	suggested_binding.type = XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING;					// Set type for the struct
 	suggested_binding.interactionProfile = controller_profile_path;									// Set our previously created interaction profile
 	suggested_binding.countSuggestedBindings = _countof(suggested_action_bindings);	// Set the number of suggested bindings
 	suggested_binding.suggestedBindings = suggested_action_bindings;								// And finally, set the previously defined suggested bindings
-	result = xrSuggestInteractionProfileBindings(openxr_instance, &suggested_binding);
+	result = xrSuggestInteractionProfileBindings(m_openxr_instance, &suggested_binding);
 	Utils::checkXrResult(result, "Failed to suggest the interaction profile bindings");
 
 	// Create the pose spaces for both controllers
 	XrActionSpaceCreateInfo grip_pose_space_create_info = {};
 	grip_pose_space_create_info.type = XR_TYPE_ACTION_SPACE_CREATE_INFO;
-	grip_pose_space_create_info.action = controller_pose_action;
+	grip_pose_space_create_info.action = m_controller_pose_action;
 	grip_pose_space_create_info.poseInActionSpace = Geometry::XrPoseIdentity();
 
 	// Create the space for the left controller
-	grip_pose_space_create_info.subactionPath = left_controller->m_controller_path;
-	result = xrCreateActionSpace(openxr_session, &grip_pose_space_create_info, &(left_controller->m_pose_space));
+	grip_pose_space_create_info.subactionPath = m_left_controller->m_controller_path;
+	result = xrCreateActionSpace(m_openxr_session, &grip_pose_space_create_info, &(m_left_controller->m_pose_space));
 	Utils::checkXrResult(result, "Failed to create the action space for pose of the left controller");
 
 	// Create the space for the right controller
-	grip_pose_space_create_info.subactionPath = right_controller->m_controller_path;
-	result = xrCreateActionSpace(openxr_session, &grip_pose_space_create_info, &(right_controller->m_pose_space));
+	grip_pose_space_create_info.subactionPath = m_right_controller->m_controller_path;
+	result = xrCreateActionSpace(m_openxr_session, &grip_pose_space_create_info, &(m_right_controller->m_pose_space));
 	Utils::checkXrResult(result, "Failed to create the action space for pose of the right controller");
 
   // Create the aim spaces for both controllers
 	XrActionSpaceCreateInfo grip_aim_space_create_info = {};
 	grip_aim_space_create_info.type = XR_TYPE_ACTION_SPACE_CREATE_INFO;
-	grip_aim_space_create_info.action = controller_aim_action;
+	grip_aim_space_create_info.action = m_controller_aim_action;
 	grip_aim_space_create_info.poseInActionSpace = Geometry::XrPoseIdentity();
 
 	// Create the space for the left controller
-	grip_aim_space_create_info.subactionPath = left_controller->m_controller_path;
-	result = xrCreateActionSpace(openxr_session, &grip_aim_space_create_info, &(left_controller->m_aim_space));
+	grip_aim_space_create_info.subactionPath = m_left_controller->m_controller_path;
+	result = xrCreateActionSpace(m_openxr_session, &grip_aim_space_create_info, &(m_left_controller->m_aim_space));
 	Utils::checkXrResult(result, "Failed to create the action space for aim of the left controller");
 
 	// Create the space for the right controller
-	grip_aim_space_create_info.subactionPath = right_controller->m_controller_path;
-	result = xrCreateActionSpace(openxr_session, &grip_aim_space_create_info, &(right_controller->m_aim_space));
+	grip_aim_space_create_info.subactionPath = m_right_controller->m_controller_path;
+	result = xrCreateActionSpace(m_openxr_session, &grip_aim_space_create_info, &(m_right_controller->m_aim_space));
 	Utils::checkXrResult(result, "Failed to create the action space for aim of the right controller");
 
 	// Attach the action set that was created to the session
 	XrSessionActionSetsAttachInfo session_action_set_attach_info = {};
 	session_action_set_attach_info.type = XR_TYPE_SESSION_ACTION_SETS_ATTACH_INFO;
 	session_action_set_attach_info.countActionSets = 1;
-	session_action_set_attach_info.actionSets = &default_action_set;
-	result = xrAttachSessionActionSets(openxr_session, &session_action_set_attach_info);
+	session_action_set_attach_info.actionSets = &m_default_action_set;
+	result = xrAttachSessionActionSets(m_openxr_session, &session_action_set_attach_info);
 	Utils::checkXrResult(result, "Failed to attach the action set to the session");
 }
 
@@ -428,7 +428,7 @@ void OpenXrHandler::pollOpenxrEvents(bool &loop_running, bool &xr_running) {
 	// We use the XR_UNQUALIFIED_SUCCESS macro to see if the xrPollEvent call
 	// was successful (i.e. was able to fetch an event)
 	// If there are no more events left over, we can end.
-	while (XR_UNQUALIFIED_SUCCESS(xrPollEvent(openxr_instance, &event_data_buffer))) {
+	while (XR_UNQUALIFIED_SUCCESS(xrPollEvent(m_openxr_instance, &event_data_buffer))) {
     // Instance seems to shut down, so we need to exit right away
     if (event_data_buffer.type == XR_TYPE_EVENT_DATA_INSTANCE_LOSS_PENDING) {
       loop_running = false;
@@ -445,18 +445,18 @@ void OpenXrHandler::pollOpenxrEvents(bool &loop_running, bool &xr_running) {
           // Session is in the READY state, i.e. we can begin the session to enter the SYNCHRONIZED state
           XrSessionBeginInfo session_begin_info = {};
 					session_begin_info.type = XR_TYPE_SESSION_BEGIN_INFO;
-					session_begin_info.primaryViewConfigurationType = application_view_type;
+					session_begin_info.primaryViewConfigurationType = m_application_view_type;
 
 					// Start the session. If the call was successful, set the xr_running flag
 					// to true
-					result = xrBeginSession(openxr_session, &session_begin_info);
+					result = xrBeginSession(m_openxr_session, &session_begin_info);
           Utils::checkXrResult(result, "Couldn't begin the XR session.");
           xr_running = true;
 					break;
         }
         case XR_SESSION_STATE_STOPPING: {
           // In STOPPING state, i.e. we need to end the session
-          result = xrEndSession(openxr_session);
+          result = xrEndSession(m_openxr_session);
           Utils::checkXrResult(result, "Couldn't end the XR session.");
           xr_running = false;
           break;
@@ -490,20 +490,20 @@ void OpenXrHandler::pollOpenxrActions(XrTime predicted_time) {
 	// Sync active action set, currently we only have one action set, so we
 	// can always use that action set.
 	XrActiveActionSet active_action_set = {};
-	active_action_set.actionSet = default_action_set;
+	active_action_set.actionSet = m_default_action_set;
 	active_action_set.subactionPath = XR_NULL_PATH;
 
   XrActionsSyncInfo actions_sync_info = {};
 	actions_sync_info.type = XR_TYPE_ACTIONS_SYNC_INFO;
   actions_sync_info.countActiveActionSets = 1;
   actions_sync_info.activeActionSets = &active_action_set;
-  result = xrSyncActions(openxr_session, &actions_sync_info);
+  result = xrSyncActions(m_openxr_session, &actions_sync_info);
 	Utils::checkXrResult(result, "Could not sync the openxr actions");
 
 	// Update the states of the controllers, in a separate method to avoid
 	// having to code this twice
-	updateControllerStates(left_controller, predicted_time);
-	updateControllerStates(right_controller, predicted_time);
+	updateControllerStates(m_left_controller, predicted_time);
+	updateControllerStates(m_right_controller, predicted_time);
 }
 
 void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predicted_time) {
@@ -514,11 +514,11 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
   space_location.type = XR_TYPE_SPACE_LOCATION;
 
   // Update pose of the controller
-  result = xrLocateSpace(controller->m_pose_space, openxr_space, predicted_time, &space_location);
+  result = xrLocateSpace(controller->m_pose_space, m_openxr_space, predicted_time, &space_location);
   Utils::checkXrResult(result, "Can't get the grip pose of the controller");
 
   // Check wether the controller should be rendered or not.
-  controller->m_should_render = (space_location.locationFlags & pose_valid_flags) == pose_valid_flags;
+  controller->m_should_render = (space_location.locationFlags & m_pose_valid_flags) == m_pose_valid_flags;
 
   // If the controller should not be rendered, we can return early
   if (!controller->m_should_render) {
@@ -533,20 +533,20 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
   space_location.type = XR_TYPE_SPACE_LOCATION;
 
   // Update aim of the controller
-  result = xrLocateSpace(controller->m_aim_space, openxr_space, predicted_time, &space_location);
+  result = xrLocateSpace(controller->m_aim_space, m_openxr_space, predicted_time, &space_location);
   Utils::checkXrResult(result, "Can't get the grip pose of the controller");
   controller->m_aim = space_location.pose;
 
   // Setup get info for the "grab" action
   XrActionStateGetInfo controller_state_get_info = {};
 	controller_state_get_info.type = XR_TYPE_ACTION_STATE_GET_INFO;
-	controller_state_get_info.action = controller_grab_action;
+	controller_state_get_info.action = m_controller_grab_action;
 	controller_state_get_info.subactionPath = controller->m_controller_path;
 
   // Get the "grab" action
   XrActionStateBoolean grab_state = {};
   grab_state.type = XR_TYPE_ACTION_STATE_BOOLEAN;
-  result = xrGetActionStateBoolean(openxr_session, &controller_state_get_info, &grab_state);
+  result = xrGetActionStateBoolean(m_openxr_session, &controller_state_get_info, &grab_state);
   Utils::checkXrResult(result, "Can't get the grab state of the controller");
 
   // Update whether the controller is grabbing or not
@@ -568,7 +568,7 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
 	// place objects, viewpoints, controllers etc. in the view
 	XrFrameState xr_frame_state = {};
 	xr_frame_state.type = XR_TYPE_FRAME_STATE;
-	result = xrWaitFrame(openxr_session, NULL, &xr_frame_state);
+	result = xrWaitFrame(m_openxr_session, NULL, &xr_frame_state);
 	if(XR_FAILED(result)) {
 		return;
 	}
@@ -576,7 +576,7 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
 	//------------------------------------------------------------------------------------------------------
 	// Begin the frame
 	//------------------------------------------------------------------------------------------------------
-	result = xrBeginFrame(openxr_session, NULL);
+	result = xrBeginFrame(m_openxr_session, NULL);
 	if (XR_FAILED(result)) {
 		return;
 	}
@@ -589,8 +589,8 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
   //------------------------------------------------------------------------------------------------------
 	// Update the interactions of the controllers with the scene
 	//------------------------------------------------------------------------------------------------------
-  left_controller->sceneModelInteractions();
-  right_controller->sceneModelInteractions();
+  m_left_controller->sceneModelInteractions();
+  m_right_controller->sceneModelInteractions();
 
 	//------------------------------------------------------------------------------------------------------
 	// Update simulation
@@ -622,10 +622,10 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
 	XrFrameEndInfo frame_end_info = {};
 	frame_end_info.type = XR_TYPE_FRAME_END_INFO;
 	frame_end_info.displayTime = xr_frame_state.predictedDisplayTime;
-	frame_end_info.environmentBlendMode = openxr_blend_mode;
+	frame_end_info.environmentBlendMode = m_openxr_blend_mode;
 	frame_end_info.layerCount = layers.size();
 	frame_end_info.layers = layers.data();
-	xrEndFrame(openxr_session, &frame_end_info);
+	xrEndFrame(m_openxr_session, &frame_end_info);
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -652,15 +652,15 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 	// predicted time, the type of view we have and the xr space we're in
 	XrViewLocateInfo view_locate_info = {};
 	view_locate_info.type = XR_TYPE_VIEW_LOCATE_INFO;
-	view_locate_info.viewConfigurationType = application_view_type;
+	view_locate_info.viewConfigurationType = m_application_view_type;
 	view_locate_info.displayTime = predicted_time;
-	view_locate_info.space = openxr_space;
+	view_locate_info.space = m_openxr_space;
 
 	// Call xrLocateViews, which will give us the number of views we have to render (stored in view_count), as
 	// well as fill in the xr_views vector with the predicted views (which is basically a struct containing
 	// the pose of the view, as well as the fov for that view. We'll use these two later to render with D3D11,
 	// as we need to modify the objects and the view before rendering.
-	result = xrLocateViews(openxr_session, &view_locate_info, &view_state, (uint32_t)openxr_views.size(), &view_count, openxr_views.data());
+	result = xrLocateViews(m_openxr_session, &view_locate_info, &view_state, (uint32_t)m_openxr_views.size(), &view_count, m_openxr_views.data());
 	Utils::checkXrResult(result, "Could not locate views!");
 	views.resize(view_count);
 
@@ -676,7 +676,7 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 		uint32_t swapchain_image_id;
 		XrSwapchainImageAcquireInfo swapchain_acquire_info = {};
 		swapchain_acquire_info.type = XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO;
-		result = xrAcquireSwapchainImage(swapchains[i].handle, &swapchain_acquire_info, &swapchain_image_id);
+		result = xrAcquireSwapchainImage(m_swapchains[i].handle, &swapchain_acquire_info, &swapchain_image_id);
 		Utils::checkXrResult(result, "Could not acquire swapchain image");
 
 		// We need to wait until the swapchain image is available for writing, as the compositor
@@ -687,7 +687,7 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 		XrSwapchainImageWaitInfo swapchain_wait_info = {};
 		swapchain_wait_info.type = XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO;
 		swapchain_wait_info.timeout = XR_INFINITE_DURATION;
-		result = xrWaitSwapchainImage(swapchains[i].handle, &swapchain_wait_info);
+		result = xrWaitSwapchainImage(m_swapchains[i].handle, &swapchain_wait_info);
 		Utils::checkXrResult(result, "Could not wait for the swapchain image");
 
 		// Setup the info we need to render the layer for the current view. The XrCompositionLayerProjectionView
@@ -698,18 +698,18 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 		// imageRect, which represents the valid portion of the image to use (in pixels)
 		views[i] = {};
 		views[i].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
-		views[i].pose = openxr_views[i].pose;
-		views[i].fov = openxr_views[i].fov;
-		views[i].subImage.swapchain = swapchains[i].handle;
+		views[i].pose = m_openxr_views[i].pose;
+		views[i].fov = m_openxr_views[i].fov;
+		views[i].subImage.swapchain = m_swapchains[i].handle;
 		views[i].subImage.imageRect.offset = { 0, 0 };
-		views[i].subImage.imageRect.extent = { swapchains[i].width, swapchains[i].height };
+		views[i].subImage.imageRect.extent = { m_swapchains[i].width, m_swapchains[i].height };
 
 		// Render the content to the swapchain, which is done by the D3D11 handler
-		m_dx11_handler.renderFrame(views[i], swapchains[i].swapchain_data[swapchain_image_id], draw_callback);
+		m_dx11_handler.renderFrame(views[i], m_swapchains[i].swapchain_data[swapchain_image_id], draw_callback);
 
 		// Render the controllers
-		left_controller->render();
-		right_controller->render();
+		m_left_controller->render();
+		m_right_controller->render();
 
 		// We're done rendering for the current view, so we can release the swapchain image (i.e. tell
 		// the OpenXR runtime that we're done with this swapchain image).
@@ -717,7 +717,7 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 		// do anything special.
 		XrSwapchainImageReleaseInfo swapchain_release_info = {};
 		swapchain_release_info.type = XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO;
-		result = xrReleaseSwapchainImage(swapchains[i].handle, &swapchain_release_info);
+		result = xrReleaseSwapchainImage(m_swapchains[i].handle, &swapchain_release_info);
 		Utils::checkXrResult(result, "Could not release the swapchain image");
 	}
 
@@ -726,7 +726,7 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 	//------------------------------------------------------------------------------------------------------
 	// Now thta we're done rendering all views, we can update the layer projection we got passed into
 	// the method with the rendered views, such that we can display them.
-	layer_projection.space = openxr_space;
+	layer_projection.space = m_openxr_space;
 	layer_projection.viewCount = (uint32_t)views.size();
 	layer_projection.views = views.data();
 }
