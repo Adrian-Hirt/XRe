@@ -5,7 +5,7 @@ Line::Line(DirectX::XMFLOAT4 color) {
   std::vector<unsigned int> indices = {0, 1};
 
   // Set the color of the line to be rendered
-  line_color = color;
+  m_line_color = color;
 
   initialize(vertices, indices);
 }
@@ -15,7 +15,7 @@ Line::Line(DirectX::XMFLOAT3 line_start, DirectX::XMFLOAT3 line_end, DirectX::XM
   std::vector<unsigned int> indices = {0, 1};
 
   // Set the color of the line to be rendered
-  line_color = color;
+  m_line_color = color;
 
   initialize(vertices, indices);
 }
@@ -32,7 +32,7 @@ void Line::render(Shader *shader) {
   shader->activate();
 
   shader->setModelMatrix(DirectX::XMMatrixIdentity());
-  shader->setModelColor(line_color);
+  shader->setModelColor(m_line_color);
   shader->updatePerModelConstantBuffer();
 
   // Set vertex and index buffers on the GPU to be the ones of this line

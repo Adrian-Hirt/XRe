@@ -17,5 +17,5 @@ private:
 
   std::vector<vertex_t> verticesFromPoints(DirectX::XMFLOAT3 start, DirectX::XMFLOAT3 end);
 
-  DirectX::XMFLOAT4 line_color;
+  DirectX::XMFLOAT4 m_line_color;
 };
