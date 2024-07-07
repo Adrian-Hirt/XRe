@@ -19,7 +19,6 @@ private:
   // A bitmap does not have a bounding box
   inline bool hasBoundingBox() { return false; }
 
-  Shader shader;
-
-  DirectX::XMFLOAT4 bitmap_color;
+  Shader m_shader;
+  DirectX::XMFLOAT4 m_bitmap_color;
 };

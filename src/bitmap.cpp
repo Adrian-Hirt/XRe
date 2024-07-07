@@ -15,7 +15,7 @@ Bitmap::Bitmap(float top_left_position_x, float top_left_position_y, float x_ext
   std::vector<unsigned int> indices = {0, 1, 2, 3, 0, 2};
 
   // Set color to white, which will be discarded anyway
-  bitmap_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+  m_bitmap_color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
   // Call general initialize method
   initialize(vertices, indices);
@@ -28,7 +28,7 @@ Bitmap::Bitmap(float top_left_position_x, float top_left_position_y, float x_ext
   error_string += texture_path;
   Utils::checkHresult(result, error_string.c_str());
 
-  shader = Shader::loadOrCreate(SHADERS_FOLDER "/bitmap.hlsl");
+  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/bitmap.hlsl");
 }
 
 Bitmap::Bitmap(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, const char *texture_path) {
@@ -41,12 +41,12 @@ Bitmap::Bitmap(std::vector<vertex_t> vertices, std::vector<unsigned int> indices
   HRESULT result = DirectX::CreateWICTextureFromFile(device, device_context, filepath.c_str(), &texture, &p_texture_view);
   Utils::checkHresult(result, "Failed to load the texture");
 
-  shader = Shader::loadOrCreate(SHADERS_FOLDER "/bitmap.hlsl");
+  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/bitmap.hlsl");
 }
 
 void Bitmap::render() {
-  shader.activate();
-  shader.setModelColor(bitmap_color);
-  shader.updatePerModelConstantBuffer();
+  m_shader.activate();
+  m_shader.setModelColor(m_bitmap_color);
+  m_shader.updatePerModelConstantBuffer();
   Mesh::render();
 }
