@@ -4,10 +4,10 @@ text_char_t Text::computeTextureOffsets(int letter) {
   int row = letter / 32;
   int column = letter % 32;
 
-  float left = column * x_step;
-  float right = left + x_step;
-  float top = row * y_step;
-  float bottom = top + y_step;
+  float left = column * X_STEP;
+  float right = left + X_STEP;
+  float top = row * Y_STEP;
+  float bottom = top + Y_STEP;
 
   text_char_t character;
   character.left = left;
@@ -77,9 +77,9 @@ void Text::buildMeshesFromSentence(const char* sentence) {
     }
   }
 
-  bitmap = Bitmap(vertices, indices, DATA_FOLDER "/fonts/DejaVuSansMono128NoAA.png");
+  m_bitmap = Bitmap(vertices, indices, DATA_FOLDER "/fonts/DejaVuSansMono128NoAA.png");
 }
 
 void Text::render() {
-  bitmap.render();
+  m_bitmap.render();
 }

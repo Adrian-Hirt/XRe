@@ -24,10 +24,10 @@ private:
   const int CHAR_COUNT = 224;
 
   // Steps for going through the texture
-  const float x_step = 1.0f / 32.0f;
-  const float y_step = 1.0f / 7.0f;
+  const float X_STEP = 1.0f / 32.0f;
+  const float Y_STEP = 1.0f / 7.0f;
 
-  Bitmap bitmap;
+  Bitmap m_bitmap;
 
   void buildMeshesFromSentence(const char* sentence);
   inline text_char_t computeTextureOffsets(int letter);
