@@ -101,12 +101,12 @@ bool OpenXrHandler::initializeOpenxr() {
 	}
 
 	// Create a new handler for the DirectX 11 related stuff.
- 	dx11_handler = Dx11Handler(graphics_requirements.adapterLuid);
+ 	m_dx11_handler = Dx11Handler(graphics_requirements.adapterLuid);
 
 	// Create a binding for the D3D11 device
 	XrGraphicsBindingD3D11KHR graphics_binding = {};
 	graphics_binding.type = XR_TYPE_GRAPHICS_BINDING_D3D11_KHR;
-	graphics_binding.device = dx11_handler.getDevice();
+	graphics_binding.device = m_dx11_handler.getDevice();
 
 	// Create the session info struct
 	XrSessionCreateInfo session_create_info = {};
@@ -185,7 +185,7 @@ bool OpenXrHandler::initializeOpenxr() {
 		swapchain_create_info.arraySize = 1; // Number of array layers
 		swapchain_create_info.mipCount = 1; // Only use one mipmap level, bigger numbers would only be useful for textures
 		swapchain_create_info.faceCount = 1; // Number of faces to render, 1 should be used, other option would be 6 for cubemaps
-		swapchain_create_info.format = dx11_handler.d3d11_swapchain_format;
+		swapchain_create_info.format = m_dx11_handler.d3d11_swapchain_format;
 		swapchain_create_info.width = current_view_configuration.recommendedImageRectWidth; // Just use the recommended width that the runtime gave us
 		swapchain_create_info.height = current_view_configuration.recommendedImageRectHeight; // Just use the recommended height that the runtime gave us
 		swapchain_create_info.sampleCount = current_view_configuration.recommendedSwapchainSampleCount; // Just use the recommended sample count that the runtime gave us
@@ -238,7 +238,7 @@ bool OpenXrHandler::initializeOpenxr() {
     // We also directly release the texture object, as we don't need it anymore after we created the
     // render target with it
     for (uint32_t i = 0; i < swapchain_image_count; i++) {
-        swapchain.swapchain_data[i] = dx11_handler.createRenderTargets(*swapchain_images[i].texture);
+        swapchain.swapchain_data[i] = m_dx11_handler.createRenderTargets(*swapchain_images[i].texture);
         swapchain_images[i].texture->Release();
     }
 
@@ -705,7 +705,7 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 		views[i].subImage.imageRect.extent = { swapchains[i].width, swapchains[i].height };
 
 		// Render the content to the swapchain, which is done by the D3D11 handler
-		dx11_handler.renderFrame(views[i], swapchains[i].swapchain_data[swapchain_image_id], draw_callback);
+		m_dx11_handler.renderFrame(views[i], swapchains[i].swapchain_data[swapchain_image_id], draw_callback);
 
 		// Render the controllers
 		left_controller->render();
@@ -732,9 +732,9 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 }
 
 ID3D11Device* OpenXrHandler::getDevice() {
-  return dx11_handler.getDevice();
+  return m_dx11_handler.getDevice();
 }
 
 ID3D11DeviceContext* OpenXrHandler::getDeviceContext() {
-  return dx11_handler.getDeviceContext();
+  return m_dx11_handler.getDeviceContext();
 }

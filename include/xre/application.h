@@ -34,6 +34,6 @@ public:
   void setWireframeMode();
 private:
   // Handlers
-  OpenXrHandler open_xr_handler;
-  Dx11Handler dx11_handler;
+  OpenXrHandler m_open_xr_handler;
+  Dx11Handler* m_dx11_handler;
 };

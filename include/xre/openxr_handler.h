@@ -40,7 +40,7 @@ public:
   ID3D11DeviceContext* getDeviceContext();
 
   // Handlers
-  Dx11Handler dx11_handler;
+  Dx11Handler m_dx11_handler;
 
 private:
   // Configs
