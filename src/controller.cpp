@@ -14,7 +14,7 @@ Controller::Controller() {
 
 void Controller::render() {
   // Return early if the controller should not be rendered alltogether
-  if (!shouldRender) {
+  if (!should_render) {
     return;
   }
 
@@ -42,7 +42,7 @@ void Controller::render() {
 }
 
 void Controller::sceneModelInteractions() {
-  if(!shouldRender) {
+  if(!should_render) {
     return;
   }
 

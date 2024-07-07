@@ -14,30 +14,30 @@
 
 namespace Utils {
   // Prints a message and then exits the application
-  inline void exitWithMessage(const char *errorString){
-    std::cout << errorString << std::endl;
+  inline void exitWithMessage(const char *error_string){
+    std::cout << error_string << std::endl;
     exit(EXIT_FAILURE);
   };
 
-  inline void checkHresult(HRESULT result, const char *errorString){
+  inline void checkHresult(HRESULT result, const char *error_string){
     if (FAILED(result)) {
       _com_error err(result);
-      LPCTSTR errMsg = err.ErrorMessage();
-      std::cout << errMsg << std::endl;
-      exitWithMessage(errorString);
+      LPCTSTR error_message = err.ErrorMessage();
+      std::cout << error_message << std::endl;
+      exitWithMessage(error_string);
     }
   }
 
-  inline void checkXrResult(XrResult result, const char *errorString){
+  inline void checkXrResult(XrResult result, const char *error_string){
     if (XR_FAILED(result)) {
       std::cout << result << std::endl;
-      exitWithMessage(errorString);
+      exitWithMessage(error_string);
     }
   };
 
-  inline void checkBoolResult(boolean result, const char *errorString){
+  inline void checkBoolResult(boolean result, const char *error_string){
     if (!result) {
-      exitWithMessage(errorString);
+      exitWithMessage(error_string);
     }
   };
 

@@ -518,10 +518,10 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
   Utils::checkXrResult(result, "Can't get the grip pose of the controller");
 
   // Check wether the controller should be rendered or not.
-  controller->shouldRender = (space_location.locationFlags & pose_valid_flags) == pose_valid_flags;
+  controller->should_render = (space_location.locationFlags & pose_valid_flags) == pose_valid_flags;
 
   // If the controller should not be rendered, we can return early
-  if (!controller->shouldRender) {
+  if (!controller->should_render) {
     return;
   }
 

@@ -21,7 +21,7 @@ public:
   void sceneModelInteractions();
 
   // Whether the controller should be rendered or not
-  bool shouldRender;
+  bool should_render;
 
   // Path for the controller, e.g. `/user/hand/left`
   XrPath controller_path;
