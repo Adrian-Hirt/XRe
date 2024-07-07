@@ -54,6 +54,10 @@ protected:
   // The bounding box of this mesh
   DirectX::BoundingOrientedBox m_bounding_box;
 
+  // Whether the mesh should be changeable (i.e. the vertex and index buffers need
+  // to be updateable or not).
+  bool m_static_buffers = true;
+
   void initialize(std::vector<vertex_t> vertices, std::vector<unsigned int> indices);
   void createVertexBuffer(std::vector<vertex_t> data, ID3D11Buffer **target_buffer);
   void createIndexBuffer(std::vector<unsigned int> data, ID3D11Buffer **target_buffer);

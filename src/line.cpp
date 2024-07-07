@@ -7,6 +7,9 @@ Line::Line(DirectX::XMFLOAT4 color) {
   // Set the color of the line to be rendered
   m_line_color = color;
 
+  // Set buffers to be dynamic, such that their contents can be updated
+  m_static_buffers = false;
+
   initialize(vertices, indices);
 }
 
@@ -16,6 +19,9 @@ Line::Line(DirectX::XMFLOAT3 line_start, DirectX::XMFLOAT3 line_end, DirectX::XM
 
   // Set the color of the line to be rendered
   m_line_color = color;
+
+  // Set buffers to be dynamic, such that their contents can be updated
+  m_static_buffers = false;
 
   initialize(vertices, indices);
 }

@@ -106,10 +106,17 @@ void Mesh::createVertexBuffer(std::vector<vertex_t> data, ID3D11Buffer **target_
   D3D11_BUFFER_DESC buffer_desc;
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
 
-  buffer_desc.Usage = D3D11_USAGE_DYNAMIC;                // write access access by CPU and read access by GPU
   buffer_desc.ByteWidth = sizeof(vertex_t) * data.size(); // Size of the buffer we want to allocate
   buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;       // use as a vertex buffer
-  buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;    // allow CPU to write in buffer
+
+  if (m_static_buffers) {
+    buffer_desc.Usage = D3D11_USAGE_IMMUTABLE; // Only access to memory for GPU
+    buffer_desc.CPUAccessFlags = 0;            // No access for CPU
+  }
+  else {
+    buffer_desc.Usage = D3D11_USAGE_DYNAMIC;             // Read access for GPU, Write access for CPU
+    buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE; // Write access for CPU
+  }
 
   // Create the buffer and copy the vertices into it
   D3D11_SUBRESOURCE_DATA vertex_buffer_data = { data.data() };
@@ -120,11 +127,18 @@ void Mesh::createVertexBuffer(std::vector<vertex_t> data, ID3D11Buffer **target_
 void Mesh::createIndexBuffer(std::vector<unsigned int> data, ID3D11Buffer **target_buffer) {
   D3D11_BUFFER_DESC buffer_desc;
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
-  buffer_desc.Usage = D3D11_USAGE_DYNAMIC;                    // write access access by CPU and read access by GPU
   buffer_desc.ByteWidth = sizeof(unsigned int) * data.size(); // Size of the buffer we want to allocate
   buffer_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;            // use as an index buffer
-  buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;        // allow CPU to write in buffer
   buffer_desc.MiscFlags = 0;
+
+  if (m_static_buffers) {
+    buffer_desc.Usage = D3D11_USAGE_IMMUTABLE; // Only access to memory for GPU
+    buffer_desc.CPUAccessFlags = 0;            // No access for CPU
+  }
+  else {
+    buffer_desc.Usage = D3D11_USAGE_DYNAMIC;             // Read access for GPU, Write access for CPU
+    buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE; // Write access for CPU
+  }
 
   // Create the buffer and copy the indices into it
   D3D11_SUBRESOURCE_DATA index_buffer_data = { data.data() };
