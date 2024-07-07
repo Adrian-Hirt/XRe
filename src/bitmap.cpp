@@ -23,7 +23,7 @@ Bitmap::Bitmap(float top_left_position_x, float top_left_position_y, float x_ext
   // Load the texture
   std::wstring filepath = Utils::stringToWString(texture_path);
   ID3D11Resource *texture; // Throwaway variable
-  HRESULT result = DirectX::CreateWICTextureFromFile(device, device_context, filepath.c_str(), &texture, &p_texture_view);
+  HRESULT result = DirectX::CreateWICTextureFromFile(m_device, m_device_context, filepath.c_str(), &texture, &m_texture_view);
   std::string error_string = "Failed to load the texture ";
   error_string += texture_path;
   Utils::checkHresult(result, error_string.c_str());
@@ -38,7 +38,7 @@ Bitmap::Bitmap(std::vector<vertex_t> vertices, std::vector<unsigned int> indices
   // Load the texture
   std::wstring filepath = Utils::stringToWString(texture_path);
   ID3D11Resource *texture; // Throwaway variable
-  HRESULT result = DirectX::CreateWICTextureFromFile(device, device_context, filepath.c_str(), &texture, &p_texture_view);
+  HRESULT result = DirectX::CreateWICTextureFromFile(m_device, m_device_context, filepath.c_str(), &texture, &m_texture_view);
   Utils::checkHresult(result, "Failed to load the texture");
 
   m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/bitmap.hlsl");

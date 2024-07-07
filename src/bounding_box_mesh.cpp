@@ -12,20 +12,20 @@ BoundingBoxMesh::BoundingBoxMesh(std::vector<vertex_t> vertices) {
     };
 
   // Store number of vertices and indices
-  vertex_count = vertices.size();
-  index_count = bounding_box_indices.size();
+  m_vertex_count = vertices.size();
+  m_index_count = bounding_box_indices.size();
 
-  createVertexBuffer(vertices, &vertex_buffer);
-  createIndexBuffer(bounding_box_indices, &index_buffer);
+  createVertexBuffer(vertices, &m_vertex_buffer);
+  createIndexBuffer(bounding_box_indices, &m_index_buffer);
 }
 
 void BoundingBoxMesh::render() {
   UINT stride = sizeof(vertex_t);
   UINT offset = 0;
 
-  device_context->IASetVertexBuffers(0, 1, &vertex_buffer, &stride, &offset);
-  device_context->IASetIndexBuffer(index_buffer, DXGI_FORMAT_R32_UINT, 0);
-  device_context->PSSetShaderResources(0, 1, &nulltexture);
-  device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-  device_context->DrawIndexed(24, 0, 0);
+  m_device_context->IASetVertexBuffers(0, 1, &m_vertex_buffer, &stride, &offset);
+  m_device_context->IASetIndexBuffer(m_index_buffer, DXGI_FORMAT_R32_UINT, 0);
+  m_device_context->PSSetShaderResources(0, 1, &m_nulltexture);
+  m_device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+  m_device_context->DrawIndexed(24, 0, 0);
 }

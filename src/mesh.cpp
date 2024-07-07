@@ -33,8 +33,8 @@ Mesh::Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, co
   // Use the `Ex` variant, which allows us to set the loader to assume that
   // the passed in texture is already sRGB.
   HRESULT result = DirectX::CreateWICTextureFromFileEx(
-    device,
-    device_context,
+    m_device,
+    m_device_context,
     filepath.c_str(),
     0,
     D3D11_USAGE_DEFAULT,
@@ -43,7 +43,7 @@ Mesh::Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, co
     0,
     DirectX::WIC_LOADER_SRGB_DEFAULT,
     &texture,
-    &p_texture_view
+    &m_texture_view
   );
 
   std::string error_string = "Failed to load the texture ";
@@ -54,30 +54,32 @@ Mesh::Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, co
 // Function to initialize the "common" data of a mesh, to avoid code-duplication
 void Mesh::initialize(std::vector<vertex_t> vertices, std::vector<unsigned int> indices) {
   // Store number of vertices and indices
-  vertex_count = vertices.size();
-  index_count = indices.size();
+  m_vertex_count = vertices.size();
+  m_index_count = indices.size();
 
-  createVertexBuffer(vertices, &vertex_buffer);
-  createIndexBuffer(indices, &index_buffer);
+  createVertexBuffer(vertices, &m_vertex_buffer);
+  createIndexBuffer(indices, &m_index_buffer);
 
   if (hasBoundingBox()) {
     // Store vertex positions temporary
-    DirectX::XMFLOAT3 vertex_positions[vertex_count];
+    DirectX::XMFLOAT3 vertex_positions[m_vertex_count];
 
-    for(int i = 0; i < vertex_count; i++) {
+    for(int i = 0; i < m_vertex_count; i++) {
       vertex_positions[i] = vertices[i].coordinates;
     }
 
     // Create the bounding box for this mesh
-    DirectX::BoundingOrientedBox::CreateFromPoints(bounding_box, vertex_count, vertex_positions, sizeof(DirectX::XMFLOAT3));
-    DirectX::XMFLOAT3 corners[bounding_box.CORNER_COUNT];
-    bounding_box.GetCorners(corners);
-    std::vector<vertex_t> bounding_box_vertices;
+    DirectX::BoundingOrientedBox::CreateFromPoints(m_bounding_box, m_vertex_count, vertex_positions, sizeof(DirectX::XMFLOAT3));
 
-    // Create vertices from the corners of the bounding box
-    for (int i = 0; i < bounding_box.CORNER_COUNT; i++) {
-      bounding_box_vertices.push_back({ corners[i], { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
-    }
+    // TODO: check what this is for
+    // DirectX::XMFLOAT3 corners[m_bounding_box.CORNER_COUNT];
+    // m_bounding_box.GetCorners(corners);
+    // std::vector<vertex_t> bounding_box_vertices;
+
+    // // Create vertices from the corners of the bounding box
+    // for (int i = 0; i < m_bounding_box.CORNER_COUNT; i++) {
+    //   bounding_box_vertices.push_back({ corners[i], { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
+    // }
   }
 }
 
@@ -85,29 +87,29 @@ void Mesh::render() {
   // Set vertex and index buffers on the GPU to be the ones of this mesh
   UINT stride = sizeof(vertex_t);
   UINT offset = 0;
-  device_context->IASetVertexBuffers(0, 1, &vertex_buffer, &stride, &offset);
-  device_context->IASetIndexBuffer(index_buffer, DXGI_FORMAT_R32_UINT, 0);
+  m_device_context->IASetVertexBuffers(0, 1, &m_vertex_buffer, &stride, &offset);
+  m_device_context->IASetIndexBuffer(m_index_buffer, DXGI_FORMAT_R32_UINT, 0);
 
   // Set the texture if it exists, otherwise remove any previously added textures
-  if (p_texture_view) {
-    device_context->PSSetShaderResources(0, 1, &p_texture_view);
+  if (m_texture_view) {
+    m_device_context->PSSetShaderResources(0, 1, &m_texture_view);
   }
   else {
-    device_context->PSSetShaderResources(0, 1, &nulltexture);
+    m_device_context->PSSetShaderResources(0, 1, &m_nulltexture);
   }
 
   // We'll be rendering a triangle list, so we need to tell the GPU
   // to render the vertices as such.
-  device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+  m_device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
   // And finally, we can call the actual draw method, which will draw all the
   // indices of this mesh.
-  device_context->DrawIndexed(index_count, 0, 0);
+  m_device_context->DrawIndexed(m_index_count, 0, 0);
 }
 
 void Mesh::registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context) {
-  Mesh::device = device;
-  Mesh::device_context = device_context;
+  Mesh::m_device = device;
+  Mesh::m_device_context = device_context;
 }
 
 void Mesh::createVertexBuffer(std::vector<vertex_t> data, ID3D11Buffer **target_buffer) {
@@ -121,7 +123,7 @@ void Mesh::createVertexBuffer(std::vector<vertex_t> data, ID3D11Buffer **target_
 
   // Create the buffer and copy the vertices into it
   D3D11_SUBRESOURCE_DATA vertex_buffer_data = { data.data() };
-  HRESULT result = device->CreateBuffer(&buffer_desc, &vertex_buffer_data, target_buffer);
+  HRESULT result = m_device->CreateBuffer(&buffer_desc, &vertex_buffer_data, target_buffer);
   Utils::checkHresult(result, "Could not create the vertex buffer!");
 }
 
@@ -136,11 +138,11 @@ void Mesh::createIndexBuffer(std::vector<unsigned int> data, ID3D11Buffer **targ
 
   // Create the buffer and copy the indices into it
   D3D11_SUBRESOURCE_DATA index_buffer_data = { data.data() };
-  HRESULT result = device->CreateBuffer(&buffer_desc, &index_buffer_data, target_buffer);
+  HRESULT result = m_device->CreateBuffer(&buffer_desc, &index_buffer_data, target_buffer);
   Utils::checkHresult(result, "Could not create the vertex buffer!");
 }
 
 DirectX::BoundingOrientedBox Mesh::getBoundingBox() {
-  return bounding_box;
+  return m_bounding_box;
 }
 
