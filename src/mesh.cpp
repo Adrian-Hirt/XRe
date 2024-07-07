@@ -70,16 +70,6 @@ void Mesh::initialize(std::vector<vertex_t> vertices, std::vector<unsigned int> 
 
     // Create the bounding box for this mesh
     DirectX::BoundingOrientedBox::CreateFromPoints(m_bounding_box, m_vertex_count, vertex_positions, sizeof(DirectX::XMFLOAT3));
-
-    // TODO: check what this is for
-    // DirectX::XMFLOAT3 corners[m_bounding_box.CORNER_COUNT];
-    // m_bounding_box.GetCorners(corners);
-    // std::vector<vertex_t> bounding_box_vertices;
-
-    // // Create vertices from the corners of the bounding box
-    // for (int i = 0; i < m_bounding_box.CORNER_COUNT; i++) {
-    //   bounding_box_vertices.push_back({ corners[i], { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
-    // }
   }
 }
 
