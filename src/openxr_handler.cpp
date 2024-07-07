@@ -272,12 +272,12 @@ void OpenXrHandler::initializeOpenxrActions() {
 
 	// Setup controller paths for the left and right hand, as we need these to
 	// get the poses of both hands.
-	result = xrStringToPath(openxr_instance, "/user/hand/left", &(left_controller->controller_path));
+	result = xrStringToPath(openxr_instance, "/user/hand/left", &(left_controller->m_controller_path));
 	Utils::checkXrResult(result, "Coult not create path from string for left hand");
-	result = xrStringToPath(openxr_instance, "/user/hand/right", &(right_controller->controller_path));
+	result = xrStringToPath(openxr_instance, "/user/hand/right", &(right_controller->m_controller_path));
 	Utils::checkXrResult(result, "Coult not create path from string for right hand");
 
-	XrPath controller_paths[2] = { left_controller->controller_path, right_controller->controller_path };
+	XrPath controller_paths[2] = { left_controller->m_controller_path, right_controller->m_controller_path };
 
 	// Create the action for tracking the pose of the controllers, such that we can get
 	// the position and orientation of each controller, render models and setup
@@ -325,21 +325,21 @@ void OpenXrHandler::initializeOpenxrActions() {
 	Utils::checkXrResult(result, "Coult not create path from string for the simple controller interaction profile");
 
 	// Create the paths for the pose of the controller for both the left and the right input
-	result = xrStringToPath(openxr_instance, "/user/hand/left/input/grip/pose", &(left_controller->pose_path));
+	result = xrStringToPath(openxr_instance, "/user/hand/left/input/grip/pose", &(left_controller->m_pose_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the left input pose");
-	result = xrStringToPath(openxr_instance, "/user/hand/right/input/grip/pose", &(right_controller->pose_path));
+	result = xrStringToPath(openxr_instance, "/user/hand/right/input/grip/pose", &(right_controller->m_pose_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the right input pose");
 
 	// Create the paths for the aim of the controller for both the left and the right input
-	result = xrStringToPath(openxr_instance, "/user/hand/left/input/aim/pose", &(left_controller->aim_path));
+	result = xrStringToPath(openxr_instance, "/user/hand/left/input/aim/pose", &(left_controller->m_aim_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the left input pose");
-	result = xrStringToPath(openxr_instance, "/user/hand/right/input/aim/pose", &(right_controller->aim_path));
+	result = xrStringToPath(openxr_instance, "/user/hand/right/input/aim/pose", &(right_controller->m_aim_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the right input pose");
 
   // Create the paths for the grab action for both the left and the right controller
-	result = xrStringToPath(openxr_instance, "/user/hand/left/input/select/click", &(left_controller->grab_path));
+	result = xrStringToPath(openxr_instance, "/user/hand/left/input/select/click", &(left_controller->m_grab_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the left grab pose");
-	result = xrStringToPath(openxr_instance, "/user/hand/right/input/select/click", &(right_controller->grab_path));
+	result = xrStringToPath(openxr_instance, "/user/hand/right/input/select/click", &(right_controller->m_grab_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the right grab pose");
 
 	// // Setup the suggested bindings, i.e. we suggest the runtime what path we want to
@@ -348,19 +348,19 @@ void OpenXrHandler::initializeOpenxrActions() {
 	XrActionSuggestedBinding suggested_action_bindings[6];
   // Pose
 	suggested_action_bindings[0].action = controller_pose_action;
-	suggested_action_bindings[0].binding = left_controller->pose_path;
+	suggested_action_bindings[0].binding = left_controller->m_pose_path;
 	suggested_action_bindings[1].action = controller_pose_action;
-	suggested_action_bindings[1].binding = right_controller->pose_path;
+	suggested_action_bindings[1].binding = right_controller->m_pose_path;
   // Aim
 	suggested_action_bindings[2].action = controller_aim_action;
-	suggested_action_bindings[2].binding = left_controller->aim_path;
+	suggested_action_bindings[2].binding = left_controller->m_aim_path;
 	suggested_action_bindings[3].action = controller_aim_action;
-	suggested_action_bindings[3].binding = right_controller->aim_path;
+	suggested_action_bindings[3].binding = right_controller->m_aim_path;
   // Grab
   suggested_action_bindings[4].action = controller_grab_action;
-	suggested_action_bindings[4].binding = left_controller->grab_path;
+	suggested_action_bindings[4].binding = left_controller->m_grab_path;
 	suggested_action_bindings[5].action = controller_grab_action;
-	suggested_action_bindings[5].binding = right_controller->grab_path;
+	suggested_action_bindings[5].binding = right_controller->m_grab_path;
 
 	XrInteractionProfileSuggestedBinding suggested_binding = {};
 	suggested_binding.type = XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING;					// Set type for the struct
@@ -377,13 +377,13 @@ void OpenXrHandler::initializeOpenxrActions() {
 	grip_pose_space_create_info.poseInActionSpace = Geometry::XrPoseIdentity();
 
 	// Create the space for the left controller
-	grip_pose_space_create_info.subactionPath = left_controller->controller_path;
-	result = xrCreateActionSpace(openxr_session, &grip_pose_space_create_info, &(left_controller->pose_space));
+	grip_pose_space_create_info.subactionPath = left_controller->m_controller_path;
+	result = xrCreateActionSpace(openxr_session, &grip_pose_space_create_info, &(left_controller->m_pose_space));
 	Utils::checkXrResult(result, "Failed to create the action space for pose of the left controller");
 
 	// Create the space for the right controller
-	grip_pose_space_create_info.subactionPath = right_controller->controller_path;
-	result = xrCreateActionSpace(openxr_session, &grip_pose_space_create_info, &(right_controller->pose_space));
+	grip_pose_space_create_info.subactionPath = right_controller->m_controller_path;
+	result = xrCreateActionSpace(openxr_session, &grip_pose_space_create_info, &(right_controller->m_pose_space));
 	Utils::checkXrResult(result, "Failed to create the action space for pose of the right controller");
 
   // Create the aim spaces for both controllers
@@ -393,13 +393,13 @@ void OpenXrHandler::initializeOpenxrActions() {
 	grip_aim_space_create_info.poseInActionSpace = Geometry::XrPoseIdentity();
 
 	// Create the space for the left controller
-	grip_aim_space_create_info.subactionPath = left_controller->controller_path;
-	result = xrCreateActionSpace(openxr_session, &grip_aim_space_create_info, &(left_controller->aim_space));
+	grip_aim_space_create_info.subactionPath = left_controller->m_controller_path;
+	result = xrCreateActionSpace(openxr_session, &grip_aim_space_create_info, &(left_controller->m_aim_space));
 	Utils::checkXrResult(result, "Failed to create the action space for aim of the left controller");
 
 	// Create the space for the right controller
-	grip_aim_space_create_info.subactionPath = right_controller->controller_path;
-	result = xrCreateActionSpace(openxr_session, &grip_aim_space_create_info, &(right_controller->aim_space));
+	grip_aim_space_create_info.subactionPath = right_controller->m_controller_path;
+	result = xrCreateActionSpace(openxr_session, &grip_aim_space_create_info, &(right_controller->m_aim_space));
 	Utils::checkXrResult(result, "Failed to create the action space for aim of the right controller");
 
 	// Attach the action set that was created to the session
@@ -514,34 +514,34 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
   space_location.type = XR_TYPE_SPACE_LOCATION;
 
   // Update pose of the controller
-  result = xrLocateSpace(controller->pose_space, openxr_space, predicted_time, &space_location);
+  result = xrLocateSpace(controller->m_pose_space, openxr_space, predicted_time, &space_location);
   Utils::checkXrResult(result, "Can't get the grip pose of the controller");
 
   // Check wether the controller should be rendered or not.
-  controller->should_render = (space_location.locationFlags & pose_valid_flags) == pose_valid_flags;
+  controller->m_should_render = (space_location.locationFlags & pose_valid_flags) == pose_valid_flags;
 
   // If the controller should not be rendered, we can return early
-  if (!controller->should_render) {
+  if (!controller->m_should_render) {
     return;
   }
 
   // Otherwise update the pose of the controller
-  controller->pose = space_location.pose;
+  controller->m_pose = space_location.pose;
 
   // Reset struct
   space_location = {};
   space_location.type = XR_TYPE_SPACE_LOCATION;
 
   // Update aim of the controller
-  result = xrLocateSpace(controller->aim_space, openxr_space, predicted_time, &space_location);
+  result = xrLocateSpace(controller->m_aim_space, openxr_space, predicted_time, &space_location);
   Utils::checkXrResult(result, "Can't get the grip pose of the controller");
-  controller->aim = space_location.pose;
+  controller->m_aim = space_location.pose;
 
   // Setup get info for the "grab" action
   XrActionStateGetInfo controller_state_get_info = {};
 	controller_state_get_info.type = XR_TYPE_ACTION_STATE_GET_INFO;
 	controller_state_get_info.action = controller_grab_action;
-	controller_state_get_info.subactionPath = controller->controller_path;
+	controller_state_get_info.subactionPath = controller->m_controller_path;
 
   // Get the "grab" action
   XrActionStateBoolean grab_state = {};
@@ -550,7 +550,7 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
   Utils::checkXrResult(result, "Can't get the grab state of the controller");
 
   // Update whether the controller is grabbing or not
-  controller->grabbing = grab_state.isActive && grab_state.currentState;
+  controller->m_grabbing = grab_state.isActive && grab_state.currentState;
 }
 
 //------------------------------------------------------------------------------------------------------

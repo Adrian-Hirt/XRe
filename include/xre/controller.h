@@ -21,34 +21,34 @@ public:
   void sceneModelInteractions();
 
   // Whether the controller should be rendered or not
-  bool should_render;
+  bool m_should_render;
 
   // Path for the controller, e.g. `/user/hand/left`
-  XrPath controller_path;
+  XrPath m_controller_path;
 
   // Path and space for the pose action
-  XrPath pose_path;
-  XrSpace pose_space;
+  XrPath m_pose_path;
+  XrSpace m_pose_space;
 
   // Path and space for the aim action
-  XrPath aim_path;
-  XrSpace aim_space;
+  XrPath m_aim_path;
+  XrSpace m_aim_space;
 
   // Path and space for the grab action
-  XrPath grab_path;
-  bool grabbing;
+  XrPath m_grab_path;
+  bool m_grabbing;
 
   // Pose of the controller
-  XrPosef pose;
+  XrPosef m_pose;
 
   // Aim of the controller
-  XrPosef aim;
+  XrPosef m_aim;
 
 private:
   // Model and shader for the controller
-  Model model;
-  Shader controller_shader;
+  Model m_model;
+  Shader m_controller_shader;
 
   // Line for visualizing the aim direction
-  Line aim_line;
+  Line m_aim_line;
 };
