@@ -62,13 +62,13 @@ public:
   // Get the bounding box with the transformation already applied
   DirectX::BoundingOrientedBox getTransformedBoundingBox();
 
-  // Mark a model as interactable
-  void makeInteractable();
+  // Mark a model as grabbable
+  void makeGrabbable();
 
   static void registerDx11Handler(Dx11Handler *handler);
 
-  // List of all instances we marked as interactable
-  inline static std::vector<Model*> s_interactable_instances;
+  // List of all instances we marked as grabbable
+  inline static std::vector<Model*> s_grabbable_instances;
 
 private:
   // Pointer to the Dx11 handler

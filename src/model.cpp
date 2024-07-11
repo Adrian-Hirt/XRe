@@ -298,6 +298,6 @@ DirectX::BoundingOrientedBox Model::applyTransformToBoundingBox(DirectX::Boundin
   return transformed;
 }
 
-void Model::makeInteractable() {
-  Model::s_interactable_instances.push_back(this);
+void Model::makeGrabbable() {
+  Model::s_grabbable_instances.push_back(this);
 }
