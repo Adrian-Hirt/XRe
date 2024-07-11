@@ -11,6 +11,9 @@ public:
   void render(Shader *shader);
   void updateLineFromXrPose(XrPosef pose);
 
+  DirectX::XMVECTOR getLineStart();
+  DirectX::XMVECTOR getLineDirection();
+
 private:
   // A line does not have a bounding box
   inline bool hasBoundingBox() { return false; }
@@ -18,4 +21,6 @@ private:
   std::vector<vertex_t> verticesFromPoints(DirectX::XMFLOAT3 start, DirectX::XMFLOAT3 end);
 
   DirectX::XMFLOAT4 m_line_color;
+  DirectX::XMVECTOR m_line_start = { 0.0f, 0.0f, 0.0f };
+  DirectX::XMVECTOR m_line_direction = { 0.0f, 0.0f, -1.0f };
 };

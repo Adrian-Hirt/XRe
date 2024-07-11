@@ -272,6 +272,10 @@ bool Model::intersects(DirectX::BoundingOrientedBox other) {
   return false;
 }
 
+bool Model::intersects(DirectX::XMVECTOR line_start, DirectX::XMVECTOR line_direction, float *out_distance) {
+  return getTransformedBoundingBox().Intersects(line_start, line_direction, *out_distance);
+}
+
 DirectX::BoundingOrientedBox Model::getTransformedBoundingBox() {
   return applyTransformToBoundingBox(m_bounding_box);
 }

@@ -51,4 +51,7 @@ private:
 
   // Line for visualizing the aim direction
   Line m_aim_line;
+
+  // Threshold for showing the line intersection point
+  static constexpr float s_line_intersection_threshold = 4.0f;
 };

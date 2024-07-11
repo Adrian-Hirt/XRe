@@ -38,6 +38,7 @@ void Controller::render() {
 
   // Update the aim line and render it
   m_aim_line.updateLineFromXrPose(m_aim);
+  // TODO: stretch line, currently only unit-length
   m_aim_line.render();
 }
 
@@ -63,6 +64,16 @@ void Controller::sceneModelInteractions() {
     }
     else {
       current_model->resetColor();
+    }
+
+    // Check if the model intersects the line of the controller
+    float intersection_distance;
+
+    if(current_model->intersects(m_aim_line.getLineStart(), m_aim_line.getLineDirection(), &intersection_distance)) {
+      if (intersection_distance > 0 && intersection_distance <= Controller::s_line_intersection_threshold) {
+        // TODO: add a small sphere at the intersection point
+        std::cout << intersection_distance << std::endl;
+      }
     }
   }
 }

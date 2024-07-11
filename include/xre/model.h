@@ -59,6 +59,10 @@ public:
   // Check whether a model intersects with a bounding box
   bool intersects(DirectX::BoundingOrientedBox other);
 
+  // Check whether a model intersects with a line (and optionally put the
+  // distance of the intersection point as an out parameter)
+  bool intersects(DirectX::XMVECTOR line_start, DirectX::XMVECTOR line_direction, float *out_distance);
+
   // Get the bounding box with the transformation already applied
   DirectX::BoundingOrientedBox getTransformedBoundingBox();
 
