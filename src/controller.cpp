@@ -5,8 +5,13 @@ Controller::Controller() {
   m_model = ModelFactory::createCube({0.67f, 0.84f, 0.9f, 1.0f});
   m_model.scale(0.03f, 0.03f, 0.075f);
 
-  // Create the shader for the controller models
-  m_controller_shader = Shader(SHADERS_FOLDER "/ambient.hlsl");
+  // Create the model for visualizing intersections of the aim line
+  m_aim_indicator_sphere = ModelFactory::createSphere(0.1f);
+  m_aim_indicator_sphere.setColor({0.0f, 0.75f, 1.0f, 1.0f});
+
+  // Create the shaders for the controller
+  m_controller_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient.hlsl");
+  m_aim_indicator_shader = Shader::loadOrCreate(SHADERS_FOLDER "/color.hlsl");
 
   // Create the line for the aim direction
   m_aim_line = Line({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
@@ -37,9 +42,13 @@ void Controller::render() {
   m_model.render(&m_controller_shader);
 
   // Update the aim line and render it
-  m_aim_line.updateLineFromXrPose(m_aim);
-  // TODO: stretch line, currently only unit-length
+  m_aim_line.updateLineFromXrPose(m_aim, Controller::s_line_intersection_threshold);
   m_aim_line.render();
+
+  // Render the aim interaction sphere
+  if (m_render_intersection_sphere) {
+    m_aim_indicator_sphere.render(&m_aim_indicator_shader);
+  }
 }
 
 void Controller::sceneModelInteractions() {
@@ -48,6 +57,8 @@ void Controller::sceneModelInteractions() {
   }
 
   DirectX::BoundingOrientedBox controller_bounding_box = m_model.getTransformedBoundingBox();
+
+  m_render_intersection_sphere = false;
 
   for(Model *current_model : Model::s_grabbable_instances) {
     // TODO: maybe set a bit a better indicator that an object is intersecting, e.g. a glow effect
@@ -71,8 +82,19 @@ void Controller::sceneModelInteractions() {
 
     if(current_model->intersects(m_aim_line.getLineStart(), m_aim_line.getLineDirection(), &intersection_distance)) {
       if (intersection_distance > 0 && intersection_distance <= Controller::s_line_intersection_threshold) {
-        // TODO: add a small sphere at the intersection point
-        std::cout << intersection_distance << std::endl;
+        m_render_intersection_sphere = true;
+
+        // The direction vector has unit length, i.e. to stretch it to the required length, we
+        // simple multiply the vector with the length, which gives us a new vector.
+        DirectX::XMVECTOR stretched_direction = m_aim_line.getLineDirection() * intersection_distance;
+
+        DirectX::XMVECTOR sphere_position = m_aim_line.getLineStart();
+        sphere_position = DirectX::XMVectorAdd(sphere_position, stretched_direction);
+
+        DirectX::XMFLOAT3 v3F;
+        DirectX::XMStoreFloat3(&v3F, sphere_position);
+
+        m_aim_indicator_sphere.setPosition(sphere_position);
       }
     }
   }

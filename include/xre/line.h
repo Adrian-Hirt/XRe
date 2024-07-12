@@ -9,7 +9,7 @@ public:
 
   void render() override;
   void render(Shader *shader);
-  void updateLineFromXrPose(XrPosef pose);
+  void updateLineFromXrPose(XrPosef pose, float length);
 
   DirectX::XMVECTOR getLineStart();
   DirectX::XMVECTOR getLineDirection();

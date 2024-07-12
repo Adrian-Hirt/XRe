@@ -86,4 +86,12 @@ namespace ModelFactory {
     Mesh ground_mesh = Mesh(vertices, indices, texture_path);
     return Model({ ground_mesh });
   }
+
+  inline Model createSphere(float radius) {
+    Model sphere = Model(DATA_FOLDER "/models/sphere.obj");
+
+    sphere.scale(radius, radius, radius);
+
+    return sphere;
+  }
 };

@@ -52,6 +52,13 @@ private:
   // Line for visualizing the aim direction
   Line m_aim_line;
 
+  // Model to visualize intersections of the aim line
+  // and models marked as interactable
+  Model m_aim_indicator_sphere;
+  Shader m_aim_indicator_shader;
+
+  bool m_render_intersection_sphere = false;
+
   // Threshold for showing the line intersection point
   static constexpr float s_line_intersection_threshold = 4.0f;
 };
