@@ -45,6 +45,9 @@ public:
   XrPosef m_aim;
 
 private:
+  // Threshold for showing the line intersection point
+  static constexpr float s_line_intersection_threshold = 6.0f;
+
   // Model and shader for the controller
   Model m_model;
   Shader m_controller_shader;
@@ -59,6 +62,5 @@ private:
 
   bool m_render_intersection_sphere = false;
 
-  // Threshold for showing the line intersection point
-  static constexpr float s_line_intersection_threshold = 4.0f;
+  float computeAimIndicatorSpherePosition(std::unordered_set<Model *> models);
 };

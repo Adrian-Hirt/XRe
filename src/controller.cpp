@@ -58,14 +58,7 @@ void Controller::sceneModelInteractions() {
 
   DirectX::BoundingOrientedBox controller_bounding_box = m_model.getTransformedBoundingBox();
 
-  m_render_intersection_sphere = false;
-
-  // As we only want to highlight the intersection with the closest model,
-  // we need to keep track of the smallest threshold. We probably should replace
-  // this later with sorting the elements by distance from the camera and then check in
-  // ascending distance, but for now this will have to do.
-  float closestIntersectionDistance = Controller::s_line_intersection_threshold + 1;
-
+  // Check if any of our controllers is grabbing a grabbable model
   for(Model *current_model : Model::getGrabbableInstances()) {
     // TODO: maybe set a bit a better indicator that an object is intersecting, e.g. a glow effect
     if(current_model->intersects(controller_bounding_box)) {
@@ -82,7 +75,32 @@ void Controller::sceneModelInteractions() {
     else {
       current_model->resetColor();
     }
+  }
 
+  // Next, check if we need to render the aim intersection sphere
+  m_render_intersection_sphere = false;
+  float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(Model::getGrabbableInstances());
+  float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(Model::getTerrainInstances());
+
+  if (m_render_intersection_sphere) {
+    // The direction vector has unit length, i.e. to stretch it to the required length, we
+    // simple multiply the vector with the length, which gives us a new vector.
+    DirectX::XMVECTOR stretched_direction = m_aim_line.getLineDirection() * std::min(closest_grabbable_aim_intersection, closest_terrain_aim_intersection);
+
+    DirectX::XMVECTOR sphere_position = m_aim_line.getLineStart();
+    sphere_position = DirectX::XMVectorAdd(sphere_position, stretched_direction);
+    m_aim_indicator_sphere.setPosition(sphere_position);
+  }
+}
+
+float Controller::computeAimIndicatorSpherePosition(std::unordered_set<Model *> models) {
+  // As we only want to highlight the intersection with the closest model,
+  // we need to keep track of the smallest threshold. We probably should replace
+  // this later with sorting the elements by distance from the camera and then check in
+  // ascending distance, but for now this will have to do.
+  float closest_intersection_distance = Controller::s_line_intersection_threshold + 1;
+
+  for(Model *current_model : models) {
     // Check if the model intersects the line of the controller
     float intersection_distance;
 
@@ -90,18 +108,12 @@ void Controller::sceneModelInteractions() {
       if (intersection_distance > 0 && intersection_distance <= Controller::s_line_intersection_threshold) {
         m_render_intersection_sphere = true;
 
-        if (closestIntersectionDistance > intersection_distance) {
-          // The direction vector has unit length, i.e. to stretch it to the required length, we
-          // simple multiply the vector with the length, which gives us a new vector.
-          DirectX::XMVECTOR stretched_direction = m_aim_line.getLineDirection() * intersection_distance;
-
-          DirectX::XMVECTOR sphere_position = m_aim_line.getLineStart();
-          sphere_position = DirectX::XMVectorAdd(sphere_position, stretched_direction);
-          m_aim_indicator_sphere.setPosition(sphere_position);
-
-          closestIntersectionDistance = intersection_distance;
+        if (closest_intersection_distance > intersection_distance) {
+          closest_intersection_distance = intersection_distance;
         }
       }
     }
   }
+
+  return closest_intersection_distance;
 }

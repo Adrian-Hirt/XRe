@@ -314,3 +314,16 @@ void Model::setGrabbable(bool grabbable) {
 std::unordered_set<Model*> Model::getGrabbableInstances() {
   return s_grabbable_instances;
 }
+
+void Model::setIsTerrain(bool is_terrain) {
+  if (is_terrain) {
+    Model::s_terrain_instances.insert(this);
+  }
+  else {
+    Model::s_terrain_instances.erase(this);
+  }
+}
+
+std::unordered_set<Model*> Model::getTerrainInstances() {
+  return s_terrain_instances;
+}

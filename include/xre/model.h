@@ -67,18 +67,25 @@ public:
   // Get the bounding box with the transformation already applied
   DirectX::BoundingOrientedBox getTransformedBoundingBox();
 
-  // Set the grabbable state of a model
+  // Update the grabbable state of a model
   void setGrabbable(bool grabbable);
+
+  // Update the is_terrain state of a model
+  void setIsTerrain(bool is_terrain);
 
   static void registerDx11Handler(Dx11Handler *handler);
   static std::unordered_set<Model*> getGrabbableInstances();
+  static std::unordered_set<Model*> getTerrainInstances();
 
 private:
   // Pointer to the Dx11 handler
   inline static Dx11Handler *s_dx11_handler = NULL;
 
-  // List of all instances we marked as grabbable
+  // Set of all instances we marked as grabbable models
   inline static std::unordered_set<Model*> s_grabbable_instances;
+
+  // Set of all instances we marked as being terrain models
+  inline static std::unordered_set<Model*> s_terrain_instances;
 
   // Vector holding all the meshes of this model
   std::vector<Mesh> m_meshes;
