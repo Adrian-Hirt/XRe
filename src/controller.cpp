@@ -60,6 +60,12 @@ void Controller::sceneModelInteractions() {
 
   m_render_intersection_sphere = false;
 
+  // As we only want to highlight the intersection with the closest model,
+  // we need to keep track of the smallest threshold. We probably should replace
+  // this later with sorting the elements by distance from the camera and then check in
+  // ascending distance, but for now this will have to do.
+  float closestIntersectionDistance = Controller::s_line_intersection_threshold + 1;
+
   for(Model *current_model : Model::getGrabbableInstances()) {
     // TODO: maybe set a bit a better indicator that an object is intersecting, e.g. a glow effect
     if(current_model->intersects(controller_bounding_box)) {
@@ -84,17 +90,17 @@ void Controller::sceneModelInteractions() {
       if (intersection_distance > 0 && intersection_distance <= Controller::s_line_intersection_threshold) {
         m_render_intersection_sphere = true;
 
-        // The direction vector has unit length, i.e. to stretch it to the required length, we
-        // simple multiply the vector with the length, which gives us a new vector.
-        DirectX::XMVECTOR stretched_direction = m_aim_line.getLineDirection() * intersection_distance;
+        if (closestIntersectionDistance > intersection_distance) {
+          // The direction vector has unit length, i.e. to stretch it to the required length, we
+          // simple multiply the vector with the length, which gives us a new vector.
+          DirectX::XMVECTOR stretched_direction = m_aim_line.getLineDirection() * intersection_distance;
 
-        DirectX::XMVECTOR sphere_position = m_aim_line.getLineStart();
-        sphere_position = DirectX::XMVectorAdd(sphere_position, stretched_direction);
+          DirectX::XMVECTOR sphere_position = m_aim_line.getLineStart();
+          sphere_position = DirectX::XMVectorAdd(sphere_position, stretched_direction);
+          m_aim_indicator_sphere.setPosition(sphere_position);
 
-        DirectX::XMFLOAT3 v3F;
-        DirectX::XMStoreFloat3(&v3F, sphere_position);
-
-        m_aim_indicator_sphere.setPosition(sphere_position);
+          closestIntersectionDistance = intersection_distance;
+        }
       }
     }
   }
