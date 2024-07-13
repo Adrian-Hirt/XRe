@@ -5,6 +5,7 @@
 
 // Include other headers
 #include <vector>
+#include <unordered_set>
 
 // XRe includes
 #include <xre/utils.h>
@@ -66,17 +67,18 @@ public:
   // Get the bounding box with the transformation already applied
   DirectX::BoundingOrientedBox getTransformedBoundingBox();
 
-  // Mark a model as grabbable
-  void makeGrabbable();
+  // Set the grabbable state of a model
+  void setGrabbable(bool grabbable);
 
   static void registerDx11Handler(Dx11Handler *handler);
-
-  // List of all instances we marked as grabbable
-  inline static std::vector<Model*> s_grabbable_instances;
+  static std::unordered_set<Model*> getGrabbableInstances();
 
 private:
   // Pointer to the Dx11 handler
   inline static Dx11Handler *s_dx11_handler = NULL;
+
+  // List of all instances we marked as grabbable
+  inline static std::unordered_set<Model*> s_grabbable_instances;
 
   // Vector holding all the meshes of this model
   std::vector<Mesh> m_meshes;

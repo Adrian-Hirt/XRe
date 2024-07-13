@@ -60,7 +60,7 @@ void Controller::sceneModelInteractions() {
 
   m_render_intersection_sphere = false;
 
-  for(Model *current_model : Model::s_grabbable_instances) {
+  for(Model *current_model : Model::getGrabbableInstances()) {
     // TODO: maybe set a bit a better indicator that an object is intersecting, e.g. a glow effect
     if(current_model->intersects(controller_bounding_box)) {
       // Set a different color if the controller is intersecting another model

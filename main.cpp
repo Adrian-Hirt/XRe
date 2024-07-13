@@ -32,13 +32,13 @@ public:
 
     // And translate the cube up a bit
     cube.translate(0.0f, 4.0f, 0.0f);
-    cube.makeGrabbable();
+    cube.setGrabbable(true);
 
-    sphere.makeGrabbable();
+    sphere.setGrabbable(true);
 
     // Translate the ground cube up a bit and to the left
     ground_cube.translate(-2.0f, 0.5f, 0.0f);
-    ground_cube.makeGrabbable();
+    ground_cube.setGrabbable(true);
 
     // Squish the ground cube
     ground_cube.scale(1.0f, 0.3f, 1.0f);

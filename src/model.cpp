@@ -302,6 +302,15 @@ DirectX::BoundingOrientedBox Model::applyTransformToBoundingBox(DirectX::Boundin
   return transformed;
 }
 
-void Model::makeGrabbable() {
-  Model::s_grabbable_instances.push_back(this);
+void Model::setGrabbable(bool grabbable) {
+  if (grabbable) {
+    Model::s_grabbable_instances.insert(this);
+  }
+  else {
+    Model::s_grabbable_instances.erase(this);
+  }
+}
+
+std::unordered_set<Model*> Model::getGrabbableInstances() {
+  return s_grabbable_instances;
 }
