@@ -34,9 +34,13 @@ public:
   XrPath m_aim_path;
   XrSpace m_aim_space;
 
-  // Path and space for the grab action
+  // Path and boolean for the grab action
   XrPath m_grab_path;
-  bool m_grabbing;
+  bool m_grabbing = false;
+
+  // Path and space for the teleport action
+  XrPath m_teleport_path;
+  bool m_teleporting_requested = false;
 
   // Pose of the controller
   XrPosef m_pose;
