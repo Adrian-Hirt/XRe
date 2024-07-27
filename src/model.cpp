@@ -32,20 +32,19 @@ Model::Model(const char *model_path, DirectX::XMFLOAT4 color) {
 
 void Model::render() {
   // Get the current active shader
-  Shader* shader = Shader::getCurrentActiveShader();
-
+  Shader shader = *Shader::getCurrentActiveShader();
   render(shader);
 }
 
-void Model::render(Shader *shader) {
+void Model::render(Shader &shader) {
   // Activate the shader
-  shader->activate();
+  shader.activate();
 
   // Update the shader with the model matrix
-  shader->setModelMatrix(getTransformationMatrix());
-  shader->setNormalRotationMatrix(getRotationMatrix());
-  shader->setModelColor(m_model_color);
-  shader->updatePerModelConstantBuffer();
+  shader.setModelMatrix(getTransformationMatrix());
+  shader.setNormalRotationMatrix(getRotationMatrix());
+  shader.setModelColor(m_model_color);
+  shader.updatePerModelConstantBuffer();
 
   for (Mesh &mesh : m_meshes) {
     mesh.render();
@@ -55,7 +54,7 @@ void Model::render(Shader *shader) {
   m_bounding_box_mesh.render();
 }
 
-void Model::renderTransparent(Shader *shader) {
+void Model::renderTransparent(Shader &shader) {
   // Render the model twice, once with Counterclockwise
   // cull mode, once with the normal clockwise cull mode, such
   // that the transparency works correctly.

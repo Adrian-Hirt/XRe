@@ -42,15 +42,15 @@ void Controller::render(DirectX::XMVECTOR current_origin) {
     m_model.setColor({0.67f, 0.84f, 0.9f, 1.0f});
   }
 
-  m_model.render(&m_controller_shader);
+  m_model.render(m_controller_shader);
 
   // Update the aim line and render it
   m_aim_line.updateAimLineFromControllerPose(controller_position, DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&m_aim.orientation), current_origin, Controller::s_line_intersection_threshold);
-  m_aim_line.render(&m_controller_shader);
+  m_aim_line.render(m_controller_shader);
 
   // Render the aim interaction sphere
   if (m_render_intersection_sphere) {
-    m_aim_indicator_sphere.render(&m_aim_indicator_shader);
+    m_aim_indicator_sphere.render(m_aim_indicator_shader);
   }
 }
 

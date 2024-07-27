@@ -67,21 +67,21 @@ public:
 
   void draw() override {
     // Render the ground
-    ground.render(&texture_shader);
+    ground.render(texture_shader);
 
     // Render the sphere
-    sphere.render(&color_shader);
-    sphere2.render(&color_shader);
-    sphere3.render(&color_shader);
+    sphere.render(color_shader);
+    sphere2.render(color_shader);
+    sphere3.render(color_shader);
 
     // Render the cube at the ground
-    ground_cube.render(&ambient_shader);
+    ground_cube.render(ambient_shader);
 
     // Render the line
-    line.render(&color_shader);
+    line.render(color_shader);
 
     // Render a transparent looking cube
-    cube.renderTransparent(&ambient_shader);
+    cube.renderTransparent(ambient_shader);
 
     quad.render();
 

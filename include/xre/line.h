@@ -9,7 +9,7 @@ public:
   Line(DirectX::XMFLOAT3 line_start, DirectX::XMFLOAT3 line_end, DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 
   void render() override;
-  void render(Shader *shader);
+  void render(Shader &shader);
   void updateAimLineFromControllerPose(DirectX::XMVECTOR controller_position, DirectX::XMVECTOR controller_orientation, DirectX::XMVECTOR current_origin, float length);
 
   DirectX::XMVECTOR getLineStart();

@@ -28,18 +28,17 @@ Line::Line(DirectX::XMFLOAT3 line_start, DirectX::XMFLOAT3 line_end, DirectX::XM
 
 void Line::render() {
   // Get the current active shader
-  Shader* shader = Shader::getCurrentActiveShader();
-
+  Shader shader = *Shader::getCurrentActiveShader();
   render(shader);
 }
 
-void Line::render(Shader *shader) {
+void Line::render(Shader &shader) {
   // Activate the shader
-  shader->activate();
+  shader.activate();
 
-  shader->setModelMatrix(DirectX::XMMatrixIdentity());
-  shader->setModelColor(m_line_color);
-  shader->updatePerModelConstantBuffer();
+  shader.setModelMatrix(DirectX::XMMatrixIdentity());
+  shader.setModelColor(m_line_color);
+  shader.updatePerModelConstantBuffer();
 
   // Set vertex and index buffers on the GPU to be the ones of this line
   UINT stride = sizeof(vertex_t);
