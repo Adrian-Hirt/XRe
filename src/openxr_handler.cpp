@@ -585,20 +585,20 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
   Utils::checkXrResult(result, "Can't get the grip pose of the controller");
   controller->m_aim = space_location.pose;
 
-  // // Setup get info for the "grab" action
-  // XrActionStateGetInfo controller_teleport_state_get_info = {};
-	// controller_teleport_state_get_info.type = XR_TYPE_ACTION_STATE_GET_INFO;
-	// controller_teleport_state_get_info.action = m_controller_grab_action;
-	// controller_teleport_state_get_info.subactionPath = controller->m_controller_path;
+  // Setup get info for the "grab" action
+  XrActionStateGetInfo controller_grab_state_get_info = {};
+	controller_grab_state_get_info.type = XR_TYPE_ACTION_STATE_GET_INFO;
+	controller_grab_state_get_info.action = m_controller_grab_action;
+	controller_grab_state_get_info.subactionPath = controller->m_controller_path;
 
-  // // Get the "grab" action
-  // XrActionStateBoolean grab_state = {};
-  // grab_state.type = XR_TYPE_ACTION_STATE_BOOLEAN;
-  // result = xrGetActionStateBoolean(m_openxr_session, &controller_teleport_state_get_info, &grab_state);
-  // Utils::checkXrResult(result, "Can't get the grab state of the controller");
+  // Get the "grab" action
+  XrActionStateBoolean grab_state = {};
+  grab_state.type = XR_TYPE_ACTION_STATE_BOOLEAN;
+  result = xrGetActionStateBoolean(m_openxr_session, &controller_grab_state_get_info, &grab_state);
+  Utils::checkXrResult(result, "Can't get the grab state of the controller");
 
-  // // Update whether the controller is grabbing or not
-  // controller->m_grabbing = grab_state.isActive && grab_state.currentState;
+  // Update whether the controller is grabbing or not
+  controller->m_grabbing = grab_state.isActive && grab_state.currentState;
 
   // Setup get info for the "teleport" action
   XrActionStateGetInfo controller_teleport_state_get_info = {};
