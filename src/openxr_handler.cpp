@@ -290,6 +290,8 @@ void OpenXrHandler::initializeOpenxrActions() {
 	Utils::checkXrResult(result, "Coult not create path from string for right hand");
 
 	XrPath controller_paths[2] = { m_left_controller->m_controller_path, m_right_controller->m_controller_path };
+  XrPath left_controller_path[1] = { m_left_controller->m_controller_path };
+  XrPath right_controller_path[1] = { m_right_controller->m_controller_path };
 
 	// Create the action for tracking the pose of the controllers, such that we can get
 	// the position and orientation of each controller, render models and setup
@@ -322,8 +324,8 @@ void OpenXrHandler::initializeOpenxrActions() {
 	grab_action_create_info.type = XR_TYPE_ACTION_CREATE_INFO;                // Set the type of the create info
 	strcpy_s(grab_action_create_info.actionName, "controller_grab");          // Set a name for the action
 	strcpy_s(grab_action_create_info.localizedActionName, "Controller Grab"); // Add a "localized" name for the action
-	grab_action_create_info.countSubactionPaths = 2;                          // We'll be using two subaction paths (left / right controller)
-	grab_action_create_info.subactionPaths = controller_paths;                // Pass in the controller paths
+	grab_action_create_info.countSubactionPaths = 1;                          // We'll be using two subaction paths (left / right controller)
+	grab_action_create_info.subactionPaths = right_controller_path;                // Pass in the controller paths
 	grab_action_create_info.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;        // Finally, tell OpenXR that this input is a boolean input
 
 	result = xrCreateAction(m_default_action_set, &grab_action_create_info, &m_controller_grab_action);
@@ -334,8 +336,8 @@ void OpenXrHandler::initializeOpenxrActions() {
 	teleport_action_create_info.type = XR_TYPE_ACTION_CREATE_INFO;                    // Set the type of the create info
 	strcpy_s(teleport_action_create_info.actionName, "controller_teleport");          // Set a name for the action
 	strcpy_s(teleport_action_create_info.localizedActionName, "Controller Teleport"); // Add a "localized" name for the action
-	teleport_action_create_info.countSubactionPaths = 2;                              // We'll be using two subaction paths (left / right controller)
-	teleport_action_create_info.subactionPaths = controller_paths;                    // Pass in the controller paths
+	teleport_action_create_info.countSubactionPaths = 1;                              // We'll be using two subaction paths (left / right controller)
+	teleport_action_create_info.subactionPaths = left_controller_path;                    // Pass in the controller paths
 	teleport_action_create_info.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;            // Finally, tell OpenXR that this input is a boolean input
 
 	result = xrCreateAction(m_default_action_set, &teleport_action_create_info, &m_controller_teleport_action);
@@ -364,14 +366,14 @@ void OpenXrHandler::initializeOpenxrActions() {
   // TODO: Re-enable this and map teleport to another action
 	// result = xrStringToPath(m_openxr_instance, "/user/hand/left/input/select/click", &(m_left_controller->m_grab_path));
 	// Utils::checkXrResult(result, "Coult not create path from string for the left grab pose");
-	// result = xrStringToPath(m_openxr_instance, "/user/hand/right/input/select/click", &(m_right_controller->m_grab_path));
-	// Utils::checkXrResult(result, "Coult not create path from string for the right grab pose");
+	result = xrStringToPath(m_openxr_instance, "/user/hand/right/input/select/click", &(m_right_controller->m_grab_path));
+	Utils::checkXrResult(result, "Coult not create path from string for the right grab pose");
 
   // Create the paths for the teleport action for both the left and the right controller
 	result = xrStringToPath(m_openxr_instance, "/user/hand/left/input/select/click", &(m_left_controller->m_teleport_path));
 	Utils::checkXrResult(result, "Coult not create path from string for the left grab pose");
-	result = xrStringToPath(m_openxr_instance, "/user/hand/right/input/select/click", &(m_right_controller->m_teleport_path));
-	Utils::checkXrResult(result, "Coult not create path from string for the right grab pose");
+	// result = xrStringToPath(m_openxr_instance, "/user/hand/right/input/select/click", &(m_right_controller->m_teleport_path));
+	// Utils::checkXrResult(result, "Coult not create path from string for the right grab pose");
 
 	// Setup the suggested bindings, i.e. we suggest the runtime what path we want to
 	// bind a specific action to. As the name says, this is only a suggestion and the
@@ -391,13 +393,13 @@ void OpenXrHandler::initializeOpenxrActions() {
   // TODO: Re-enable this and map teleport to another action
   // suggested_action_bindings[4].action = m_controller_grab_action;
 	// suggested_action_bindings[4].binding = m_left_controller->m_grab_path;
-	// suggested_action_bindings[5].action = m_controller_grab_action;
-	// suggested_action_bindings[5].binding = m_right_controller->m_grab_path;
+	suggested_action_bindings[5].action = m_controller_grab_action;
+	suggested_action_bindings[5].binding = m_right_controller->m_grab_path;
   // Teleport
   suggested_action_bindings[4].action = m_controller_teleport_action;
 	suggested_action_bindings[4].binding = m_left_controller->m_teleport_path;
-	suggested_action_bindings[5].action = m_controller_teleport_action;
-	suggested_action_bindings[5].binding = m_right_controller->m_teleport_path;
+	// suggested_action_bindings[5].action = m_controller_teleport_action;
+	// suggested_action_bindings[5].binding = m_right_controller->m_teleport_path;
 
 	XrInteractionProfileSuggestedBinding suggested_binding = {};
 	suggested_binding.type = XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING;					// Set type for the struct
@@ -595,10 +597,11 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
   XrActionStateBoolean grab_state = {};
   grab_state.type = XR_TYPE_ACTION_STATE_BOOLEAN;
   result = xrGetActionStateBoolean(m_openxr_session, &controller_grab_state_get_info, &grab_state);
-  Utils::checkXrResult(result, "Can't get the grab state of the controller");
 
-  // Update whether the controller is grabbing or not
-  controller->m_grabbing = grab_state.isActive && grab_state.currentState;
+  if (XR_SUCCEEDED(result)) {
+    // Update whether the controller is grabbing or not
+    controller->m_grabbing = grab_state.isActive && grab_state.currentState;
+  }
 
   // Setup get info for the "teleport" action
   XrActionStateGetInfo controller_teleport_state_get_info = {};
@@ -610,10 +613,11 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
   XrActionStateBoolean teleport_state = {};
   teleport_state.type = XR_TYPE_ACTION_STATE_BOOLEAN;
   result = xrGetActionStateBoolean(m_openxr_session, &controller_teleport_state_get_info, &teleport_state);
-  Utils::checkXrResult(result, "Can't get the teleport state of the controller");
 
-  // Update whether the user requested to be teleported in this frame.
-  controller->m_teleporting_requested = teleport_state.isActive && teleport_state.currentState && teleport_state.changedSinceLastSync;
+  if (XR_SUCCEEDED(result)) {
+    // Update whether the user requested to be teleported in this frame.
+    controller->m_teleporting_requested = teleport_state.isActive && teleport_state.currentState && teleport_state.changedSinceLastSync;
+  }
 }
 
 //------------------------------------------------------------------------------------------------------
