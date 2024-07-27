@@ -249,7 +249,8 @@ swapchain_data_t Dx11Handler::createRenderTargets(ID3D11Texture2D &texture) {
 //------------------------------------------------------------------------------------------------------
 void Dx11Handler::renderFrame(XrCompositionLayerProjectionView& view,
                                   swapchain_data_t& swapchain_data,
-                                  std::function<void()> draw_callback) {
+                                  std::function<void()> draw_callback,
+                                  DirectX::XMVECTOR current_origin) {
   //----------------------------------------------------------------------------------
 	// Setup viewport
 	//----------------------------------------------------------------------------------
@@ -295,7 +296,7 @@ void Dx11Handler::renderFrame(XrCompositionLayerProjectionView& view,
 	//----------------------------------------------------------------------------------
   // Compute the viewProjectionMatrix as well as the model matrix
   // and send them to the GPU
-  Shader::updateViewProjectionMatrix(Geometry::computeViewProjectionMatrix(view));
+  Shader::updateViewProjectionMatrix(Geometry::computeViewProjectionMatrix(view, current_origin));
 
   //----------------------------------------------------------------------------------
 	// Draw the scene

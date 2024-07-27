@@ -17,7 +17,7 @@ Controller::Controller() {
   m_aim_line = Line({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
 }
 
-void Controller::render() {
+void Controller::render(DirectX::XMVECTOR current_origin) {
   // Return early if the controller should not be rendered alltogether
   if (!m_should_render) {
     return;
@@ -25,6 +25,9 @@ void Controller::render() {
 
   DirectX::XMVECTOR controller_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&m_pose.position);
   DirectX::XMVECTOR controller_orientation = DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&m_pose.orientation);
+
+  // Apply the global teleport translation from moving the origin
+  controller_position = DirectX::XMVectorAdd(controller_position, current_origin);
 
   // Set position and orientation of the model
   m_model.setPosition(controller_position);
@@ -42,8 +45,8 @@ void Controller::render() {
   m_model.render(&m_controller_shader);
 
   // Update the aim line and render it
-  m_aim_line.updateLineFromXrPose(m_aim, Controller::s_line_intersection_threshold);
-  m_aim_line.render();
+  m_aim_line.updateAimLineFromControllerPose(controller_position, DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&m_aim.orientation), current_origin, Controller::s_line_intersection_threshold);
+  m_aim_line.render(&m_controller_shader);
 
   // Render the aim interaction sphere
   if (m_render_intersection_sphere) {
@@ -51,9 +54,9 @@ void Controller::render() {
   }
 }
 
-void Controller::sceneModelInteractions() {
+std::optional<DirectX::XMVECTOR> Controller::sceneModelInteractions() {
   if(!m_should_render) {
-    return;
+    return std::nullopt;
   }
 
   DirectX::BoundingOrientedBox controller_bounding_box = m_model.getTransformedBoundingBox();
@@ -92,14 +95,15 @@ void Controller::sceneModelInteractions() {
     DirectX::XMVECTOR sphere_position = m_aim_line.getLineStart();
     sphere_position = DirectX::XMVectorAdd(sphere_position, stretched_direction);
     m_aim_indicator_sphere.setPosition(sphere_position);
+
+    // If a teleporting is requested and there is an intersection sphere rendered, we can
+    // check whether the target is a terrain, and if yes, teleport to that location.
+    if (m_teleporting_requested && closest_terrain_aim_intersection < closest_grabbable_aim_intersection) {
+      return sphere_position;
+    }
   }
 
-  // If a teleporting is requested and there is an intersection sphere rendered, we can
-  // check whether the target is a terrain, and if yes, teleport to that location.
-  if (m_teleporting_requested && m_render_intersection_sphere && closest_terrain_aim_intersection < closest_grabbable_aim_intersection) {
-    // TODO: teleport
-    std::cout << "Teleport" << std::endl;
-  }
+  return std::nullopt;
 }
 
 float Controller::computeAimIndicatorSpherePosition(std::unordered_set<Model *> models) {

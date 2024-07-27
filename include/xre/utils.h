@@ -5,6 +5,7 @@
 
 // DirectX includes
 #include <d3d11.h>
+#include <DirectXMath/DirectXMath.h>
 
 // Other includes
 #include <iostream>
@@ -73,5 +74,15 @@ namespace Utils {
     std::wstring result(string_size_needed, 0);
     MultiByteToWideChar(CP_UTF8, 0, string.c_str(), -1, &result[0], string_size_needed);
     return result;
+  }
+
+  inline void printVector(DirectX::XMVECTOR input) {
+    DirectX::XMFLOAT3 vector;
+    DirectX::XMStoreFloat3(&vector, input);
+    std::cout << vector.x << ", " << vector.y << ", " << vector.z << std::endl;
+  }
+
+  inline void printVector(XrVector3f input) {
+    std::cout << input.x << ", " << input.y << ", " << input.z << std::endl;
   }
 }

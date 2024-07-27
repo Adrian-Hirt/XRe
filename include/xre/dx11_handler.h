@@ -20,7 +20,7 @@ public:
   ID3D11Device* getDevice();
   ID3D11DeviceContext* getDeviceContext();
   swapchain_data_t createRenderTargets(ID3D11Texture2D &texture);
-  void renderFrame(XrCompositionLayerProjectionView& view, swapchain_data_t& swapchain_data, std::function<void()> draw_callback);
+  void renderFrame(XrCompositionLayerProjectionView& view, swapchain_data_t& swapchain_data, std::function<void()> draw_callback, DirectX::XMVECTOR current_origin);
 
   DXGI_FORMAT m_d3d11_swapchain_format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 

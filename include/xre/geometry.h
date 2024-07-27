@@ -8,7 +8,7 @@
 #include <DirectXMath/DirectXMath.h>
 
 namespace Geometry {
-  inline DirectX::XMMATRIX computeViewProjectionMatrix(XrCompositionLayerProjectionView &view) {
+  inline DirectX::XMMATRIX computeViewProjectionMatrix(XrCompositionLayerProjectionView &view, DirectX::XMVECTOR current_origin) {
     // First, we need to build the projection matrix
 
     // Set values for the near and far clipping plane. Usually, the near plane is
@@ -40,6 +40,9 @@ namespace Geometry {
     // Load the rotation quaternion and the position vector into a vector
     DirectX::XMVECTOR view_rotation = DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&view.pose.orientation);
     DirectX::XMVECTOR view_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&view.pose.position);
+
+    // Apply the translation given by teleportation
+    view_position = DirectX::XMVectorAdd(view_position, current_origin);
 
     // Build an affine transformation matrix from the rotation & position. The First
     // Param is a scaling factor, which we set to all ones, as we currently don't want

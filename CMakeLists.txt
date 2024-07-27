@@ -4,6 +4,9 @@ project(XRe)
 # TODO: will need to make this work with ARM64 later.
 set(TARGET_ARCHITECTURE x64)
 
+# TODO: remove and fix warnings
+add_compile_options(-Wno-ignored-attributes)
+
 find_library(OPENXR NAMES openxr_loader PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib/open_xr/${TARGET_ARCHITECTURE}/${CMAKE_BUILD_TYPE})
 message(STATUS "***** find_library returned ${OPENXR} *****")
 message(STATUS "***** CMake Build type: ${CMAKE_BUILD_TYPE} *****")

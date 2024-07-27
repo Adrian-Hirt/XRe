@@ -1,5 +1,6 @@
 #pragma once
 
+// XRe includes
 #include <xre/mesh.h>
 
 class Line : public Mesh {
@@ -9,7 +10,7 @@ public:
 
   void render() override;
   void render(Shader *shader);
-  void updateLineFromXrPose(XrPosef pose, float length);
+  void updateAimLineFromControllerPose(DirectX::XMVECTOR controller_position, DirectX::XMVECTOR controller_orientation, DirectX::XMVECTOR current_origin, float length);
 
   DirectX::XMVECTOR getLineStart();
   DirectX::XMVECTOR getLineDirection();

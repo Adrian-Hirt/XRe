@@ -53,7 +53,8 @@ private:
   XrSystemId m_openxr_system_id = XR_NULL_SYSTEM_ID; // The ID of the OpenXR system
   XrSession m_openxr_session;
   XrEnvironmentBlendMode m_openxr_blend_mode; // Blend mode (opaque / transparent) to use
-  XrSpace m_openxr_space;
+  XrSpace m_openxr_stage_space;
+  XrSpace m_openxr_view_space;
   std::vector<XrView> m_openxr_views;
   std::vector<XrViewConfigurationView> m_openxr_view_configuration_views;
 
@@ -76,6 +77,9 @@ private:
 
   // For checking if the pose of a controller is valid
   const static XrSpaceLocationFlags s_pose_valid_flags = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
+
+  DirectX::XMVECTOR m_headset_position = { 0.0f, 0.0f, 0.0f };
+  DirectX::XMVECTOR m_current_origin = { 0.0f, 0.0f, 0.0f };
 
   // Methods
   bool initializeOpenxr();

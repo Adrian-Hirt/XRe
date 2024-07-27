@@ -124,13 +124,26 @@ bool OpenXrHandler::initializeOpenxr() {
 	//------------------------------------------------------------------------------------------------------
 	// Next, we need to choose a reference space to display the content. We'll use stage, which is relative
 	// to the devices "guardian" system
-	XrReferenceSpaceCreateInfo reference_space_create_info = {};
-	reference_space_create_info.type = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
-	reference_space_create_info.poseInReferenceSpace = { {0, 0, 0, 1}, {0, 0, 0} };
-	reference_space_create_info.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_STAGE;
+	XrReferenceSpaceCreateInfo stage_reference_space_create_info = {};
+	stage_reference_space_create_info.type = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
+	stage_reference_space_create_info.poseInReferenceSpace = Geometry::XrPoseIdentity();
+	stage_reference_space_create_info.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_STAGE;
 
 	// Create the reference space
-	result = xrCreateReferenceSpace(m_openxr_session, &reference_space_create_info, &m_openxr_space);
+	result = xrCreateReferenceSpace(m_openxr_session, &stage_reference_space_create_info, &m_openxr_stage_space);
+	if (XR_FAILED(result)) {
+		return false;
+	}
+
+  // We also create a view reference space, which tracks the view origin of the center of both of the
+  // views (i.e. the "center" of the HMD).
+  XrReferenceSpaceCreateInfo view_reference_space_create_info = {};
+	view_reference_space_create_info.type = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
+	view_reference_space_create_info.poseInReferenceSpace = Geometry::XrPoseIdentity();
+	view_reference_space_create_info.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_VIEW;
+
+	// Create the reference space
+	result = xrCreateReferenceSpace(m_openxr_session, &view_reference_space_create_info, &m_openxr_view_space);
 	if (XR_FAILED(result)) {
 		return false;
 	}
@@ -528,6 +541,17 @@ void OpenXrHandler::pollOpenxrActions(XrTime predicted_time) {
 	// having to code this twice
 	updateControllerStates(m_left_controller, predicted_time);
 	updateControllerStates(m_right_controller, predicted_time);
+
+  // Update the location of the headset
+  XrSpaceLocation space_location = {};
+  space_location.type = XR_TYPE_SPACE_LOCATION;
+  space_location.pose = Geometry::XrPoseIdentity();
+  result = xrLocateSpace(m_openxr_view_space, m_openxr_stage_space, predicted_time, &space_location);
+  Utils::checkXrResult(result, "Can't get the view pose of the HMD in the stage space");
+
+  if ((space_location.locationFlags & s_pose_valid_flags) == s_pose_valid_flags) {
+    m_headset_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&space_location.pose.position);
+  }
 }
 
 void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predicted_time) {
@@ -538,7 +562,7 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
   space_location.type = XR_TYPE_SPACE_LOCATION;
 
   // Update pose of the controller
-  result = xrLocateSpace(controller->m_pose_space, m_openxr_space, predicted_time, &space_location);
+  result = xrLocateSpace(controller->m_pose_space, m_openxr_stage_space, predicted_time, &space_location);
   Utils::checkXrResult(result, "Can't get the grip pose of the controller");
 
   // Check wether the controller should be rendered or not.
@@ -557,7 +581,7 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
   space_location.type = XR_TYPE_SPACE_LOCATION;
 
   // Update aim of the controller
-  result = xrLocateSpace(controller->m_aim_space, m_openxr_space, predicted_time, &space_location);
+  result = xrLocateSpace(controller->m_aim_space, m_openxr_stage_space, predicted_time, &space_location);
   Utils::checkXrResult(result, "Can't get the grip pose of the controller");
   controller->m_aim = space_location.pose;
 
@@ -628,8 +652,25 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
   //------------------------------------------------------------------------------------------------------
 	// Update the interactions of the controllers with the scene
 	//------------------------------------------------------------------------------------------------------
-  m_left_controller->sceneModelInteractions();
-  m_right_controller->sceneModelInteractions();
+  std::optional<DirectX::XMVECTOR> teleport_location_left, teleport_location_right;
+  teleport_location_left = m_left_controller->sceneModelInteractions();
+  teleport_location_right = m_right_controller->sceneModelInteractions();
+
+  // As both might have a value, we arbitrarily decide to give the right controller
+  // precedende. Later, we might map the teleport action to a single controller anyway,
+  // so maybe this will not be needed anymore.
+  if (teleport_location_right.has_value()) {
+    DirectX::XMVECTOR difference_vector = teleport_location_right.value() - m_headset_position;
+    m_current_origin = difference_vector;
+
+    // FIXME: Set the Y value to 0, such that we don't teleport "down" into the floor.
+    // We'll need to have some reliable method to determine the current y value of the floor
+    // (i.e. mesh with terrain flag) under the HMD position to fix this.
+    m_current_origin = DirectX::XMVectorSetY(m_current_origin, 0.0f);
+  }
+  else if (teleport_location_left.has_value()) {
+    DirectX::XMVECTOR teleport_target = teleport_location_left.value();
+  }
 
 	//------------------------------------------------------------------------------------------------------
 	// Update simulation
@@ -693,7 +734,7 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 	view_locate_info.type = XR_TYPE_VIEW_LOCATE_INFO;
 	view_locate_info.viewConfigurationType = m_application_view_type;
 	view_locate_info.displayTime = predicted_time;
-	view_locate_info.space = m_openxr_space;
+	view_locate_info.space = m_openxr_stage_space;
 
 	// Call xrLocateViews, which will give us the number of views we have to render (stored in view_count), as
 	// well as fill in the xr_views vector with the predicted views (which is basically a struct containing
@@ -744,11 +785,11 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 		views[i].subImage.imageRect.extent = { m_swapchains[i].width, m_swapchains[i].height };
 
 		// Render the content to the swapchain, which is done by the D3D11 handler
-		m_dx11_handler.renderFrame(views[i], m_swapchains[i].swapchain_data[swapchain_image_id], draw_callback);
+		m_dx11_handler.renderFrame(views[i], m_swapchains[i].swapchain_data[swapchain_image_id], draw_callback, m_current_origin);
 
 		// Render the controllers
-		m_left_controller->render();
-		m_right_controller->render();
+		m_left_controller->render(m_current_origin);
+		m_right_controller->render(m_current_origin);
 
 		// We're done rendering for the current view, so we can release the swapchain image (i.e. tell
 		// the OpenXR runtime that we're done with this swapchain image).
@@ -765,7 +806,7 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 	//------------------------------------------------------------------------------------------------------
 	// Now thta we're done rendering all views, we can update the layer projection we got passed into
 	// the method with the rendered views, such that we can display them.
-	layer_projection.space = m_openxr_space;
+	layer_projection.space = m_openxr_stage_space;
 	layer_projection.viewCount = (uint32_t)views.size();
 	layer_projection.views = views.data();
 }

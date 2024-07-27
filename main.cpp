@@ -16,6 +16,8 @@ public:
 
   // Create custom models
   Model sphere = Model(DATA_FOLDER "/models/sphere.obj");
+  Model sphere2 = Model(DATA_FOLDER "/models/sphere.obj");
+  Model sphere3 = Model(DATA_FOLDER "/models/sphere.obj");
 
   // Create a line
   Line line = Line({0.0f, 0.0f, 0.0f}, {10.0f, 10.0f, 5.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
@@ -34,6 +36,7 @@ public:
     cube.translate(0.0f, 4.0f, 0.0f);
     cube.setGrabbable(true);
 
+    sphere.scale(0.1f, 0.1f, 0.1f);
     sphere.setGrabbable(true);
 
     // Translate the ground cube up a bit and to the left
@@ -42,6 +45,14 @@ public:
 
     // Squish the ground cube
     ground_cube.scale(1.0f, 0.3f, 1.0f);
+
+    sphere2.scale(0.1f, 0.1f, 0.1f);
+    sphere2.translate(1.0f, 0.0f, 2.0f);
+    sphere2.setColor({1.0f, 0.0f, 0.0f, 1.0f});
+
+    sphere3.scale(0.1f, 0.1f, 0.1f);
+    sphere3.translate(-2.0f, 0.0f, -2.5f);
+    sphere3.setColor({0.0f, 1.0f, 0.0f, 1.0f});
 
     // Set the ground to be terrain
     ground.setIsTerrain(true);
@@ -60,6 +71,8 @@ public:
 
     // Render the sphere
     sphere.render(&color_shader);
+    sphere2.render(&color_shader);
+    sphere3.render(&color_shader);
 
     // Render the cube at the ground
     ground_cube.render(&ambient_shader);

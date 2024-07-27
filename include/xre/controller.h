@@ -1,5 +1,8 @@
 #pragma once
 
+// Other includes
+#include <optional>
+
 // OpenXR includes
 #include <open_xr/openxr.h>
 
@@ -15,10 +18,10 @@ public:
   Controller();
 
   // render a controller
-  void render();
+  void render(DirectX::XMVECTOR current_origin);
 
   // Check whether the controller interacts with any models
-  void sceneModelInteractions();
+  std::optional<DirectX::XMVECTOR> sceneModelInteractions();
 
   // Whether the controller should be rendered or not
   bool m_should_render;

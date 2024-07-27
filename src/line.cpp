@@ -56,24 +56,23 @@ void Line::render(Shader *shader) {
   s_device_context->DrawIndexed(m_index_count, 0, 0);
 }
 
-void Line::updateLineFromXrPose(XrPosef pose, float length) {
-  // The start of the line is simply the position of the pose
-  DirectX::XMFLOAT3 line_start = *((DirectX::XMFLOAT3 *)&pose.position);
-  m_line_start = DirectX::XMLoadFloat3(&line_start);
+void Line::updateAimLineFromControllerPose(DirectX::XMVECTOR controller_position, DirectX::XMVECTOR controller_orientation, DirectX::XMVECTOR current_origin, float length) {
+  // The start of the line is simply the position of the controller
+  m_line_start = controller_position;
 
   // For the end of the line, we assume that we're aiming in negative z direction initially. As such,
   // we first take an unit-vector in negative z direction, and then rotate it with the quaternion
   // given in the XrPosef struct
-  DirectX::XMVECTOR orientation = DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&pose.orientation);
-  m_line_direction = DirectX::XMVector3Rotate(DirectX::XMVECTORF32({0.0f, 0.0f, -1.0f}), orientation);
+  m_line_direction = DirectX::XMVector3Rotate(DirectX::XMVECTORF32({0.0f, 0.0f, -1.0f}), controller_orientation);
 
   // Stretch the direction vector to have the given length. As the vector has unit length, we can simply
   // multiply each component by the passed in length.
   DirectX::XMVECTOR stretched_direction = m_line_direction * length;
+  DirectX::XMVECTOR line_end_vec = DirectX::XMVectorAdd(stretched_direction, m_line_start);
 
-  DirectX::XMVECTOR line_end_vec = DirectX::XMVectorAdd(stretched_direction, DirectX::XMLoadFloat3(&line_start));
-
-  // Store the vector in an xmfloat3
+  // Store the vectors in xmfloat3 to build vertices for the lines
+  DirectX::XMFLOAT3 line_start;
+  DirectX::XMStoreFloat3(&line_start, m_line_start);
   DirectX::XMFLOAT3 line_end;
   DirectX::XMStoreFloat3(&line_end, line_end_vec);
 
