@@ -660,16 +660,10 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
   // precedende. Later, we might map the teleport action to a single controller anyway,
   // so maybe this will not be needed anymore.
   if (teleport_location_right.has_value()) {
-    DirectX::XMVECTOR difference_vector = teleport_location_right.value() - m_headset_position;
-    m_current_origin = difference_vector;
-
-    // FIXME: Set the Y value to 0, such that we don't teleport "down" into the floor.
-    // We'll need to have some reliable method to determine the current y value of the floor
-    // (i.e. mesh with terrain flag) under the HMD position to fix this.
-    m_current_origin = DirectX::XMVectorSetY(m_current_origin, 0.0f);
+    updateCurrentOriginForTeleport(teleport_location_right.value());
   }
   else if (teleport_location_left.has_value()) {
-    DirectX::XMVECTOR teleport_target = teleport_location_left.value();
+    updateCurrentOriginForTeleport(teleport_location_left.value());
   }
 
 	//------------------------------------------------------------------------------------------------------
@@ -817,4 +811,14 @@ ID3D11Device* OpenXrHandler::getDevice() {
 
 ID3D11DeviceContext* OpenXrHandler::getDeviceContext() {
   return m_dx11_handler.getDeviceContext();
+}
+
+void OpenXrHandler::updateCurrentOriginForTeleport(DirectX::XMVECTOR teleport_location) {
+  DirectX::XMVECTOR difference_vector = teleport_location- m_headset_position;
+  m_current_origin = difference_vector;
+
+  // FIXME: Set the Y value to 0, such that we don't teleport "down" into the floor.
+  // We'll need to have some reliable method to determine the current y value of the floor
+  // (i.e. mesh with terrain flag) under the HMD position to fix this.
+  m_current_origin = DirectX::XMVectorSetY(m_current_origin, 0.0f);
 }
