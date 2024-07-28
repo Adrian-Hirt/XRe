@@ -2,15 +2,24 @@
 
 XRe is a small toy project to build a XR engine using OpenXR and DirectX
 
-Please note that XRe is a WIP project and mainly intended for me to learn more about OpenXR, DirectX and XR development for the moment.
+Please note that XRe is a WIP project and mainly intended for me to learn more about OpenXR, DirectX and XR development for the moment. It is
+not (yet) meant to be used for XR development directly.
 
 ## Features
 
-Currently, XRe features a rendering loop with the possiblity to manually define models, as well as loading models from `.obj` files.
-It can also render text and flat bitmaps, as well as lines. It tracks the controllers of the user and registers a `grab` action for the
-controllers, rendering the grabbing controller red.
+XRe currently has the following features:
 
-Bounding boxes are implemented as well, and a WIP version of collision detection (to make objects grabable) is also implemented.
+* Full Rendering loop with separate methods to update the simulation (with predicted render time passed in) and render the scene.
+* Defining models from vertices as well as loading models from `.obj` files
+* Rendering text and flat bitmaps
+* Rendering simple lines
+* Controller tracking
+  - Tracking of the `grab` action on controllers
+* Ability to move / rotate objects in the scene by grabbing
+* Bounding boxes for objects
+* Teleporting to other locations in the scene
+* Tracking the aim of the user and highlighting intersections of the aim and the scene.
+* Various shaders (e.g. ambient lighting, textured models)
 
 ### Screenshots
 
