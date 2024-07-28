@@ -70,6 +70,9 @@ public:
   // Update the grabbable state of a model
   void setGrabbable(bool grabbable);
 
+  void setGrabbed(bool grabbed);
+  bool getGrabbed();
+
   // Update the is_terrain state of a model
   void setIsTerrain(bool is_terrain);
 
@@ -86,6 +89,9 @@ private:
 
   // Set of all instances we marked as being terrain models
   inline static std::unordered_set<Model*> s_terrain_instances;
+
+  // Track whether a model is currently grabbed (e.g. to stop animations when object is grabbed)
+  bool m_grabbed = false;
 
   // Vector holding all the meshes of this model
   std::vector<Mesh> m_meshes;

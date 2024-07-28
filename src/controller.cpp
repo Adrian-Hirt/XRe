@@ -63,6 +63,8 @@ std::optional<DirectX::XMVECTOR> Controller::sceneModelInteractions() {
 
   // Check if any of our controllers is grabbing a grabbable model
   for(Model *current_model : Model::getGrabbableInstances()) {
+    current_model->setGrabbed(false);
+
     // TODO: maybe set a bit a better indicator that an object is intersecting, e.g. a glow effect
     if(current_model->intersects(controller_bounding_box)) {
       // Set a different color if the controller is intersecting another model
@@ -71,6 +73,7 @@ std::optional<DirectX::XMVECTOR> Controller::sceneModelInteractions() {
       // Also, if the controller is grabbing, set the position and the rotation of the
       // model to those of the controller
       if (m_grabbing) {
+        current_model->setGrabbed(true);
         current_model->setPosition(m_model.getPosition());
         current_model->setRotation(m_model.getRotation());
       }

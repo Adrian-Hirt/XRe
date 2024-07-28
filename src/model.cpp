@@ -310,6 +310,14 @@ void Model::setGrabbable(bool grabbable) {
   }
 }
 
+void Model::setGrabbed(bool grabbed) {
+  m_grabbed = grabbed;
+}
+
+bool Model::getGrabbed() {
+  return m_grabbed;
+}
+
 std::unordered_set<Model*> Model::getGrabbableInstances() {
   return s_grabbable_instances;
 }
