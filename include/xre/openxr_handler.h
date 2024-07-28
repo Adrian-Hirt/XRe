@@ -84,7 +84,8 @@ private:
   // Methods
   bool initializeOpenxr();
   void initializeOpenxrActions();
-  void suggestBindings();
+  void setupActionBindings();
+  void suggestBindings(std::string interaction_profile, std::vector<XrActionSuggestedBinding> bindings);
   void pollOpenxrActions(XrTime predicted_time);
   void updateControllerStates(Controller *controller, XrTime predicted_time);
   void updateCurrentOriginForTeleport(DirectX::XMVECTOR teleport_location);

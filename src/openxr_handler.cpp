@@ -343,7 +343,7 @@ void OpenXrHandler::initializeOpenxrActions() {
 	result = xrCreateAction(m_default_action_set, &teleport_action_create_info, &m_controller_teleport_action);
 	Utils::checkXrResult(result, "Coult not create the teleport action");
 
-  suggestBindings();
+  setupActionBindings();
 
 	// Create the pose spaces for both controllers
 	XrActionSpaceCreateInfo grip_pose_space_create_info = {};
@@ -386,33 +386,44 @@ void OpenXrHandler::initializeOpenxrActions() {
 	Utils::checkXrResult(result, "Failed to attach the action set to the session");
 }
 
-void OpenXrHandler::suggestBindings() {
+void OpenXrHandler::setupActionBindings() {
   XrResult result;
 
   // Setup the suggested bindings, i.e. we suggest the runtime what path we want to
 	// bind a specific action to. As the name says, this is only a suggestion and the
 	// runtime may change a binding, e.g. if a user re-maps inputs on their device.
-	std::vector<XrActionSuggestedBinding> suggested_action_bindings;
 
-  // Pose
-  suggested_action_bindings.push_back({ m_controller_pose_action, getXrPathFromString("/user/hand/left/input/grip/pose") });
-  suggested_action_bindings.push_back({ m_controller_pose_action, getXrPathFromString("/user/hand/right/input/grip/pose") });
+  // Setup the bindings for the khr/simple_controller binding
+  {
+    std::vector<XrActionSuggestedBinding> suggested_action_bindings;
 
-  // Aim
-  suggested_action_bindings.push_back({ m_controller_aim_action, getXrPathFromString("/user/hand/left/input/aim/pose") });
-  suggested_action_bindings.push_back({ m_controller_aim_action, getXrPathFromString("/user/hand/right/input/aim/pose") });
+    // Pose
+    suggested_action_bindings.push_back({ m_controller_pose_action, getXrPathFromString("/user/hand/left/input/grip/pose") });
+    suggested_action_bindings.push_back({ m_controller_pose_action, getXrPathFromString("/user/hand/right/input/grip/pose") });
 
-  // Grab
-  suggested_action_bindings.push_back({ m_controller_grab_action, getXrPathFromString("/user/hand/right/input/select/click") });
+    // Aim
+    suggested_action_bindings.push_back({ m_controller_aim_action, getXrPathFromString("/user/hand/left/input/aim/pose") });
+    suggested_action_bindings.push_back({ m_controller_aim_action, getXrPathFromString("/user/hand/right/input/aim/pose") });
 
-  // Teleport
-  suggested_action_bindings.push_back({ m_controller_teleport_action, getXrPathFromString("/user/hand/left/input/select/click") });
+    // Grab
+    suggested_action_bindings.push_back({ m_controller_grab_action, getXrPathFromString("/user/hand/right/input/select/click") });
 
-	XrInteractionProfileSuggestedBinding suggested_binding = {};
-	suggested_binding.type = XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING;					// Set type for the struct
-	suggested_binding.interactionProfile = getXrPathFromString("/interaction_profiles/khr/simple_controller"); // Set the interaction profile
-	suggested_binding.countSuggestedBindings = suggested_action_bindings.size();	// Set the number of suggested bindings
-	suggested_binding.suggestedBindings = suggested_action_bindings.data();								// And finally, set the previously defined suggested bindings
+    // Teleport
+    suggested_action_bindings.push_back({ m_controller_teleport_action, getXrPathFromString("/user/hand/left/input/select/click") });
+
+    suggestBindings("/interaction_profiles/khr/simple_controller", suggested_action_bindings);
+  }
+
+}
+
+void OpenXrHandler::suggestBindings(std::string interaction_profile, std::vector<XrActionSuggestedBinding> bindings) {
+  XrResult result;
+
+  XrInteractionProfileSuggestedBinding suggested_binding = {};
+	suggested_binding.type = XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING;          // Set type for the struct
+	suggested_binding.interactionProfile = getXrPathFromString(interaction_profile); // Set the interaction profile
+	suggested_binding.countSuggestedBindings = bindings.size();                      // Set the number of suggested bindings
+	suggested_binding.suggestedBindings = bindings.data();                           // And finally, set the previously defined suggested bindings
 	result = xrSuggestInteractionProfileBindings(m_openxr_instance, &suggested_binding);
 	Utils::checkXrResult(result, "Failed to suggest the interaction profile bindings");
 }
