@@ -414,6 +414,29 @@ void OpenXrHandler::setupActionBindings() {
     suggestBindings("/interaction_profiles/khr/simple_controller", suggested_action_bindings);
   }
 
+  // Setup bindings for oculus/touch_controller
+  {
+    std::vector<XrActionSuggestedBinding> suggested_action_bindings;
+
+    // Pose
+    suggested_action_bindings.push_back({ m_controller_pose_action, getXrPathFromString("/user/hand/left/input/grip/pose") });
+    suggested_action_bindings.push_back({ m_controller_pose_action, getXrPathFromString("/user/hand/right/input/grip/pose") });
+
+    // Aim
+    suggested_action_bindings.push_back({ m_controller_aim_action, getXrPathFromString("/user/hand/left/input/aim/pose") });
+    suggested_action_bindings.push_back({ m_controller_aim_action, getXrPathFromString("/user/hand/right/input/aim/pose") });
+
+    // Grab
+    suggested_action_bindings.push_back({ m_controller_grab_action, getXrPathFromString("/user/hand/left/input/squeeze/value") });
+    suggested_action_bindings.push_back({ m_controller_grab_action, getXrPathFromString("/user/hand/right/input/squeeze/value") });
+
+    // Teleport
+    suggested_action_bindings.push_back({ m_controller_teleport_action, getXrPathFromString("/user/hand/left/input/x/click") });
+    suggested_action_bindings.push_back({ m_controller_teleport_action, getXrPathFromString("/user/hand/right/input/a/click") });
+
+    suggestBindings("/interaction_profiles/oculus/touch_controller", suggested_action_bindings);
+  }
+
 }
 
 void OpenXrHandler::suggestBindings(std::string interaction_profile, std::vector<XrActionSuggestedBinding> bindings) {
