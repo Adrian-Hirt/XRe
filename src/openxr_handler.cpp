@@ -343,67 +343,35 @@ void OpenXrHandler::initializeOpenxrActions() {
 	result = xrCreateAction(m_default_action_set, &teleport_action_create_info, &m_controller_teleport_action);
 	Utils::checkXrResult(result, "Coult not create the teleport action");
 
-	// Bind the previously added actions to the controllers. We'll be using the "simple controller"
-	// interaction path from Khronos, as this is a generic profile that should work with most
-	// input controllers that we'll encounter.
-	XrPath controller_profile_path;
-	result = xrStringToPath(m_openxr_instance, "/interaction_profiles/khr/simple_controller", &controller_profile_path);
-	Utils::checkXrResult(result, "Coult not create path from string for the simple controller interaction profile");
-
-	// Create the paths for the pose of the controller for both the left and the right input
-	result = xrStringToPath(m_openxr_instance, "/user/hand/left/input/grip/pose", &(m_left_controller->m_pose_path));
-	Utils::checkXrResult(result, "Coult not create path from string for the left input pose");
-	result = xrStringToPath(m_openxr_instance, "/user/hand/right/input/grip/pose", &(m_right_controller->m_pose_path));
-	Utils::checkXrResult(result, "Coult not create path from string for the right input pose");
-
-	// Create the paths for the aim of the controller for both the left and the right input
-	result = xrStringToPath(m_openxr_instance, "/user/hand/left/input/aim/pose", &(m_left_controller->m_aim_path));
-	Utils::checkXrResult(result, "Coult not create path from string for the left input pose");
-	result = xrStringToPath(m_openxr_instance, "/user/hand/right/input/aim/pose", &(m_right_controller->m_aim_path));
-	Utils::checkXrResult(result, "Coult not create path from string for the right input pose");
-
-  // Create the paths for the grab action for both the left and the right controller
-  // TODO: Re-enable this and map teleport to another action
-	// result = xrStringToPath(m_openxr_instance, "/user/hand/left/input/select/click", &(m_left_controller->m_grab_path));
-	// Utils::checkXrResult(result, "Coult not create path from string for the left grab pose");
-	result = xrStringToPath(m_openxr_instance, "/user/hand/right/input/select/click", &(m_right_controller->m_grab_path));
-	Utils::checkXrResult(result, "Coult not create path from string for the right grab pose");
-
-  // Create the paths for the teleport action for both the left and the right controller
-	result = xrStringToPath(m_openxr_instance, "/user/hand/left/input/select/click", &(m_left_controller->m_teleport_path));
-	Utils::checkXrResult(result, "Coult not create path from string for the left grab pose");
-	// result = xrStringToPath(m_openxr_instance, "/user/hand/right/input/select/click", &(m_right_controller->m_teleport_path));
-	// Utils::checkXrResult(result, "Coult not create path from string for the right grab pose");
-
 	// Setup the suggested bindings, i.e. we suggest the runtime what path we want to
 	// bind a specific action to. As the name says, this is only a suggestion and the
 	// runtime may change a binding, e.g. if a user re-maps inputs on their device.
 	XrActionSuggestedBinding suggested_action_bindings[6];
   // Pose
 	suggested_action_bindings[0].action = m_controller_pose_action;
-	suggested_action_bindings[0].binding = m_left_controller->m_pose_path;
+	suggested_action_bindings[0].binding = getXrPathFromString("/user/hand/left/input/grip/pose");
 	suggested_action_bindings[1].action = m_controller_pose_action;
-	suggested_action_bindings[1].binding = m_right_controller->m_pose_path;
+	suggested_action_bindings[1].binding = getXrPathFromString("/user/hand/right/input/grip/pose");
   // Aim
 	suggested_action_bindings[2].action = m_controller_aim_action;
-	suggested_action_bindings[2].binding = m_left_controller->m_aim_path;
+	suggested_action_bindings[2].binding = getXrPathFromString("/user/hand/left/input/aim/pose");
 	suggested_action_bindings[3].action = m_controller_aim_action;
-	suggested_action_bindings[3].binding = m_right_controller->m_aim_path;
+	suggested_action_bindings[3].binding = getXrPathFromString("/user/hand/right/input/aim/pose");
   // Grab
   // TODO: Re-enable this and map teleport to another action
   // suggested_action_bindings[4].action = m_controller_grab_action;
-	// suggested_action_bindings[4].binding = m_left_controller->m_grab_path;
+	// suggested_action_bindings[4].binding = getXrPathFromString("/user/hand/left/input/select/click");
 	suggested_action_bindings[5].action = m_controller_grab_action;
-	suggested_action_bindings[5].binding = m_right_controller->m_grab_path;
+	suggested_action_bindings[5].binding = getXrPathFromString("/user/hand/right/input/select/click");
   // Teleport
   suggested_action_bindings[4].action = m_controller_teleport_action;
-	suggested_action_bindings[4].binding = m_left_controller->m_teleport_path;
+	suggested_action_bindings[4].binding = getXrPathFromString("/user/hand/left/input/select/click");
 	// suggested_action_bindings[5].action = m_controller_teleport_action;
-	// suggested_action_bindings[5].binding = m_right_controller->m_teleport_path;
+	// suggested_action_bindings[5].binding = getXrPathFromString("/user/hand/right/input/select/click");
 
 	XrInteractionProfileSuggestedBinding suggested_binding = {};
 	suggested_binding.type = XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING;					// Set type for the struct
-	suggested_binding.interactionProfile = controller_profile_path;									// Set our previously created interaction profile
+	suggested_binding.interactionProfile = getXrPathFromString("/interaction_profiles/khr/simple_controller"); // Set the interaction profile
 	suggested_binding.countSuggestedBindings = _countof(suggested_action_bindings);	// Set the number of suggested bindings
 	suggested_binding.suggestedBindings = suggested_action_bindings;								// And finally, set the previously defined suggested bindings
 	result = xrSuggestInteractionProfileBindings(m_openxr_instance, &suggested_binding);
@@ -825,4 +793,15 @@ void OpenXrHandler::updateCurrentOriginForTeleport(DirectX::XMVECTOR teleport_lo
   // We'll need to have some reliable method to determine the current y value of the floor
   // (i.e. mesh with terrain flag) under the HMD position to fix this.
   m_current_origin = DirectX::XMVectorSetY(m_current_origin, 0.0f);
+}
+
+XrPath OpenXrHandler::getXrPathFromString(std::string string) {
+  XrPath path;
+  XrResult result;
+
+  std::string error = "Coult not create path from string " + string;
+  result = xrStringToPath(m_openxr_instance, string.c_str(), &path);
+	Utils::checkXrResult(result, error.c_str());
+
+  return path;
 }

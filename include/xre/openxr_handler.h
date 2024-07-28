@@ -87,4 +87,6 @@ private:
   void pollOpenxrActions(XrTime predicted_time);
   void updateControllerStates(Controller *controller, XrTime predicted_time);
   void updateCurrentOriginForTeleport(DirectX::XMVECTOR teleport_location);
+
+  XrPath getXrPathFromString(std::string string);
 };
