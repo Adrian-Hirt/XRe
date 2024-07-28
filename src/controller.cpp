@@ -83,7 +83,6 @@ std::optional<DirectX::XMVECTOR> Controller::sceneModelInteractions() {
   // Next, check if we need to render the aim intersection sphere
   m_render_intersection_sphere = false;
 
-  // TODO: replace return values by updating a member value in the methods
   float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(Model::getGrabbableInstances());
   float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(Model::getTerrainInstances());
 
@@ -95,11 +94,17 @@ std::optional<DirectX::XMVECTOR> Controller::sceneModelInteractions() {
     DirectX::XMVECTOR sphere_position = m_aim_line.getLineStart();
     sphere_position = DirectX::XMVectorAdd(sphere_position, stretched_direction);
     m_aim_indicator_sphere.setPosition(sphere_position);
+    m_aim_indicator_sphere.setColor({0.0f, 0.75f, 1.0f, 1.0f});
 
-    // If a teleporting is requested and there is an intersection sphere rendered, we can
-    // check whether the target is a terrain, and if yes, teleport to that location.
-    if (m_teleporting_requested && closest_terrain_aim_intersection < closest_grabbable_aim_intersection) {
-      return sphere_position;
+    if (closest_terrain_aim_intersection < closest_grabbable_aim_intersection) {
+      // Paint the indicator spheres yellow if we can teleport to their location
+      m_aim_indicator_sphere.setColor({1.0f, 1.0f, 0.0f, 1.0f});
+
+      // If a teleporting is requested and there is an intersection sphere rendered, we can
+      // check whether the target is a terrain, and if yes, teleport to that location.
+      if (m_teleporting_requested) {
+        return sphere_position;
+      }
     }
   }
 
