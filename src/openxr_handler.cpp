@@ -324,8 +324,8 @@ void OpenXrHandler::initializeOpenxrActions() {
 	grab_action_create_info.type = XR_TYPE_ACTION_CREATE_INFO;                // Set the type of the create info
 	strcpy_s(grab_action_create_info.actionName, "controller_grab");          // Set a name for the action
 	strcpy_s(grab_action_create_info.localizedActionName, "Controller Grab"); // Add a "localized" name for the action
-	grab_action_create_info.countSubactionPaths = 1;                          // We'll be using two subaction paths (left / right controller)
-	grab_action_create_info.subactionPaths = right_controller_path;                // Pass in the controller paths
+	grab_action_create_info.countSubactionPaths = 2;                          // We'll be using two subaction paths (left / right controller)
+	grab_action_create_info.subactionPaths = controller_paths;                // Pass in the controller paths
 	grab_action_create_info.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;        // Finally, tell OpenXR that this input is a boolean input
 
 	result = xrCreateAction(m_default_action_set, &grab_action_create_info, &m_controller_grab_action);
@@ -336,8 +336,8 @@ void OpenXrHandler::initializeOpenxrActions() {
 	teleport_action_create_info.type = XR_TYPE_ACTION_CREATE_INFO;                    // Set the type of the create info
 	strcpy_s(teleport_action_create_info.actionName, "controller_teleport");          // Set a name for the action
 	strcpy_s(teleport_action_create_info.localizedActionName, "Controller Teleport"); // Add a "localized" name for the action
-	teleport_action_create_info.countSubactionPaths = 1;                              // We'll be using two subaction paths (left / right controller)
-	teleport_action_create_info.subactionPaths = left_controller_path;                    // Pass in the controller paths
+	teleport_action_create_info.countSubactionPaths = 2;                              // We'll be using two subaction paths (left / right controller)
+	teleport_action_create_info.subactionPaths = controller_paths;                    // Pass in the controller paths
 	teleport_action_create_info.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;            // Finally, tell OpenXR that this input is a boolean input
 
 	result = xrCreateAction(m_default_action_set, &teleport_action_create_info, &m_controller_teleport_action);
