@@ -29,20 +29,16 @@ public:
   // Path for the controller, e.g. `/user/hand/left`
   XrPath m_controller_path;
 
-  // Path and space for the pose action
-  XrPath m_pose_path;
+  // Space for the pose action
   XrSpace m_pose_space;
 
-  // Path and space for the aim action
-  XrPath m_aim_path;
+  // Space for the aim action
   XrSpace m_aim_space;
 
-  // Path and boolean for the grab action
-  XrPath m_grab_path;
+  // Boolean for the grab action
   bool m_grabbing = false;
 
-  // Path and space for the teleport action
-  XrPath m_teleport_path;
+  // Space for the teleport action
   bool m_teleporting_requested = false;
 
   // Pose of the controller
