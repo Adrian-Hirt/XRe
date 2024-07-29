@@ -414,6 +414,7 @@ void OpenXrHandler::setupActionBindings() {
     suggestBindings("/interaction_profiles/khr/simple_controller", suggested_action_bindings);
   }
 
+#ifdef ENABLE_ACTION_BINDINGS
   // Setup bindings for oculus/touch_controller
   {
     std::vector<XrActionSuggestedBinding> suggested_action_bindings;
@@ -436,7 +437,7 @@ void OpenXrHandler::setupActionBindings() {
 
     suggestBindings("/interaction_profiles/oculus/touch_controller", suggested_action_bindings);
   }
-
+#endif
 }
 
 void OpenXrHandler::suggestBindings(std::string interaction_profile, std::vector<XrActionSuggestedBinding> bindings) {

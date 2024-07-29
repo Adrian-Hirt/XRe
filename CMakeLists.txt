@@ -7,6 +7,10 @@ set(TARGET_ARCHITECTURE x64)
 # TODO: remove and fix warnings
 add_compile_options(-Wno-ignored-attributes)
 
+# Enable Action bindings other than khr/simple_controller. Comment this out to only use
+# khr/simple_controller for the Mixed Reality-Portal debugging.
+# add_compile_definitions(ENABLE_ACTION_BINDINGS)
+
 find_library(OPENXR NAMES openxr_loader PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib/open_xr/${TARGET_ARCHITECTURE}/${CMAKE_BUILD_TYPE})
 message(STATUS "***** find_library returned ${OPENXR} *****")
 message(STATUS "***** CMake Build type: ${CMAKE_BUILD_TYPE} *****")
