@@ -41,18 +41,61 @@ OpenXrHandler::~OpenXrHandler() {}
 bool OpenXrHandler::initializeOpenxr() {
   XrResult result;
 
+  //------------------------------------------------------------------------------------------------------
+	// Setup requested extensions
+	//------------------------------------------------------------------------------------------------------
+  std::vector<const char *> requested_extensions = {
+    XR_KHR_D3D11_ENABLE_EXTENSION_NAME,
+    XR_EXT_HAND_TRACKING_EXTENSION_NAME,
+    XR_EXT_HAND_INTERACTION_EXTENSION_NAME
+  };
+
+  //------------------------------------------------------------------------------------------------------
+	// Query available extensions
+	//------------------------------------------------------------------------------------------------------
+  // First we need to query the number of available extensions
+  uint32_t extension_count = 0;
+	result = xrEnumerateInstanceExtensionProperties(NULL, 0, &extension_count, NULL);
+	if (XR_FAILED(result)) {
+		return false;
+	}
+
+	// Now that we know how many extensions we have, create a vector containing the data
+  std::vector<XrExtensionProperties> extension_properties(extension_count, { XR_TYPE_EXTENSION_PROPERTIES });
+
+	// Now we again call xrEnumerateViewConfigurationViews, this time we set the 4th param
+	// to the number of our viewports, such that the method fills the xr_view_configurations
+	// vector with the actual view configurations
+	result = xrEnumerateInstanceExtensionProperties(NULL, extension_count, &extension_count, extension_properties.data());
+	if (XR_FAILED(result)) {
+		return false;
+  }
+
+  // Check for each requested extension that it is available.
+  for (const char * extension : requested_extensions) {
+    bool found_extension = false;
+
+    for (XrExtensionProperties extension_property : extension_properties) {
+      if (strcmp(extension, extension_property.extensionName) == 0) {
+        found_extension = true;
+        break;
+      }
+    }
+
+    if (!found_extension) {
+      std::cout << "Did not find requested extension " << extension << std::endl;
+      return false;
+    }
+  }
+
 	//------------------------------------------------------------------------------------------------------
 	// OpenXR Instance
 	//------------------------------------------------------------------------------------------------------
-  // First, setup the OpenXR instance. We're only using the DirectX11 extension for now.
-  // other extensions might be added later.
-  const char* extensions[] = { XR_KHR_D3D11_ENABLE_EXTENSION_NAME };
-
   // Create the param struct
   XrInstanceCreateInfo instance_create_info = {};
 	instance_create_info.type = XR_TYPE_INSTANCE_CREATE_INFO;
-	instance_create_info.enabledExtensionCount = 1;
-	instance_create_info.enabledExtensionNames = extensions;
+	instance_create_info.enabledExtensionCount = requested_extensions.size();
+	instance_create_info.enabledExtensionNames = requested_extensions.data();
 	instance_create_info.applicationInfo.apiVersion = XR_CURRENT_API_VERSION;
 	strcpy_s(instance_create_info.applicationInfo.applicationName, 128, m_application_name);
 
