@@ -18,6 +18,7 @@
 #include <xre/structs.h>
 #include <xre/dx11_handler.h>
 #include <xre/controller.h>
+#include <xre/hand.h>
 
 // Other includes
 #include <iostream>
@@ -58,15 +59,26 @@ private:
   std::vector<XrView> m_openxr_views;
   std::vector<XrViewConfigurationView> m_openxr_view_configuration_views;
 
+  // System properties
+  XrSystemProperties m_openxr_system_properties = { XR_TYPE_SYSTEM_PROPERTIES };
+  XrSystemHandTrackingPropertiesEXT m_openxr_hand_tracking_system_properties = { XR_TYPE_SYSTEM_HAND_TRACKING_PROPERTIES_EXT };
+
   // Swapchains
   std::vector<swapchain_t> m_swapchains;
 
   // Pointers to ext functions we need to use
   PFN_xrGetD3D11GraphicsRequirementsKHR m_ext_xrGetD3D11GraphicsRequirementsKHR;
+  PFN_xrCreateHandTrackerEXT m_ext_xrCreateHandTrackerEXT;
+  PFN_xrDestroyHandTrackerEXT m_ext_xrDestroyHandTrackerEXT;
+  PFN_xrLocateHandJointsEXT m_ext_xrLocateHandJointsEXT;
 
   // Controllers
   Controller *m_left_controller = NULL;
   Controller *m_right_controller = NULL;
+
+  // Hands
+  Hand *m_left_hand = NULL;
+  Hand *m_right_hand = NULL;
 
   // Actions
   XrActionSet m_default_action_set;
@@ -84,10 +96,12 @@ private:
   // Methods
   bool initializeOpenxr();
   void initializeOpenxrActions();
+  void initializeHandTracking();
   void setupActionBindings();
   void suggestBindings(std::string interaction_profile, std::vector<XrActionSuggestedBinding> bindings);
   void pollOpenxrActions(XrTime predicted_time);
   void updateControllerStates(Controller *controller, XrTime predicted_time);
+  void updateHandTrackingStates(Hand *hand, XrTime predicted_time);
   void updateCurrentOriginForTeleport(DirectX::XMVECTOR teleport_location);
   XrPath getXrPathFromString(std::string string);
 };

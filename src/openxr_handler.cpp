@@ -28,6 +28,10 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
 
   // Instruct the handler to initialize the xr actions
   initializeOpenxrActions();
+
+  // Instruct the handler to initialize the hand tracking (will not do anything
+  // if hand tracking is not enabled).
+  initializeHandTracking();
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -46,8 +50,8 @@ bool OpenXrHandler::initializeOpenxr() {
 	//------------------------------------------------------------------------------------------------------
   std::vector<const char *> requested_extensions = {
     XR_KHR_D3D11_ENABLE_EXTENSION_NAME,
-    XR_EXT_HAND_TRACKING_EXTENSION_NAME,
-    XR_EXT_HAND_INTERACTION_EXTENSION_NAME
+    XR_EXT_HAND_TRACKING_EXTENSION_NAME
+    // XR_EXT_HAND_INTERACTION_EXTENSION_NAME // Not supported on Quest at the moment it seems
   };
 
   //------------------------------------------------------------------------------------------------------
@@ -116,6 +120,12 @@ bool OpenXrHandler::initializeOpenxr() {
 		return false;
 	}
 
+  // Get the systems properties for some information about the hardware. We also get system properties
+  // about the hand tracking support.
+  m_openxr_system_properties.next = &m_openxr_hand_tracking_system_properties;
+  result = xrGetSystemProperties(m_openxr_instance, m_openxr_system_id, &m_openxr_system_properties);
+  Utils::checkXrResult(result, "Failed to get system properties");
+
 	//------------------------------------------------------------------------------------------------------
 	// OpenXR Session
 	//------------------------------------------------------------------------------------------------------
@@ -127,9 +137,24 @@ bool OpenXrHandler::initializeOpenxr() {
 		return false;
 	}
 
-	// Get the address of the "xrGetD3D11GraphicsRequirementsKHR" function and store it, such that we can
-	// call the function. As of now, it seems it's not yet possible to directly call the function
-	xrGetInstanceProcAddr(m_openxr_instance, "xrGetD3D11GraphicsRequirementsKHR", (PFN_xrVoidFunction*)(&m_ext_xrGetD3D11GraphicsRequirementsKHR));
+	// Get the address of the ext funtions and store, such that we can call the function. This is the more portable
+  // way of calling extension functions.
+	result = xrGetInstanceProcAddr(m_openxr_instance, "xrGetD3D11GraphicsRequirementsKHR", (PFN_xrVoidFunction*)(&m_ext_xrGetD3D11GraphicsRequirementsKHR));
+  if (XR_FAILED(result)) {
+    return false;
+  };
+
+  // Only load the handtracking extensions if we actually can use them
+  if (m_openxr_hand_tracking_system_properties.supportsHandTracking) {
+    result = xrGetInstanceProcAddr(m_openxr_instance, "xrCreateHandTrackerEXT", (PFN_xrVoidFunction*)(&m_ext_xrCreateHandTrackerEXT));
+    Utils::checkXrResult(result, "Failed to get the xrCreateHandTrackerEXT function pointer");
+
+    result = xrGetInstanceProcAddr(m_openxr_instance, "xrDestroyHandTrackerEXT", (PFN_xrVoidFunction*)(&m_ext_xrDestroyHandTrackerEXT));
+    Utils::checkXrResult(result, "Failed to get the xrDestroyHandTrackerEXT function pointer");
+
+    result = xrGetInstanceProcAddr(m_openxr_instance, "xrLocateHandJointsEXT", (PFN_xrVoidFunction*)(&m_ext_xrLocateHandJointsEXT));
+    Utils::checkXrResult(result, "Failed to get the xrLocateHandJointsEXT function pointer");
+  }
 
 	XrGraphicsRequirementsD3D11KHR graphics_requirements = {};
 	graphics_requirements.type = XR_TYPE_GRAPHICS_REQUIREMENTS_D3D11_KHR;
@@ -589,6 +614,11 @@ void OpenXrHandler::pollOpenxrActions(XrTime predicted_time) {
 	updateControllerStates(m_left_controller, predicted_time);
 	updateControllerStates(m_right_controller, predicted_time);
 
+  // Update the hand tracking (these methods will simply do nothing if
+  // hand tracking is not enabled);
+  updateHandTrackingStates(m_left_hand, predicted_time);
+  updateHandTrackingStates(m_right_hand, predicted_time);
+
   // Update the location of the headset
   XrSpaceLocation space_location = {};
   space_location.type = XR_TYPE_SPACE_LOCATION;
@@ -663,6 +693,37 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
     // Update whether the user requested to be teleported in this frame.
     controller->m_teleporting_requested = teleport_state.isActive && teleport_state.currentState && teleport_state.changedSinceLastSync;
   }
+}
+
+void OpenXrHandler::updateHandTrackingStates(Hand *hand, XrTime predicted_time) {
+  XrResult result;
+
+  // Return if the runtime does not support hand tracking
+  if (!m_openxr_hand_tracking_system_properties.supportsHandTracking) {
+    return;
+  }
+
+  // Throw an error if the hand is a nullptr
+  if (hand == nullptr) {
+    Utils::exitWithMessage("Hand is a nullptr!");
+  }
+
+  XrHandJointsMotionRangeInfoEXT hand_joints_motion_range_info = {};
+  hand_joints_motion_range_info.type = XR_TYPE_HAND_JOINTS_MOTION_RANGE_INFO_EXT;
+  hand_joints_motion_range_info.handJointsMotionRange = XR_HAND_JOINTS_MOTION_RANGE_UNOBSTRUCTED_EXT;
+
+  XrHandJointsLocateInfoEXT hand_joints_locate_info = {};
+  hand_joints_locate_info.type = XR_TYPE_HAND_JOINTS_LOCATE_INFO_EXT;
+  hand_joints_locate_info.next = &hand_joints_motion_range_info;
+  hand_joints_locate_info.baseSpace = m_openxr_stage_space;
+  hand_joints_locate_info.time = predicted_time;
+
+  XrHandJointLocationsEXT hand_joint_locations = {};
+  hand_joint_locations.type = XR_TYPE_HAND_JOINT_LOCATIONS_EXT;
+  hand_joint_locations.jointCount = (uint32_t) XR_HAND_JOINT_COUNT_EXT;
+  hand_joint_locations.jointLocations = hand->m_joint_locations;
+  result = m_ext_xrLocateHandJointsEXT(hand->m_hand_tracker, &hand_joints_locate_info, &hand_joint_locations);
+  Utils::checkXrResult(result, "Failed to locate hand joints");
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -834,6 +895,12 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 		m_left_controller->render(m_current_origin);
 		m_right_controller->render(m_current_origin);
 
+    // Render the hands if the hands are not null pointers
+    if (m_left_hand != nullptr && m_right_hand != nullptr) {
+      m_left_hand->render(m_current_origin);
+      m_right_hand->render(m_current_origin);
+    }
+
 		// We're done rendering for the current view, so we can release the swapchain image (i.e. tell
 		// the OpenXR runtime that we're done with this swapchain image).
 		// We have to pass in a XrSwapchainImageReleaseInfo, but at the moment, this struct doesn't
@@ -881,4 +948,25 @@ XrPath OpenXrHandler::getXrPathFromString(std::string string) {
 	Utils::checkXrResult(result, error.c_str());
 
   return path;
+}
+
+void OpenXrHandler::initializeHandTracking() {
+  XrResult result;
+
+  // Return if the runtime does not support hand tracking
+  if (!m_openxr_hand_tracking_system_properties.supportsHandTracking) {
+    return;
+  }
+
+  m_left_hand = new Hand(XR_HAND_LEFT_EXT);
+  m_right_hand = new Hand(XR_HAND_RIGHT_EXT);
+
+  for (Hand *hand : { m_left_hand, m_right_hand }) {
+    XrHandTrackerCreateInfoEXT hand_tracker_create_info = {};
+    hand_tracker_create_info.type = XR_TYPE_HAND_TRACKER_CREATE_INFO_EXT;
+    hand_tracker_create_info.hand = hand->m_hand_identifier;
+    hand_tracker_create_info.handJointSet = XR_HAND_JOINT_SET_DEFAULT_EXT;
+    result = m_ext_xrCreateHandTrackerEXT(m_openxr_session, &hand_tracker_create_info, &hand->m_hand_tracker);
+    Utils::checkXrResult(result, "Failed to create the hand tracker extension");
+  }
 }
