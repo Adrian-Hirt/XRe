@@ -1,9 +1,9 @@
 # XRe
 
-XRe is a small toy project to build a XR engine using OpenXR and DirectX
+XRe is a project to build a XR engine from scratch using OpenXR and DirectX.
 
-Please note that XRe is a WIP project and mainly intended for me to learn more about OpenXR, DirectX and XR development for the moment. It is
-not (yet) meant to be used for XR development directly.
+_Please note that XRe is a WIP project and mainly intended for me to learn more about OpenXR, DirectX and XR development for the moment. It is
+not (yet) meant to be used for XR development directly._
 
 ## Features
 
@@ -20,10 +20,17 @@ XRe currently has the following features:
 * Teleporting to other locations in the scene
 * Tracking the aim of the user and highlighting intersections of the aim and the scene.
 * Various shaders (e.g. ambient lighting, textured models)
+* Basic hand tracking
 
 ### Screenshots
 
+Simple scene:
+
 ![](doc/img/screenshot_mr_portal_1.png)
+
+Hand tracking:
+
+![](doc/img/hand_tracking.jpeg)
 
 ## Acknowledgements
 
