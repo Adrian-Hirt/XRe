@@ -110,7 +110,7 @@ void Model::setRotation(DirectX::XMVECTOR rotation) {
 
 void Model::setScale(float x, float y, float z) {
   DirectX::XMVECTOR scaling = DirectX::XMVECTORF32({x, y, z});
-  setPosition(scaling);
+  setScale(scaling);
 }
 
 void Model::setScale(DirectX::XMVECTOR scaling) {
