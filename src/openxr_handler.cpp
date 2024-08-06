@@ -708,6 +708,7 @@ void OpenXrHandler::updateHandTrackingStates(Hand *hand, XrTime predicted_time) 
     Utils::exitWithMessage("Hand is a nullptr!");
   }
 
+  // Update the hand joints locations
   XrHandJointsMotionRangeInfoEXT hand_joints_motion_range_info = {};
   hand_joints_motion_range_info.type = XR_TYPE_HAND_JOINTS_MOTION_RANGE_INFO_EXT;
   hand_joints_motion_range_info.handJointsMotionRange = XR_HAND_JOINTS_MOTION_RANGE_UNOBSTRUCTED_EXT;
@@ -724,6 +725,9 @@ void OpenXrHandler::updateHandTrackingStates(Hand *hand, XrTime predicted_time) 
   hand_joint_locations.jointLocations = hand->m_joint_locations;
   result = m_ext_xrLocateHandJointsEXT(hand->m_hand_tracker, &hand_joints_locate_info, &hand_joint_locations);
   Utils::checkXrResult(result, "Failed to locate hand joints");
+
+  // Run the logic computing the "grab" or "pinch" state of the hand
+  hand->updateHandGrabAndPinchState();
 }
 
 //------------------------------------------------------------------------------------------------------

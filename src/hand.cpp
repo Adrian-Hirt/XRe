@@ -41,11 +41,9 @@ bool Hand::jointIsFingerTip(int joint_index, bool include_thumb) {
 }
 
 void Hand::render(DirectX::XMVECTOR current_origin) {
-  const XrSpaceLocationFlags pose_valid_flags = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
-
   for (int i = 0; i < XR_HAND_JOINT_COUNT_EXT; i++) {
     // Only render the joint if its pose is valid
-    if ((m_joint_locations[i].locationFlags & pose_valid_flags) != pose_valid_flags) {
+    if ((m_joint_locations[i].locationFlags & s_pose_valid_flags) != s_pose_valid_flags) {
       continue;
     }
 
@@ -67,5 +65,44 @@ void Hand::render(DirectX::XMVECTOR current_origin) {
     // And render the model
     current_model.render(m_joint_shader);
   }
+}
+
+void Hand::updateHandGrabAndPinchState() {
+  // Nothing to do if we can't track the thumb
+  if ((m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].locationFlags & s_pose_valid_flags) != s_pose_valid_flags) {
+    return;
+  }
+
+  // Reset pinching state
+  m_pinching = false;
+
+  // Compute whether the hand is pinching. For now, "pinching" means at least
+  // the tip of one finger is within a small threshold of the tip of the thumb.
+  DirectX::XMVECTOR thumb_position =  DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].pose.position);
+
+  const float pinch_threshold = 0.05f; // 5 cm
+
+  for (XrHandJointEXT fingertip : s_fingertips) {
+    DirectX::XMVECTOR tip_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&m_joint_locations[fingertip].pose.position);
+    DirectX::XMVECTOR tip_distance = DirectX::XMVector3Length(DirectX::XMVectorSubtract(thumb_position, tip_position));
+    Model *current_model = &m_joints[fingertip];
+
+    float distance = 0;
+    DirectX::XMStoreFloat(&distance, tip_distance);
+
+    // If a finger is pinching (possible that multiple fingers are pinching),
+    // color it blue. Interactions with pinching (e.g. to move an object) should
+    // probably happen based on the position of the thumb.
+    if (distance < pinch_threshold) {
+      current_model->setColor({0.0f, 0.0f, 1.0f, 1.0f});
+      m_pinching = true;
+    }
+    else {
+      current_model->resetColor();
+    }
+  }
+
+  // TODO: Track whether the hand is closed (approach for pinching above might
+  // incorrectly report closing hand as pinching).
 }
 
