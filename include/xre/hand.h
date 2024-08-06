@@ -22,4 +22,6 @@ public:
 private:
   Shader m_joint_shader;
   std::vector<Model> m_joints;
+
+  bool jointIsFingerTip(int joint_index, bool include_thumb);
 };

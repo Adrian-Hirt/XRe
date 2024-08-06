@@ -7,10 +7,37 @@ Hand::Hand(XrHandEXT hand_identifier) {
   // This could probably be replaced by instancing, where we only have one cube but draw it multiple
   // times. For the first version we'll keep this approach though.
   for (int i = 0; i < XR_HAND_JOINT_COUNT_EXT; i++) {
-    Model model = ModelFactory::createCube({0.67f, 0.84f, 0.9f, 1.0f});
+    DirectX::XMFLOAT4 cube_color;
+
+    if (jointIsFingerTip(i, true)) {
+      cube_color = {1.0f, 0.0f, 0.0f, 1.0f};
+    }
+    else {
+      cube_color = {0.67f, 0.84f, 0.9f, 1.0f};
+    }
+
+    Model model = ModelFactory::createCube(cube_color);
     model.setScale(0.005f, 0.005f, 0.005f);
     m_joints.push_back(model);
   }
+}
+
+bool Hand::jointIsFingerTip(int joint_index, bool include_thumb) {
+  // See https://registry.khronos.org/OpenXR/specs/1.0/man/html/XrHandJointEXT.html,
+  // The tips of the 5 fingers (including thumb) are the indices:
+  //   * 5 => thumb
+  //   * 10 => index finger
+  //   * 15 => middle finger
+  //   * 20 => ring finger
+  //   * 15 => little finger
+  if (joint_index == 0 || joint_index % 5 != 0) {
+    return false;
+  }
+
+  // If we include the thumb, we can directly return true,
+  // otherwise we can only return true if the index is not
+  // equal to 5.
+  return include_thumb || joint_index != 5;
 }
 
 void Hand::render(DirectX::XMVECTOR current_origin) {
