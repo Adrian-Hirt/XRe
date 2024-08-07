@@ -80,7 +80,7 @@ void Hand::updateHandGrabAndPinchState() {
   // the tip of one finger is within a small threshold of the tip of the thumb.
   DirectX::XMVECTOR thumb_position =  DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].pose.position);
 
-  const float pinch_threshold = 0.05f; // 5 cm
+  const float pinch_threshold = 0.015f; // 1.5 cm
 
   for (XrHandJointEXT fingertip : s_fingertips) {
     DirectX::XMVECTOR tip_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&m_joint_locations[fingertip].pose.position);
