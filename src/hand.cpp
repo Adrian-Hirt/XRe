@@ -41,6 +41,11 @@ bool Hand::jointIsFingerTip(int joint_index, bool include_thumb) {
 }
 
 void Hand::render(DirectX::XMVECTOR current_origin) {
+  // Nothing to do if the hand is not active
+  if (!m_active) {
+    return;
+  }
+
   for (int i = 0; i < XR_HAND_JOINT_COUNT_EXT; i++) {
     // Only render the joint if its pose is valid
     if ((m_joint_locations[i].locationFlags & s_pose_valid_flags) != s_pose_valid_flags) {
@@ -68,6 +73,11 @@ void Hand::render(DirectX::XMVECTOR current_origin) {
 }
 
 void Hand::updateHandGrabAndPinchState() {
+  // Nothing to do if the hand is not active
+  if (!m_active) {
+    return;
+  }
+
   // Nothing to do if we can't track the thumb
   if ((m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].locationFlags & s_pose_valid_flags) != s_pose_valid_flags) {
     return;

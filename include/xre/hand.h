@@ -20,6 +20,8 @@ public:
   XrHandJointLocationEXT m_joint_locations[XR_HAND_JOINT_COUNT_EXT];
   XrHandEXT m_hand_identifier;
 
+  bool m_active = false;
+
 private:
   Shader m_joint_shader;
   std::vector<Model> m_joints;

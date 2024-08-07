@@ -726,6 +726,9 @@ void OpenXrHandler::updateHandTrackingStates(Hand *hand, XrTime predicted_time) 
   result = m_ext_xrLocateHandJointsEXT(hand->m_hand_tracker, &hand_joints_locate_info, &hand_joint_locations);
   Utils::checkXrResult(result, "Failed to locate hand joints");
 
+  // Update the active state of the hand
+  hand->m_active = hand_joint_locations.isActive;
+
   // Run the logic computing the "grab" or "pinch" state of the hand
   hand->updateHandGrabAndPinchState();
 }
