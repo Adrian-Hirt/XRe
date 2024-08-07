@@ -23,8 +23,8 @@ public:
   // Check whether the controller interacts with any models
   std::optional<DirectX::XMVECTOR> sceneModelInteractions();
 
-  // Whether the controller should be rendered or not
-  bool m_should_render;
+  // Whether the controller is active or not
+  bool m_active = false;
 
   // Path for the controller, e.g. `/user/hand/left`
   XrPath m_controller_path;

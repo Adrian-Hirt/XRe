@@ -18,8 +18,8 @@ Controller::Controller() {
 }
 
 void Controller::render(DirectX::XMVECTOR current_origin) {
-  // Return early if the controller should not be rendered alltogether
-  if (!m_should_render) {
+  // Return early if the controller is not active
+  if (!m_active) {
     return;
   }
 
@@ -55,7 +55,7 @@ void Controller::render(DirectX::XMVECTOR current_origin) {
 }
 
 std::optional<DirectX::XMVECTOR> Controller::sceneModelInteractions() {
-  if(!m_should_render) {
+  if(!m_active) {
     return std::nullopt;
   }
 
