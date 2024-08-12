@@ -767,7 +767,7 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
 	pollOpenxrActions(xr_frame_state.predictedDisplayTime);
 
   //------------------------------------------------------------------------------------------------------
-	// Update the interactions of the controllers with the scene
+	// Update the interactions of the controllers and hands with the scene
 	//------------------------------------------------------------------------------------------------------
   std::optional<DirectX::XMVECTOR> teleport_location_left, teleport_location_right;
   teleport_location_left = m_left_controller->sceneModelInteractions();
@@ -781,6 +781,12 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
   }
   else if (teleport_location_left.has_value()) {
     updateCurrentOriginForTeleport(teleport_location_left.value());
+  }
+
+  // Update the interactions with the scene and the hands, but only if the hands are enabled.
+  if (m_left_hand != nullptr && m_right_hand != nullptr) {
+    m_left_hand->sceneModelInteractions();
+    m_right_hand->sceneModelInteractions();
   }
 
 	//------------------------------------------------------------------------------------------------------

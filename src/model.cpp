@@ -275,6 +275,11 @@ bool Model::intersects(DirectX::XMVECTOR line_start, DirectX::XMVECTOR line_dire
   return getTransformedBoundingBox().Intersects(line_start, line_direction, *out_distance);
 }
 
+bool Model::contains(DirectX::XMVECTOR point) {
+  DirectX::ContainmentType result = getTransformedBoundingBox().Contains(point);
+  return result == DirectX::INTERSECTS || result == DirectX::CONTAINS;
+}
+
 DirectX::BoundingOrientedBox Model::getTransformedBoundingBox() {
   return applyTransformToBoundingBox(m_bounding_box);
 }

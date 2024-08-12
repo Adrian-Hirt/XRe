@@ -116,3 +116,48 @@ void Hand::updateHandGrabAndPinchState() {
   // incorrectly report closing hand as pinching).
 }
 
+void Hand::sceneModelInteractions() {
+  // Nothing to do if the hand is not active
+  if (!m_active) {
+    return;
+  }
+
+  // Nothing to do if either the thumb or the palm is not valid
+  bool thumb_valid = (m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].locationFlags & s_pose_valid_flags) == s_pose_valid_flags;
+  bool palm_valid = (m_joint_locations[XR_HAND_JOINT_PALM_EXT].locationFlags & s_pose_valid_flags) == s_pose_valid_flags;
+
+  if (!thumb_valid || !palm_valid) {
+    return;
+  }
+
+  // Check if the hand is intersecting a grabbable model. To make it simpler for the moment, we only
+  // check intersection with the palm and the tip of the thumb (as for "grab", both the thumb and the
+  // center of the palm should intersect, and for "pinch", the tip of the thumb needs to intersect).
+  DirectX::XMVECTOR thumb_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].pose.position);
+  DirectX::XMVECTOR palm_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&m_joint_locations[XR_HAND_JOINT_PALM_EXT].pose.position);
+
+  // Utils::printVector(thumb_position);
+
+  for(Model *current_model : Model::getGrabbableInstances()) {
+    current_model->setGrabbed(false);
+
+    // TODO: maybe set a bit a better indicator that an object is intersecting, e.g. a glow effect
+    if(current_model->contains(thumb_position) || current_model->contains(palm_position)) {
+      // Set a different color if the hand is intersecting another model
+      current_model->setColor({1.0f, 0.0f, 0.0f, 1.0f});
+
+      // Also, if the hand is pinching, set the position of the  model to that of the thumb
+      if (m_pinching) {
+        current_model->setGrabbed(true);
+        current_model->setPosition(thumb_position);
+      }
+    }
+    else {
+      current_model->resetColor();
+    }
+  }
+
+  // TODO: If the hand is closed, we need to check for intersection with the central
+  // palm joint position, to determine whether the hand is grabbing something.
+}
+

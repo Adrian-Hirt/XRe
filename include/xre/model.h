@@ -64,6 +64,9 @@ public:
   // distance of the intersection point as an out parameter)
   bool intersects(DirectX::XMVECTOR line_start, DirectX::XMVECTOR line_direction, float *out_distance);
 
+  // Check whether a model contains a point
+  bool contains(DirectX::XMVECTOR point);
+
   // Get the bounding box with the transformation already applied
   DirectX::BoundingOrientedBox getTransformedBoundingBox();
 
