@@ -13,9 +13,17 @@ public:
   // Constructor
   Hand(XrHandEXT hand_identifier);
 
-  void render(DirectX::XMVECTOR current_origin);
-  void updateHandGrabAndPinchState();
+  // Render the hand
+  void render();
+
+  // Update the position of the controller
+  void updatePosition(DirectX::XMVECTOR current_origin);
+
+  // Compute scene interactions of the controllers
   void computeSceneInteractions();
+
+
+  void updateHandGrabAndPinchState();
 
   XrHandTrackerEXT m_hand_tracker;
   XrHandJointLocationEXT m_joint_locations[XR_HAND_JOINT_COUNT_EXT];

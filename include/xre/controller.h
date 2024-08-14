@@ -17,13 +17,16 @@ public:
   // Constructor
   Controller();
 
-  // render a controller
-  void render(DirectX::XMVECTOR current_origin);
+  // Render the controller
+  void render();
 
   // Check whether we want to teleport
   std::optional<DirectX::XMVECTOR> updateIntersectionSphereAndComputePossibleTeleport();
 
-  // Check whether the controller interacts with any models
+  // Update the position of the controller
+  void updatePosition(DirectX::XMVECTOR current_origin);
+
+  // Compute scene interactions of the controllers
   void computeSceneInteractions();
 
   // Whether the controller is active or not

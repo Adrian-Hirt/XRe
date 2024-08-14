@@ -17,7 +17,33 @@ Controller::Controller() {
   m_aim_line = Line({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
 }
 
-void Controller::render(DirectX::XMVECTOR current_origin) {
+void Controller::render() {
+  // Return early if the controller is not active
+  if (!m_active) {
+    return;
+  }
+
+  // Color the model a different color depending on the "grab"
+  // state of the controller
+  if (m_grabbing) {
+    m_model.setColor({1.0f, 0.0f, 0.0f, 1.0f});
+  }
+  else {
+    m_model.setColor({0.67f, 0.84f, 0.9f, 1.0f});
+  }
+
+  m_model.render(m_controller_shader);
+
+  // Render the aim line
+  m_aim_line.render(m_controller_shader);
+
+  // Render the aim interaction sphere
+  if (m_render_intersection_sphere) {
+    m_aim_indicator_sphere.render(m_aim_indicator_shader);
+  }
+}
+
+void Controller::updatePosition(DirectX::XMVECTOR current_origin) {
   // Return early if the controller is not active
   if (!m_active) {
     return;
@@ -33,25 +59,8 @@ void Controller::render(DirectX::XMVECTOR current_origin) {
   m_model.setPosition(controller_position);
   m_model.setRotation(controller_orientation);
 
-  // Color the model a different color depending on the "grab"
-  // state of the controller
-  if (m_grabbing) {
-    m_model.setColor({1.0f, 0.0f, 0.0f, 1.0f});
-  }
-  else {
-    m_model.setColor({0.67f, 0.84f, 0.9f, 1.0f});
-  }
-
-  m_model.render(m_controller_shader);
-
-  // Update the aim line and render it
+  // Update the aim line
   m_aim_line.updateAimLineFromControllerPose(controller_position, DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&m_aim.orientation), current_origin, Controller::s_line_intersection_threshold);
-  m_aim_line.render(m_controller_shader);
-
-  // Render the aim interaction sphere
-  if (m_render_intersection_sphere) {
-    m_aim_indicator_sphere.render(m_aim_indicator_shader);
-  }
 }
 
 void Controller::computeSceneInteractions() {

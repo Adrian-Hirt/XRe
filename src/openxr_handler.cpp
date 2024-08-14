@@ -785,12 +785,19 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
     // TODO: update position of grabbed model if we're currently grabbing something with either hand
   }
   else {
-    // If not teleporting, we can update the interaction of the controllers with the scene
+    // If not teleporting, we can update the position of the controller, as well as their interactions
+    // with the scene
+    m_left_controller->updatePosition(m_current_origin);
+    m_right_controller->updatePosition(m_current_origin);
+
     m_left_controller->computeSceneInteractions();
     m_right_controller->computeSceneInteractions();
 
     // Update the interactions with the scene and the hands, but only if the hands are enabled.
     if (m_left_hand != nullptr && m_right_hand != nullptr) {
+      m_left_hand->updatePosition(m_current_origin);
+      m_right_hand->updatePosition(m_current_origin);
+
       m_left_hand->computeSceneInteractions();
       m_right_hand->computeSceneInteractions();
     }
@@ -912,13 +919,13 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 		m_dx11_handler.renderFrame(views[i], m_swapchains[i].swapchain_data[swapchain_image_id], draw_callback, m_current_origin);
 
 		// Render the controllers
-		m_left_controller->render(m_current_origin);
-		m_right_controller->render(m_current_origin);
+		m_left_controller->render();
+		m_right_controller->render();
 
     // Render the hands if the hands are not null pointers
     if (m_left_hand != nullptr && m_right_hand != nullptr) {
-      m_left_hand->render(m_current_origin);
-      m_right_hand->render(m_current_origin);
+      m_left_hand->render();
+      m_right_hand->render();
     }
 
 		// We're done rendering for the current view, so we can release the swapchain image (i.e. tell

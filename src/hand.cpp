@@ -40,7 +40,7 @@ bool Hand::jointIsFingerTip(int joint_index, bool include_thumb) {
   return include_thumb || joint_index != 5;
 }
 
-void Hand::render(DirectX::XMVECTOR current_origin) {
+void Hand::render() {
   // Nothing to do if the hand is not active
   if (!m_active) {
     return;
@@ -48,27 +48,10 @@ void Hand::render(DirectX::XMVECTOR current_origin) {
 
   for (int i = 0; i < XR_HAND_JOINT_COUNT_EXT; i++) {
     // Only render the joint if its pose is valid
-    if ((m_joint_locations[i].locationFlags & s_pose_valid_flags) != s_pose_valid_flags) {
-      continue;
+    if ((m_joint_locations[i].locationFlags & s_pose_valid_flags) == s_pose_valid_flags) {
+      Model current_model = m_joints[i];
+      current_model.render(m_joint_shader);
     }
-
-    Model current_model = m_joints[i];
-    XrPosef pose = m_joint_locations[i].pose;
-
-    DirectX::XMVECTOR joint_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&pose.position);
-    DirectX::XMVECTOR joint_orientation = DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&pose.orientation);
-    float joint_scale =  m_joint_locations[i].radius;
-
-    // Apply the global teleport translation from moving the origin
-    joint_position = DirectX::XMVectorAdd(joint_position, current_origin);
-
-    // Update the cube model
-    current_model.setPosition(joint_position);
-    current_model.setRotation(joint_orientation);
-    current_model.setScale(joint_scale, joint_scale, joint_scale);
-
-    // And render the model
-    current_model.render(m_joint_shader);
   }
 }
 
@@ -114,6 +97,35 @@ void Hand::updateHandGrabAndPinchState() {
 
   // TODO: Track whether the hand is closed (approach for pinching above might
   // incorrectly report closing hand as pinching).
+}
+
+void Hand::updatePosition(DirectX::XMVECTOR current_origin) {
+  // Nothing to do if the hand is not active
+  if (!m_active) {
+    return;
+  }
+
+  for (int i = 0; i < XR_HAND_JOINT_COUNT_EXT; i++) {
+    // Only update the joint position its pose is valid
+    if ((m_joint_locations[i].locationFlags & s_pose_valid_flags) != s_pose_valid_flags) {
+      continue;
+    }
+
+    Model *current_model = &m_joints[i];
+    XrPosef pose = m_joint_locations[i].pose;
+
+    DirectX::XMVECTOR joint_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&pose.position);
+    DirectX::XMVECTOR joint_orientation = DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&pose.orientation);
+    float joint_scale = m_joint_locations[i].radius;
+
+    // Apply the global teleport translation from moving the origin
+    joint_position = DirectX::XMVectorAdd(joint_position, current_origin);
+
+    // Update the cube model
+    current_model->setPosition(joint_position);
+    current_model->setRotation(joint_orientation);
+    current_model->setScale(joint_scale, joint_scale, joint_scale);
+  }
 }
 
 void Hand::computeSceneInteractions() {
