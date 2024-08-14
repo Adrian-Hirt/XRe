@@ -10,9 +10,10 @@ public:
   Shader texture_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient_texture.hlsl");
 
   // Create models with the ModelFactory
-  Model cube = ModelFactory::createCube({1.0f, 0.0f, 0.0f, 0.25f});
+  Model spinning_cube = ModelFactory::createCube({1.0f, 0.0f, 0.0f, 0.25f});
   Model ground_cube = ModelFactory::createCube(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
   Model ground = ModelFactory::createGroundPlane(10, DATA_FOLDER "/textures/Tiles012_2K-JPG_Color.jpg");
+  Model small_cube = ModelFactory::createCube(DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
 
   // Create custom models
   Model sphere = Model(DATA_FOLDER "/models/sphere.obj");
@@ -30,11 +31,16 @@ public:
 
   void setup() override {
     // Scale the cube down a bit
-    cube.scale(0.33f, 0.33f, 0.33f);
+    spinning_cube.scale(0.33f, 0.33f, 0.33f);
 
     // And translate the cube up a bit
-    cube.translate(0.0f, 4.0f, 0.0f);
-    cube.setGrabbable(true);
+    spinning_cube.translate(0.0f, 4.0f, 0.0f);
+    spinning_cube.setGrabbable(true);
+
+    // Scale the small cube down and translate it a bit. Also, mark it as grabbable.
+    small_cube.scale(0.1f, 0.1f, 0.1f);
+    small_cube.translate(2.0f, 1.5f, 0.0f);
+    small_cube.setGrabbable(true);
 
     sphere.scale(0.1f, 0.1f, 0.1f);
     sphere.setGrabbable(true);
@@ -62,7 +68,7 @@ public:
     // Rotate the cube
     // TODO: we should interpolate the rotation value such that it's
     // not coupled to the framerate
-    cube.rotate(0.0f, 0.0f, 0.01f);
+    spinning_cube.rotate(0.0f, 0.0f, 0.01f);
   };
 
   void draw() override {
@@ -81,10 +87,13 @@ public:
     line.render(color_shader);
 
     // Render a transparent looking cube
-    cube.renderTransparent(ambient_shader);
+    spinning_cube.renderTransparent(ambient_shader);
 
+    // Render the small cube
+    small_cube.render();
+
+    // Render the flat bitmaps
     quad.render();
-
     text.render();
   };
 };
