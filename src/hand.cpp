@@ -146,10 +146,12 @@ void Hand::sceneModelInteractions() {
       // Set a different color if the hand is intersecting another model
       current_model->setColor({1.0f, 0.0f, 0.0f, 1.0f});
 
-      // Also, if the hand is pinching, set the position of the  model to that of the thumb
+      // Also, if the hand is pinching, set the position and rotation of the model to that of the thumb
       if (m_pinching) {
+        DirectX::XMVECTOR thumb_orientation = DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].pose.orientation);
         current_model->setGrabbed(true);
         current_model->setPosition(thumb_position);
+        current_model->setRotation(thumb_orientation);
       }
     }
     else {
