@@ -15,7 +15,7 @@ public:
 
   void render(DirectX::XMVECTOR current_origin);
   void updateHandGrabAndPinchState();
-  void sceneModelInteractions();
+  void computeSceneInteractions();
 
   XrHandTrackerEXT m_hand_tracker;
   XrHandJointLocationEXT m_joint_locations[XR_HAND_JOINT_COUNT_EXT];

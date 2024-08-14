@@ -54,9 +54,9 @@ void Controller::render(DirectX::XMVECTOR current_origin) {
   }
 }
 
-std::optional<DirectX::XMVECTOR> Controller::sceneModelInteractions() {
+void Controller::computeSceneInteractions() {
   if(!m_active) {
-    return std::nullopt;
+    return;
   }
 
   DirectX::BoundingOrientedBox controller_bounding_box = m_model.getTransformedBoundingBox();
@@ -81,6 +81,12 @@ std::optional<DirectX::XMVECTOR> Controller::sceneModelInteractions() {
     else {
       current_model->resetColor();
     }
+  }
+}
+
+std::optional<DirectX::XMVECTOR> Controller::updateIntersectionSphereAndComputePossibleTeleport() {
+  if(!m_active) {
+    return std::nullopt;
   }
 
   // Next, check if we need to render the aim intersection sphere

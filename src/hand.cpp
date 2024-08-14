@@ -116,7 +116,7 @@ void Hand::updateHandGrabAndPinchState() {
   // incorrectly report closing hand as pinching).
 }
 
-void Hand::sceneModelInteractions() {
+void Hand::computeSceneInteractions() {
   // Nothing to do if the hand is not active
   if (!m_active) {
     return;

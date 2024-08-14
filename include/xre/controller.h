@@ -20,8 +20,11 @@ public:
   // render a controller
   void render(DirectX::XMVECTOR current_origin);
 
+  // Check whether we want to teleport
+  std::optional<DirectX::XMVECTOR> updateIntersectionSphereAndComputePossibleTeleport();
+
   // Check whether the controller interacts with any models
-  std::optional<DirectX::XMVECTOR> sceneModelInteractions();
+  void computeSceneInteractions();
 
   // Whether the controller is active or not
   bool m_active = false;
