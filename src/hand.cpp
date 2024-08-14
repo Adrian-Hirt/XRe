@@ -145,8 +145,8 @@ void Hand::computeSceneInteractions() {
   // Check if the hand is intersecting a grabbable model. To make it simpler for the moment, we only
   // check intersection with the palm and the tip of the thumb (as for "grab", both the thumb and the
   // center of the palm should intersect, and for "pinch", the tip of the thumb needs to intersect).
-  DirectX::XMVECTOR thumb_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].pose.position);
-  DirectX::XMVECTOR palm_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&m_joint_locations[XR_HAND_JOINT_PALM_EXT].pose.position);
+  DirectX::BoundingOrientedBox thumb_bounding_box = m_joints[XR_HAND_JOINT_THUMB_TIP_EXT].getTransformedBoundingBox();
+  DirectX::BoundingOrientedBox palm_bounding_box = m_joints[XR_HAND_JOINT_PALM_EXT].getTransformedBoundingBox();
 
   // Utils::printVector(thumb_position);
 
@@ -154,16 +154,15 @@ void Hand::computeSceneInteractions() {
     current_model->setGrabbed(false);
 
     // TODO: maybe set a bit a better indicator that an object is intersecting, e.g. a glow effect
-    if(current_model->contains(thumb_position) || current_model->contains(palm_position)) {
+    if(current_model->intersects(thumb_bounding_box) || current_model->intersects(palm_bounding_box)) {
       // Set a different color if the hand is intersecting another model
       current_model->setColor({1.0f, 0.0f, 0.0f, 1.0f});
 
       // Also, if the hand is pinching, set the position and rotation of the model to that of the thumb
       if (m_pinching) {
-        DirectX::XMVECTOR thumb_orientation = DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].pose.orientation);
         current_model->setGrabbed(true);
-        current_model->setPosition(thumb_position);
-        current_model->setRotation(thumb_orientation);
+        current_model->setPosition(m_joints[XR_HAND_JOINT_THUMB_TIP_EXT].getPosition());
+        current_model->setRotation(m_joints[XR_HAND_JOINT_THUMB_TIP_EXT].getRotation());
       }
     }
     else {
