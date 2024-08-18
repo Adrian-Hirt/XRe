@@ -24,7 +24,7 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
 
   // Register the device & device_context with the classes that need them
   Shader::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
-  Mesh::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
+  Renderable::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
 
   // Instruct the handler to initialize the xr actions
   initializeOpenxrActions();
