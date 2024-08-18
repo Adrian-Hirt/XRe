@@ -15,23 +15,16 @@ find_library(OPENXR NAMES openxr_loader PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib/op
 message(STATUS "***** find_library returned ${OPENXR} *****")
 message(STATUS "***** CMake Build type: ${CMAKE_BUILD_TYPE} *****")
 
-FILE(GLOB SRCFILES src/*)
+FILE(GLOB SRCFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+
+# Needed to access the include folders from the individual apps
+SET(XRE_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/ext)
 
 SET(ADDITIONAL_SRCFILES
-  "ext/DirectXTex/WICTextureLoader11.cpp"
+  "${CMAKE_CURRENT_LIST_DIR}/ext/DirectXTex/WICTextureLoader11.cpp"
 )
-
-add_executable(${PROJECT_NAME} ${SRCFILES} ${ADDITIONAL_SRCFILES} main.cpp)
 
 set(SHADERS_FOLDER "\"${CMAKE_CURRENT_SOURCE_DIR}/shaders\"" STRING "")
 set(DATA_FOLDER "\"${CMAKE_CURRENT_SOURCE_DIR}/data\"" STRING "")
-target_compile_definitions(${PROJECT_NAME} PUBLIC SHADERS_FOLDER=${SHADERS_FOLDER} DATA_FOLDER=${DATA_FOLDER})
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include)
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/ext)
-target_link_libraries(${PROJECT_NAME} PUBLIC
-  ${OPENXR}
-  dxgi
-  D3D11
-  D3dcompiler
-)
+add_subdirectory(apps)
