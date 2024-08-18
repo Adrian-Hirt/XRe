@@ -48,5 +48,5 @@ void Bitmap::render() {
   m_shader.activate();
   m_shader.setModelColor(m_bitmap_color);
   m_shader.updatePerModelConstantBuffer();
-  Mesh::render();
+  Renderable::render();
 }

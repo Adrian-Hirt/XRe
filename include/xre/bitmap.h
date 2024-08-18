@@ -7,7 +7,7 @@
 // Other includes
 #include <vector>
 
-class Bitmap : public Mesh {
+class Bitmap : public Renderable {
 public:
   Bitmap();
   Bitmap(float top_left_position_x, float top_left_position_y, float x_extend, float y_extend, const char *texture_path);

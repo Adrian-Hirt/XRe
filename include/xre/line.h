@@ -1,9 +1,9 @@
 #pragma once
 
 // XRe includes
-#include <xre/mesh.h>
+#include <xre/renderable.h>
 
-class Line : public Mesh {
+class Line : public Renderable {
 public:
   Line(DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
   Line(DirectX::XMFLOAT3 line_start, DirectX::XMFLOAT3 line_end, DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -18,6 +18,8 @@ public:
 private:
   // A line does not have a bounding box
   inline bool hasBoundingBox() { return false; }
+
+  inline bool usesStaticBuffers() { return false; };
 
   std::vector<vertex_t> verticesFromPoints(DirectX::XMFLOAT3 start, DirectX::XMFLOAT3 end);
 

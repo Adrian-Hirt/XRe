@@ -51,28 +51,6 @@ Mesh::Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, co
   Utils::checkHresult(result, error_string.c_str());
 }
 
-// Function to initialize the "common" data of a mesh, to avoid code-duplication
-void Mesh::initialize(std::vector<vertex_t> vertices, std::vector<unsigned int> indices) {
-  // Store number of vertices and indices
-  m_vertex_count = vertices.size();
-  m_index_count = indices.size();
-
-  createVertexBuffer(vertices, &m_vertex_buffer);
-  createIndexBuffer(indices, &m_index_buffer);
-
-  if (hasBoundingBox()) {
-    // Store vertex positions temporary
-    DirectX::XMFLOAT3 vertex_positions[m_vertex_count];
-
-    for(int i = 0; i < m_vertex_count; i++) {
-      vertex_positions[i] = vertices[i].coordinates;
-    }
-
-    // Create the bounding box for this mesh
-    DirectX::BoundingOrientedBox::CreateFromPoints(m_bounding_box, m_vertex_count, vertex_positions, sizeof(DirectX::XMFLOAT3));
-  }
-}
-
 void Mesh::render() {
   // Set vertex and index buffers on the GPU to be the ones of this mesh
   UINT stride = sizeof(vertex_t);
@@ -96,57 +74,3 @@ void Mesh::render() {
   // indices of this mesh.
   s_device_context->DrawIndexed(m_index_count, 0, 0);
 }
-
-void Mesh::registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context) {
-  Mesh::s_device = device;
-  Mesh::s_device_context = device_context;
-}
-
-void Mesh::createVertexBuffer(std::vector<vertex_t> data, ID3D11Buffer **target_buffer) {
-  D3D11_BUFFER_DESC buffer_desc;
-  ZeroMemory(&buffer_desc, sizeof(buffer_desc));
-
-  buffer_desc.ByteWidth = sizeof(vertex_t) * data.size(); // Size of the buffer we want to allocate
-  buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;       // use as a vertex buffer
-
-  if (m_static_buffers) {
-    buffer_desc.Usage = D3D11_USAGE_IMMUTABLE; // Only access to memory for GPU
-    buffer_desc.CPUAccessFlags = 0;            // No access for CPU
-  }
-  else {
-    buffer_desc.Usage = D3D11_USAGE_DYNAMIC;             // Read access for GPU, Write access for CPU
-    buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE; // Write access for CPU
-  }
-
-  // Create the buffer and copy the vertices into it
-  D3D11_SUBRESOURCE_DATA vertex_buffer_data = { data.data() };
-  HRESULT result = s_device->CreateBuffer(&buffer_desc, &vertex_buffer_data, target_buffer);
-  Utils::checkHresult(result, "Could not create the vertex buffer!");
-}
-
-void Mesh::createIndexBuffer(std::vector<unsigned int> data, ID3D11Buffer **target_buffer) {
-  D3D11_BUFFER_DESC buffer_desc;
-  ZeroMemory(&buffer_desc, sizeof(buffer_desc));
-  buffer_desc.ByteWidth = sizeof(unsigned int) * data.size(); // Size of the buffer we want to allocate
-  buffer_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;            // use as an index buffer
-  buffer_desc.MiscFlags = 0;
-
-  if (m_static_buffers) {
-    buffer_desc.Usage = D3D11_USAGE_IMMUTABLE; // Only access to memory for GPU
-    buffer_desc.CPUAccessFlags = 0;            // No access for CPU
-  }
-  else {
-    buffer_desc.Usage = D3D11_USAGE_DYNAMIC;             // Read access for GPU, Write access for CPU
-    buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE; // Write access for CPU
-  }
-
-  // Create the buffer and copy the indices into it
-  D3D11_SUBRESOURCE_DATA index_buffer_data = { data.data() };
-  HRESULT result = s_device->CreateBuffer(&buffer_desc, &index_buffer_data, target_buffer);
-  Utils::checkHresult(result, "Could not create the vertex buffer!");
-}
-
-DirectX::BoundingOrientedBox Mesh::getBoundingBox() {
-  return m_bounding_box;
-}
-
