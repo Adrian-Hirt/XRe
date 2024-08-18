@@ -86,15 +86,15 @@ public:
     // Render the line
     line.render(color_shader);
 
-    // Render a transparent looking cube
-    spinning_cube.renderTransparent(ambient_shader);
-
     // Render the small cube
     small_cube.render();
 
     // Render the flat bitmaps
     quad.render();
     text.render();
+
+    // Render a transparent looking cube
+    spinning_cube.renderTransparent(ambient_shader);
   };
 };
 
