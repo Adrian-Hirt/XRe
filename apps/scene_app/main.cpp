@@ -13,11 +13,14 @@ public:
   void setup() override {
     root_node.addChildNode(cube_node);
     cube_node.addChildNode(moon_node);
+    moon_node.translate(2.0f, 1.0f, 0.0f);
+    moon_node.scale(0.1f, 0.1f, 0.1f);
     root_node.updateTransformation();
   };
 
   void updateSimulation(XrTime predicted_time) override {
-
+    cube_node.rotate(0.0f, 0.0f, 0.01f);
+    root_node.updateTransformation();
   };
 
   void draw() override {

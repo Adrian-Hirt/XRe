@@ -26,6 +26,7 @@ public:
   void render();
   void render(Shader &shader);
   void renderTransparent(Shader &shader);
+  void renderInSceneNode();
 
   DirectX::XMMATRIX getTransformationMatrix();
   DirectX::XMMATRIX getRotationMatrix();
@@ -57,6 +58,7 @@ public:
   // Set the color of the model
   void setColor(DirectX::XMFLOAT4 color);
   void resetColor();
+  DirectX::XMFLOAT4 getColor();
 
   // Check whether a model intersects with a bounding box
   bool intersects(DirectX::BoundingOrientedBox other);

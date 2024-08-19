@@ -36,6 +36,15 @@ void Model::render() {
   render(shader);
 }
 
+void Model::renderInSceneNode() {
+  for (Mesh &mesh : m_meshes) {
+    mesh.render();
+  }
+
+  // Next, render the bounding box
+  m_bounding_box_mesh.render();
+}
+
 void Model::render(Shader &shader) {
   // Activate the shader
   shader.activate();
@@ -144,6 +153,10 @@ void Model::setColor(DirectX::XMFLOAT4 color) {
 
 void Model::resetColor() {
   m_model_color = m_original_model_color;
+}
+
+DirectX::XMFLOAT4 Model::getColor() {
+  return m_model_color;
 }
 
 void Model::loadObj(const char *model_path) {

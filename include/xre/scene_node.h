@@ -21,6 +21,25 @@ public:
   void render();
   void updateTransformation();
 
+  // These methods apply the rotation / translation / scaling
+  // to the values we already have, e.g. to simply double the
+  // scale you could pass in a value of 2 to the `scale` method
+  void rotate(float roll, float pitch, float yaw);
+  void rotate(DirectX::XMVECTOR rotation);
+  void translate(float x, float y, float z);
+  void translate(DirectX::XMVECTOR translation);
+  void scale(float x, float y, float z);
+  void scale(DirectX::XMVECTOR scaling);
+
+  // These methods set the rotation / translation / scaling to
+  // the values passed in, use this if you already calculated the
+  // new values to use beforehand.
+  void setRotation(DirectX::XMVECTOR rotation);
+  void setScale(float x, float y, float z);
+  void setScale(DirectX::XMVECTOR scaling);
+  void setPosition(float x, float y, float z);
+  void setPosition(DirectX::XMVECTOR position);
+
 private:
   // Parent node (which might be null for the root node)
   SceneNode* m_parent;
