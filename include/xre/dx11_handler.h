@@ -2,6 +2,7 @@
 
 // DirectX includes
 #include <d3d11.h>
+#include <DirectXMath/DirectXMath.h>
 
 // XRe includes
 #include <xre/utils.h>

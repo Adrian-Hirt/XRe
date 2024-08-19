@@ -1,5 +1,9 @@
 #pragma once
 
+// DirectX includes
+#include <d3d11.h>
+#include <DirectXMath/DirectXMath.h>
+
 // OpenXR includes
 #include <open_xr/openxr.h>
 
