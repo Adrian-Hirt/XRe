@@ -42,6 +42,9 @@ public:
   void setPosition(float x, float y, float z);
   void setPosition(DirectX::XMVECTOR position);
 
+  static std::unordered_set<SceneNode*> getGrabbableInstances();
+  void setGrabbable(bool grabbable);
+
 private:
   // Parent node (which might be null for the root node)
   SceneNode* m_parent;
@@ -76,4 +79,7 @@ private:
 
   DirectX::BoundingOrientedBox m_model_bounding_box;
   BoundingBoxMesh m_model_bounding_box_mesh;
+
+  // Set of all instances we marked as grabbable
+  inline static std::unordered_set<SceneNode*> s_grabbable_instances;
 };

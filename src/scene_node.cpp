@@ -149,3 +149,16 @@ void SceneNode::setPosition(float x, float y, float z) {
 void SceneNode::setPosition(DirectX::XMVECTOR position) {
   m_translation = position;
 }
+
+void SceneNode::setGrabbable(bool grabbable) {
+  if (grabbable) {
+    SceneNode::s_grabbable_instances.insert(this);
+  }
+  else {
+    SceneNode::s_grabbable_instances.erase(this);
+  }
+}
+
+std::unordered_set<SceneNode*> SceneNode::getGrabbableInstances() {
+  return s_grabbable_instances;
+}

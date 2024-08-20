@@ -16,6 +16,7 @@ public:
     moon_node.translate(2.0f, 1.0f, 0.0f);
     moon_node.scale(0.1f, 0.1f, 0.1f);
     root_node.updateTransformation();
+    root_node.setGrabbable(true);
   };
 
   void updateSimulation(XrTime predicted_time) override {
