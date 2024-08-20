@@ -95,6 +95,12 @@ void SceneNode::updateTransformation() {
   }
 }
 
+DirectX::BoundingOrientedBox SceneNode::getTransformedBoundingBox() {
+  DirectX::BoundingOrientedBox transformed;
+  m_model_bounding_box.Transform(transformed, m_world_transform);
+  return transformed;
+}
+
 void SceneNode::rotate(float roll, float pitch, float yaw) {
   DirectX::XMVECTOR rotation = DirectX::XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
   rotate(rotation);
