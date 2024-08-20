@@ -37,12 +37,9 @@ void Model::render() {
 }
 
 void Model::renderInSceneNode() {
-  // for (Mesh &mesh : m_meshes) {
-  //   mesh.render();
-  // }
-
-  // Next, render the bounding box
-  // m_bounding_box_mesh.render();
+  for (Mesh &mesh : m_meshes) {
+    mesh.render();
+  }
 }
 
 void Model::render(Shader &shader) {

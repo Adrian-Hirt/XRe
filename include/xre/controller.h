@@ -14,6 +14,7 @@
 #include <xre/shader.h>
 #include <xre/model_factory.h>
 #include <xre/line.h>
+#include <xre/scene_node.h>
 
 class Controller {
 public:

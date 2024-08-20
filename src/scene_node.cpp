@@ -53,6 +53,13 @@ void SceneNode::render() {
     m_shader.updatePerModelConstantBuffer();
     m_model->renderInSceneNode();
 
+    // Set shader variables to identities, as the bounding box is already updated
+    // with the correct position (as we need the correct position to be able to
+    // compute intersections).
+    m_shader.setModelMatrix(DirectX::XMMatrixIdentity());
+    m_shader.setNormalRotationMatrix(DirectX::XMMatrixIdentity());
+    m_shader.setModelColor({1.0f, 1.0f, 1.0f, 1.0f});
+    m_shader.updatePerModelConstantBuffer();
     m_model_bounding_box_mesh.render();
   }
 
@@ -88,6 +95,10 @@ void SceneNode::updateTransformation() {
     // relative to the origin point.
     m_world_transform = m_local_transform;
     m_world_rotation_matrix = DirectX::XMMatrixRotationQuaternion(m_rotation);
+  }
+
+  if (m_model) {
+    m_model_bounding_box_mesh.updateVerticesFromBoundingBox(getTransformedBoundingBox());
   }
 
   for (SceneNode *child : m_children) {
@@ -161,4 +172,8 @@ void SceneNode::setGrabbable(bool grabbable) {
 
 std::unordered_set<SceneNode*> SceneNode::getGrabbableInstances() {
   return s_grabbable_instances;
+}
+
+bool SceneNode::intersects(DirectX::BoundingOrientedBox other) {
+  return getTransformedBoundingBox().Intersects(other);
 }

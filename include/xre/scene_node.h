@@ -45,6 +45,8 @@ public:
   static std::unordered_set<SceneNode*> getGrabbableInstances();
   void setGrabbable(bool grabbable);
 
+  bool intersects(DirectX::BoundingOrientedBox other);
+
 private:
   // Parent node (which might be null for the root node)
   SceneNode* m_parent;
