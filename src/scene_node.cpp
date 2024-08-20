@@ -97,7 +97,7 @@ void SceneNode::updateTransformation() {
 
 DirectX::BoundingOrientedBox SceneNode::getTransformedBoundingBox() {
   DirectX::BoundingOrientedBox transformed;
-  m_model_bounding_box.Transform(transformed, m_world_transform);
+  m_model_bounding_box.Transform(transformed, DirectX::XMMatrixTranspose(m_world_transform));
   return transformed;
 }
 
