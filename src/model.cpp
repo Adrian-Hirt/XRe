@@ -42,7 +42,7 @@ void Model::renderInSceneNode() {
   // }
 
   // Next, render the bounding box
-  m_bounding_box_mesh.render();
+  // m_bounding_box_mesh.render();
 }
 
 void Model::render(Shader &shader) {
@@ -233,10 +233,9 @@ void Model::registerDx11Handler(Dx11Handler *handler) {
   Model::s_dx11_handler = handler;
 }
 
-void Model::buildBoundingBox() {
+std::vector<DirectX::XMFLOAT3> Model::getMeshBoundingBoxCorners() {
   size_t points_count = m_meshes.size() * 8;
-  DirectX::XMFLOAT3 all_corners[points_count];
-  size_t idx = 0;
+  std::vector<DirectX::XMFLOAT3> all_corners;
 
   // Get all bounding boxes of all meshes, and put the
   // corners into the previously defined array
@@ -245,12 +244,19 @@ void Model::buildBoundingBox() {
     mesh.getBoundingBox().GetCorners(corners);
 
     for (size_t j = 0; j < 8; j++) {
-      all_corners[idx++] = corners[j];
+     all_corners.push_back(corners[j]);
     }
   }
 
+  return all_corners;
+}
+
+void Model::buildBoundingBox() {
+  std::vector<DirectX::XMFLOAT3> bounding_box_corners = getMeshBoundingBoxCorners();
+  size_t points_count = bounding_box_corners.size();
+
   // Build the bounding box
-  DirectX::BoundingOrientedBox::CreateFromPoints(m_bounding_box, points_count, all_corners, sizeof(DirectX::XMFLOAT3));
+  DirectX::BoundingOrientedBox::CreateFromPoints(m_bounding_box, points_count, bounding_box_corners.data(), sizeof(DirectX::XMFLOAT3));
 
   // Create the bounding box mesh, such that we can render it
   DirectX::XMFLOAT3 corners[m_bounding_box.CORNER_COUNT];

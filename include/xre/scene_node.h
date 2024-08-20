@@ -20,6 +20,7 @@ public:
   void addChildNode(SceneNode &child);
   void render();
   void updateTransformation();
+  void buildBoundingBox();
 
   // These methods apply the rotation / translation / scaling
   // to the values we already have, e.g. to simply double the
@@ -71,4 +72,7 @@ private:
 
   // Rotation relative to world
   DirectX::XMMATRIX m_world_rotation_matrix;
+
+  DirectX::BoundingOrientedBox m_model_bounding_box;
+  BoundingBoxMesh m_model_bounding_box_mesh;
 };

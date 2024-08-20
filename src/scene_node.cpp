@@ -8,8 +8,29 @@ SceneNode::SceneNode() {
 
 SceneNode::SceneNode(Model* model) {
   m_model = model;
+  buildBoundingBox();
   m_parent = NULL;
   m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/color.hlsl");
+}
+
+void SceneNode::buildBoundingBox() {
+  std::vector<DirectX::XMFLOAT3> bounding_box_corners = m_model->getMeshBoundingBoxCorners();
+  size_t points_count = bounding_box_corners.size();
+
+  // Build the bounding box
+  DirectX::BoundingOrientedBox::CreateFromPoints(m_model_bounding_box, points_count, bounding_box_corners.data(), sizeof(DirectX::XMFLOAT3));
+
+  // Create the bounding box mesh, such that we can render it
+  DirectX::XMFLOAT3 corners[m_model_bounding_box.CORNER_COUNT];
+  m_model_bounding_box.GetCorners(corners);
+  std::vector<vertex_t> bounding_box_vertices;
+
+  // Create vertices from the corners of the bounding box
+  for (int i = 0; i < m_model_bounding_box.CORNER_COUNT; i++) {
+    bounding_box_vertices.push_back({ corners[i], { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
+  }
+
+  m_model_bounding_box_mesh = BoundingBoxMesh(bounding_box_vertices);
 }
 
 SceneNode::~SceneNode() {
@@ -31,6 +52,8 @@ void SceneNode::render() {
     m_shader.setModelColor(m_model->getColor());
     m_shader.updatePerModelConstantBuffer();
     m_model->renderInSceneNode();
+
+    m_model_bounding_box_mesh.render();
   }
 
   for (SceneNode *child : m_children) {

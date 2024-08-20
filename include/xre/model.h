@@ -86,6 +86,8 @@ public:
   static std::unordered_set<Model*> getGrabbableInstances();
   static std::unordered_set<Model*> getTerrainInstances();
 
+  std::vector<DirectX::XMFLOAT3> getMeshBoundingBoxCorners();
+
 private:
   // Pointer to the Dx11 handler
   inline static Dx11Handler *s_dx11_handler = NULL;
