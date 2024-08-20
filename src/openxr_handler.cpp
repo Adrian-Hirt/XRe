@@ -698,6 +698,8 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
 void OpenXrHandler::updateHandTrackingStates(Hand *hand, XrTime predicted_time) {
   XrResult result;
 
+  return;
+
   // Return if the runtime does not support hand tracking
   if (!m_openxr_hand_tracking_system_properties.supportsHandTracking) {
     return;
@@ -979,6 +981,9 @@ XrPath OpenXrHandler::getXrPathFromString(std::string string) {
 
 void OpenXrHandler::initializeHandTracking() {
   XrResult result;
+
+  // Disable for now
+  return;
 
   // Return if the runtime does not support hand tracking
   if (!m_openxr_hand_tracking_system_properties.supportsHandTracking) {

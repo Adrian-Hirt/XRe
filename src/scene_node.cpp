@@ -3,13 +3,13 @@
 SceneNode::SceneNode() {
   m_parent = NULL;
   m_model = NULL;
-  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient.hlsl");
+  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/color.hlsl");
 }
 
 SceneNode::SceneNode(Model* model) {
   m_model = model;
   m_parent = NULL;
-  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient.hlsl");
+  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/color.hlsl");
 }
 
 SceneNode::~SceneNode() {
