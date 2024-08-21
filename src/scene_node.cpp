@@ -41,6 +41,11 @@ void SceneNode::addChildNode(SceneNode &child) {
   child.m_parent = this;
 }
 
+void SceneNode::addChildNode(SceneNode *child) {
+  m_children.push_back(child);
+  child->m_parent = this;
+}
+
 void SceneNode::render() {
   if (m_model) {
     m_shader.activate();

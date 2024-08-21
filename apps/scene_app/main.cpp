@@ -29,6 +29,7 @@ public:
   };
 
   void draw() override {
+    // TODO: do not consider bounding boxes if model is not rendered for intersection!
     root_node.render();
   };
 };

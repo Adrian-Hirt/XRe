@@ -18,6 +18,7 @@ public:
   ~SceneNode();
 
   void addChildNode(SceneNode &child);
+  void addChildNode(SceneNode *child);
   void render();
   void updateTransformation();
   void buildBoundingBox();

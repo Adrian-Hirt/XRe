@@ -4,21 +4,16 @@ Hand::Hand(XrHandEXT hand_identifier) {
   m_hand_identifier = hand_identifier;
   m_joint_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient.hlsl");
 
+  m_joint_model = ModelFactory::createCube({0.67f, 0.84f, 0.9f, 1.0f});
+  m_hand_root_node = SceneNode();
+
   // This could probably be replaced by instancing, where we only have one cube but draw it multiple
   // times. For the first version we'll keep this approach though.
   for (int i = 0; i < XR_HAND_JOINT_COUNT_EXT; i++) {
-    DirectX::XMFLOAT4 cube_color;
-
-    if (jointIsFingerTip(i, true)) {
-      cube_color = {1.0f, 0.0f, 0.0f, 1.0f};
-    }
-    else {
-      cube_color = {0.67f, 0.84f, 0.9f, 1.0f};
-    }
-
-    Model model = ModelFactory::createCube(cube_color);
-    model.setScale(0.005f, 0.005f, 0.005f);
-    m_joints.push_back(model);
+    SceneNode* joint_node = new SceneNode(&m_joint_model);
+    joint_node->setScale(0.005f, 0.005f, 0.005f);
+    m_hand_root_node.addChildNode(joint_node);
+    m_joint_nodes.push_back(joint_node);
   }
 }
 
@@ -46,13 +41,15 @@ void Hand::render() {
     return;
   }
 
-  for (int i = 0; i < XR_HAND_JOINT_COUNT_EXT; i++) {
-    // Only render the joint if its pose is valid
-    if ((m_joint_locations[i].locationFlags & s_pose_valid_flags) == s_pose_valid_flags) {
-      Model current_model = m_joints[i];
-      current_model.render(m_joint_shader);
-    }
-  }
+  // for (int i = 0; i < XR_HAND_JOINT_COUNT_EXT; i++) {
+  //   // Only render the joint if its pose is valid
+  //   if ((m_joint_locations[i].locationFlags & s_pose_valid_flags) == s_pose_valid_flags) {
+  //     SceneNode* current_node = &m_joint_nodes[i];
+  //     current_node->render();
+  //   }
+  // }
+
+  m_hand_root_node.render();
 }
 
 void Hand::updateHandGrabAndPinchState() {
@@ -73,25 +70,20 @@ void Hand::updateHandGrabAndPinchState() {
   // the tip of one finger is within a small threshold of the tip of the thumb.
   DirectX::XMVECTOR thumb_position =  DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].pose.position);
 
-  const float pinch_threshold = 0.015f; // 1.5 cm
+  const float pinch_threshold = 0.05f; // 1.5 cm
 
   for (XrHandJointEXT fingertip : s_fingertips) {
     DirectX::XMVECTOR tip_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&m_joint_locations[fingertip].pose.position);
     DirectX::XMVECTOR tip_distance = DirectX::XMVector3Length(DirectX::XMVectorSubtract(thumb_position, tip_position));
-    Model *current_model = &m_joints[fingertip];
+    SceneNode *current_node = m_joint_nodes[fingertip];
 
     float distance = 0;
     DirectX::XMStoreFloat(&distance, tip_distance);
 
-    // If a finger is pinching (possible that multiple fingers are pinching),
-    // color it blue. Interactions with pinching (e.g. to move an object) should
+    // Interactions with pinching (e.g. to move an object) should
     // probably happen based on the position of the thumb.
     if (distance < pinch_threshold) {
-      current_model->setColor({0.0f, 0.0f, 1.0f, 1.0f});
       m_pinching = true;
-    }
-    else {
-      current_model->resetColor();
     }
   }
 
@@ -111,7 +103,7 @@ void Hand::updatePosition(DirectX::XMVECTOR current_origin) {
       continue;
     }
 
-    Model *current_model = &m_joints[i];
+    SceneNode *current_node = m_joint_nodes[i];
     XrPosef pose = m_joint_locations[i].pose;
 
     DirectX::XMVECTOR joint_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&pose.position);
@@ -122,10 +114,12 @@ void Hand::updatePosition(DirectX::XMVECTOR current_origin) {
     joint_position = DirectX::XMVectorAdd(joint_position, current_origin);
 
     // Update the cube model
-    current_model->setPosition(joint_position);
-    current_model->setRotation(joint_orientation);
-    current_model->setScale(joint_scale, joint_scale, joint_scale);
+    current_node->setPosition(joint_position);
+    current_node->setRotation(joint_orientation);
+    current_node->setScale(joint_scale, joint_scale, joint_scale);
   }
+
+  m_hand_root_node.updateTransformation();
 }
 
 void Hand::computeSceneInteractions() {
@@ -145,8 +139,8 @@ void Hand::computeSceneInteractions() {
   // Check if the hand is intersecting a grabbable node. To make it simpler for the moment, we only
   // check intersection with the palm and the tip of the thumb (as for "grab", both the thumb and the
   // center of the palm should intersect, and for "pinch", the tip of the thumb needs to intersect).
-  DirectX::BoundingOrientedBox thumb_bounding_box = m_joints[XR_HAND_JOINT_THUMB_TIP_EXT].getTransformedBoundingBox();
-  DirectX::BoundingOrientedBox palm_bounding_box = m_joints[XR_HAND_JOINT_PALM_EXT].getTransformedBoundingBox();
+  DirectX::BoundingOrientedBox thumb_bounding_box = m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT]->getTransformedBoundingBox();
+  DirectX::BoundingOrientedBox palm_bounding_box = m_joint_nodes[XR_HAND_JOINT_PALM_EXT]->getTransformedBoundingBox();
 
   // Utils::printVector(thumb_position);
 
@@ -163,8 +157,8 @@ void Hand::computeSceneInteractions() {
       // Also, if the hand is pinching, set the position and rotation of the model to that of the thumb
       if (m_pinching) {
         current_node->m_grabbed = true;
-        current_node->setPosition(m_joints[XR_HAND_JOINT_THUMB_TIP_EXT].getPosition());
-        current_node->setRotation(m_joints[XR_HAND_JOINT_THUMB_TIP_EXT].getRotation());
+        current_node->setPosition(m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT]->getPosition());
+        current_node->setRotation(m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT]->getRotation());
       }
     }
   }
