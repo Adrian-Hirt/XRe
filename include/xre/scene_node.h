@@ -42,6 +42,11 @@ public:
   void setPosition(float x, float y, float z);
   void setPosition(DirectX::XMVECTOR position);
 
+  // Getters for position, scale and rotation
+  DirectX::XMVECTOR getRotation();
+  DirectX::XMVECTOR getScale();
+  DirectX::XMVECTOR getPosition();
+
   static std::unordered_set<SceneNode*> getGrabbableInstances();
   void setGrabbable(bool grabbable);
 

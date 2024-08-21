@@ -3,14 +3,13 @@
 SceneNode::SceneNode() {
   m_parent = NULL;
   m_model = NULL;
-  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/color.hlsl");
 }
 
 SceneNode::SceneNode(Model* model) {
   m_model = model;
   buildBoundingBox();
   m_parent = NULL;
-  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/color.hlsl");
+  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient.hlsl");
 }
 
 void SceneNode::buildBoundingBox() {
@@ -43,9 +42,9 @@ void SceneNode::addChildNode(SceneNode &child) {
 }
 
 void SceneNode::render() {
-  m_shader.activate();
-
   if (m_model) {
+    m_shader.activate();
+
     // Update the shader with the transform
     m_shader.setModelMatrix(m_world_transform);
     m_shader.setNormalRotationMatrix(m_world_rotation_matrix);
@@ -164,6 +163,18 @@ void SceneNode::setPosition(float x, float y, float z) {
 
 void SceneNode::setPosition(DirectX::XMVECTOR position) {
   m_translation = position;
+}
+
+DirectX::XMVECTOR SceneNode::getRotation() {
+  return m_rotation;
+}
+
+DirectX::XMVECTOR SceneNode::getScale() {
+  return m_scaling;
+}
+
+DirectX::XMVECTOR SceneNode::getPosition() {
+  return m_translation;
 }
 
 void SceneNode::setGrabbable(bool grabbable) {

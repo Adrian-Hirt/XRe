@@ -3,7 +3,8 @@
 Controller::Controller() {
   // Create the model for visualizing the controllers
   m_model = ModelFactory::createCube({0.67f, 0.84f, 0.9f, 1.0f});
-  m_model.scale(0.03f, 0.03f, 0.075f);
+  m_scene_node = SceneNode(&m_model);
+  m_scene_node.scale(0.03f, 0.03f, 0.075f);
 
   // Create the model for visualizing intersections of the aim line
   m_aim_indicator_sphere = ModelFactory::createSphere(0.1f);
@@ -32,7 +33,7 @@ void Controller::render() {
     m_model.setColor({0.67f, 0.84f, 0.9f, 1.0f});
   }
 
-  m_model.render(m_controller_shader);
+  m_scene_node.render();
 
   // Render the aim line
   m_aim_line.render(m_controller_shader);
@@ -55,12 +56,15 @@ void Controller::updatePosition(DirectX::XMVECTOR current_origin) {
   // Apply the global teleport translation from moving the origin
   controller_position = DirectX::XMVectorAdd(controller_position, current_origin);
 
-  // Set position and orientation of the model
-  m_model.setPosition(controller_position);
-  m_model.setRotation(controller_orientation);
+  // Set position and orientation of the scene node
+  m_scene_node.setPosition(controller_position);
+  m_scene_node.setRotation(controller_orientation);
 
   // Update the aim line
-  m_aim_line.updateAimLineFromControllerPose(controller_position, DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&m_aim.orientation), current_origin, Controller::s_line_intersection_threshold);
+  m_aim_line.updateAimLineFromControllerPose(controller_position,
+                                             DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&m_aim.orientation),
+                                             current_origin,
+                                             Controller::s_line_intersection_threshold);
 }
 
 void Controller::computeSceneInteractions() {
@@ -69,7 +73,9 @@ void Controller::computeSceneInteractions() {
     return;
   }
 
-  DirectX::BoundingOrientedBox controller_bounding_box = m_model.getTransformedBoundingBox();
+  m_scene_node.updateTransformation();
+
+  DirectX::BoundingOrientedBox controller_bounding_box = m_scene_node.getTransformedBoundingBox();
 
   // Check if any of our controllers is grabbing a grabbable node
   for(SceneNode *current_node : SceneNode::getGrabbableInstances()) {
@@ -87,8 +93,8 @@ void Controller::computeSceneInteractions() {
       // model to those of the controller
       if (m_grabbing) {
         current_node->m_grabbed = true;
-        current_node->setPosition(m_model.getPosition());
-        current_node->setRotation(m_model.getRotation());
+        current_node->setPosition(m_scene_node.getPosition());
+        current_node->setRotation(m_scene_node.getRotation());
       }
     }
   }
