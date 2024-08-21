@@ -64,7 +64,9 @@ private:
   // Model and shader for the controller
   Model m_model;
   Shader m_controller_shader;
-  SceneNode m_scene_node;
+  SceneNode m_root_node;
+  SceneNode m_model_node;
+  SceneNode m_intersection_sphere_node;
 
   // Line for visualizing the aim direction
   Line m_aim_line;

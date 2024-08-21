@@ -3,12 +3,18 @@
 Controller::Controller() {
   // Create the model for visualizing the controllers
   m_model = ModelFactory::createCube({0.67f, 0.84f, 0.9f, 1.0f});
-  m_scene_node = SceneNode(&m_model);
-  m_scene_node.scale(0.03f, 0.03f, 0.075f);
+  m_root_node = SceneNode();
+  m_model_node = SceneNode(&m_model);
+  m_model_node.scale(0.03f, 0.03f, 0.075f);
 
   // Create the model for visualizing intersections of the aim line
-  m_aim_indicator_sphere = ModelFactory::createSphere(0.1f);
+  m_aim_indicator_sphere = ModelFactory::createSphere();
   m_aim_indicator_sphere.setColor({0.0f, 0.75f, 1.0f, 1.0f});
+  m_intersection_sphere_node = SceneNode(&m_aim_indicator_sphere);
+  m_intersection_sphere_node.scale(0.1f, 0.1f, 0.1f);
+
+  m_root_node.addChildNode(m_model_node);
+  m_root_node.addChildNode(m_intersection_sphere_node);
 
   // Create the shaders for the controller
   m_controller_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient.hlsl");
@@ -33,7 +39,7 @@ void Controller::render() {
     m_model.setColor({0.67f, 0.84f, 0.9f, 1.0f});
   }
 
-  m_scene_node.render();
+  m_root_node.render();
 
   // Render the aim line
   m_aim_line.render(m_controller_shader);
@@ -57,8 +63,8 @@ void Controller::updatePosition(DirectX::XMVECTOR current_origin) {
   controller_position = DirectX::XMVectorAdd(controller_position, current_origin);
 
   // Set position and orientation of the scene node
-  m_scene_node.setPosition(controller_position);
-  m_scene_node.setRotation(controller_orientation);
+  m_model_node.setPosition(controller_position);
+  m_model_node.setRotation(controller_orientation);
 
   // Update the aim line
   m_aim_line.updateAimLineFromControllerPose(controller_position,
@@ -73,9 +79,9 @@ void Controller::computeSceneInteractions() {
     return;
   }
 
-  m_scene_node.updateTransformation();
+  m_root_node.updateTransformation();
 
-  DirectX::BoundingOrientedBox controller_bounding_box = m_scene_node.getTransformedBoundingBox();
+  DirectX::BoundingOrientedBox controller_bounding_box = m_model_node.getTransformedBoundingBox();
 
   // Check if any of our controllers is grabbing a grabbable node
   for(SceneNode *current_node : SceneNode::getGrabbableInstances()) {
@@ -92,8 +98,8 @@ void Controller::computeSceneInteractions() {
       // model to those of the controller
       if (m_grabbing) {
         current_node->m_grabbed = true;
-        current_node->setPosition(m_scene_node.getPosition());
-        current_node->setRotation(m_scene_node.getRotation());
+        current_node->setPosition(m_model_node.getPosition());
+        current_node->setRotation(m_model_node.getRotation());
       }
     }
   }
@@ -117,7 +123,7 @@ std::optional<DirectX::XMVECTOR> Controller::updateIntersectionSphereAndComputeP
 
     DirectX::XMVECTOR sphere_position = m_aim_line.getLineStart();
     sphere_position = DirectX::XMVectorAdd(sphere_position, stretched_direction);
-    m_aim_indicator_sphere.setPosition(sphere_position);
+    m_intersection_sphere_node.setPosition(sphere_position);
     m_aim_indicator_sphere.setColor({0.0f, 0.75f, 1.0f, 1.0f});
 
     if (closest_terrain_aim_intersection < closest_grabbable_aim_intersection) {

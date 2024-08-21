@@ -87,10 +87,8 @@ namespace ModelFactory {
     return Model({ ground_mesh });
   }
 
-  inline Model createSphere(float radius) {
+  inline Model createSphere() {
     Model sphere = Model(DATA_FOLDER "/models/sphere.obj");
-
-    sphere.scale(radius, radius, radius);
 
     return sphere;
   }
