@@ -73,30 +73,13 @@ public:
   // Get the bounding box with the transformation already applied
   DirectX::BoundingOrientedBox getTransformedBoundingBox();
 
-  // Update the grabbable state of a model
-  void setGrabbable(bool grabbable);
-
-  void setGrabbed(bool grabbed);
-  bool getGrabbed();
-
-  // Update the is_terrain state of a model
-  void setIsTerrain(bool is_terrain);
-
   static void registerDx11Handler(Dx11Handler *handler);
-  static std::unordered_set<Model*> getGrabbableInstances();
-  static std::unordered_set<Model*> getTerrainInstances();
 
   std::vector<DirectX::XMFLOAT3> getMeshBoundingBoxCorners();
 
 private:
   // Pointer to the Dx11 handler
   inline static Dx11Handler *s_dx11_handler = NULL;
-
-  // Set of all instances we marked as grabbable models
-  inline static std::unordered_set<Model*> s_grabbable_instances;
-
-  // Set of all instances we marked as being terrain models
-  inline static std::unordered_set<Model*> s_terrain_instances;
 
   // Track whether a model is currently grabbed (e.g. to stop animations when object is grabbed)
   bool m_grabbed = false;
