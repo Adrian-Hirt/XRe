@@ -27,114 +27,19 @@ Model::Model(const char *model_path, DirectX::XMFLOAT4 color) {
 }
 
 void Model::render() {
-  // Get the current active shader
-  Shader shader = *Shader::getCurrentActiveShader();
-  render(shader);
-}
-
-void Model::renderInSceneNode() {
   for (Mesh &mesh : m_meshes) {
     mesh.render();
   }
 }
 
-void Model::render(Shader &shader) {
-  // Activate the shader
-  shader.activate();
-
-  // Update the shader with the model matrix
-  shader.setModelMatrix(getTransformationMatrix());
-  shader.setNormalRotationMatrix(getRotationMatrix());
-  shader.setModelColor(m_model_color);
-  shader.updatePerModelConstantBuffer();
-
-  for (Mesh &mesh : m_meshes) {
-    mesh.render();
-  }
-}
-
-void Model::renderTransparent(Shader &shader) {
+void Model::renderTransparent() {
   // Render the model twice, once with Counterclockwise
   // cull mode, once with the normal clockwise cull mode, such
   // that the transparency works correctly.
   s_dx11_handler->useDefaultRasterizer(false);
-  render(shader);
+  render();
   s_dx11_handler->useDefaultRasterizer(true);
-  render(shader);
-}
-
-DirectX::XMMATRIX Model::getTransformationMatrix() {
-  return DirectX::XMMatrixTranspose(DirectX::XMMatrixAffineTransformation(
-         m_scaling,
-         DirectX::g_XMZero,
-         m_rotation,
-         m_translation));
-
-}
-
-DirectX::XMMATRIX Model::getRotationMatrix() {
-  return DirectX::XMMatrixRotationQuaternion(m_rotation);
-}
-
-void Model::rotate(float roll, float pitch, float yaw) {
-  DirectX::XMVECTOR rotation = DirectX::XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
-  rotate(rotation);
-}
-
-void Model::rotate(DirectX::XMVECTOR rotation) {
-  m_rotation = DirectX::XMQuaternionMultiply(m_rotation, rotation);
-}
-
-void Model::translate(float x, float y, float z) {
-  DirectX::XMVECTOR translation = DirectX::XMVECTORF32({x, y, z});
-  translate(translation);
-}
-
-void Model::translate(DirectX::XMVECTOR translation) {
-  m_translation = DirectX::XMVectorAdd(m_translation, translation);
-}
-
-void Model::scale(float x, float y, float z) {
-  DirectX::XMVECTOR scaling = DirectX::XMVECTORF32({x, y, z});
-  scale(scaling);
-}
-
-void Model::scale(DirectX::XMVECTOR scaling) {
-  m_scaling = DirectX::XMVectorMultiply(m_scaling, scaling);
-}
-
-void Model::setRotation(DirectX::XMVECTOR rotation) {
-  m_rotation = rotation;
-}
-
-void Model::setScale(float x, float y, float z) {
-  DirectX::XMVECTOR scaling = DirectX::XMVECTORF32({x, y, z});
-  setScale(scaling);
-}
-
-void Model::setScale(DirectX::XMVECTOR scaling) {
-  m_scaling = scaling;
-}
-
-void Model::setPosition(float x, float y, float z) {
-  DirectX::XMVECTOR position = DirectX::XMVECTORF32({x, y, z});
-  setPosition(position);
-}
-
-void Model::setPosition(DirectX::XMVECTOR position) {
-  m_translation = position;
-}
-
-DirectX::XMVECTOR Model::getRotation() {
-  return m_rotation;
-}
-
-DirectX::XMVECTOR Model::getScale() {
-  return m_scaling;
-}
-
-DirectX::XMVECTOR Model::getPosition() {
-  return m_translation;
+  render();
 }
 
 void Model::setColor(DirectX::XMFLOAT4 color) {
