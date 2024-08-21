@@ -124,9 +124,6 @@ private:
   // the bounding boxes of the meshes definitely will not).
   DirectX::BoundingOrientedBox m_bounding_box;
 
-  // Bounding box "mesh"
-  BoundingBoxMesh m_bounding_box_mesh;
-
   void loadObj(const char *model_path);
   void buildBoundingBox();
 

@@ -55,9 +55,6 @@ void Model::render(Shader &shader) {
   for (Mesh &mesh : m_meshes) {
     mesh.render();
   }
-
-  // Next, render the bounding box
-  m_bounding_box_mesh.render();
 }
 
 void Model::renderTransparent(Shader &shader) {
@@ -264,8 +261,6 @@ void Model::buildBoundingBox() {
   for (int i = 0; i < m_bounding_box.CORNER_COUNT; i++) {
     bounding_box_vertices.push_back({ corners[i], { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
   }
-
-  m_bounding_box_mesh = BoundingBoxMesh(bounding_box_vertices);
 }
 
 bool Model::intersects(DirectX::BoundingOrientedBox other) {
