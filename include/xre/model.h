@@ -60,19 +60,6 @@ public:
   void resetColor();
   DirectX::XMFLOAT4 getColor();
 
-  // Check whether a model intersects with a bounding box
-  bool intersects(DirectX::BoundingOrientedBox other);
-
-  // Check whether a model intersects with a line (and optionally put the
-  // distance of the intersection point as an out parameter)
-  bool intersects(DirectX::XMVECTOR line_start, DirectX::XMVECTOR line_direction, float *out_distance);
-
-  // Check whether a model contains a point
-  bool contains(DirectX::XMVECTOR point);
-
-  // Get the bounding box with the transformation already applied
-  DirectX::BoundingOrientedBox getTransformedBoundingBox();
-
   static void registerDx11Handler(Dx11Handler *handler);
 
   std::vector<DirectX::XMFLOAT3> getMeshBoundingBoxCorners();
@@ -101,15 +88,5 @@ private:
   // Store the original color
   DirectX::XMFLOAT4 m_original_model_color;
 
-  // The bounding box of this model, used to quickly check
-  // whether we need to check intersection with the meshes
-  // (if the bounding box of the model does not intersect,
-  // the bounding boxes of the meshes definitely will not).
-  DirectX::BoundingOrientedBox m_bounding_box;
-
   void loadObj(const char *model_path);
-  void buildBoundingBox();
-
-  // Apply the transform of the model to another bounding box (e.g. the bounding box of a child mesh)
-  DirectX::BoundingOrientedBox applyTransformToBoundingBox(DirectX::BoundingOrientedBox input_bounding_box);
 };

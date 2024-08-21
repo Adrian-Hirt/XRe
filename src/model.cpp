@@ -18,16 +18,12 @@ Model::Model(std::vector<Mesh> meshes, DirectX::XMFLOAT4 color) {
   m_meshes = meshes;
   m_model_color = color;
   m_original_model_color = color;
-
-  buildBoundingBox();
 }
 
 Model::Model(const char *model_path, DirectX::XMFLOAT4 color) {
   loadObj(model_path);
   m_model_color = color;
   m_original_model_color = color;
-
-  buildBoundingBox();
 }
 
 void Model::render() {
@@ -243,76 +239,4 @@ std::vector<DirectX::XMFLOAT3> Model::getMeshBoundingBoxCorners() {
   }
 
   return all_corners;
-}
-
-void Model::buildBoundingBox() {
-  std::vector<DirectX::XMFLOAT3> bounding_box_corners = getMeshBoundingBoxCorners();
-  size_t points_count = bounding_box_corners.size();
-
-  // Build the bounding box
-  DirectX::BoundingOrientedBox::CreateFromPoints(m_bounding_box, points_count, bounding_box_corners.data(), sizeof(DirectX::XMFLOAT3));
-
-  // Create the bounding box mesh, such that we can render it
-  DirectX::XMFLOAT3 corners[m_bounding_box.CORNER_COUNT];
-  m_bounding_box.GetCorners(corners);
-  std::vector<vertex_t> bounding_box_vertices;
-
-  // Create vertices from the corners of the bounding box
-  for (int i = 0; i < m_bounding_box.CORNER_COUNT; i++) {
-    bounding_box_vertices.push_back({ corners[i], { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
-  }
-}
-
-bool Model::intersects(DirectX::BoundingOrientedBox other) {
-  // If the `other` does not intersect the bounding box of the model,
-  // we can directly return false.
-  if (!getTransformedBoundingBox().Intersects(other)) {
-    return false;
-  }
-
-  // Otherwise, we need to iterate over the meshes of the model and
-  // check for each mesh whether it intersects with `other`. If we find
-  // one such box, we can directly return true.
-  for(Mesh mesh : m_meshes) {
-    if (applyTransformToBoundingBox(mesh.getBoundingBox()).Intersects(other)){
-      return true;
-    }
-  };
-
-  return false;
-}
-
-bool Model::intersects(DirectX::XMVECTOR line_start, DirectX::XMVECTOR line_direction, float *out_distance) {
-  return getTransformedBoundingBox().Intersects(line_start, line_direction, *out_distance);
-}
-
-bool Model::contains(DirectX::XMVECTOR point) {
-  DirectX::ContainmentType result = getTransformedBoundingBox().Contains(point);
-  return result == DirectX::INTERSECTS || result == DirectX::CONTAINS;
-}
-
-DirectX::BoundingOrientedBox Model::getTransformedBoundingBox() {
-  return applyTransformToBoundingBox(m_bounding_box);
-}
-
-DirectX::BoundingOrientedBox Model::applyTransformToBoundingBox(DirectX::BoundingOrientedBox input_bounding_box) {
-  DirectX::BoundingOrientedBox transformed;
-
-  // This method does not work with scaling in different x, y and z scales, and
-  // therefore we need to build a transformation matrix with just scaling and
-  // apply that one. Also, the method that uses a transformation matrix ignores
-  // translations. We therefore build a matrix only for scaling, apply it, and
-  // then apply rotation and translation.
-  DirectX::XMFLOAT3 scalingVect;
-  DirectX::XMStoreFloat3(&scalingVect, m_scaling);
-  DirectX::XMMATRIX scaling = DirectX::XMMatrixScaling(scalingVect.x, scalingVect.y, scalingVect.z);
-
-  // Apply the scaling
-  input_bounding_box.Transform(transformed, scaling);
-
-  // Apply rotation and translation
-  transformed.Transform(transformed, 1.0f, m_rotation, m_translation);
-
-  // Done
-  return transformed;
 }
