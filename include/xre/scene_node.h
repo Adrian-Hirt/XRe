@@ -49,13 +49,20 @@ public:
 
   static std::unordered_set<SceneNode*> getGrabbableInstances();
   void setGrabbable(bool grabbable);
+  static std::unordered_set<SceneNode*> getTerrainInstances();
+  void setIsTerrain(bool is_terrain);
 
+  // Check whether a node intersects with a bounding box
   bool intersects(DirectX::BoundingOrientedBox other);
+
+  // Check whether a node intersects with a line (and optionally put the
+  // distance of the intersection point as an out parameter)
+  bool intersects(DirectX::XMVECTOR line_start, DirectX::XMVECTOR line_direction, float *out_distance);
 
   bool m_grabbed = false;
   bool m_intersected_in_current_frame = false;
 
-  static void resetIntersectedStates();
+  static void resetInteractionStates();
 
 private:
   // Parent node (which might be null for the root node)
@@ -94,4 +101,6 @@ private:
 
   // Set of all instances we marked as grabbable
   inline static std::unordered_set<SceneNode*> s_grabbable_instances;
+
+  inline static std::unordered_set<SceneNode*> s_terrain_instances;
 };

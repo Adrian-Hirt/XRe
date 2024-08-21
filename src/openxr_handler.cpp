@@ -698,8 +698,6 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
 void OpenXrHandler::updateHandTrackingStates(Hand *hand, XrTime predicted_time) {
   XrResult result;
 
-  return;
-
   // Return if the runtime does not support hand tracking
   if (!m_openxr_hand_tracking_system_properties.supportsHandTracking) {
     return;
@@ -775,8 +773,8 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
   teleport_location_left = m_left_controller->updateIntersectionSphereAndComputePossibleTeleport();
   teleport_location_right = m_right_controller->updateIntersectionSphereAndComputePossibleTeleport();
 
-  // Reset the "m_intersected_in_current_frame" booleans on the grabbable SceneNodes
-  SceneNode::resetIntersectedStates();
+  // Reset the interaction tracking booleans on the grabbable SceneNodes
+  SceneNode::resetInteractionStates();
 
   // As both might have a value, we arbitrarily decide to give the right controller
   // precedende. Later, we might map the teleport action to a single controller anyway,
@@ -984,9 +982,6 @@ XrPath OpenXrHandler::getXrPathFromString(std::string string) {
 
 void OpenXrHandler::initializeHandTracking() {
   XrResult result;
-
-  // Disable for now
-  return;
 
   // Return if the runtime does not support hand tracking
   if (!m_openxr_hand_tracking_system_properties.supportsHandTracking) {

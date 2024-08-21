@@ -79,14 +79,13 @@ void Controller::computeSceneInteractions() {
 
   // Check if any of our controllers is grabbing a grabbable node
   for(SceneNode *current_node : SceneNode::getGrabbableInstances()) {
-    // Skip this if we already are intersecting with this node with another controller
-    if (current_node->m_intersected_in_current_frame) {
+    // Skip this if we already are grabbing this node with another controller or a hand
+    if (current_node->m_grabbed) {
       continue;
     }
 
     if(current_node->intersects(controller_bounding_box)) {
-      // TODO: maybe set a bit a better indicator that an object is intersecting, e.g. a glow effect
-      // Set a different color if the controller is intersecting another model
+      // Keep track that we're intersecting with this model
       current_node->m_intersected_in_current_frame = true;
 
       // Also, if the controller is grabbing, set the position and the rotation of the
@@ -108,8 +107,8 @@ std::optional<DirectX::XMVECTOR> Controller::updateIntersectionSphereAndComputeP
   // Next, check if we need to render the aim intersection sphere
   m_render_intersection_sphere = false;
 
-  float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(Model::getGrabbableInstances());
-  float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(Model::getTerrainInstances());
+  float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(SceneNode::getGrabbableInstances());
+  float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(SceneNode::getTerrainInstances());
 
   if (m_render_intersection_sphere) {
     // The direction vector has unit length, i.e. to stretch it to the required length, we
@@ -136,18 +135,18 @@ std::optional<DirectX::XMVECTOR> Controller::updateIntersectionSphereAndComputeP
   return std::nullopt;
 }
 
-float Controller::computeAimIndicatorSpherePosition(std::unordered_set<Model *> models) {
+float Controller::computeAimIndicatorSpherePosition(std::unordered_set<SceneNode *> nodes) {
   // As we only want to highlight the intersection with the closest model,
   // we need to keep track of the smallest threshold. We probably should replace
   // this later with sorting the elements by distance from the camera and then check in
   // ascending distance, but for now this will have to do.
   float closest_intersection_distance = Controller::s_line_intersection_threshold + 1;
 
-  for(Model *current_model : models) {
-    // Check if the model intersects the line of the controller
+  for(SceneNode *current_node : nodes) {
+    // Check if the node intersects the line of the controller
     float intersection_distance;
 
-    if(current_model->intersects(m_aim_line.getLineStart(), m_aim_line.getLineDirection(), &intersection_distance)) {
+    if(current_node->intersects(m_aim_line.getLineStart(), m_aim_line.getLineDirection(), &intersection_distance)) {
       if (intersection_distance > 0 && intersection_distance <= Controller::s_line_intersection_threshold) {
         m_render_intersection_sphere = true;
 

@@ -142,7 +142,7 @@ void Hand::computeSceneInteractions() {
     return;
   }
 
-  // Check if the hand is intersecting a grabbable model. To make it simpler for the moment, we only
+  // Check if the hand is intersecting a grabbable node. To make it simpler for the moment, we only
   // check intersection with the palm and the tip of the thumb (as for "grab", both the thumb and the
   // center of the palm should intersect, and for "pinch", the tip of the thumb needs to intersect).
   DirectX::BoundingOrientedBox thumb_bounding_box = m_joints[XR_HAND_JOINT_THUMB_TIP_EXT].getTransformedBoundingBox();
@@ -150,23 +150,22 @@ void Hand::computeSceneInteractions() {
 
   // Utils::printVector(thumb_position);
 
-  for(Model *current_model : Model::getGrabbableInstances()) {
-    current_model->setGrabbed(false);
+  for(SceneNode *current_node : SceneNode::getGrabbableInstances()) {
+    // Skip this if we already are grabbing this node with another controller or a hand
+    if (current_node->m_grabbed) {
+      continue;
+    }
 
-    // TODO: maybe set a bit a better indicator that an object is intersecting, e.g. a glow effect
-    if(current_model->intersects(thumb_bounding_box) || current_model->intersects(palm_bounding_box)) {
-      // Set a different color if the hand is intersecting another model
-      current_model->setColor({1.0f, 0.0f, 0.0f, 1.0f});
+    if(current_node->intersects(thumb_bounding_box) || current_node->intersects(palm_bounding_box)) {
+      // Keep track that we're intersecting with this model
+      current_node->m_intersected_in_current_frame = true;
 
       // Also, if the hand is pinching, set the position and rotation of the model to that of the thumb
       if (m_pinching) {
-        current_model->setGrabbed(true);
-        current_model->setPosition(m_joints[XR_HAND_JOINT_THUMB_TIP_EXT].getPosition());
-        current_model->setRotation(m_joints[XR_HAND_JOINT_THUMB_TIP_EXT].getRotation());
+        current_node->m_grabbed = true;
+        current_node->setPosition(m_joints[XR_HAND_JOINT_THUMB_TIP_EXT].getPosition());
+        current_node->setRotation(m_joints[XR_HAND_JOINT_THUMB_TIP_EXT].getRotation());
       }
-    }
-    else {
-      current_model->resetColor();
     }
   }
 

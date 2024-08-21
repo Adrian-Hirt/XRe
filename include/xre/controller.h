@@ -76,5 +76,5 @@ private:
 
   bool m_render_intersection_sphere = false;
 
-  float computeAimIndicatorSpherePosition(std::unordered_set<Model *> models);
+  float computeAimIndicatorSpherePosition(std::unordered_set<SceneNode *> models);
 };

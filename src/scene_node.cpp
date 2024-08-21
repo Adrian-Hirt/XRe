@@ -190,12 +190,30 @@ std::unordered_set<SceneNode*> SceneNode::getGrabbableInstances() {
   return s_grabbable_instances;
 }
 
+void SceneNode::setIsTerrain(bool is_terrain) {
+  if (is_terrain) {
+    SceneNode::s_terrain_instances.insert(this);
+  }
+  else {
+    SceneNode::s_terrain_instances.erase(this);
+  }
+}
+
+std::unordered_set<SceneNode*> SceneNode::getTerrainInstances() {
+  return s_terrain_instances;
+}
+
 bool SceneNode::intersects(DirectX::BoundingOrientedBox other) {
   return getTransformedBoundingBox().Intersects(other);
 }
 
-void SceneNode::resetIntersectedStates() {
+bool SceneNode::intersects(DirectX::XMVECTOR line_start, DirectX::XMVECTOR line_direction, float *out_distance) {
+  return getTransformedBoundingBox().Intersects(line_start, line_direction, *out_distance);
+}
+
+void SceneNode::resetInteractionStates() {
   for (SceneNode* current_node : s_grabbable_instances) {
     current_node->m_intersected_in_current_frame = false;
+    current_node->m_grabbed = false;
   }
 }
