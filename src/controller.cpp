@@ -64,37 +64,32 @@ void Controller::updatePosition(DirectX::XMVECTOR current_origin) {
 }
 
 void Controller::computeSceneInteractions() {
+  // Nothing to do if the controller is not active
   if(!m_active) {
     return;
   }
 
   DirectX::BoundingOrientedBox controller_bounding_box = m_model.getTransformedBoundingBox();
 
-  // // Check if any of our controllers is grabbing a grabbable model
-  // for(Model *current_model : Model::getGrabbableInstances()) {
-  //   current_model->setGrabbed(false);
-
-  //   // TODO: maybe set a bit a better indicator that an object is intersecting, e.g. a glow effect
-  //   if(current_model->intersects(controller_bounding_box)) {
-  //     // Set a different color if the controller is intersecting another model
-  //     current_model->setColor({1.0f, 0.0f, 0.0f, 1.0f});
-
-  //     // Also, if the controller is grabbing, set the position and the rotation of the
-  //     // model to those of the controller
-  //     if (m_grabbing) {
-  //       current_model->setGrabbed(true);
-  //       current_model->setPosition(m_model.getPosition());
-  //       current_model->setRotation(m_model.getRotation());
-  //     }
-  //   }
-  //   else {
-  //     current_model->resetColor();
-  //   }
-  // }
-
+  // Check if any of our controllers is grabbing a grabbable node
   for(SceneNode *current_node : SceneNode::getGrabbableInstances()) {
+    // Skip this if we already are intersecting with this node with another controller
+    if (current_node->m_intersected_in_current_frame) {
+      continue;
+    }
+
     if(current_node->intersects(controller_bounding_box)) {
-      std::cout << "Intersect" << std::endl;
+      // TODO: maybe set a bit a better indicator that an object is intersecting, e.g. a glow effect
+      // Set a different color if the controller is intersecting another model
+      current_node->m_intersected_in_current_frame = true;
+
+      // Also, if the controller is grabbing, set the position and the rotation of the
+      // model to those of the controller
+      if (m_grabbing) {
+        current_node->m_grabbed = true;
+        current_node->setPosition(m_model.getPosition());
+        current_node->setRotation(m_model.getRotation());
+      }
     }
   }
 }

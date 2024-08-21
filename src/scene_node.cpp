@@ -49,7 +49,12 @@ void SceneNode::render() {
     // Update the shader with the transform
     m_shader.setModelMatrix(m_world_transform);
     m_shader.setNormalRotationMatrix(m_world_rotation_matrix);
-    m_shader.setModelColor(m_model->getColor());
+    if (m_intersected_in_current_frame) {
+      m_shader.setModelColor({1.0f, 0.0f, 0.0f, 1.0f});
+    }
+    else {
+      m_shader.setModelColor(m_model->getColor());
+    }
     m_shader.updatePerModelConstantBuffer();
     m_model->renderInSceneNode();
 
@@ -176,4 +181,10 @@ std::unordered_set<SceneNode*> SceneNode::getGrabbableInstances() {
 
 bool SceneNode::intersects(DirectX::BoundingOrientedBox other) {
   return getTransformedBoundingBox().Intersects(other);
+}
+
+void SceneNode::resetIntersectedStates() {
+  for (SceneNode* current_node : s_grabbable_instances) {
+    current_node->m_intersected_in_current_frame = false;
+  }
 }

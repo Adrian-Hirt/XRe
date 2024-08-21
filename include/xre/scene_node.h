@@ -47,6 +47,11 @@ public:
 
   bool intersects(DirectX::BoundingOrientedBox other);
 
+  bool m_grabbed = false;
+  bool m_intersected_in_current_frame = false;
+
+  static void resetIntersectedStates();
+
 private:
   // Parent node (which might be null for the root node)
   SceneNode* m_parent;
