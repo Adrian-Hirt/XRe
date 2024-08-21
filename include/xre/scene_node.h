@@ -65,6 +65,8 @@ public:
 
   static void resetInteractionStates();
 
+  bool m_render = true;
+
 private:
   // Parent node (which might be null for the root node)
   SceneNode* m_parent;

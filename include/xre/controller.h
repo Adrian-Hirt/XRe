@@ -74,9 +74,6 @@ private:
   // Model to visualize intersections of the aim line
   // and models marked as interactable
   Model m_aim_indicator_sphere;
-  Shader m_aim_indicator_shader;
-
-  bool m_render_intersection_sphere = false;
 
   float computeAimIndicatorSpherePosition(std::unordered_set<SceneNode *> models);
 };

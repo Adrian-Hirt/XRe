@@ -18,7 +18,6 @@ Controller::Controller() {
 
   // Create the shaders for the controller
   m_controller_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient.hlsl");
-  m_aim_indicator_shader = Shader::loadOrCreate(SHADERS_FOLDER "/color.hlsl");
 
   // Create the line for the aim direction
   m_aim_line = Line({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
@@ -43,11 +42,6 @@ void Controller::render() {
 
   // Render the aim line
   m_aim_line.render(m_controller_shader);
-
-  // Render the aim interaction sphere
-  if (m_render_intersection_sphere) {
-    m_aim_indicator_sphere.render(m_aim_indicator_shader);
-  }
 }
 
 void Controller::updatePosition(DirectX::XMVECTOR current_origin) {
@@ -111,12 +105,12 @@ std::optional<DirectX::XMVECTOR> Controller::updateIntersectionSphereAndComputeP
   }
 
   // Next, check if we need to render the aim intersection sphere
-  m_render_intersection_sphere = false;
+  m_intersection_sphere_node.m_render = false;
 
   float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(SceneNode::getGrabbableInstances());
   float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(SceneNode::getTerrainInstances());
 
-  if (m_render_intersection_sphere) {
+  if (m_intersection_sphere_node.m_render) {
     // The direction vector has unit length, i.e. to stretch it to the required length, we
     // simple multiply the vector with the length, which gives us a new vector.
     DirectX::XMVECTOR stretched_direction = m_aim_line.getLineDirection() * std::min(closest_grabbable_aim_intersection, closest_terrain_aim_intersection);
@@ -154,7 +148,7 @@ float Controller::computeAimIndicatorSpherePosition(std::unordered_set<SceneNode
 
     if(current_node->intersects(m_aim_line.getLineStart(), m_aim_line.getLineDirection(), &intersection_distance)) {
       if (intersection_distance > 0 && intersection_distance <= Controller::s_line_intersection_threshold) {
-        m_render_intersection_sphere = true;
+        m_intersection_sphere_node.m_render = true;
 
         if (closest_intersection_distance > intersection_distance) {
           closest_intersection_distance = intersection_distance;

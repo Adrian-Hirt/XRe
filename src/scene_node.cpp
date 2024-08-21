@@ -47,6 +47,10 @@ void SceneNode::addChildNode(SceneNode *child) {
 }
 
 void SceneNode::render() {
+  if (!m_render) {
+    return;
+  }
+
   if (m_model) {
     m_shader.activate();
 
@@ -60,7 +64,7 @@ void SceneNode::render() {
       m_shader.setModelColor(m_model->getColor());
     }
     m_shader.updatePerModelConstantBuffer();
-    m_model->renderInSceneNode();
+    m_model->render();
 
     // Set shader variables to identities, as the bounding box is already updated
     // with the correct position (as we need the correct position to be able to
