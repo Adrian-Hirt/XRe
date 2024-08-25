@@ -46,7 +46,7 @@ void SceneNode::addChildNode(SceneNode *child) {
 }
 
 void SceneNode::render() {
-  if (!m_render) {
+  if (!m_is_active) {
     return;
   }
 
@@ -210,7 +210,15 @@ void SceneNode::setGrabbable(bool grabbable) {
 }
 
 std::unordered_set<SceneNode*> SceneNode::getGrabbableInstances() {
-  return s_grabbable_instances;
+  std::unordered_set<SceneNode*> result;
+
+  for (SceneNode *current_node : s_grabbable_instances) {
+    if (current_node->isActive()) {
+      result.insert(current_node);
+    }
+  }
+
+  return result;
 }
 
 void SceneNode::setIsTerrain(bool is_terrain) {
@@ -222,8 +230,24 @@ void SceneNode::setIsTerrain(bool is_terrain) {
   }
 }
 
+void SceneNode::setActive(bool is_active) {
+  m_is_active = is_active;
+}
+
+bool SceneNode::isActive() {
+  return m_is_active;
+}
+
 std::unordered_set<SceneNode*> SceneNode::getTerrainInstances() {
-  return s_terrain_instances;
+  std::unordered_set<SceneNode*> result;
+
+  for (SceneNode *current_node : s_terrain_instances) {
+    if (current_node->isActive()) {
+      result.insert(current_node);
+    }
+  }
+
+  return result;
 }
 
 bool SceneNode::intersects(DirectX::BoundingOrientedBox other) {

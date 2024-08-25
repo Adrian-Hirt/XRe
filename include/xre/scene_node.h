@@ -53,6 +53,9 @@ public:
   static std::unordered_set<SceneNode*> getTerrainInstances();
   void setIsTerrain(bool is_terrain);
 
+  void setActive(bool is_active);
+  bool isActive();
+
   // Check whether a node intersects with a bounding box
   bool intersects(DirectX::BoundingOrientedBox other);
 
@@ -64,9 +67,6 @@ public:
   bool m_intersected_in_current_frame = false;
 
   static void resetInteractionStates();
-
-  bool m_render = true;
-
 private:
   // Parent node (which might be null for the root node)
   SceneNode* m_parent;
@@ -105,4 +105,6 @@ private:
   inline static std::unordered_set<SceneNode*> s_terrain_instances;
 
   bool m_transform_needs_update = true;
+
+  bool m_is_active = true;
 };

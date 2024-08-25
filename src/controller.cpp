@@ -105,12 +105,12 @@ std::optional<DirectX::XMVECTOR> Controller::updateIntersectionSphereAndComputeP
   }
 
   // Next, check if we need to render the aim intersection sphere
-  m_intersection_sphere_node.m_render = false;
+  m_intersection_sphere_node.setActive(false);
 
   float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(SceneNode::getGrabbableInstances());
   float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(SceneNode::getTerrainInstances());
 
-  if (m_intersection_sphere_node.m_render) {
+  if (m_intersection_sphere_node.isActive()) {
     // The direction vector has unit length, i.e. to stretch it to the required length, we
     // simple multiply the vector with the length, which gives us a new vector.
     DirectX::XMVECTOR stretched_direction = m_aim_line.getLineDirection() * std::min(closest_grabbable_aim_intersection, closest_terrain_aim_intersection);
@@ -148,7 +148,7 @@ float Controller::computeAimIndicatorSpherePosition(std::unordered_set<SceneNode
 
     if(current_node->intersects(m_aim_line.getLineStart(), m_aim_line.getLineDirection(), &intersection_distance)) {
       if (intersection_distance > 0 && intersection_distance <= Controller::s_line_intersection_threshold) {
-        m_intersection_sphere_node.m_render = true;
+        m_intersection_sphere_node.setActive(true);
 
         if (closest_intersection_distance > intersection_distance) {
           closest_intersection_distance = intersection_distance;
