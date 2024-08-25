@@ -78,9 +78,6 @@ private:
   // transformation)
   Model* m_model;
 
-  // TODO: remove when models have a default shader
-  Shader m_shader;
-
   // Position, scale and rotation of the SceneNode. These are all LOCAL,
   // i.e. in relation to the transform of the parent node!
   // Scale factors, initialize to use the scale of 1 for X, Y and Z

@@ -18,12 +18,14 @@ Model::Model(std::vector<Mesh> meshes, DirectX::XMFLOAT4 color) {
   m_meshes = meshes;
   m_model_color = color;
   m_original_model_color = color;
+  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient.hlsl");
 }
 
 Model::Model(const char *model_path, DirectX::XMFLOAT4 color) {
   loadObj(model_path);
   m_model_color = color;
   m_original_model_color = color;
+  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient.hlsl");
 }
 
 void Model::render() {

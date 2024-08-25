@@ -9,7 +9,6 @@ SceneNode::SceneNode(Model* model) {
   m_model = model;
   buildBoundingBox();
   m_parent = NULL;
-  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient.hlsl");
 }
 
 void SceneNode::buildBoundingBox() {
@@ -52,23 +51,24 @@ void SceneNode::render() {
   }
 
   if (m_model) {
-    m_shader.activate();
+    m_model->m_shader.activate();
 
     // Update the shader with the transform
-    m_shader.setModelMatrix(m_world_transform);
-    m_shader.setNormalRotationMatrix(m_world_rotation_matrix);
+    m_model->m_shader.setModelMatrix(m_world_transform);
+    m_model->m_shader.setNormalRotationMatrix(m_world_rotation_matrix);
     if (m_intersected_in_current_frame) {
-      m_shader.setModelColor({1.0f, 0.0f, 0.0f, 1.0f});
+      m_model->m_shader.setModelColor({1.0f, 0.0f, 0.0f, 1.0f});
     }
     else {
-      m_shader.setModelColor(m_model->getColor());
+      m_model->m_shader.setModelColor(m_model->getColor());
     }
-    m_shader.updatePerModelConstantBuffer();
+    m_model->m_shader.updatePerModelConstantBuffer();
     m_model->render();
 
     // Set shader variables to identities, as the bounding box is already updated
     // with the correct position (as we need the correct position to be able to
     // compute intersections).
+    // TODO: the bounding box mesh should also have its own shader!
     m_shader.setModelMatrix(DirectX::XMMatrixIdentity());
     m_shader.setNormalRotationMatrix(DirectX::XMMatrixIdentity());
     m_shader.setModelColor({1.0f, 1.0f, 1.0f, 1.0f});

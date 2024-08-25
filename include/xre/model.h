@@ -13,6 +13,7 @@
 #include <xre/structs.h>
 #include <xre/dx11_handler.h>
 #include <xre/mesh.h>
+#include <xre/shader.h>
 #include <xre/bounding_box_mesh.h>
 
 class Model {
@@ -35,6 +36,7 @@ public:
 
   std::vector<DirectX::XMFLOAT3> getMeshBoundingBoxCorners();
 
+  Shader m_shader;
 private:
   // Pointer to the Dx11 handler
   inline static Dx11Handler *s_dx11_handler = NULL;
