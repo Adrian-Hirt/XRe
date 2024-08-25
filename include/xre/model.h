@@ -29,10 +29,7 @@ public:
   Model(const char *model_path, const char* shader_path);
   Model(const char *model_path, DirectX::XMFLOAT4 color, const char* shader_path);
 
-  // Two different rendering methods, one where the user can pass in
-  // a shader to use for this model
   void render();
-  void renderTransparent();
 
   // Set the color of the model
   void setColor(DirectX::XMFLOAT4 color);
@@ -44,6 +41,9 @@ public:
   std::vector<DirectX::XMFLOAT3> getMeshBoundingBoxCorners();
 
   Shader m_shader;
+
+  bool m_has_transparency = false;
+
 private:
   // Pointer to the Dx11 handler
   inline static Dx11Handler *s_dx11_handler = NULL;
@@ -58,4 +58,7 @@ private:
   DirectX::XMFLOAT4 m_original_model_color;
 
   void loadObj(const char *model_path);
+
+  void renderWithTransparency();
+  void renderMeshes();
 };

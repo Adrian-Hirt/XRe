@@ -37,19 +37,28 @@ Model::Model(const char *model_path, DirectX::XMFLOAT4 color, const char* shader
 }
 
 void Model::render() {
+  if (m_has_transparency) {
+    renderWithTransparency();
+  }
+  else {
+    renderMeshes();
+  }
+}
+
+void Model::renderMeshes() {
   for (Mesh &mesh : m_meshes) {
     mesh.render();
   }
 }
 
-void Model::renderTransparent() {
+void Model::renderWithTransparency() {
   // Render the model twice, once with Counterclockwise
   // cull mode, once with the normal clockwise cull mode, such
   // that the transparency works correctly.
   s_dx11_handler->useDefaultRasterizer(false);
-  render();
+  renderMeshes();
   s_dx11_handler->useDefaultRasterizer(true);
-  render();
+  renderMeshes();
 }
 
 void Model::setColor(DirectX::XMFLOAT4 color) {
