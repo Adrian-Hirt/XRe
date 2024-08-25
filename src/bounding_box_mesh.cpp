@@ -23,6 +23,7 @@ BoundingBoxMesh::BoundingBoxMesh(std::vector<vertex_t> vertices) {
 void BoundingBoxMesh::render() {
   m_shader.activate();
   m_shader.setModelColor({1.0f, 1.0f, 1.0f, 1.0f});
+  m_shader.updatePerModelConstantBuffer();
 
   UINT stride = sizeof(vertex_t);
   UINT offset = 0;
