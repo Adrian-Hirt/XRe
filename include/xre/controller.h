@@ -61,12 +61,8 @@ private:
   // Threshold for showing the line intersection point
   static constexpr float s_line_intersection_threshold = 6.0f;
 
-  // Model and shader for the controller
+  // Model for the controller
   Model m_model;
-  Shader m_controller_shader;
-  SceneNode m_root_node;
-  SceneNode m_model_node;
-  SceneNode m_intersection_sphere_node;
 
   // Line for visualizing the aim direction
   Line m_aim_line;
@@ -74,6 +70,12 @@ private:
   // Model to visualize intersections of the aim line
   // and models marked as interactable
   Model m_aim_indicator_sphere;
+
+  // Scene nodes
+  SceneNode m_root_node;
+  SceneNode m_model_node;
+  SceneNode m_intersection_sphere_node;
+  SceneNode m_aim_line_node;
 
   float computeAimIndicatorSpherePosition(std::unordered_set<SceneNode *> models);
 };

@@ -27,6 +27,9 @@ private:
   const float X_STEP = 1.0f / 32.0f;
   const float Y_STEP = 1.0f / 7.0f;
 
+  // Text does not have a bounding box
+  inline bool hasBoundingBox() override { return false; };
+
   void buildMeshesFromSentence(const char* sentence);
   inline text_char_t computeTextureOffsets(int letter);
 };

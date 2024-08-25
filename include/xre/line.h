@@ -16,9 +16,9 @@ public:
 
 private:
   // A line does not have a bounding box
-  inline bool hasBoundingBox() { return false; }
+  inline bool hasBoundingBox() override { return false; };
 
-  inline bool usesStaticBuffers() { return false; };
+  inline bool usesStaticBuffers() override { return false; };
 
   std::vector<vertex_t> verticesFromPoints(DirectX::XMFLOAT3 start, DirectX::XMFLOAT3 end);
 

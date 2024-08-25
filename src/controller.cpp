@@ -16,11 +16,10 @@ Controller::Controller() {
   m_root_node.addChildNode(m_model_node);
   m_root_node.addChildNode(m_intersection_sphere_node);
 
-  // Create the shaders for the controller
-  m_controller_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient.hlsl");
-
   // Create the line for the aim direction
   m_aim_line = Line({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
+  m_aim_line_node = SceneNode(&m_aim_line);
+  m_root_node.addChildNode(m_aim_line_node);
 }
 
 void Controller::render() {
@@ -39,9 +38,6 @@ void Controller::render() {
   }
 
   m_root_node.render();
-
-  // Render the aim line
-  m_aim_line.render();
 }
 
 void Controller::updatePosition(DirectX::XMVECTOR current_origin) {
