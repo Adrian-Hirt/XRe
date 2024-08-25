@@ -29,6 +29,9 @@ public:
   SceneNode sphere_1_node = SceneNode(&sphere, root_node);
   SceneNode sphere_2_node = SceneNode(&sphere, root_node);
   SceneNode sphere_3_node = SceneNode(&sphere, root_node);
+  SceneNode text_node = SceneNode(&text, root_node);
+  SceneNode quad_node = SceneNode(&quad, root_node);
+  SceneNode line_node = SceneNode(&line, root_node);
 
   void setup() override {
     spinning_cube_node.scale(0.3f, 0.3f, 0.3f);
@@ -65,13 +68,6 @@ public:
 
   void draw() override {
     root_node.render();
-
-    // Render the line
-    line.render();
-
-    // Render the flat bitmaps
-    quad.render();
-    text.render();
   };
 };
 
