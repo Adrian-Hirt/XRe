@@ -41,7 +41,7 @@ void Controller::render() {
   m_root_node.render();
 
   // Render the aim line
-  m_aim_line.render(m_controller_shader);
+  m_aim_line.render();
 }
 
 void Controller::updatePosition(DirectX::XMVECTOR current_origin) {
