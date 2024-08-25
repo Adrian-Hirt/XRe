@@ -11,6 +11,12 @@ SceneNode::SceneNode(Model* model) {
   m_parent = NULL;
 }
 
+SceneNode::SceneNode(Model* model, SceneNode &parent) {
+  m_model = model;
+  buildBoundingBox();
+  parent.addChildNode(this);
+}
+
 void SceneNode::buildBoundingBox() {
   std::vector<DirectX::XMFLOAT3> bounding_box_corners = m_model->getMeshBoundingBoxCorners();
   size_t points_count = bounding_box_corners.size();

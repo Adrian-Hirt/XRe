@@ -15,6 +15,7 @@ class SceneNode {
 public:
   SceneNode();
   SceneNode(Model* model);
+  SceneNode(Model* model, SceneNode &parent);
   ~SceneNode();
 
   void addChildNode(SceneNode &child);
