@@ -14,18 +14,26 @@ Model::Model() {}
 //  1) Vector of meshes for this model
 //  2) Color of the model
 //------------------------------------------------------------------------------------------------------
-Model::Model(std::vector<Mesh> meshes, DirectX::XMFLOAT4 color) {
+Model::Model(std::vector<Mesh> meshes) : Model::Model(meshes, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), SHADERS_FOLDER "/ambient.hlsl") {}
+Model::Model(std::vector<Mesh> meshes, DirectX::XMFLOAT4 color) : Model::Model(meshes, color, SHADERS_FOLDER "/ambient.hlsl") {}
+Model::Model(std::vector<Mesh> meshes, const char* shader_path) : Model::Model(meshes, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), shader_path) {}
+
+Model::Model(std::vector<Mesh> meshes, DirectX::XMFLOAT4 color, const char* shader_path) {
   m_meshes = meshes;
   m_model_color = color;
   m_original_model_color = color;
-  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient.hlsl");
+  m_shader = Shader::loadOrCreate(shader_path);
 }
 
-Model::Model(const char *model_path, DirectX::XMFLOAT4 color) {
+Model::Model(const char *model_path) : Model::Model(model_path, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), SHADERS_FOLDER "/ambient.hlsl") {}
+Model::Model(const char *model_path, DirectX::XMFLOAT4 color) : Model::Model(model_path, color, SHADERS_FOLDER "/ambient.hlsl") {}
+Model::Model(const char *model_path, const char* shader_path) : Model::Model(model_path, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), shader_path) {}
+
+Model::Model(const char *model_path, DirectX::XMFLOAT4 color, const char* shader_path) {
   loadObj(model_path);
   m_model_color = color;
   m_original_model_color = color;
-  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient.hlsl");
+  m_shader = Shader::loadOrCreate(shader_path);
 }
 
 void Model::render() {

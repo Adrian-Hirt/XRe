@@ -19,8 +19,15 @@
 class Model {
 public:
   Model();
-  Model(std::vector<Mesh> meshes, DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f));
-  Model(const char *model_path, DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f));
+  Model(std::vector<Mesh> meshes);
+  Model(std::vector<Mesh> meshes, DirectX::XMFLOAT4 color);
+  Model(std::vector<Mesh> meshes, const char* shader_path);
+  Model(std::vector<Mesh> meshes, DirectX::XMFLOAT4 color, const char* shader_path);
+
+  Model(const char *model_path);
+  Model(const char *model_path, DirectX::XMFLOAT4 color);
+  Model(const char *model_path, const char* shader_path);
+  Model(const char *model_path, DirectX::XMFLOAT4 color, const char* shader_path);
 
   // Two different rendering methods, one where the user can pass in
   // a shader to use for this model
