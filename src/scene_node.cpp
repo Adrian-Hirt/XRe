@@ -14,6 +14,17 @@ SceneNode::SceneNode(Model* model) {
 SceneNode::SceneNode(Model* model, SceneNode &parent) {
   m_model = model;
   buildBoundingBox();
+  m_parent = &parent;
+  parent.addChildNode(this);
+}
+
+SceneNode::SceneNode(Renderable* renderable) {
+  m_renderable = renderable;
+}
+
+SceneNode::SceneNode(Renderable* renderable, SceneNode &parent) {
+  m_renderable = renderable;
+  m_parent = &parent;
   parent.addChildNode(this);
 }
 
@@ -75,6 +86,9 @@ void SceneNode::render() {
     // with the correct position (as we need the correct position to be able to
     // compute intersections).
     m_model_bounding_box_mesh.render();
+  }
+  else if (m_renderable) {
+    m_renderable->render();
   }
 
   for (SceneNode *child : m_children) {

@@ -16,6 +16,8 @@ public:
   SceneNode();
   SceneNode(Model* model);
   SceneNode(Model* model, SceneNode &parent);
+  SceneNode(Renderable* model);
+  SceneNode(Renderable* model, SceneNode &parent);
   ~SceneNode();
 
   void addChildNode(SceneNode &child);
@@ -75,9 +77,10 @@ private:
   // Children of this node
   std::vector<SceneNode *> m_children;
 
-  // Model contained in this node (which might be null, e.g. for a node only containing some
+  // Model or Renderable contained in this node (which might be null, e.g. for a node only containing some
   // transformation)
-  Model* m_model;
+  Model* m_model = nullptr;
+  Renderable* m_renderable = nullptr;
 
   // Position, scale and rotation of the SceneNode. These are all LOCAL,
   // i.e. in relation to the transform of the parent node!

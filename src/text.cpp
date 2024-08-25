@@ -25,9 +25,6 @@ Text::Text(const char* sentence) {
 void Text::buildMeshesFromSentence(const char* sentence) {
   int lenght = strlen(sentence);
 
-  float x_position = 0.0;
-  float y_position = 0.0;
-
   float x_offset = -0.95f;
   float char_height = 0.1;
   float char_width = 0.05f;
@@ -77,9 +74,21 @@ void Text::buildMeshesFromSentence(const char* sentence) {
     }
   }
 
-  m_bitmap = Bitmap(vertices, indices, DATA_FOLDER "/fonts/DejaVuSansMono128NoAA.png");
+  // Call general initialize method
+  initialize(vertices, indices);
+
+  // Load the texture
+  std::wstring filepath = Utils::stringToWString(DATA_FOLDER "/fonts/DejaVuSansMono128NoAA.png");
+  ID3D11Resource *texture; // Throwaway variable
+  HRESULT result = DirectX::CreateWICTextureFromFile(s_device, s_device_context, filepath.c_str(), &texture, &m_texture_view);
+  Utils::checkHresult(result, "Failed to load the texture");
+
+  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/bitmap.hlsl");
 }
 
 void Text::render() {
-  m_bitmap.render();
+  m_shader.activate();
+  m_shader.updatePerModelConstantBuffer();
+
+  Renderable::render();
 }
