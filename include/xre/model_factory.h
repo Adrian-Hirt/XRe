@@ -84,7 +84,7 @@ namespace ModelFactory {
     auto [vertices, indices] = getGroundVerticesAndIndices(extent);
 
     Mesh ground_mesh = Mesh(vertices, indices, texture_path);
-    return Model({ ground_mesh });
+    return Model({ ground_mesh }, SHADERS_FOLDER "/ambient_texture.hlsl");
   }
 
   inline Model createSphere() {
