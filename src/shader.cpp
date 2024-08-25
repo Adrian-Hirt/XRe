@@ -13,8 +13,11 @@ Shader::Shader(const char *shader_path) {
   std::wstring w_obj_location = Utils::stringToWString(obj_location);
 
   // Load and compile the pixel and vertex shaders
-  ID3D10Blob *vertex_shader_blob, *pixel_shader_blob, *errors_blob;
+  ID3DBlob *vertex_shader_blob = nullptr;
+  ID3DBlob *pixel_shader_blob = nullptr;
+  ID3DBlob *errors_blob = nullptr;
   D3DCompileFromFile(w_obj_location.c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, "VShader", "vs_4_0", D3DCOMPILE_OPTIMIZATION_LEVEL3, 0, &vertex_shader_blob, &errors_blob);
+
   if (errors_blob) {
     std::cout << reinterpret_cast<const char *>(errors_blob->GetBufferPointer()) << std::endl;
     Utils::exitWithMessage("The vertex shader failed to compile.");
