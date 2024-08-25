@@ -68,11 +68,6 @@ void SceneNode::render() {
     // Set shader variables to identities, as the bounding box is already updated
     // with the correct position (as we need the correct position to be able to
     // compute intersections).
-    // TODO: the bounding box mesh should also have its own shader!
-    m_shader.setModelMatrix(DirectX::XMMatrixIdentity());
-    m_shader.setNormalRotationMatrix(DirectX::XMMatrixIdentity());
-    m_shader.setModelColor({1.0f, 1.0f, 1.0f, 1.0f});
-    m_shader.updatePerModelConstantBuffer();
     m_model_bounding_box_mesh.render();
   }
 

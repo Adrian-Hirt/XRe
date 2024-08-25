@@ -1,8 +1,6 @@
 #include <xre/bounding_box_mesh.h>
 
-BoundingBoxMesh::BoundingBoxMesh() {
-
-}
+BoundingBoxMesh::BoundingBoxMesh() {}
 
 BoundingBoxMesh::BoundingBoxMesh(std::vector<vertex_t> vertices) {
   std::vector<unsigned int> bounding_box_indices = {
@@ -17,9 +15,14 @@ BoundingBoxMesh::BoundingBoxMesh(std::vector<vertex_t> vertices) {
 
   createVertexBuffer(vertices, &m_vertex_buffer);
   createIndexBuffer(bounding_box_indices, &m_index_buffer);
+
+  // Set shader to simply use the color shader
+  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/fixed_position.hlsl");
 }
 
 void BoundingBoxMesh::render() {
+  m_shader.activate();
+
   UINT stride = sizeof(vertex_t);
   UINT offset = 0;
 

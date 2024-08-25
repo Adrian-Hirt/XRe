@@ -59,6 +59,8 @@ protected:
   // to be updateable or not).
   bool m_static_buffers = true;
 
+  Shader m_shader;
+
   void initialize(std::vector<vertex_t> vertices, std::vector<unsigned int> indices);
   void createVertexBuffer(std::vector<vertex_t> data, ID3D11Buffer **target_buffer);
   void createIndexBuffer(std::vector<unsigned int> data, ID3D11Buffer **target_buffer);
