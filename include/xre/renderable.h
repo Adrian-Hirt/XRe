@@ -18,7 +18,7 @@
 // can be rendered to display some output in the program.
 class Renderable {
 public:
-  virtual void render() {};
+  virtual void render();
   DirectX::BoundingOrientedBox getBoundingBox();
 
   static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);

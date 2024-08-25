@@ -21,6 +21,4 @@ public:
   Mesh();
   Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices);
   Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, const char *texture_path);
-
-  void render() override;
 };
