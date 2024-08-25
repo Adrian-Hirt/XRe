@@ -106,4 +106,6 @@ private:
   inline static std::unordered_set<SceneNode*> s_grabbable_instances;
 
   inline static std::unordered_set<SceneNode*> s_terrain_instances;
+
+  bool m_transform_needs_update = true;
 };

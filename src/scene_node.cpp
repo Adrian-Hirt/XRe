@@ -82,41 +82,54 @@ void SceneNode::render() {
 }
 
 void SceneNode::updateTransformation() {
-  // Update the local transform
-  m_local_transform = DirectX::XMMatrixTranspose(
-    DirectX::XMMatrixAffineTransformation(
-      m_scaling,
-      DirectX::g_XMZero,
-      m_rotation,
-      m_translation
-    )
-  );
+  // Update the `m_transform_needs_update` flag with the flag from parent node, as this node itself
+  // might not have been changed, but its parent might be (which means this node needs to
+  // update its transformation as well, which needs to be reflected in its children).
+  m_transform_needs_update = m_transform_needs_update || m_parent && m_parent->m_transform_needs_update;
 
-  if (m_parent) {
-    m_world_transform = DirectX::XMMatrixMultiply(
-      m_parent->m_world_transform,
-      m_local_transform
+  // We only need to update the transform for the current element
+  // if its `m_transform_needs_update` flag or the one of its parent is set to `true`
+  if (m_transform_needs_update) {
+    // Update the local transform
+    m_local_transform = DirectX::XMMatrixTranspose(
+      DirectX::XMMatrixAffineTransformation(
+        m_scaling,
+        DirectX::g_XMZero,
+        m_rotation,
+        m_translation
+      )
     );
 
-    m_world_rotation_matrix = DirectX::XMMatrixRotationQuaternion(
-      DirectX::XMQuaternionMultiply(m_parent->m_rotation, m_rotation)
-    );
-  }
-  else {
-    // No parent, is the root node, which means its local transform
-    // is also its world transform, since the local transform is applied
-    // relative to the origin point.
-    m_world_transform = m_local_transform;
-    m_world_rotation_matrix = DirectX::XMMatrixRotationQuaternion(m_rotation);
+    if (m_parent) {
+      m_world_transform = DirectX::XMMatrixMultiply(
+        m_parent->m_world_transform,
+        m_local_transform
+      );
+
+      m_world_rotation_matrix = DirectX::XMMatrixRotationQuaternion(
+        DirectX::XMQuaternionMultiply(m_parent->m_rotation, m_rotation)
+      );
+    }
+    else {
+      // No parent, is the root node, which means its local transform
+      // is also its world transform, since the local transform is applied
+      // relative to the origin point.
+      m_world_transform = m_local_transform;
+      m_world_rotation_matrix = DirectX::XMMatrixRotationQuaternion(m_rotation);
+    }
+
+    if (m_model) {
+      m_model_bounding_box_mesh.updateVerticesFromBoundingBox(getTransformedBoundingBox());
+    }
   }
 
-  if (m_model) {
-    m_model_bounding_box_mesh.updateVerticesFromBoundingBox(getTransformedBoundingBox());
-  }
-
+  // Update the transforms of all the children.
   for (SceneNode *child : m_children) {
     child->updateTransformation();
   }
+
+  // And then reset the `m_transform_needs_update` flag
+  m_transform_needs_update = false;
 }
 
 DirectX::BoundingOrientedBox SceneNode::getTransformedBoundingBox() {
@@ -132,6 +145,7 @@ void SceneNode::rotate(float roll, float pitch, float yaw) {
 
 void SceneNode::rotate(DirectX::XMVECTOR rotation) {
   m_rotation = DirectX::XMQuaternionMultiply(m_rotation, rotation);
+  m_transform_needs_update = true;
 }
 
 void SceneNode::translate(float x, float y, float z) {
@@ -141,6 +155,7 @@ void SceneNode::translate(float x, float y, float z) {
 
 void SceneNode::translate(DirectX::XMVECTOR translation) {
   m_translation = DirectX::XMVectorAdd(m_translation, translation);
+  m_transform_needs_update = true;
 }
 
 void SceneNode::scale(float x, float y, float z) {
@@ -150,10 +165,12 @@ void SceneNode::scale(float x, float y, float z) {
 
 void SceneNode::scale(DirectX::XMVECTOR scaling) {
   m_scaling = DirectX::XMVectorMultiply(m_scaling, scaling);
+  m_transform_needs_update = true;
 }
 
 void SceneNode::setRotation(DirectX::XMVECTOR rotation) {
   m_rotation = rotation;
+  m_transform_needs_update = true;
 }
 
 void SceneNode::setScale(float x, float y, float z) {
@@ -163,6 +180,7 @@ void SceneNode::setScale(float x, float y, float z) {
 
 void SceneNode::setScale(DirectX::XMVECTOR scaling) {
   m_scaling = scaling;
+  m_transform_needs_update = true;
 }
 
 void SceneNode::setPosition(float x, float y, float z) {
@@ -172,6 +190,7 @@ void SceneNode::setPosition(float x, float y, float z) {
 
 void SceneNode::setPosition(DirectX::XMVECTOR position) {
   m_translation = position;
+  m_transform_needs_update = true;
 }
 
 DirectX::XMVECTOR SceneNode::getRotation() {
