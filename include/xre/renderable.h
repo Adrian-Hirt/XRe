@@ -2,6 +2,7 @@
 
 // DirectX includes
 #include <d3d11.h>
+#include <DirectXMath/DirectXMath.h>
 #include <DirectXTex/WICTextureLoader11.h>
 #include <DirectXMath/DirectXCollision.h>
 
@@ -17,7 +18,7 @@
 // can be rendered to display some output in the program.
 class Renderable {
 public:
-  virtual void render() {};
+  virtual void render();
   DirectX::BoundingOrientedBox getBoundingBox();
 
   static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);
@@ -57,6 +58,8 @@ protected:
   // Whether the mesh should be changeable (i.e. the vertex and index buffers need
   // to be updateable or not).
   bool m_static_buffers = true;
+
+  Shader m_shader;
 
   void initialize(std::vector<vertex_t> vertices, std::vector<unsigned int> indices);
   void createVertexBuffer(std::vector<vertex_t> data, ID3D11Buffer **target_buffer);

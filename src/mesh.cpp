@@ -50,27 +50,3 @@ Mesh::Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, co
   error_string += texture_path;
   Utils::checkHresult(result, error_string.c_str());
 }
-
-void Mesh::render() {
-  // Set vertex and index buffers on the GPU to be the ones of this mesh
-  UINT stride = sizeof(vertex_t);
-  UINT offset = 0;
-  s_device_context->IASetVertexBuffers(0, 1, &m_vertex_buffer, &stride, &offset);
-  s_device_context->IASetIndexBuffer(m_index_buffer, DXGI_FORMAT_R32_UINT, 0);
-
-  // Set the texture if it exists, otherwise remove any previously added textures
-  if (m_texture_view) {
-    s_device_context->PSSetShaderResources(0, 1, &m_texture_view);
-  }
-  else {
-    s_device_context->PSSetShaderResources(0, 1, &s_nulltexture);
-  }
-
-  // We'll be rendering a triangle list, so we need to tell the GPU
-  // to render the vertices as such.
-  s_device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-  // And finally, we can call the actual draw method, which will draw all the
-  // indices of this mesh.
-  s_device_context->DrawIndexed(m_index_count, 0, 0);
-}

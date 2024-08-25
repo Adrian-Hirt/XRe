@@ -1,5 +1,9 @@
 #pragma once
 
+// DirectX includes
+#include <d3d11.h>
+#include <DirectXMath/DirectXMath.h>
+
 // OpenXR includes
 #include <open_xr/openxr.h>
 
@@ -7,6 +11,7 @@
 #include <xre/model.h>
 #include <xre/shader.h>
 #include <xre/model_factory.h>
+#include <xre/scene_node.h>
 
 class Hand {
 public:
@@ -33,7 +38,9 @@ public:
 
 private:
   Shader m_joint_shader;
-  std::vector<Model> m_joints;
+  Model m_joint_model;
+  SceneNode m_hand_root_node;
+  std::vector<SceneNode*> m_joint_nodes;
 
   bool m_pinching = false;
 

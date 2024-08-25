@@ -4,21 +4,12 @@ class TestApp : public Application {
 public:
   TestApp(const char *application_name) : Application(application_name) {};
 
-  // Create shaders
-  Shader ambient_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient.hlsl");
-  Shader color_shader = Shader::loadOrCreate(SHADERS_FOLDER "/color.hlsl");
-  Shader texture_shader = Shader::loadOrCreate(SHADERS_FOLDER "/ambient_texture.hlsl");
-
-  // Create models with the ModelFactory
-  Model spinning_cube = ModelFactory::createCube({1.0f, 0.0f, 0.0f, 0.25f});
-  Model ground_cube = ModelFactory::createCube(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
-  Model ground = ModelFactory::createGroundPlane(10, DATA_FOLDER "/textures/Tiles012_2K-JPG_Color.jpg");
-  Model small_cube = ModelFactory::createCube(DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+  Model floor = ModelFactory::createGroundPlane(10, DATA_FOLDER "/textures/Tiles012_2K-JPG_Color.jpg");
+  Model cube = ModelFactory::createCube({0.0f, 1.0f, 0.0f, 1.0f});
+  Model transparent_cube = ModelFactory::createCube({1.0f, 0.0f, 0.0f, 0.25f});
 
   // Create custom models
   Model sphere = Model(DATA_FOLDER "/models/sphere.obj");
-  Model sphere2 = Model(DATA_FOLDER "/models/sphere.obj");
-  Model sphere3 = Model(DATA_FOLDER "/models/sphere.obj");
 
   // Create a line
   Line line = Line({0.0f, 0.0f, 0.0f}, {10.0f, 10.0f, 5.0f}, {1.0f, 0.0f, 0.0f, 1.0f});
@@ -29,72 +20,54 @@ public:
   // Create some text with some valid and some invalid characters
   Text text = Text("This is a sample text :) カタカナ");
 
+  // Build the scene nodes
+  SceneNode root_node = SceneNode();
+  SceneNode floor_node = SceneNode(&floor, root_node);
+  SceneNode spinning_cube_node = SceneNode(&cube, root_node);
+  SceneNode moon_cube_node = SceneNode(&cube, spinning_cube_node);
+  SceneNode transparent_cube_node = SceneNode(&transparent_cube, root_node);
+  SceneNode sphere_1_node = SceneNode(&sphere, root_node);
+  SceneNode sphere_2_node = SceneNode(&sphere, root_node);
+  SceneNode sphere_3_node = SceneNode(&sphere, root_node);
+  SceneNode text_node = SceneNode(&text, root_node);
+  SceneNode quad_node = SceneNode(&quad, root_node);
+  SceneNode line_node = SceneNode(&line, root_node);
+
   void setup() override {
-    // Scale the cube down a bit
-    spinning_cube.scale(0.33f, 0.33f, 0.33f);
+    spinning_cube_node.scale(0.3f, 0.3f, 0.3f);
+    spinning_cube_node.translate(1.0f, 1.0f, 1.0f);
+    spinning_cube_node.setGrabbable(true);
 
-    // And translate the cube up a bit
-    spinning_cube.translate(0.0f, 4.0f, 0.0f);
-    spinning_cube.setGrabbable(true);
+    moon_cube_node.translate(2.0f, 1.0f, 0.0f);
+    moon_cube_node.scale(0.1f, 0.1f, 0.1f);
 
-    // Scale the small cube down and translate it a bit. Also, mark it as grabbable.
-    small_cube.scale(0.1f, 0.1f, 0.1f);
-    small_cube.translate(2.0f, 1.5f, 0.0f);
-    small_cube.setGrabbable(true);
+    transparent_cube.m_has_transparency = true;
+    transparent_cube_node.scale(0.1f, 0.1f, 0.1f);
+    transparent_cube_node.translate(2.0f, 1.5f, 0.0f);
+    transparent_cube_node.setGrabbable(true);
 
-    sphere.scale(0.1f, 0.1f, 0.1f);
-    sphere.setGrabbable(true);
+    sphere_1_node.scale(0.1f, 0.1f, 0.1f);
 
-    // Translate the ground cube up a bit and to the left
-    ground_cube.translate(-2.0f, 0.5f, 0.0f);
-    ground_cube.setGrabbable(true);
+    sphere_2_node.scale(0.1f, 0.1f, 0.1f);
+    sphere_2_node.translate(1.0f, 0.0f, 2.0f);
 
-    // Squish the ground cube
-    ground_cube.scale(1.0f, 0.3f, 1.0f);
-
-    sphere2.scale(0.1f, 0.1f, 0.1f);
-    sphere2.translate(1.0f, 0.0f, 2.0f);
-    sphere2.setColor({1.0f, 0.0f, 0.0f, 1.0f});
-
-    sphere3.scale(0.1f, 0.1f, 0.1f);
-    sphere3.translate(-2.0f, 0.0f, -2.5f);
-    sphere3.setColor({0.0f, 1.0f, 0.0f, 1.0f});
+    sphere_3_node.scale(0.1f, 0.1f, 0.1f);
+    sphere_3_node.translate(-2.0f, 0.0f, -2.5f);
 
     // Set the ground to be terrain
-    ground.setIsTerrain(true);
+    floor_node.setIsTerrain(true);
   };
 
   void updateSimulation(XrTime predicted_time) override {
     // Rotate the cube
     // TODO: we should interpolate the rotation value such that it's
     // not coupled to the framerate
-    spinning_cube.rotate(0.0f, 0.0f, 0.01f);
+    spinning_cube_node.rotate(0.0f, 0.0f, 0.01f);
+    root_node.updateTransformation();
   };
 
   void draw() override {
-    // Render the ground
-    ground.render(texture_shader);
-
-    // Render the sphere
-    sphere.render(color_shader);
-    sphere2.render(color_shader);
-    sphere3.render(color_shader);
-
-    // Render the cube at the ground
-    ground_cube.render(ambient_shader);
-
-    // Render the line
-    line.render(color_shader);
-
-    // Render the small cube
-    small_cube.render();
-
-    // Render the flat bitmaps
-    quad.render();
-    text.render();
-
-    // Render a transparent looking cube
-    spinning_cube.renderTransparent(ambient_shader);
+    root_node.render();
   };
 };
 

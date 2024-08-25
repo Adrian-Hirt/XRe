@@ -89,4 +89,8 @@ namespace Utils {
   inline void printVector(DirectX::XMFLOAT4 input) {
     std::cout << input.x << ", " << input.y << ", " << input.z << ", " << input.w << std::endl;
   }
+
+  inline void printVector(DirectX::XMFLOAT3 input) {
+    std::cout << input.x << ", " << input.y << ", " << input.z << std::endl;
+  }
 }

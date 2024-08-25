@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.20)
 project(XRe)
 
 # TODO: will need to make this work with ARM64 later.
@@ -6,6 +6,8 @@ set(TARGET_ARCHITECTURE x64)
 
 # TODO: remove and fix warnings
 add_compile_options(-Wno-ignored-attributes)
+
+set(CMAKE_CXX_STANDARD 20)
 
 # Enable Action bindings other than khr/simple_controller. Comment this out to only use
 # khr/simple_controller for the Mixed Reality-Portal debugging.

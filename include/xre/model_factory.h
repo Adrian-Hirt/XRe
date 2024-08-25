@@ -84,13 +84,11 @@ namespace ModelFactory {
     auto [vertices, indices] = getGroundVerticesAndIndices(extent);
 
     Mesh ground_mesh = Mesh(vertices, indices, texture_path);
-    return Model({ ground_mesh });
+    return Model({ ground_mesh }, SHADERS_FOLDER "/ambient_texture.hlsl");
   }
 
-  inline Model createSphere(float radius) {
+  inline Model createSphere() {
     Model sphere = Model(DATA_FOLDER "/models/sphere.obj");
-
-    sphere.scale(radius, radius, radius);
 
     return sphere;
   }

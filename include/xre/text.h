@@ -7,13 +7,13 @@
 // XRe includes
 #include <xre/structs.h>
 #include <xre/utils.h>
-#include <xre/bitmap.h>
+#include <xre/renderable.h>
 
 // Other includes
 #include <fstream>
 #include <vector>
 
-class Text {
+class Text : public Renderable {
 public:
   Text(const char* sentence);
 
@@ -27,7 +27,8 @@ private:
   const float X_STEP = 1.0f / 32.0f;
   const float Y_STEP = 1.0f / 7.0f;
 
-  Bitmap m_bitmap;
+  // Text does not have a bounding box
+  inline bool hasBoundingBox() override { return false; };
 
   void buildMeshesFromSentence(const char* sentence);
   inline text_char_t computeTextureOffsets(int letter);

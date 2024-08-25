@@ -773,6 +773,9 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
   teleport_location_left = m_left_controller->updateIntersectionSphereAndComputePossibleTeleport();
   teleport_location_right = m_right_controller->updateIntersectionSphereAndComputePossibleTeleport();
 
+  // Reset the interaction tracking booleans on the grabbable SceneNodes
+  SceneNode::resetInteractionStates();
+
   // As both might have a value, we arbitrarily decide to give the right controller
   // precedende. Later, we might map the teleport action to a single controller anyway,
   // so maybe this will not be needed anymore.

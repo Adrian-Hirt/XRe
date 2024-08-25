@@ -10,6 +10,9 @@ Line::Line(DirectX::XMFLOAT4 color) {
   // Set buffers to be dynamic, such that their contents can be updated
   m_static_buffers = false;
 
+  // Set shader to simply use the color shader
+  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/fixed_position.hlsl");
+
   initialize(vertices, indices);
 }
 
@@ -23,22 +26,18 @@ Line::Line(DirectX::XMFLOAT3 line_start, DirectX::XMFLOAT3 line_end, DirectX::XM
   // Set buffers to be dynamic, such that their contents can be updated
   m_static_buffers = false;
 
+  // Set shader to simply use the color shader
+  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/fixed_position.hlsl");
+
   initialize(vertices, indices);
 }
 
 void Line::render() {
-  // Get the current active shader
-  Shader shader = *Shader::getCurrentActiveShader();
-  render(shader);
-}
-
-void Line::render(Shader &shader) {
   // Activate the shader
-  shader.activate();
+  m_shader.activate();
 
-  shader.setModelMatrix(DirectX::XMMatrixIdentity());
-  shader.setModelColor(m_line_color);
-  shader.updatePerModelConstantBuffer();
+  m_shader.setModelColor(m_line_color);
+  m_shader.updatePerModelConstantBuffer();
 
   // Set vertex and index buffers on the GPU to be the ones of this line
   UINT stride = sizeof(vertex_t);
