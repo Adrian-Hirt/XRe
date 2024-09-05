@@ -7,6 +7,7 @@ public:
   Model floor = ModelFactory::createGroundPlane(10, DATA_FOLDER "/textures/Tiles012_2K-JPG_Color.jpg");
   Model cube = ModelFactory::createCube({0.0f, 1.0f, 0.0f, 1.0f});
   Model transparent_cube = ModelFactory::createCube({1.0f, 0.0f, 0.0f, 0.25f});
+  Model brick_cube = ModelFactory::createCube(DATA_FOLDER "/textures/Bricks090_2K-JPG_Color.jpg");
 
   // Create custom models
   Model sphere = Model(DATA_FOLDER "/models/sphere.obj");
@@ -32,6 +33,7 @@ public:
   SceneNode text_node = SceneNode(&text, root_node);
   SceneNode quad_node = SceneNode(&quad, root_node);
   SceneNode line_node = SceneNode(&line, root_node);
+  SceneNode brick_cube_node = SceneNode(&brick_cube, root_node);
 
   void setup() override {
     spinning_cube_node.scale(0.3f, 0.3f, 0.3f);
@@ -56,6 +58,10 @@ public:
 
     // Set the ground to be terrain
     floor_node.setIsTerrain(true);
+
+    brick_cube_node.translate(4.0f, 0.6f, -3.0f);
+    brick_cube_node.scale(1.0f, 1.2f, 0.8f);
+    brick_cube_node.setGrabbable(true);
   };
 
   void updateSimulation(XrTime predicted_time) override {
