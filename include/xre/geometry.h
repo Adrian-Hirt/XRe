@@ -4,7 +4,6 @@
 #include <open_xr/openxr.h>
 
 // DirectX includes
-#include <d3d11.h>
 #include <DirectXMath/DirectXMath.h>
 
 namespace Geometry {

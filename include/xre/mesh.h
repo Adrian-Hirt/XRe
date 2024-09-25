@@ -1,7 +1,6 @@
 #pragma once
 
 // DirectX includes
-#include <d3d11.h>
 #include <DirectXTex/WICTextureLoader11.h>
 #include <DirectXMath/DirectXCollision.h>
 
