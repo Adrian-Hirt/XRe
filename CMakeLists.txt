@@ -17,14 +17,15 @@ find_library(OPENXR NAMES openxr_loader PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib/op
 message(STATUS "***** find_library returned ${OPENXR} *****")
 message(STATUS "***** CMake Build type: ${CMAKE_BUILD_TYPE} *****")
 
-FILE(GLOB SRCFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+# FILE(GLOB SRCFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+SET(SRCFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/application.cpp)
 
 # Needed to access the include folders from the individual apps
 SET(XRE_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/ext)
 
-SET(ADDITIONAL_SRCFILES
-  "${CMAKE_CURRENT_LIST_DIR}/ext/DirectXTex/WICTextureLoader11.cpp"
-)
+# SET(ADDITIONAL_SRCFILES
+#   "${CMAKE_CURRENT_LIST_DIR}/ext/DirectXTex/WICTextureLoader11.cpp"
+# )
 
 set(SHADERS_FOLDER "\"${CMAKE_CURRENT_SOURCE_DIR}/shaders\"" STRING "")
 set(DATA_FOLDER "\"${CMAKE_CURRENT_SOURCE_DIR}/data\"" STRING "")
