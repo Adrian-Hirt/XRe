@@ -17,8 +17,17 @@ find_library(OPENXR NAMES openxr_loader PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib/op
 message(STATUS "***** find_library returned ${OPENXR} *****")
 message(STATUS "***** CMake Build type: ${CMAKE_BUILD_TYPE} *****")
 
+# TODO: This should probably work without having to specify the path
+set(ENV{VULKAN_SDK} "C:/VulkanSDK/1.3.290.0")
+find_package(Vulkan)
+
+
 # FILE(GLOB SRCFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
-SET(SRCFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/application.cpp)
+SET(SRCFILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/application.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/openxr_handler.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_handler.cpp
+)
 
 # Needed to access the include folders from the individual apps
 SET(XRE_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/ext)

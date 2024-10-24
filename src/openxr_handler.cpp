@@ -19,19 +19,21 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
   // Check if we were successful in creating the openxr system.
   Utils::checkBoolResult(result, "Initializing OpenXR failed!");
 
-	// Initialize the global buffers for the shaders
-  Shader::createGlobalBuffers(getDevice(), getDeviceContext());
+	// // Initialize the global buffers for the shaders
+  // Shader::createGlobalBuffers(getDevice(), getDeviceContext());
 
-  // Register the device & device_context with the classes that need them
-  Shader::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
-  Renderable::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
+  // // Register the device & device_context with the classes that need them
+  // Shader::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
+  // Renderable::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
 
-  // Instruct the handler to initialize the xr actions
-  initializeOpenxrActions();
+  // // Instruct the handler to initialize the xr actions
+  // initializeOpenxrActions();
 
-  // Instruct the handler to initialize the hand tracking (will not do anything
-  // if hand tracking is not enabled).
-  initializeHandTracking();
+  // // Instruct the handler to initialize the hand tracking (will not do anything
+  // // if hand tracking is not enabled).
+  // initializeHandTracking();
+
+  std::cout << "Aight :)" << std::endl;
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -49,7 +51,7 @@ bool OpenXrHandler::initializeOpenxr() {
 	// Setup requested extensions
 	//------------------------------------------------------------------------------------------------------
   std::vector<const char *> requested_extensions = {
-    XR_KHR_D3D11_ENABLE_EXTENSION_NAME,
+    XR_KHR_VULKAN_ENABLE_EXTENSION_NAME,
     XR_EXT_HAND_TRACKING_EXTENSION_NAME
     // XR_EXT_HAND_INTERACTION_EXTENSION_NAME // Not supported on Quest at the moment it seems
   };
@@ -137,199 +139,203 @@ bool OpenXrHandler::initializeOpenxr() {
 		return false;
 	}
 
-	// Get the address of the ext funtions and store, such that we can call the function. This is the more portable
-  // way of calling extension functions.
-	result = xrGetInstanceProcAddr(m_openxr_instance, "xrGetD3D11GraphicsRequirementsKHR", (PFN_xrVoidFunction*)(&m_ext_xrGetD3D11GraphicsRequirementsKHR));
-  if (XR_FAILED(result)) {
-    return false;
-  };
+  // TODO: do we need this??
+	// // Get the address of the ext funtions and store, such that we can call the function. This is the more portable
+  // // way of calling extension functions.
+  // PFN_xrGetVulkanGraphicsRequirementsKHR ext_xrGetD3D11GraphicsRequirementsKHR;
+	// result = xrGetInstanceProcAddr(m_openxr_instance, "xrGetVulkanGraphicsRequirementsKHR", (PFN_xrVoidFunction*)(&ext_xrGetD3D11GraphicsRequirementsKHR));
+  // if (XR_FAILED(result)) {
+  //   return false;
+  // };
 
-  // Only load the handtracking extensions if we actually can use them
-  if (m_openxr_hand_tracking_system_properties.supportsHandTracking) {
-    result = xrGetInstanceProcAddr(m_openxr_instance, "xrCreateHandTrackerEXT", (PFN_xrVoidFunction*)(&m_ext_xrCreateHandTrackerEXT));
-    Utils::checkXrResult(result, "Failed to get the xrCreateHandTrackerEXT function pointer");
+  // // Only load the handtracking extensions if we actually can use them
+  // if (m_openxr_hand_tracking_system_properties.supportsHandTracking) {
+  //   result = xrGetInstanceProcAddr(m_openxr_instance, "xrCreateHandTrackerEXT", (PFN_xrVoidFunction*)(&m_ext_xrCreateHandTrackerEXT));
+  //   Utils::checkXrResult(result, "Failed to get the xrCreateHandTrackerEXT function pointer");
 
-    result = xrGetInstanceProcAddr(m_openxr_instance, "xrDestroyHandTrackerEXT", (PFN_xrVoidFunction*)(&m_ext_xrDestroyHandTrackerEXT));
-    Utils::checkXrResult(result, "Failed to get the xrDestroyHandTrackerEXT function pointer");
+  //   result = xrGetInstanceProcAddr(m_openxr_instance, "xrDestroyHandTrackerEXT", (PFN_xrVoidFunction*)(&m_ext_xrDestroyHandTrackerEXT));
+  //   Utils::checkXrResult(result, "Failed to get the xrDestroyHandTrackerEXT function pointer");
 
-    result = xrGetInstanceProcAddr(m_openxr_instance, "xrLocateHandJointsEXT", (PFN_xrVoidFunction*)(&m_ext_xrLocateHandJointsEXT));
-    Utils::checkXrResult(result, "Failed to get the xrLocateHandJointsEXT function pointer");
-  }
+  //   result = xrGetInstanceProcAddr(m_openxr_instance, "xrLocateHandJointsEXT", (PFN_xrVoidFunction*)(&m_ext_xrLocateHandJointsEXT));
+  //   Utils::checkXrResult(result, "Failed to get the xrLocateHandJointsEXT function pointer");
+  // }
 
-	XrGraphicsRequirementsD3D11KHR graphics_requirements = {};
-	graphics_requirements.type = XR_TYPE_GRAPHICS_REQUIREMENTS_D3D11_KHR;
-	// Call the function which retrieves the D3D11 feature level and graphic device requirements for an instance and system
-	// The graphics_requirements param is a XrGraphicsRequirementsD3D11KHR struct, where
-	// the field "adapterLuid" identifies the graphics device to be used, and the field "minFeatureLevel" specifies
-	// the minimum feature level the D3D11 device must be initialized with
-	result = m_ext_xrGetD3D11GraphicsRequirementsKHR(m_openxr_instance, m_openxr_system_id, &graphics_requirements);
-	if (XR_FAILED(result)) {
-		return false;
-	}
+  // TODO: do we need this??
+	// XrGraphicsRequirementsVulkanKHR graphics_requirements = {};
+	// graphics_requirements.type = XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN_KHR;
+	// // Call the function which retrieves the Vulkan API versions (min & max)
+	// result = ext_xrGetD3D11GraphicsRequirementsKHR(m_openxr_instance, m_openxr_system_id, &graphics_requirements);
+	// if (XR_FAILED(result)) {
+	// 	return false;
+	// }
 
-	// Create a new handler for the DirectX 11 related stuff.
- 	m_dx11_handler = Dx11Handler(graphics_requirements.adapterLuid);
+	// Create a new handler for the Vulkan related stuff.
+ 	m_vulkan_handler = VulkanHandler();
 
-	// Create a binding for the D3D11 device
-	XrGraphicsBindingD3D11KHR graphics_binding = {};
-	graphics_binding.type = XR_TYPE_GRAPHICS_BINDING_D3D11_KHR;
-	graphics_binding.device = m_dx11_handler.getDevice();
+  std::cout << "Next!" << std::endl;
 
-	// Create the session info struct
-	XrSessionCreateInfo session_create_info = {};
-	session_create_info.type = XR_TYPE_SESSION_CREATE_INFO;
-	session_create_info.next = &graphics_binding;
-	session_create_info.systemId = m_openxr_system_id;
+	// // Create a binding for the D3D11 device
+	// XrGraphicsBindingD3D11KHR graphics_binding = {};
+	// graphics_binding.type = XR_TYPE_GRAPHICS_BINDING_D3D11_KHR;
+	// graphics_binding.device = m_dx11_handler.getDevice();
 
-	// And finally create the openxr session
-	result = xrCreateSession(m_openxr_instance, &session_create_info, &m_openxr_session);
-	if (XR_FAILED(result)) {
-		return false;
-	}
+	// // Create the session info struct
+	// XrSessionCreateInfo session_create_info = {};
+	// session_create_info.type = XR_TYPE_SESSION_CREATE_INFO;
+	// session_create_info.next = &graphics_binding;
+	// session_create_info.systemId = m_openxr_system_id;
 
-	//------------------------------------------------------------------------------------------------------
-	// Reference Spaces
-	//------------------------------------------------------------------------------------------------------
-	// Next, we need to choose a reference space to display the content. We'll use stage, which is relative
-	// to the devices "guardian" system
-	XrReferenceSpaceCreateInfo stage_reference_space_create_info = {};
-	stage_reference_space_create_info.type = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
-	stage_reference_space_create_info.poseInReferenceSpace = Geometry::XrPoseIdentity();
-	stage_reference_space_create_info.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_STAGE;
+	// // And finally create the openxr session
+	// result = xrCreateSession(m_openxr_instance, &session_create_info, &m_openxr_session);
+	// if (XR_FAILED(result)) {
+	// 	return false;
+	// }
 
-	// Create the reference space
-	result = xrCreateReferenceSpace(m_openxr_session, &stage_reference_space_create_info, &m_openxr_stage_space);
-	if (XR_FAILED(result)) {
-		return false;
-	}
+	// //------------------------------------------------------------------------------------------------------
+	// // Reference Spaces
+	// //------------------------------------------------------------------------------------------------------
+	// // Next, we need to choose a reference space to display the content. We'll use stage, which is relative
+	// // to the devices "guardian" system
+	// XrReferenceSpaceCreateInfo stage_reference_space_create_info = {};
+	// stage_reference_space_create_info.type = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
+	// stage_reference_space_create_info.poseInReferenceSpace = Geometry::XrPoseIdentity();
+	// stage_reference_space_create_info.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_STAGE;
 
-  // We also create a view reference space, which tracks the view origin of the center of both of the
-  // views (i.e. the "center" of the HMD).
-  XrReferenceSpaceCreateInfo view_reference_space_create_info = {};
-	view_reference_space_create_info.type = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
-	view_reference_space_create_info.poseInReferenceSpace = Geometry::XrPoseIdentity();
-	view_reference_space_create_info.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_VIEW;
+	// // Create the reference space
+	// result = xrCreateReferenceSpace(m_openxr_session, &stage_reference_space_create_info, &m_openxr_stage_space);
+	// if (XR_FAILED(result)) {
+	// 	return false;
+	// }
 
-	// Create the reference space
-	result = xrCreateReferenceSpace(m_openxr_session, &view_reference_space_create_info, &m_openxr_view_space);
-	if (XR_FAILED(result)) {
-		return false;
-	}
+  // // We also create a view reference space, which tracks the view origin of the center of both of the
+  // // views (i.e. the "center" of the HMD).
+  // XrReferenceSpaceCreateInfo view_reference_space_create_info = {};
+	// view_reference_space_create_info.type = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
+	// view_reference_space_create_info.poseInReferenceSpace = Geometry::XrPoseIdentity();
+	// view_reference_space_create_info.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_VIEW;
 
-	//------------------------------------------------------------------------------------------------------
-	// View ports
-	//------------------------------------------------------------------------------------------------------
-	// Devices running OpenXR code can have multiple viewports (views we need to render). For a stereo
-	// headset (XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO), this is usually 2, one for each eye. If it's
-	// an AR application running on e.g. a phone, this would be 1, and for other constellations, such as
-	// a cave-like system where on each wall an image is projected, this can even be 6 (or any other number).
+	// // Create the reference space
+	// result = xrCreateReferenceSpace(m_openxr_session, &view_reference_space_create_info, &m_openxr_view_space);
+	// if (XR_FAILED(result)) {
+	// 	return false;
+	// }
 
-	// As such, we first need to find out how many views we need to support. If we set the 4th param of
-	// the xrEnumerateViewConfigurationViews function call to zero, it will retrieve the required
-	// number of viewports and store it in the 5th param
-	uint32_t viewport_count = 0;
-	result = xrEnumerateViewConfigurationViews(m_openxr_instance, m_openxr_system_id, m_application_view_type, 0, &viewport_count, NULL);
-	if (XR_FAILED(result)) {
-		return false;
-	}
+	// //------------------------------------------------------------------------------------------------------
+	// // View ports
+	// //------------------------------------------------------------------------------------------------------
+	// // Devices running OpenXR code can have multiple viewports (views we need to render). For a stereo
+	// // headset (XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO), this is usually 2, one for each eye. If it's
+	// // an AR application running on e.g. a phone, this would be 1, and for other constellations, such as
+	// // a cave-like system where on each wall an image is projected, this can even be 6 (or any other number).
 
-	// Now that we know how many views we need to render, resize the vector that contains the view
-	// configurations (each XrViewConfigurationView specifies properties related to rendering an
-	// individual view) and the vector containing the views (each XrView specifies the pose and
-	// the fov of the view. Basically, a XrView is a view matrix in "traditional" rendering).
-	m_openxr_view_configuration_views.resize(viewport_count, { XR_TYPE_VIEW_CONFIGURATION_VIEW });
-	m_openxr_views.resize(viewport_count, { XR_TYPE_VIEW });
+	// // As such, we first need to find out how many views we need to support. If we set the 4th param of
+	// // the xrEnumerateViewConfigurationViews function call to zero, it will retrieve the required
+	// // number of viewports and store it in the 5th param
+	// uint32_t viewport_count = 0;
+	// result = xrEnumerateViewConfigurationViews(m_openxr_instance, m_openxr_system_id, m_application_view_type, 0, &viewport_count, NULL);
+	// if (XR_FAILED(result)) {
+	// 	return false;
+	// }
 
-	// Now we again call xrEnumerateViewConfigurationViews, this time we set the 4th param
-	// to the number of our viewports, such that the method fills the xr_view_configurations
-	// vector with the actual view configurations
-	result = xrEnumerateViewConfigurationViews(m_openxr_instance, m_openxr_system_id, m_application_view_type, viewport_count, &viewport_count, m_openxr_view_configuration_views.data());
-	if (XR_FAILED(result)) {
-		return false;
-	}
+	// // Now that we know how many views we need to render, resize the vector that contains the view
+	// // configurations (each XrViewConfigurationView specifies properties related to rendering an
+	// // individual view) and the vector containing the views (each XrView specifies the pose and
+	// // the fov of the view. Basically, a XrView is a view matrix in "traditional" rendering).
+	// m_openxr_view_configuration_views.resize(viewport_count, { XR_TYPE_VIEW_CONFIGURATION_VIEW });
+	// m_openxr_views.resize(viewport_count, { XR_TYPE_VIEW });
 
-	//------------------------------------------------------------------------------------------------------
-	// Swapchains
-	//------------------------------------------------------------------------------------------------------
-	// For each viewport, we need to setup a swapchain. A swapchain consists of multiple buffers, where one
-	// is used to draw the data to the screen, and another is used to render the deta from the simulation
-	// to. With this approach, tearing (that might occur because the scene is updated while it's drawn
-	// to the screen) should not occur
-	for (uint32_t i = 0; i < viewport_count; i++) {
-		// Get the current view configuration we're interested in
-		XrViewConfigurationView& current_view_configuration = m_openxr_view_configuration_views[i];
+	// // Now we again call xrEnumerateViewConfigurationViews, this time we set the 4th param
+	// // to the number of our viewports, such that the method fills the xr_view_configurations
+	// // vector with the actual view configurations
+	// result = xrEnumerateViewConfigurationViews(m_openxr_instance, m_openxr_system_id, m_application_view_type, viewport_count, &viewport_count, m_openxr_view_configuration_views.data());
+	// if (XR_FAILED(result)) {
+	// 	return false;
+	// }
 
-		// Create a create info struct to create the swapchain
-		XrSwapchainCreateInfo swapchain_create_info = {};
-		swapchain_create_info.type = { XR_TYPE_SWAPCHAIN_CREATE_INFO };
-		swapchain_create_info.arraySize = 1; // Number of array layers
-		swapchain_create_info.mipCount = 1; // Only use one mipmap level, bigger numbers would only be useful for textures
-		swapchain_create_info.faceCount = 1; // Number of faces to render, 1 should be used, other option would be 6 for cubemaps
-		swapchain_create_info.format = m_dx11_handler.m_d3d11_swapchain_format;
-		swapchain_create_info.width = current_view_configuration.recommendedImageRectWidth; // Just use the recommended width that the runtime gave us
-		swapchain_create_info.height = current_view_configuration.recommendedImageRectHeight; // Just use the recommended height that the runtime gave us
-		swapchain_create_info.sampleCount = current_view_configuration.recommendedSwapchainSampleCount; // Just use the recommended sample count that the runtime gave us
-		swapchain_create_info.usageFlags = XR_SWAPCHAIN_USAGE_SAMPLED_BIT | XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT;
+	// //------------------------------------------------------------------------------------------------------
+	// // Swapchains
+	// //------------------------------------------------------------------------------------------------------
+	// // For each viewport, we need to setup a swapchain. A swapchain consists of multiple buffers, where one
+	// // is used to draw the data to the screen, and another is used to render the deta from the simulation
+	// // to. With this approach, tearing (that might occur because the scene is updated while it's drawn
+	// // to the screen) should not occur
+	// for (uint32_t i = 0; i < viewport_count; i++) {
+	// 	// Get the current view configuration we're interested in
+	// 	XrViewConfigurationView& current_view_configuration = m_openxr_view_configuration_views[i];
 
-		// Create the OpenXR swapchain
-		XrSwapchain swapchain_handle;
-		result = xrCreateSwapchain(m_openxr_session, &swapchain_create_info, &swapchain_handle);
-		if (XR_FAILED(result)) {
-			return false;
-		}
+	// 	// Create a create info struct to create the swapchain
+	// 	XrSwapchainCreateInfo swapchain_create_info = {};
+	// 	swapchain_create_info.type = { XR_TYPE_SWAPCHAIN_CREATE_INFO };
+	// 	swapchain_create_info.arraySize = 1; // Number of array layers
+	// 	swapchain_create_info.mipCount = 1; // Only use one mipmap level, bigger numbers would only be useful for textures
+	// 	swapchain_create_info.faceCount = 1; // Number of faces to render, 1 should be used, other option would be 6 for cubemaps
+	// 	swapchain_create_info.format = m_dx11_handler.m_d3d11_swapchain_format;
+	// 	swapchain_create_info.width = current_view_configuration.recommendedImageRectWidth; // Just use the recommended width that the runtime gave us
+	// 	swapchain_create_info.height = current_view_configuration.recommendedImageRectHeight; // Just use the recommended height that the runtime gave us
+	// 	swapchain_create_info.sampleCount = current_view_configuration.recommendedSwapchainSampleCount; // Just use the recommended sample count that the runtime gave us
+	// 	swapchain_create_info.usageFlags = XR_SWAPCHAIN_USAGE_SAMPLED_BIT | XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT;
 
-		// OpenXR can create an arbitrary number of swapchain images (from which we'll create our buffers),
-		// so we need to find out how many were created by the runtime
-		// If we pass zero as the 2nd param, we request the number of swapchain images and store it
-		// in the 3rd param
-		uint32_t swapchain_image_count = 0;
-		result = xrEnumerateSwapchainImages(swapchain_handle, 0, &swapchain_image_count, NULL);
-		if (XR_FAILED(result)) {
-			return false;
-		}
+	// 	// Create the OpenXR swapchain
+	// 	XrSwapchain swapchain_handle;
+	// 	result = xrCreateSwapchain(m_openxr_session, &swapchain_create_info, &swapchain_handle);
+	// 	if (XR_FAILED(result)) {
+	// 		return false;
+	// 	}
 
-		// We need a vector to store the swapchain images. The swapchain images store
-		// the image data in a structured way. As we only need these to create the swapchains,
-		// we put them in a temporary vector which we won't use afterwards
-		std::vector<XrSwapchainImageD3D11KHR> swapchain_images;
-		swapchain_images.resize(swapchain_image_count, {XR_TYPE_SWAPCHAIN_IMAGE_D3D11_KHR});
+	// 	// OpenXR can create an arbitrary number of swapchain images (from which we'll create our buffers),
+	// 	// so we need to find out how many were created by the runtime
+	// 	// If we pass zero as the 2nd param, we request the number of swapchain images and store it
+	// 	// in the 3rd param
+	// 	uint32_t swapchain_image_count = 0;
+	// 	result = xrEnumerateSwapchainImages(swapchain_handle, 0, &swapchain_image_count, NULL);
+	// 	if (XR_FAILED(result)) {
+	// 		return false;
+	// 	}
+
+	// 	// We need a vector to store the swapchain images. The swapchain images store
+	// 	// the image data in a structured way. As we only need these to create the swapchains,
+	// 	// we put them in a temporary vector which we won't use afterwards
+	// 	std::vector<XrSwapchainImageD3D11KHR> swapchain_images;
+	// 	swapchain_images.resize(swapchain_image_count, {XR_TYPE_SWAPCHAIN_IMAGE_D3D11_KHR});
 
 
-		// Now we can create the swapchain struct, that stores the swapchain handle, the height
-		// and width of the swapchains (which usually should match the size of the window / view
-		// we render to, and the swapchain_data structs (which contain the backbuffer & depthbuffer
-		// of the many swapchains we get)
-		swapchain_t swapchain = {};
+	// 	// Now we can create the swapchain struct, that stores the swapchain handle, the height
+	// 	// and width of the swapchains (which usually should match the size of the window / view
+	// 	// we render to, and the swapchain_data structs (which contain the backbuffer & depthbuffer
+	// 	// of the many swapchains we get)
+	// 	swapchain_t swapchain = {};
 
-		swapchain.width = swapchain_create_info.width;
-		swapchain.height = swapchain_create_info.height;
-		swapchain.handle = swapchain_handle;
-		swapchain.swapchain_data.resize(swapchain_image_count);
+	// 	swapchain.width = swapchain_create_info.width;
+	// 	swapchain.height = swapchain_create_info.height;
+	// 	swapchain.handle = swapchain_handle;
+	// 	swapchain.swapchain_data.resize(swapchain_image_count);
 
-		// Now call the xrEnumerateSwapchainImages function again, this time with the 2nd param set to the number
-		// of swapchain images that got created by OpenXR. That way, we can store the swapchain images into our
-		// temporary vector and use them to create the swapchains
-		result = xrEnumerateSwapchainImages(swapchain_handle, swapchain_image_count, &swapchain_image_count, (XrSwapchainImageBaseHeader *)swapchain_images.data());
-		if (XR_FAILED(result)) {
-      return false;
-		}
+	// 	// Now call the xrEnumerateSwapchainImages function again, this time with the 2nd param set to the number
+	// 	// of swapchain images that got created by OpenXR. That way, we can store the swapchain images into our
+	// 	// temporary vector and use them to create the swapchains
+	// 	result = xrEnumerateSwapchainImages(swapchain_handle, swapchain_image_count, &swapchain_image_count, (XrSwapchainImageBaseHeader *)swapchain_images.data());
+	// 	if (XR_FAILED(result)) {
+  //     return false;
+	// 	}
 
-    // For each swapchain image, call the function to create a render target using that swapchain image
-    // We also directly release the texture object, as we don't need it anymore after we created the
-    // render target with it
-    for (uint32_t i = 0; i < swapchain_image_count; i++) {
-        swapchain.swapchain_data[i] = m_dx11_handler.createRenderTargets(*swapchain_images[i].texture);
-        swapchain_images[i].texture->Release();
-    }
+  //   // For each swapchain image, call the function to create a render target using that swapchain image
+  //   // We also directly release the texture object, as we don't need it anymore after we created the
+  //   // render target with it
+  //   for (uint32_t i = 0; i < swapchain_image_count; i++) {
+  //       swapchain.swapchain_data[i] = m_dx11_handler.createRenderTargets(*swapchain_images[i].texture);
+  //       swapchain_images[i].texture->Release();
+  //   }
 
-    // We're done creating that swapchain, we can now add it to the vector of our swapchains (as we have multiple,
-    // as mentioned before one for each view
-    m_swapchains.push_back(swapchain);
-	}
+  //   // We're done creating that swapchain, we can now add it to the vector of our swapchains (as we have multiple,
+  //   // as mentioned before one for each view
+  //   m_swapchains.push_back(swapchain);
+	// }
 
   return true;
 }
 
+
+#if false
 //------------------------------------------------------------------------------------------------------
 // Initialize the OpenXR actions
 //------------------------------------------------------------------------------------------------------
@@ -1000,3 +1006,4 @@ void OpenXrHandler::initializeHandTracking() {
     Utils::checkXrResult(result, "Failed to create the hand tracker extension");
   }
 }
+#endif
