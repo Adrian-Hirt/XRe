@@ -25,6 +25,13 @@ namespace Utils {
   //   }
   // }
 
+  inline void checkVkResult(VkResult result, const char *error_string){
+    if (result != VK_SUCCESS) {
+      std::cout << result << std::endl;
+      exitWithMessage(error_string);
+    }
+  };
+
   inline void checkXrResult(XrResult result, const char *error_string){
     if (XR_FAILED(result)) {
       std::cout << result << std::endl;
