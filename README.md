@@ -32,6 +32,12 @@ Hand tracking:
 
 ![](doc/img/hand_tracking.jpeg)
 
+## Hints
+
+When setting up a new machine to work on XRe, you need to have the OpenXR Loader in your path.
+For Windows, the file is in `bin/openxr_loader.dll`, which you need to add to your `PATH` in order
+to launch the applications.
+
 ## Acknowledgements
 
 * The textures in `data/textures` were downloaded from https://ambientcg.com/, licensed under the Creative Commons CC0 1.0 Universal License.
