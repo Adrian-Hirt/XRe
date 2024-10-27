@@ -2,13 +2,23 @@
 
 // TODO: why can't i put this in a class?
 // Validation layers we wish to use
-const std::vector<const char*> validation_layers = {
+const std::vector<const char*> s_validation_layers = {
   "VK_LAYER_KHRONOS_validation"
 };
 
+// Extensions for the device we wish to use
+const std::vector<const char*> s_device_extensions = {
+  VK_KHR_SWAPCHAIN_EXTENSION_NAME
+};
+
 VulkanHandler::VulkanHandler() {
+  initializeVulkan();
+}
+
+void VulkanHandler::initializeVulkan() {
   createInstance();
   setupDebugMessenger();
+  setupDevice();
 }
 
 void VulkanHandler::createInstance() {
@@ -45,8 +55,8 @@ void VulkanHandler::createInstance() {
 
   // If validation layers are enabled, add them to the create info.
   if (s_enable_validation_layers) {
-    instance_create_info.enabledLayerCount = static_cast<uint32_t>(validation_layers.size());
-    instance_create_info.ppEnabledLayerNames = validation_layers.data();
+    instance_create_info.enabledLayerCount = static_cast<uint32_t>(s_validation_layers.size());
+    instance_create_info.ppEnabledLayerNames = s_validation_layers.data();
   }
   else {
     instance_create_info.enabledLayerCount = 0;
@@ -69,7 +79,7 @@ bool VulkanHandler::checkValidationLayerSupport() {
   vkEnumerateInstanceLayerProperties(&layer_count, available_layers.data());
 
   // Loop over all the layers we requested and see whether they are available.
-  for (const std::string layer_name : validation_layers) {
+  for (const std::string layer_name : s_validation_layers) {
     bool layer_found = false;
 
     for (const auto& layer_properties : available_layers) {
@@ -118,6 +128,110 @@ void VulkanHandler::setupDebugMessenger() {
 
   auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(m_vk_instance, "vkCreateDebugUtilsMessengerEXT");
   if (func(m_vk_instance, &create_info, nullptr, &m_debug_messenger) != VK_SUCCESS) {
-    throw std::runtime_error("failed to set up debug messenger!");
+    Utils::exitWithMessage("failed to set up debug messenger!");
   }
 }
+
+void VulkanHandler::setupDevice() {
+  VkResult result;
+
+  // Query the number of physical devices
+  uint32_t physical_device_count = 0;
+  result = vkEnumeratePhysicalDevices(m_vk_instance, &physical_device_count, nullptr);
+
+  // If there are no physical devices we can use, we cannot continue
+  if (physical_device_count == 0 || result != VK_SUCCESS) {
+    Utils::exitWithMessage("failed to find GPUs with Vulkan support!");
+  }
+
+  // Get all the physical devices from the system
+  std::vector<VkPhysicalDevice> devices(physical_device_count);
+  result = vkEnumeratePhysicalDevices(m_vk_instance, &physical_device_count, devices.data());
+  Utils::checkVkResult(result, "Failes to enumerate physical devices");
+
+  // For now, simply pick the first device as the device to be used.
+  // TODO: select the device a bit smarter
+  m_physical_device = devices[0];
+
+  // Next, we need to setup the logical device.
+  // Get the number of queue families
+  uint32_t physical_device_queue_family_count = 0;
+  vkGetPhysicalDeviceQueueFamilyProperties(m_physical_device, &physical_device_queue_family_count, nullptr);
+
+  // Retrieve the actual queue families.
+  std::vector<VkQueueFamilyProperties> queue_families(physical_device_queue_family_count);
+  vkGetPhysicalDeviceQueueFamilyProperties(m_physical_device, &physical_device_queue_family_count, queue_families.data());
+
+  // Loop over all queue families and keep track of the queue families we are interested in.
+  // We simply assume that the graphics queue family and the present graphics family are the same for now.
+  // TODO: cleanup code for case where graphics family != present family. I'll need to figure out how to
+  // check for surface support.
+  QueueFamilyIndices queue_family_indices;
+  int i = 0;
+  for (const auto& queue_family : queue_families) {
+    // Keep track of the graphics queue family
+    if (queue_family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+      queue_family_indices.m_graphics_family = i;
+      queue_family_indices.m_present_family = i;
+      break;
+    }
+
+    i++;
+  }
+
+  if (!queue_family_indices.isComplete()) {
+    Utils::exitWithMessage("Failed to find a graphics queue family");
+  }
+
+  // Create device queues for the present and the graphics families
+  std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
+  // TODO: currently this uses only a single queue family for the graphics and present
+  // queue, we probably need to adapt this to also support a present family.
+  std::set<uint32_t> queue_family_indices_set = { queue_family_indices.m_graphics_family.value(), queue_family_indices.m_present_family.value() };
+
+  float queue_priority = 1.0f;
+  for (uint32_t queue_family : queue_family_indices_set) {
+    VkDeviceQueueCreateInfo queue_create_info{};
+    queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queue_create_info.queueFamilyIndex = queue_family;
+    queue_create_info.queueCount = 1;
+    queue_create_info.pQueuePriorities = &queue_priority;
+    queue_create_infos.push_back(queue_create_info);
+  }
+
+  // Specify used device features
+    VkPhysicalDeviceFeatures device_features{};
+    device_features.samplerAnisotropy = VK_TRUE;
+
+    // Create the logical device
+    VkDeviceCreateInfo device_create_info{};
+    device_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+
+    // add infos about the device queues we want to create
+    device_create_info.queueCreateInfoCount = static_cast<uint32_t>(queue_create_infos.size());
+    device_create_info.pQueueCreateInfos = queue_create_infos.data();
+
+    // And add infos about the device features we need
+    device_create_info.pEnabledFeatures = &device_features;
+
+    // Setup the extensions we wish to use
+    device_create_info.enabledExtensionCount = static_cast<uint32_t>(s_device_extensions.size());
+    device_create_info.ppEnabledExtensionNames = s_device_extensions.data();
+
+    // Obsolete code which is only put in for compability with older vulkan implementations
+    if (s_enable_validation_layers) {
+      device_create_info.enabledLayerCount = static_cast<uint32_t>(s_validation_layers.size());
+      device_create_info.ppEnabledLayerNames = s_validation_layers.data();
+    }
+    else {
+      device_create_info.enabledLayerCount = 0;
+    }
+
+    // create the device
+    result = vkCreateDevice(m_physical_device, &device_create_info, nullptr, &m_device);
+    Utils::checkVkResult(result, "failed to create logical device!");
+
+    // and finally retrieve the created graphics queue
+    vkGetDeviceQueue(m_device, queue_family_indices.m_graphics_family.value(), 0, &m_graphics_queue);
+    vkGetDeviceQueue(m_device, queue_family_indices.m_present_family.value(), 0, &m_present_queue);
+};
