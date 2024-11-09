@@ -179,66 +179,66 @@ bool OpenXrHandler::initializeOpenxr() {
 	result = xrCreateSession(m_openxr_instance, &session_create_info, &m_openxr_session);
   Utils::checkXrResult(result, "Failed to create the OpenXR session!");
 
-	// //------------------------------------------------------------------------------------------------------
-	// // Reference Spaces
-	// //------------------------------------------------------------------------------------------------------
-	// // Next, we need to choose a reference space to display the content. We'll use stage, which is relative
-	// // to the devices "guardian" system
-	// XrReferenceSpaceCreateInfo stage_reference_space_create_info = {};
-	// stage_reference_space_create_info.type = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
-	// stage_reference_space_create_info.poseInReferenceSpace = Geometry::XrPoseIdentity();
-	// stage_reference_space_create_info.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_STAGE;
+	//------------------------------------------------------------------------------------------------------
+	// Reference Spaces
+	//------------------------------------------------------------------------------------------------------
+	// Next, we need to choose a reference space to display the content. We'll use stage, which is relative
+	// to the devices "guardian" system
+	XrReferenceSpaceCreateInfo stage_reference_space_create_info = {};
+	stage_reference_space_create_info.type = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
+	stage_reference_space_create_info.poseInReferenceSpace = Geometry::XrPoseIdentity();
+	stage_reference_space_create_info.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_STAGE;
 
-	// // Create the reference space
-	// result = xrCreateReferenceSpace(m_openxr_session, &stage_reference_space_create_info, &m_openxr_stage_space);
-	// if (XR_FAILED(result)) {
-	// 	return false;
-	// }
+	// Create the reference space
+	result = xrCreateReferenceSpace(m_openxr_session, &stage_reference_space_create_info, &m_openxr_stage_space);
+	if (XR_FAILED(result)) {
+		return false;
+	}
 
-  // // We also create a view reference space, which tracks the view origin of the center of both of the
-  // // views (i.e. the "center" of the HMD).
-  // XrReferenceSpaceCreateInfo view_reference_space_create_info = {};
-	// view_reference_space_create_info.type = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
-	// view_reference_space_create_info.poseInReferenceSpace = Geometry::XrPoseIdentity();
-	// view_reference_space_create_info.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_VIEW;
+  // We also create a view reference space, which tracks the view origin of the center of both of the
+  // views (i.e. the "center" of the HMD).
+  XrReferenceSpaceCreateInfo view_reference_space_create_info = {};
+	view_reference_space_create_info.type = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
+	view_reference_space_create_info.poseInReferenceSpace = Geometry::XrPoseIdentity();
+	view_reference_space_create_info.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_VIEW;
 
-	// // Create the reference space
-	// result = xrCreateReferenceSpace(m_openxr_session, &view_reference_space_create_info, &m_openxr_view_space);
-	// if (XR_FAILED(result)) {
-	// 	return false;
-	// }
+	// Create the reference space
+	result = xrCreateReferenceSpace(m_openxr_session, &view_reference_space_create_info, &m_openxr_view_space);
+	if (XR_FAILED(result)) {
+		return false;
+	}
 
-	// //------------------------------------------------------------------------------------------------------
-	// // View ports
-	// //------------------------------------------------------------------------------------------------------
-	// // Devices running OpenXR code can have multiple viewports (views we need to render). For a stereo
-	// // headset (XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO), this is usually 2, one for each eye. If it's
-	// // an AR application running on e.g. a phone, this would be 1, and for other constellations, such as
-	// // a cave-like system where on each wall an image is projected, this can even be 6 (or any other number).
+	//------------------------------------------------------------------------------------------------------
+	// View ports
+	//------------------------------------------------------------------------------------------------------
+	// Devices running OpenXR code can have multiple viewports (views we need to render). For a stereo
+	// headset (XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO), this is usually 2, one for each eye. If it's
+	// an AR application running on e.g. a phone, this would be 1, and for other constellations, such as
+	// a cave-like system where on each wall an image is projected, this can even be 6 (or any other number).
 
-	// // As such, we first need to find out how many views we need to support. If we set the 4th param of
-	// // the xrEnumerateViewConfigurationViews function call to zero, it will retrieve the required
-	// // number of viewports and store it in the 5th param
-	// uint32_t viewport_count = 0;
-	// result = xrEnumerateViewConfigurationViews(m_openxr_instance, m_openxr_system_id, m_application_view_type, 0, &viewport_count, NULL);
-	// if (XR_FAILED(result)) {
-	// 	return false;
-	// }
+	// As such, we first need to find out how many views we need to support. If we set the 4th param of
+	// the xrEnumerateViewConfigurationViews function call to zero, it will retrieve the required
+	// number of viewports and store it in the 5th param
+	uint32_t viewport_count = 0;
+	result = xrEnumerateViewConfigurationViews(m_openxr_instance, m_openxr_system_id, m_application_view_type, 0, &viewport_count, NULL);
+	if (XR_FAILED(result)) {
+		return false;
+	}
 
-	// // Now that we know how many views we need to render, resize the vector that contains the view
-	// // configurations (each XrViewConfigurationView specifies properties related to rendering an
-	// // individual view) and the vector containing the views (each XrView specifies the pose and
-	// // the fov of the view. Basically, a XrView is a view matrix in "traditional" rendering).
-	// m_openxr_view_configuration_views.resize(viewport_count, { XR_TYPE_VIEW_CONFIGURATION_VIEW });
-	// m_openxr_views.resize(viewport_count, { XR_TYPE_VIEW });
+	// Now that we know how many views we need to render, resize the vector that contains the view
+	// configurations (each XrViewConfigurationView specifies properties related to rendering an
+	// individual view) and the vector containing the views (each XrView specifies the pose and
+	// the fov of the view. Basically, a XrView is a view matrix in "traditional" rendering).
+	m_openxr_view_configuration_views.resize(viewport_count, { XR_TYPE_VIEW_CONFIGURATION_VIEW });
+	m_openxr_views.resize(viewport_count, { XR_TYPE_VIEW });
 
-	// // Now we again call xrEnumerateViewConfigurationViews, this time we set the 4th param
-	// // to the number of our viewports, such that the method fills the xr_view_configurations
-	// // vector with the actual view configurations
-	// result = xrEnumerateViewConfigurationViews(m_openxr_instance, m_openxr_system_id, m_application_view_type, viewport_count, &viewport_count, m_openxr_view_configuration_views.data());
-	// if (XR_FAILED(result)) {
-	// 	return false;
-	// }
+	// Now we again call xrEnumerateViewConfigurationViews, this time we set the 4th param
+	// to the number of our viewports, such that the method fills the xr_view_configurations
+	// vector with the actual view configurations
+	result = xrEnumerateViewConfigurationViews(m_openxr_instance, m_openxr_system_id, m_application_view_type, viewport_count, &viewport_count, m_openxr_view_configuration_views.data());
+	if (XR_FAILED(result)) {
+		return false;
+	}
 
 	// //------------------------------------------------------------------------------------------------------
 	// // Swapchains
