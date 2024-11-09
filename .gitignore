@@ -12,3 +12,6 @@ TODO.md
 
 # Debugging
 debug.cpp
+
+# Compiled shaders
+*.spv

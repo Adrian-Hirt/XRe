@@ -271,8 +271,24 @@ bool OpenXrHandler::initializeOpenxr() {
   VkFormat vk_chosen_format = static_cast<VkFormat>(chosen_format);
   m_vulkan_handler.createRenderPass(vk_chosen_format);
 
+  // Check that all images have the same size (currently it's not supported to
+  // have views with different sizes).
+  uint32_t image_width = m_openxr_view_configuration_views[0].recommendedImageRectWidth;
+  uint32_t image_height = m_openxr_view_configuration_views[0].recommendedImageRectHeight;
+  for (uint32_t i = 1; i < viewport_count; i++) {
+    if (image_width != m_openxr_view_configuration_views[i].recommendedImageRectWidth) {
+      Utils::exitWithMessage("Image widths are not equal!");
+    }
+
+    if (image_height != m_openxr_view_configuration_views[i].recommendedImageRectHeight) {
+      Utils::exitWithMessage("Image widths are not equal!");
+    }
+  }
+
+
   // TODO: maybe group these?
   m_vulkan_handler.createDescriptorSetLayout();
+  m_vulkan_handler.createGraphicsPipeline(image_height, image_width);
 
 	for (uint32_t i = 0; i < viewport_count; i++) {
 		// Get the current view configuration we're interested in
@@ -313,7 +329,7 @@ bool OpenXrHandler::initializeOpenxr() {
 		// and width of the swapchains (which usually should match the size of the window / view
 		// we render to, and the swapchain_data structs (which contain the backbuffer & depthbuffer
 		// of the many swapchains we get)
-		swapchain_t swapchain = {};
+		Swapchain swapchain = {};
 
 		swapchain.handle = swapchain_handle;
 		swapchain.width = swapchain_create_info.width;

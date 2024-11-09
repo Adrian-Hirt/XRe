@@ -27,6 +27,7 @@ public:
   void createDescriptorSetLayout();
   VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
   VkImageView createDepthImage(VkFormat format, uint32_t width, uint32_t height);
+  void createGraphicsPipeline(uint32_t viewport_height, uint32_t viewport_width);
 
   VkInstance getInstance();
   VkPhysicalDevice getPhysicalDevice();
@@ -43,6 +44,7 @@ private:
   uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
   void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
                    VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+  VkShaderModule createShaderModule(const std::vector<char>& code);
 
 
   // -------------------------------------------
@@ -74,6 +76,15 @@ private:
 
   // Specifies the types of resources that are going to be accessed by the pipeline
   VkDescriptorSetLayout m_descriptor_set_layout;
+
+  // Size of the viewport
+  VkExtent2D m_viewport_extent;
+
+  // Layout of the graphics pipeline (holds `uniform` values in shaders)
+  VkPipelineLayout m_pipeline_layout;
+
+  // The graphics pipeline itself
+  VkPipeline m_graphics_pipeline;
 
   // Whether to enable or disable validation layers
   #ifdef NULL

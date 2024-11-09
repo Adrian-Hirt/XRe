@@ -5,7 +5,8 @@
 
 // Other includes
 #include <iostream>
-#include <comdef.h>
+#include <vector>
+#include <fstream>
 
 // small header-only file which contains some utility functions
 
@@ -30,10 +31,29 @@ namespace Utils {
     }
   };
 
-  inline void checkBoolResult(boolean result, const char *error_string){
+  inline void checkBoolResult(bool result, const char *error_string){
     if (!result) {
       exitWithMessage(error_string);
     }
+  };
+
+  inline std::vector<char> readFile(const std::string& filename) {
+    std::ifstream file(filename, std::ios::ate | std::ios::binary);
+
+    if (!file.is_open()) {
+      std::string error_string = "Failed to open file ";
+      error_string.append(filename);
+      exitWithMessage(error_string.c_str());
+    }
+
+    size_t fileSize = (size_t) file.tellg();
+    std::vector<char> buffer(fileSize);
+    file.seekg(0);
+    file.read(buffer.data(), fileSize);
+
+    file.close();
+
+    return buffer;
   };
 
   // inline std::string getFileLocation(const std::string &path) {

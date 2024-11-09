@@ -451,3 +451,191 @@ VkImageView VulkanHandler::createDepthImage(VkFormat format, uint32_t width, uin
 
   return depth_image_view;
 }
+
+VkShaderModule VulkanHandler::createShaderModule(const std::vector<char>& code) {
+  // Setup the create info for the shader module
+  VkShaderModuleCreateInfo shader_module_create_info{};
+  shader_module_create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+  shader_module_create_info.codeSize = code.size();
+  shader_module_create_info.pCode = reinterpret_cast<const uint32_t*>(code.data());
+
+  // And create the shader module itself
+  VkShaderModule shader_module;
+  VkResult result = vkCreateShaderModule(m_device, &shader_module_create_info, nullptr, &shader_module);
+  Utils::checkVkResult(result, "Failed to create shader module");
+
+  return shader_module;
+}
+
+void VulkanHandler::createGraphicsPipeline(uint32_t viewport_height, uint32_t viewport_width) {
+  m_viewport_extent = {};
+  m_viewport_extent.height = viewport_height;
+  m_viewport_extent.width = viewport_width;
+
+  // --------------------------
+  // Shader modules
+  // --------------------------
+  // Load shader bytecodes
+  static std::vector<char> vertex_shader_code = Utils::readFile(SHADERS_FOLDER "/vert.spv");
+  static std::vector<char> fragment_shader_code = Utils::readFile(SHADERS_FOLDER "/frag.spv");
+
+  // Create shader modules for both of the shaders
+  VkShaderModule vertex_shader_module = createShaderModule(vertex_shader_code);
+  VkShaderModule fragment_shader_module = createShaderModule(fragment_shader_code);
+
+  // We need to assign the shaders to specific pipeline stages, start with the vertext shader
+  VkPipelineShaderStageCreateInfo vertex_shader_stage_create_info{};
+  vertex_shader_stage_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+  vertex_shader_stage_create_info.stage = VK_SHADER_STAGE_VERTEX_BIT;
+  vertex_shader_stage_create_info.module = vertex_shader_module;
+  vertex_shader_stage_create_info.pName = "main";
+
+  // and do the same for the fragment shader
+  VkPipelineShaderStageCreateInfo fragment_shader_stage_create_info{};
+  fragment_shader_stage_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+  fragment_shader_stage_create_info.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+  fragment_shader_stage_create_info.module = fragment_shader_module;
+  fragment_shader_stage_create_info.pName = "main";
+
+  VkPipelineShaderStageCreateInfo shader_stages[] = { vertex_shader_stage_create_info, fragment_shader_stage_create_info };
+
+  // --------------------------
+  // Dynamic state
+  // --------------------------
+  VkPipelineDynamicStateCreateInfo dynamic_state_create_info{};
+  dynamic_state_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+  dynamic_state_create_info.dynamicStateCount = 0;
+  dynamic_state_create_info.pDynamicStates = nullptr;
+
+  // --------------------------
+  // Vertex input
+  // --------------------------
+  auto vertex_binding_description = Vertex::getBindingDescription();
+  auto vertex_attribute_descriptions = Vertex::getAttributeDescriptions();
+  VkPipelineVertexInputStateCreateInfo vertex_input_info{};
+  vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+  vertex_input_info.vertexBindingDescriptionCount = 1;
+  vertex_input_info.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertex_attribute_descriptions.size());
+  vertex_input_info.pVertexBindingDescriptions = &vertex_binding_description;
+  vertex_input_info.pVertexAttributeDescriptions = vertex_attribute_descriptions.data();
+
+  // --------------------------
+  // Input assembly
+  // --------------------------
+  // Describe the input topology and if primitive restart is enabled
+  VkPipelineInputAssemblyStateCreateInfo input_assembly_info{};
+  input_assembly_info.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+  input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+  input_assembly_info.primitiveRestartEnable = VK_FALSE;
+
+  // --------------------------
+  // Viewports and scissors
+  // --------------------------
+  // Setup the viewport
+  VkViewport viewport{};
+  viewport.x = 0.0f;
+  viewport.y = 0.0f;
+  viewport.width = (float) m_viewport_extent.width;
+  viewport.height = (float) m_viewport_extent.height;
+  viewport.minDepth = 0.0f;
+  viewport.maxDepth = 1.0f;
+
+  // We're not using a scissor rectangle (i.e. draw the whole viewport)
+  VkRect2D scissor{};
+  scissor.offset = {0, 0};
+  scissor.extent = m_viewport_extent;
+
+  // Setup the viewport state
+  VkPipelineViewportStateCreateInfo viewport_state_info{};
+  viewport_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+  viewport_state_info.viewportCount = 1;
+  viewport_state_info.pViewports = &viewport;
+  viewport_state_info.scissorCount = 1;
+  viewport_state_info.pScissors = &scissor;
+
+  // --------------------------
+  // Rasterizer
+  // --------------------------
+  // Setup the rasterizer
+  VkPipelineRasterizationStateCreateInfo rasterizer{};
+  rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+  rasterizer.depthClampEnable = VK_FALSE;
+  rasterizer.rasterizerDiscardEnable = VK_FALSE;
+  rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+  rasterizer.lineWidth = 1.0f;
+  rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+  rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+  rasterizer.depthBiasEnable = VK_FALSE;
+
+  // --------------------------
+  // Multisampling
+  // --------------------------
+  // Keep multisampling disabled for now
+  VkPipelineMultisampleStateCreateInfo multisampling_info{};
+  multisampling_info.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+  multisampling_info.sampleShadingEnable = VK_FALSE;
+  multisampling_info.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+
+  // --------------------------
+  // Depth buffer and stencil
+  // --------------------------
+  VkPipelineDepthStencilStateCreateInfo depth_stencil_info{};
+  depth_stencil_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+  depth_stencil_info.depthTestEnable = VK_TRUE;
+  depth_stencil_info.depthWriteEnable = VK_TRUE;
+  depth_stencil_info.depthCompareOp = VK_COMPARE_OP_LESS;
+  depth_stencil_info.depthBoundsTestEnable = VK_FALSE;
+  depth_stencil_info.stencilTestEnable = VK_FALSE;
+
+  // --------------------------
+  // Color blending
+  // --------------------------
+  VkPipelineColorBlendAttachmentState color_blend_attachment_state{};
+  color_blend_attachment_state.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+  color_blend_attachment_state.blendEnable = VK_FALSE;
+
+  VkPipelineColorBlendStateCreateInfo color_blend_info{};
+  color_blend_info.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+  color_blend_info.logicOpEnable = VK_FALSE;
+  color_blend_info.attachmentCount = 1;
+  color_blend_info.pAttachments = &color_blend_attachment_state;
+
+  // --------------------------
+  // Pipeline layout
+  // --------------------------
+  VkPipelineLayoutCreateInfo pipeline_layout_info{};
+  pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+  pipeline_layout_info.setLayoutCount = 1;
+  pipeline_layout_info.pSetLayouts = &m_descriptor_set_layout;
+
+  VkResult result = vkCreatePipelineLayout(m_device, &pipeline_layout_info, nullptr, &m_pipeline_layout);
+  Utils::checkVkResult(result, "Failed to create pipeline layout");
+
+  // --------------------------
+  // Graphics pipeline
+  // --------------------------
+  VkGraphicsPipelineCreateInfo pipeline_create_info{};
+  pipeline_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+  pipeline_create_info.stageCount = 2;
+  pipeline_create_info.pStages = shader_stages;
+  pipeline_create_info.pVertexInputState = &vertex_input_info;
+  pipeline_create_info.pInputAssemblyState = &input_assembly_info;
+  pipeline_create_info.pViewportState = &viewport_state_info;
+  pipeline_create_info.pRasterizationState = &rasterizer;
+  pipeline_create_info.pMultisampleState = &multisampling_info;
+  pipeline_create_info.pDepthStencilState = nullptr; // Optional
+  pipeline_create_info.pColorBlendState = &color_blend_info;
+  pipeline_create_info.pDynamicState = &dynamic_state_create_info;
+  pipeline_create_info.pDepthStencilState = &depth_stencil_info;
+  pipeline_create_info.layout = m_pipeline_layout;
+  pipeline_create_info.renderPass = m_render_pass;
+  pipeline_create_info.subpass = 0;
+
+  result = vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &pipeline_create_info, nullptr, &m_graphics_pipeline);
+  Utils::checkVkResult(result, "Failed to create the graphics pipeline");
+
+
+  // Make sure to cleanup the shader modules
+  vkDestroyShaderModule(m_device, fragment_shader_module, nullptr);
+  vkDestroyShaderModule(m_device, vertex_shader_module, nullptr);
+}
