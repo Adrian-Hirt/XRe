@@ -353,3 +353,34 @@ void VulkanHandler::createDescriptorSetLayout() {
   VkResult result = vkCreateDescriptorSetLayout(m_device, &layout_create_info, nullptr, &m_descriptor_set_layout);
   Utils::checkVkResult(result, "Failed to create the descriptor set layout");
 }
+
+VkImageView VulkanHandler::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
+  VkImageViewCreateInfo image_view_create_info{};
+  image_view_create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+  image_view_create_info.image = image;
+  image_view_create_info.viewType = VK_IMAGE_VIEW_TYPE_2D; // Treat image as 2D texture
+  image_view_create_info.format = format;
+
+  // Keep the default mappings of the RGBA channels
+  image_view_create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+  image_view_create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+  image_view_create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+  image_view_create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+  // subresourceRange describes the image’s purpose and which part of the
+  // image should be accessed. The images should be used as color targets
+  // without any mipmapping levels or multiple layers.
+  // If the application was stereographic 3D, the swapchain would have multiple
+  // layers representing the views for left and right.
+  image_view_create_info.subresourceRange.aspectMask = aspectFlags;
+  image_view_create_info.subresourceRange.baseMipLevel = 0;
+  image_view_create_info.subresourceRange.levelCount = 1;
+  image_view_create_info.subresourceRange.baseArrayLayer = 0;
+  image_view_create_info.subresourceRange.layerCount = 1;
+
+  VkImageView image_view;
+  VkResult result = vkCreateImageView(m_device, &image_view_create_info, nullptr, &image_view);
+  Utils::checkVkResult(result, "Failed to create image view");
+
+  return image_view;
+}

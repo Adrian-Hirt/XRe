@@ -25,6 +25,7 @@ public:
   void initializeVulkanAndDevices(XrInstance xr_instance, XrSystemId xr_system_id);
   void createRenderPass(VkFormat swapchain_format);
   void createDescriptorSetLayout();
+  VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 
   VkInstance getInstance();
   VkPhysicalDevice getPhysicalDevice();

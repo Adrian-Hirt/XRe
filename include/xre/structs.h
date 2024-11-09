@@ -26,7 +26,7 @@ struct swapchain_t {
   XrSwapchain handle;
   int32_t width;
   int32_t height;
-  // std::vector<swapchain_data_t> swapchain_data;
+  std::vector<VkImageView> image_views;
 };
 
 // typedef struct vertex_t {

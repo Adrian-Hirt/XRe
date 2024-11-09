@@ -306,7 +306,7 @@ bool OpenXrHandler::initializeOpenxr() {
 		// the image data in a structured way. As we only need these to create the swapchains,
 		// we put them in a temporary vector which we won't use afterwards
 		std::vector<XrSwapchainImageVulkanKHR> swapchain_images;
-		swapchain_images.resize(swapchain_image_count, {XR_TYPE_SWAPCHAIN_IMAGE_VULKAN_KHR });
+		swapchain_images.resize(swapchain_image_count, { XR_TYPE_SWAPCHAIN_IMAGE_VULKAN_KHR });
 
 		// Now we can create the swapchain struct, that stores the swapchain handle, the height
 		// and width of the swapchains (which usually should match the size of the window / view
@@ -314,23 +314,19 @@ bool OpenXrHandler::initializeOpenxr() {
 		// of the many swapchains we get)
 		swapchain_t swapchain = {};
 
+		swapchain.handle = swapchain_handle;
 		swapchain.width = swapchain_create_info.width;
 		swapchain.height = swapchain_create_info.height;
-		swapchain.handle = swapchain_handle;
-		// swapchain.swapchain_data.resize(swapchain_image_count);
+		swapchain.image_views.resize(swapchain_image_count);
 
 		// Now call the xrEnumerateSwapchainImages function again, this time with the 2nd param set to the number
-		// of swapchain images that got created by OpenXR. That way, we can store the swapchain images into our
-		// temporary vector and use them to create the swapchains
+		// of swapchain images that got created by OpenXR.
 		result = xrEnumerateSwapchainImages(swapchain_handle, swapchain_image_count, &swapchain_image_count, (XrSwapchainImageBaseHeader *)swapchain_images.data());
 		Utils::checkXrResult(result, "Failed to enumerate the swapchain images");
 
-    // For each swapchain image, call the function to create a render target using that swapchain image
-    // We also directly release the texture object, as we don't need it anymore after we created the
-    // render target with it
+    // For each swapchain image, call the function to create a swapchain image view using that swapchain image.
     for (uint32_t i = 0; i < swapchain_image_count; i++) {
-        // swapchain.swapchain_data[i] = m_dx11_handler.createRenderTargets(*swapchain_images[i].texture);
-        // swapchain_images[i].texture->Release();
+      swapchain.image_views[i] = m_vulkan_handler.createImageView(swapchain_images[i].image, static_cast<VkFormat>(chosen_format), VK_IMAGE_ASPECT_COLOR_BIT);
     }
 
     // We're done creating that swapchain, we can now add it to the vector of our swapchains (as we have multiple,
