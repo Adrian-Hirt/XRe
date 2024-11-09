@@ -326,3 +326,30 @@ void VulkanHandler::createRenderPass(VkFormat swapchain_format) {
   VkResult result = vkCreateRenderPass(m_device, &renderPassInfo, nullptr, &m_render_pass);
   Utils::checkVkResult(result, "Failed to create render pass");
 }
+
+void VulkanHandler::createDescriptorSetLayout() {
+  // Uniform buffer object
+  VkDescriptorSetLayoutBinding ubo_layout_binding{};
+  ubo_layout_binding.binding = 0;
+  ubo_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+  ubo_layout_binding.descriptorCount = 1;
+  ubo_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+  // Combined image sampler
+  VkDescriptorSetLayoutBinding sampler_layout_binding{};
+  sampler_layout_binding.binding = 1;
+  sampler_layout_binding.descriptorCount = 1;
+  sampler_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+  sampler_layout_binding.pImmutableSamplers = nullptr;
+  sampler_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+  std::array<VkDescriptorSetLayoutBinding, 2> bindings = { ubo_layout_binding, sampler_layout_binding };
+
+  VkDescriptorSetLayoutCreateInfo layout_create_info{};
+  layout_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+  layout_create_info.bindingCount = static_cast<uint32_t>(bindings.size());
+  layout_create_info.pBindings = bindings.data();
+
+  VkResult result = vkCreateDescriptorSetLayout(m_device, &layout_create_info, nullptr, &m_descriptor_set_layout);
+  Utils::checkVkResult(result, "Failed to create the descriptor set layout");
+}

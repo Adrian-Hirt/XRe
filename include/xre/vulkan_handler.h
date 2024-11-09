@@ -24,6 +24,7 @@ public:
   VulkanHandler();
   void initializeVulkanAndDevices(XrInstance xr_instance, XrSystemId xr_system_id);
   void createRenderPass(VkFormat swapchain_format);
+  void createDescriptorSetLayout();
 
   VkInstance getInstance();
   VkPhysicalDevice getPhysicalDevice();
@@ -65,6 +66,9 @@ private:
 
   // Render pass for the graphics pipeline
   VkRenderPass m_render_pass;
+
+  // Specifies the types of resources that are going to be accessed by the pipeline
+  VkDescriptorSetLayout m_descriptor_set_layout;
 
   // Whether to enable or disable validation layers
   #ifdef NULL

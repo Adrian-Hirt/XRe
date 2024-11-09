@@ -270,6 +270,9 @@ bool OpenXrHandler::initializeOpenxr() {
   // Create render passes for the VulkanHandler
   m_vulkan_handler.createRenderPass(static_cast<VkFormat>(chosen_format));
 
+  // TODO: maybe group these?
+  m_vulkan_handler.createDescriptorSetLayout();
+
 	for (uint32_t i = 0; i < viewport_count; i++) {
 		// Get the current view configuration we're interested in
 		XrViewConfigurationView& current_view_configuration = m_openxr_view_configuration_views[i];
