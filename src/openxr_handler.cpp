@@ -291,6 +291,7 @@ bool OpenXrHandler::initializeOpenxr() {
   m_vulkan_handler.createGraphicsPipeline(image_height, image_width);
   m_vulkan_handler.createCommandPool();
   m_vulkan_handler.createCommandBuffers();
+  m_vulkan_handler.createSyncObjects();
 
 
 	for (uint32_t i = 0; i < viewport_count; i++) {

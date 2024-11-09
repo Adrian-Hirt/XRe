@@ -685,3 +685,31 @@ void VulkanHandler::createCommandBuffers() {
   VkResult result = vkAllocateCommandBuffers(m_device, &buffer_allocate_info, m_command_buffers.data());
   Utils::checkVkResult(result, "Failed to allocate command buffers");
 }
+
+void VulkanHandler::createSyncObjects() {
+  m_image_available_semaphores.resize(s_max_frames_in_flight);
+  m_render_finished_semaphores.resize(s_max_frames_in_flight);
+  m_in_flight_fences.resize(s_max_frames_in_flight);
+
+  VkSemaphoreCreateInfo semaphore_create_info{};
+  semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+  VkFenceCreateInfo fence_create_info{};
+  fence_create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+  // Create the fence in the signalled state such that the first `vkWaitForFences` call
+  // does not block indefinitely.
+  fence_create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+  VkResult result;
+
+  for (size_t i = 0; i < s_max_frames_in_flight; i++) {
+    result = vkCreateSemaphore(m_device, &semaphore_create_info, nullptr, &m_image_available_semaphores[i]);
+    Utils::checkVkResult(result, "Failed to create semaphore");
+
+    result = vkCreateSemaphore(m_device, &semaphore_create_info, nullptr, &m_render_finished_semaphores[i]);
+    Utils::checkVkResult(result, "Failed to create semaphore");
+
+    result = vkCreateFence(m_device, &fence_create_info, nullptr, &m_in_flight_fences[i]);
+    Utils::checkVkResult(result, "Failed to create fence");
+  }
+}

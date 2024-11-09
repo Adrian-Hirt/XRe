@@ -31,6 +31,7 @@ public:
   void createGraphicsPipeline(uint32_t viewport_height, uint32_t viewport_width);
   void createCommandPool();
   void createCommandBuffers();
+  void createSyncObjects();
 
   VkInstance getInstance();
   VkPhysicalDevice getPhysicalDevice();
@@ -101,6 +102,11 @@ private:
 
   // Command buffers for our application
   std::vector<VkCommandBuffer> m_command_buffers;
+
+  // Synchronization objects
+  std::vector<VkSemaphore> m_image_available_semaphores;
+  std::vector<VkSemaphore> m_render_finished_semaphores;
+  std::vector<VkFence> m_in_flight_fences;
 
   // Whether to enable or disable validation layers
   #ifdef NULL
