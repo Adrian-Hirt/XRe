@@ -22,7 +22,8 @@
 class VulkanHandler {
 public:
   VulkanHandler();
-  VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id);
+  void initializeVulkanAndDevices(XrInstance xr_instance, XrSystemId xr_system_id);
+  void createRenderPass(VkFormat swapchain_format);
 
   VkInstance getInstance();
   VkPhysicalDevice getPhysicalDevice();
@@ -32,7 +33,6 @@ private:
   // -------------------------------------------
   // Methods
   // -------------------------------------------
-  void initializeVulkan(XrInstance xr_instance, XrSystemId xr_system_id);
   void createInstance();
   void setupDebugMessenger();
   bool checkValidationLayerSupport();
@@ -59,6 +59,9 @@ private:
 
   // Queue used for presenting the rendered images
   VkQueue m_present_queue;
+
+  // Swapchain
+  VkFormat m_swapchain_format;
 
   // Whether to enable or disable validation layers
   #ifdef NULL

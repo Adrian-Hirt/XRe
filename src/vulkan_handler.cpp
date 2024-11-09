@@ -13,10 +13,6 @@ const std::vector<const char*> s_device_extensions = {
 
 VulkanHandler::VulkanHandler() {};
 
-VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
-  initializeVulkan(xr_instance, xr_system_id);
-}
-
 VkInstance VulkanHandler::getInstance() {
   return m_vk_instance;
 }
@@ -29,7 +25,7 @@ VkDevice VulkanHandler::getLogicalDevice() {
   return m_device;
 }
 
-void VulkanHandler::initializeVulkan(XrInstance xr_instance, XrSystemId xr_system_id) {
+void VulkanHandler::initializeVulkanAndDevices(XrInstance xr_instance, XrSystemId xr_system_id) {
   createInstance();
   // setupDebugMessenger(); TODO: this seems broken :(
   setupDevice(xr_instance, xr_system_id);
@@ -243,3 +239,7 @@ void VulkanHandler::setupDevice(XrInstance xr_instance, XrSystemId xr_system_id)
   vkGetDeviceQueue(m_device, queue_family_indices.m_graphics_family.value(), 0, &m_graphics_queue);
   vkGetDeviceQueue(m_device, queue_family_indices.m_present_family.value(), 0, &m_present_queue);
 };
+
+void VulkanHandler::createRenderPass(VkFormat swapchain_format) {
+  m_swapchain_format = swapchain_format;
+}

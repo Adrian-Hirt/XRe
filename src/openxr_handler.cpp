@@ -158,7 +158,8 @@ bool OpenXrHandler::initializeOpenxr() {
 	Utils::checkXrResult(result, "Failed to get the Vulkan graphics requirements!");
 
 	// Create a new handler for the Vulkan related stuff.
- 	m_vulkan_handler = VulkanHandler(m_openxr_instance, m_openxr_system_id);
+ 	m_vulkan_handler = VulkanHandler();
+  m_vulkan_handler.initializeVulkanAndDevices(m_openxr_instance, m_openxr_system_id);
 
 	// Create a binding for the Vulkan device
 	XrGraphicsBindingVulkanKHR graphics_binding = { XR_TYPE_GRAPHICS_BINDING_VULKAN_KHR };
@@ -247,8 +248,7 @@ bool OpenXrHandler::initializeOpenxr() {
 	// is used to draw the data to the screen, and another is used to render the deta from the simulation
 	// to. With this approach, tearing (that might occur because the scene is updated while it's drawn
 	// to the screen) should not occur
-
-  // First, select the format for the swapchains
+  // Select the format for the swapchains as we need to pass this to the vulkan handler as well
   uint32_t swapchain_format_count = 0;
 	result = xrEnumerateSwapchainFormats(m_openxr_session, 0, &swapchain_format_count, NULL);
 	Utils::checkXrResult(result, "Failed to enumerate the swapchain formats");
@@ -266,6 +266,9 @@ bool OpenXrHandler::initializeOpenxr() {
       break;
     }
   }
+
+  // Create render passes for the VulkanHandler
+  m_vulkan_handler.createRenderPass(static_cast<VkFormat>(chosen_format));
 
 	for (uint32_t i = 0; i < viewport_count; i++) {
 		// Get the current view configuration we're interested in
