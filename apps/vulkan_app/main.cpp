@@ -6,7 +6,7 @@ public:
 
 
   void setup() override {
-
+    std::cout << "Setup" << std::endl;
   };
 
   // void updateSimulation(XrTime predicted_time) override {

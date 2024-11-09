@@ -559,6 +559,7 @@ void OpenXrHandler::suggestBindings(std::string interaction_profile, std::vector
 	result = xrSuggestInteractionProfileBindings(m_openxr_instance, &suggested_binding);
 	Utils::checkXrResult(result, "Failed to suggest the interaction profile bindings");
 }
+#endif
 
 //------------------------------------------------------------------------------------------------------
 // Poll the OpenXR events
@@ -630,6 +631,7 @@ void OpenXrHandler::pollOpenxrEvents(bool &loop_running, bool &xr_running) {
   }
 }
 
+#if false
 //------------------------------------------------------------------------------------------------------
 // Poll the OpenXR actions
 //------------------------------------------------------------------------------------------------------

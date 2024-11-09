@@ -12,22 +12,22 @@ Application::Application(const char *application_name) {
 Application::~Application() {};
 
 void Application::run() {
-  // bool loop_running = true;
-  // bool xr_running = false;
+  bool loop_running = true;
+  bool xr_running = false;
 
-  // // Call the setup mmethod
-  // setup();
+  // Call the setup method
+  setup();
 
-  // // Main render loop
-  // while(loop_running) {
-  //   // Poll the OpenXR events, and if OpenXR reports to still be running, keep going on
-  //   m_open_xr_handler.pollOpenxrEvents(loop_running, xr_running);
+  // Main render loop
+  while(loop_running) {
+    // Poll the OpenXR events, and if OpenXR reports to still be running, keep going on
+    m_open_xr_handler.pollOpenxrEvents(loop_running, xr_running);
 
-  //   if (xr_running) {
-  //     // Render frame
-  //     m_open_xr_handler.renderFrame(std::bind(&Application::draw, this), std::bind(&Application::updateSimulation, this, std::placeholders::_1));
-  //   }
-  // }
+    // if (xr_running) {
+    //   // Render frame
+    //   m_open_xr_handler.renderFrame(std::bind(&Application::draw, this), std::bind(&Application::updateSimulation, this, std::placeholders::_1));
+    // }
+  }
 }
 
 void Application::setup() {
