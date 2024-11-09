@@ -22,12 +22,12 @@ typedef struct {
 //   ID3D11RenderTargetView *back_buffer;
 // };
 
-// struct swapchain_t {
-//   XrSwapchain handle;
-//   int32_t width;
-//   int32_t height;
-//   std::vector<swapchain_data_t> swapchain_data;
-// };
+struct swapchain_t {
+  XrSwapchain handle;
+  int32_t width;
+  int32_t height;
+  // std::vector<swapchain_data_t> swapchain_data;
+};
 
 // typedef struct vertex_t {
 //   DirectX::XMFLOAT3 coordinates;

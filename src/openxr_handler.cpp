@@ -240,84 +240,97 @@ bool OpenXrHandler::initializeOpenxr() {
 		return false;
 	}
 
-	// //------------------------------------------------------------------------------------------------------
-	// // Swapchains
-	// //------------------------------------------------------------------------------------------------------
-	// // For each viewport, we need to setup a swapchain. A swapchain consists of multiple buffers, where one
-	// // is used to draw the data to the screen, and another is used to render the deta from the simulation
-	// // to. With this approach, tearing (that might occur because the scene is updated while it's drawn
-	// // to the screen) should not occur
-	// for (uint32_t i = 0; i < viewport_count; i++) {
-	// 	// Get the current view configuration we're interested in
-	// 	XrViewConfigurationView& current_view_configuration = m_openxr_view_configuration_views[i];
+	//------------------------------------------------------------------------------------------------------
+	// Swapchains
+	//------------------------------------------------------------------------------------------------------
+	// For each viewport, we need to setup a swapchain. A swapchain consists of multiple buffers, where one
+	// is used to draw the data to the screen, and another is used to render the deta from the simulation
+	// to. With this approach, tearing (that might occur because the scene is updated while it's drawn
+	// to the screen) should not occur
 
-	// 	// Create a create info struct to create the swapchain
-	// 	XrSwapchainCreateInfo swapchain_create_info = {};
-	// 	swapchain_create_info.type = { XR_TYPE_SWAPCHAIN_CREATE_INFO };
-	// 	swapchain_create_info.arraySize = 1; // Number of array layers
-	// 	swapchain_create_info.mipCount = 1; // Only use one mipmap level, bigger numbers would only be useful for textures
-	// 	swapchain_create_info.faceCount = 1; // Number of faces to render, 1 should be used, other option would be 6 for cubemaps
-	// 	swapchain_create_info.format = m_dx11_handler.m_d3d11_swapchain_format;
-	// 	swapchain_create_info.width = current_view_configuration.recommendedImageRectWidth; // Just use the recommended width that the runtime gave us
-	// 	swapchain_create_info.height = current_view_configuration.recommendedImageRectHeight; // Just use the recommended height that the runtime gave us
-	// 	swapchain_create_info.sampleCount = current_view_configuration.recommendedSwapchainSampleCount; // Just use the recommended sample count that the runtime gave us
-	// 	swapchain_create_info.usageFlags = XR_SWAPCHAIN_USAGE_SAMPLED_BIT | XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT;
+  // First, select the format for the swapchains
+  uint32_t swapchain_format_count = 0;
+	result = xrEnumerateSwapchainFormats(m_openxr_session, 0, &swapchain_format_count, NULL);
+	Utils::checkXrResult(result, "Failed to enumerate the swapchain formats");
 
-	// 	// Create the OpenXR swapchain
-	// 	XrSwapchain swapchain_handle;
-	// 	result = xrCreateSwapchain(m_openxr_session, &swapchain_create_info, &swapchain_handle);
-	// 	if (XR_FAILED(result)) {
-	// 		return false;
-	// 	}
+  std::vector<int64_t> swapchain_formats(swapchain_format_count);
+  result = xrEnumerateSwapchainFormats(m_openxr_session, swapchain_format_count, &swapchain_format_count, swapchain_formats.data());
+	Utils::checkXrResult(result, "Failed to enumerate the swapchain formats");
 
-	// 	// OpenXR can create an arbitrary number of swapchain images (from which we'll create our buffers),
-	// 	// so we need to find out how many were created by the runtime
-	// 	// If we pass zero as the 2nd param, we request the number of swapchain images and store it
-	// 	// in the 3rd param
-	// 	uint32_t swapchain_image_count = 0;
-	// 	result = xrEnumerateSwapchainImages(swapchain_handle, 0, &swapchain_image_count, NULL);
-	// 	if (XR_FAILED(result)) {
-	// 		return false;
-	// 	}
+  // Default to the first available format if the desired format is not available
+  int64_t chosen_format = swapchain_formats.front();
 
-	// 	// We need a vector to store the swapchain images. The swapchain images store
-	// 	// the image data in a structured way. As we only need these to create the swapchains,
-	// 	// we put them in a temporary vector which we won't use afterwards
-	// 	std::vector<XrSwapchainImageD3D11KHR> swapchain_images;
-	// 	swapchain_images.resize(swapchain_image_count, {XR_TYPE_SWAPCHAIN_IMAGE_D3D11_KHR});
+  for (const auto& available_format : swapchain_formats) {
+    if (available_format == VK_FORMAT_B8G8R8A8_SRGB) {
+      chosen_format = available_format;
+      break;
+    }
+  }
 
+	for (uint32_t i = 0; i < viewport_count; i++) {
+		// Get the current view configuration we're interested in
+		XrViewConfigurationView& current_view_configuration = m_openxr_view_configuration_views[i];
 
-	// 	// Now we can create the swapchain struct, that stores the swapchain handle, the height
-	// 	// and width of the swapchains (which usually should match the size of the window / view
-	// 	// we render to, and the swapchain_data structs (which contain the backbuffer & depthbuffer
-	// 	// of the many swapchains we get)
-	// 	swapchain_t swapchain = {};
+		// Create a create info struct to create the swapchain
+		XrSwapchainCreateInfo swapchain_create_info = {};
+		swapchain_create_info.type = { XR_TYPE_SWAPCHAIN_CREATE_INFO };
+		swapchain_create_info.arraySize = 1; // Number of array layers
+		swapchain_create_info.mipCount = 1; // Only use one mipmap level, bigger numbers would only be useful for textures
+		swapchain_create_info.faceCount = 1; // Number of faces to render, 1 should be used, other option would be 6 for cubemaps
+		swapchain_create_info.format = chosen_format;
+		swapchain_create_info.width = current_view_configuration.recommendedImageRectWidth; // Just use the recommended width that the runtime gave us
+		swapchain_create_info.height = current_view_configuration.recommendedImageRectHeight; // Just use the recommended height that the runtime gave us
+		swapchain_create_info.sampleCount = current_view_configuration.recommendedSwapchainSampleCount; // Just use the recommended sample count that the runtime gave us
+		swapchain_create_info.usageFlags = XR_SWAPCHAIN_USAGE_SAMPLED_BIT | XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT;
 
-	// 	swapchain.width = swapchain_create_info.width;
-	// 	swapchain.height = swapchain_create_info.height;
-	// 	swapchain.handle = swapchain_handle;
-	// 	swapchain.swapchain_data.resize(swapchain_image_count);
+		// Create the OpenXR swapchain
+		XrSwapchain swapchain_handle;
+		result = xrCreateSwapchain(m_openxr_session, &swapchain_create_info, &swapchain_handle);
+		Utils::checkXrResult(result, "Failed to create a swapchain");
 
-	// 	// Now call the xrEnumerateSwapchainImages function again, this time with the 2nd param set to the number
-	// 	// of swapchain images that got created by OpenXR. That way, we can store the swapchain images into our
-	// 	// temporary vector and use them to create the swapchains
-	// 	result = xrEnumerateSwapchainImages(swapchain_handle, swapchain_image_count, &swapchain_image_count, (XrSwapchainImageBaseHeader *)swapchain_images.data());
-	// 	if (XR_FAILED(result)) {
-  //     return false;
-	// 	}
+		// OpenXR can create an arbitrary number of swapchain images (from which we'll create our buffers),
+		// so we need to find out how many were created by the runtime
+		// If we pass zero as the 2nd param, we request the number of swapchain images and store it
+		// in the 3rd param
+		uint32_t swapchain_image_count = 0;
+		result = xrEnumerateSwapchainImages(swapchain_handle, 0, &swapchain_image_count, NULL);
+		Utils::checkXrResult(result, "Failed to enumerate the swapchain images");
 
-  //   // For each swapchain image, call the function to create a render target using that swapchain image
-  //   // We also directly release the texture object, as we don't need it anymore after we created the
-  //   // render target with it
-  //   for (uint32_t i = 0; i < swapchain_image_count; i++) {
-  //       swapchain.swapchain_data[i] = m_dx11_handler.createRenderTargets(*swapchain_images[i].texture);
-  //       swapchain_images[i].texture->Release();
-  //   }
+		// We need a vector to store the swapchain images. The swapchain images store
+		// the image data in a structured way. As we only need these to create the swapchains,
+		// we put them in a temporary vector which we won't use afterwards
+		std::vector<XrSwapchainImageVulkanKHR> swapchain_images;
+		swapchain_images.resize(swapchain_image_count, {XR_TYPE_SWAPCHAIN_IMAGE_VULKAN_KHR });
 
-  //   // We're done creating that swapchain, we can now add it to the vector of our swapchains (as we have multiple,
-  //   // as mentioned before one for each view
-  //   m_swapchains.push_back(swapchain);
-	// }
+		// Now we can create the swapchain struct, that stores the swapchain handle, the height
+		// and width of the swapchains (which usually should match the size of the window / view
+		// we render to, and the swapchain_data structs (which contain the backbuffer & depthbuffer
+		// of the many swapchains we get)
+		swapchain_t swapchain = {};
+
+		swapchain.width = swapchain_create_info.width;
+		swapchain.height = swapchain_create_info.height;
+		swapchain.handle = swapchain_handle;
+		// swapchain.swapchain_data.resize(swapchain_image_count);
+
+		// Now call the xrEnumerateSwapchainImages function again, this time with the 2nd param set to the number
+		// of swapchain images that got created by OpenXR. That way, we can store the swapchain images into our
+		// temporary vector and use them to create the swapchains
+		result = xrEnumerateSwapchainImages(swapchain_handle, swapchain_image_count, &swapchain_image_count, (XrSwapchainImageBaseHeader *)swapchain_images.data());
+		Utils::checkXrResult(result, "Failed to enumerate the swapchain images");
+
+    // For each swapchain image, call the function to create a render target using that swapchain image
+    // We also directly release the texture object, as we don't need it anymore after we created the
+    // render target with it
+    for (uint32_t i = 0; i < swapchain_image_count; i++) {
+        // swapchain.swapchain_data[i] = m_dx11_handler.createRenderTargets(*swapchain_images[i].texture);
+        // swapchain_images[i].texture->Release();
+    }
+
+    // We're done creating that swapchain, we can now add it to the vector of our swapchains (as we have multiple,
+    // as mentioned before one for each view
+    m_swapchains.push_back(swapchain);
+	}
 
   return true;
 }

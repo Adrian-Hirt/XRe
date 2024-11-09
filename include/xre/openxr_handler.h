@@ -61,8 +61,8 @@ private:
   XrSystemProperties m_openxr_system_properties = { XR_TYPE_SYSTEM_PROPERTIES };
   XrSystemHandTrackingPropertiesEXT m_openxr_hand_tracking_system_properties = { XR_TYPE_SYSTEM_HAND_TRACKING_PROPERTIES_EXT };
 
-  // // Swapchains
-  // std::vector<swapchain_t> m_swapchains;
+  // Swapchains
+  std::vector<swapchain_t> m_swapchains;
 
   // // Pointers to ext functions we need to use
   // PFN_xrGetD3D11GraphicsRequirementsKHR m_ext_xrGetD3D11GraphicsRequirementsKHR;
