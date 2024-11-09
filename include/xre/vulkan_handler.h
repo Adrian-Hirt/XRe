@@ -26,6 +26,7 @@ public:
   void createRenderPass(VkFormat swapchain_format);
   void createDescriptorSetLayout();
   VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+  VkImageView createDepthImage(VkFormat format, uint32_t width, uint32_t height);
 
   VkInstance getInstance();
   VkPhysicalDevice getPhysicalDevice();
@@ -39,6 +40,9 @@ private:
   void setupDebugMessenger();
   bool checkValidationLayerSupport();
   void setupDevice(XrInstance xr_instance, XrSystemId xr_system_id);
+  uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+  void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
+                   VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 
 
   // -------------------------------------------

@@ -268,7 +268,8 @@ bool OpenXrHandler::initializeOpenxr() {
   }
 
   // Create render passes for the VulkanHandler
-  m_vulkan_handler.createRenderPass(static_cast<VkFormat>(chosen_format));
+  VkFormat vk_chosen_format = static_cast<VkFormat>(chosen_format);
+  m_vulkan_handler.createRenderPass(vk_chosen_format);
 
   // TODO: maybe group these?
   m_vulkan_handler.createDescriptorSetLayout();
@@ -326,8 +327,15 @@ bool OpenXrHandler::initializeOpenxr() {
 
     // For each swapchain image, call the function to create a swapchain image view using that swapchain image.
     for (uint32_t i = 0; i < swapchain_image_count; i++) {
-      swapchain.image_views[i] = m_vulkan_handler.createImageView(swapchain_images[i].image, static_cast<VkFormat>(chosen_format), VK_IMAGE_ASPECT_COLOR_BIT);
+      swapchain.image_views[i] = m_vulkan_handler.createImageView(swapchain_images[i].image, vk_chosen_format, VK_IMAGE_ASPECT_COLOR_BIT);
     }
+
+    // And also create a depth image
+    swapchain.depth_image_view = m_vulkan_handler.createDepthImage(
+      vk_chosen_format,
+      current_view_configuration.recommendedImageRectWidth,
+      current_view_configuration.recommendedImageRectHeight
+    );
 
     // We're done creating that swapchain, we can now add it to the vector of our swapchains (as we have multiple,
     // as mentioned before one for each view

@@ -27,6 +27,7 @@ struct swapchain_t {
   int32_t width;
   int32_t height;
   std::vector<VkImageView> image_views;
+  VkImageView depth_image_view;
 };
 
 // typedef struct vertex_t {
