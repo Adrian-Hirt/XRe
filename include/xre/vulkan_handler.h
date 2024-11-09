@@ -27,7 +27,10 @@ public:
   void createDescriptorSetLayout();
   VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
   VkImageView createDepthImage(VkFormat format, uint32_t width, uint32_t height);
+  void createFramebuffers(Swapchain swapchain);
   void createGraphicsPipeline(uint32_t viewport_height, uint32_t viewport_width);
+  void createCommandPool();
+  void createCommandBuffers();
 
   VkInstance getInstance();
   VkPhysicalDevice getPhysicalDevice();
@@ -86,10 +89,26 @@ private:
   // The graphics pipeline itself
   VkPipeline m_graphics_pipeline;
 
+  // Array to hold the frame buffers for our swapchains
+  std::vector<VkFramebuffer> m_swapchain_framebuffers;
+
+  // Indices of the queue families we use
+  QueueFamilyIndices m_queue_family_indices;
+
+  // Command pool for our application (manage the memory that is used to store
+  // command buffers).
+  VkCommandPool m_command_pool;
+
+  // Command buffers for our application
+  std::vector<VkCommandBuffer> m_command_buffers;
+
   // Whether to enable or disable validation layers
   #ifdef NULL
   const static bool s_enable_validation_layers = false;
   #else
   const static bool s_enable_validation_layers = true;
   #endif
+
+  // Allow 2 frames in flight
+  const static int s_max_frames_in_flight = 2;
 };

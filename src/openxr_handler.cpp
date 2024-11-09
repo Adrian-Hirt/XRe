@@ -289,6 +289,9 @@ bool OpenXrHandler::initializeOpenxr() {
   // TODO: maybe group these?
   m_vulkan_handler.createDescriptorSetLayout();
   m_vulkan_handler.createGraphicsPipeline(image_height, image_width);
+  m_vulkan_handler.createCommandPool();
+  m_vulkan_handler.createCommandBuffers();
+
 
 	for (uint32_t i = 0; i < viewport_count; i++) {
 		// Get the current view configuration we're interested in
@@ -341,17 +344,20 @@ bool OpenXrHandler::initializeOpenxr() {
 		result = xrEnumerateSwapchainImages(swapchain_handle, swapchain_image_count, &swapchain_image_count, (XrSwapchainImageBaseHeader *)swapchain_images.data());
 		Utils::checkXrResult(result, "Failed to enumerate the swapchain images");
 
-    // For each swapchain image, call the function to create a swapchain image view using that swapchain image.
-    for (uint32_t i = 0; i < swapchain_image_count; i++) {
-      swapchain.image_views[i] = m_vulkan_handler.createImageView(swapchain_images[i].image, vk_chosen_format, VK_IMAGE_ASPECT_COLOR_BIT);
-    }
-
-    // And also create a depth image
+    // Create a depth image
     swapchain.depth_image_view = m_vulkan_handler.createDepthImage(
       vk_chosen_format,
       current_view_configuration.recommendedImageRectWidth,
       current_view_configuration.recommendedImageRectHeight
     );
+
+    // For each swapchain image, call the function to create a swapchain image view using that swapchain image.
+    for (uint32_t i = 0; i < swapchain_image_count; i++) {
+      swapchain.image_views[i] = m_vulkan_handler.createImageView(swapchain_images[i].image, vk_chosen_format, VK_IMAGE_ASPECT_COLOR_BIT);
+    }
+
+    // Also, create a framebuffer for each of the image views
+    m_vulkan_handler.createFramebuffers(swapchain);
 
     // We're done creating that swapchain, we can now add it to the vector of our swapchains (as we have multiple,
     // as mentioned before one for each view

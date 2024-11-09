@@ -167,20 +167,19 @@ void VulkanHandler::setupDevice(XrInstance xr_instance, XrSystemId xr_system_id)
   // We simply assume that the graphics queue family and the present graphics family are the same for now.
   // TODO: cleanup code for case where graphics family != present family. I'll need to figure out how to
   // check for surface support.
-  QueueFamilyIndices queue_family_indices;
   int i = 0;
   for (const auto& queue_family : queue_families) {
     // Keep track of the graphics queue family
     if (queue_family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-      queue_family_indices.m_graphics_family = i;
-      queue_family_indices.m_present_family = i;
+      m_queue_family_indices.m_graphics_family = i;
+      m_queue_family_indices.m_present_family = i;
       break;
     }
 
     i++;
   }
 
-  if (!queue_family_indices.isComplete()) {
+  if (!m_queue_family_indices.isComplete()) {
     Utils::exitWithMessage("Failed to find a graphics queue family");
   }
 
@@ -189,8 +188,8 @@ void VulkanHandler::setupDevice(XrInstance xr_instance, XrSystemId xr_system_id)
   // TODO: currently this uses only a single queue family for the graphics and present
   // queue, we probably need to adapt this to also support a present family.
   std::set<uint32_t> queue_family_indices_set = {
-    queue_family_indices.m_graphics_family.value(),
-    queue_family_indices.m_present_family.value()
+    m_queue_family_indices.m_graphics_family.value(),
+    m_queue_family_indices.m_present_family.value()
   };
 
   float queue_priority = 1.0f;
@@ -236,8 +235,8 @@ void VulkanHandler::setupDevice(XrInstance xr_instance, XrSystemId xr_system_id)
   Utils::checkVkResult(result, "failed to create logical device!");
 
   // and finally retrieve the created graphics queue
-  vkGetDeviceQueue(m_device, queue_family_indices.m_graphics_family.value(), 0, &m_graphics_queue);
-  vkGetDeviceQueue(m_device, queue_family_indices.m_present_family.value(), 0, &m_present_queue);
+  vkGetDeviceQueue(m_device, m_queue_family_indices.m_graphics_family.value(), 0, &m_graphics_queue);
+  vkGetDeviceQueue(m_device, m_queue_family_indices.m_present_family.value(), 0, &m_present_queue);
 };
 
 void VulkanHandler::createRenderPass(VkFormat swapchain_format) {
@@ -638,4 +637,51 @@ void VulkanHandler::createGraphicsPipeline(uint32_t viewport_height, uint32_t vi
   // Make sure to cleanup the shader modules
   vkDestroyShaderModule(m_device, fragment_shader_module, nullptr);
   vkDestroyShaderModule(m_device, vertex_shader_module, nullptr);
+}
+
+void VulkanHandler::createFramebuffers(Swapchain swapchain) {
+  m_swapchain_framebuffers.resize(swapchain.image_views.size());
+
+  // For each image views from the swapchain, we need to create a framebuffer
+  for (size_t i = 0; i < swapchain.image_views.size(); i++) {
+    std::array<VkImageView, 2> attachments = {
+      swapchain.image_views[i],
+      swapchain.depth_image_view
+    };
+
+    VkFramebufferCreateInfo framebuffer_create_info{};
+    framebuffer_create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    framebuffer_create_info.renderPass = m_render_pass;
+    framebuffer_create_info.attachmentCount = static_cast<uint32_t>(attachments.size());
+    framebuffer_create_info.pAttachments = attachments.data();
+    framebuffer_create_info.width = m_viewport_extent.width;
+    framebuffer_create_info.height = m_viewport_extent.height;
+    framebuffer_create_info.layers = 1;
+
+    VkResult result = vkCreateFramebuffer(m_device, &framebuffer_create_info, nullptr, &m_swapchain_framebuffers[i]);
+    Utils::checkVkResult(result, "Failed to create framebuffer");
+  }
+}
+
+void VulkanHandler::createCommandPool() {
+  VkCommandPoolCreateInfo pool_create_info{};
+  pool_create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+  pool_create_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+  pool_create_info.queueFamilyIndex = m_queue_family_indices.m_graphics_family.value();
+
+  VkResult result = vkCreateCommandPool(m_device, &pool_create_info, nullptr, &m_command_pool);
+  Utils::checkVkResult(result, "Failed to create the command pool");
+}
+
+void VulkanHandler::createCommandBuffers() {
+  m_command_buffers.resize(s_max_frames_in_flight);
+
+  VkCommandBufferAllocateInfo buffer_allocate_info{};
+  buffer_allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  buffer_allocate_info.commandPool = m_command_pool;
+  buffer_allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  buffer_allocate_info.commandBufferCount = (uint32_t) m_command_buffers.size();
+
+  VkResult result = vkAllocateCommandBuffers(m_device, &buffer_allocate_info, m_command_buffers.data());
+  Utils::checkVkResult(result, "Failed to allocate command buffers");
 }
