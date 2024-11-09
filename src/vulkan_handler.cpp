@@ -187,7 +187,10 @@ void VulkanHandler::setupDevice() {
   std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
   // TODO: currently this uses only a single queue family for the graphics and present
   // queue, we probably need to adapt this to also support a present family.
-  std::set<uint32_t> queue_family_indices_set = { queue_family_indices.m_graphics_family.value(), queue_family_indices.m_present_family.value() };
+  std::set<uint32_t> queue_family_indices_set = {
+    queue_family_indices.m_graphics_family.value(),
+    queue_family_indices.m_present_family.value()
+  };
 
   float queue_priority = 1.0f;
   for (uint32_t queue_family : queue_family_indices_set) {
@@ -200,38 +203,38 @@ void VulkanHandler::setupDevice() {
   }
 
   // Specify used device features
-    VkPhysicalDeviceFeatures device_features{};
-    device_features.samplerAnisotropy = VK_TRUE;
+  VkPhysicalDeviceFeatures device_features{};
+  device_features.samplerAnisotropy = VK_TRUE;
 
-    // Create the logical device
-    VkDeviceCreateInfo device_create_info{};
-    device_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+  // Create the logical device
+  VkDeviceCreateInfo device_create_info{};
+  device_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
-    // add infos about the device queues we want to create
-    device_create_info.queueCreateInfoCount = static_cast<uint32_t>(queue_create_infos.size());
-    device_create_info.pQueueCreateInfos = queue_create_infos.data();
+  // add infos about the device queues we want to create
+  device_create_info.queueCreateInfoCount = static_cast<uint32_t>(queue_create_infos.size());
+  device_create_info.pQueueCreateInfos = queue_create_infos.data();
 
-    // And add infos about the device features we need
-    device_create_info.pEnabledFeatures = &device_features;
+  // And add infos about the device features we need
+  device_create_info.pEnabledFeatures = &device_features;
 
-    // Setup the extensions we wish to use
-    device_create_info.enabledExtensionCount = static_cast<uint32_t>(s_device_extensions.size());
-    device_create_info.ppEnabledExtensionNames = s_device_extensions.data();
+  // Setup the extensions we wish to use
+  device_create_info.enabledExtensionCount = static_cast<uint32_t>(s_device_extensions.size());
+  device_create_info.ppEnabledExtensionNames = s_device_extensions.data();
 
-    // Obsolete code which is only put in for compability with older vulkan implementations
-    if (s_enable_validation_layers) {
-      device_create_info.enabledLayerCount = static_cast<uint32_t>(s_validation_layers.size());
-      device_create_info.ppEnabledLayerNames = s_validation_layers.data();
-    }
-    else {
-      device_create_info.enabledLayerCount = 0;
-    }
+  // Obsolete code which is only put in for compability with older vulkan implementations
+  if (s_enable_validation_layers) {
+    device_create_info.enabledLayerCount = static_cast<uint32_t>(s_validation_layers.size());
+    device_create_info.ppEnabledLayerNames = s_validation_layers.data();
+  }
+  else {
+    device_create_info.enabledLayerCount = 0;
+  }
 
-    // create the device
-    result = vkCreateDevice(m_physical_device, &device_create_info, nullptr, &m_device);
-    Utils::checkVkResult(result, "failed to create logical device!");
+  // create the device
+  result = vkCreateDevice(m_physical_device, &device_create_info, nullptr, &m_device);
+  Utils::checkVkResult(result, "failed to create logical device!");
 
-    // and finally retrieve the created graphics queue
-    vkGetDeviceQueue(m_device, queue_family_indices.m_graphics_family.value(), 0, &m_graphics_queue);
-    vkGetDeviceQueue(m_device, queue_family_indices.m_present_family.value(), 0, &m_present_queue);
+  // and finally retrieve the created graphics queue
+  vkGetDeviceQueue(m_device, queue_family_indices.m_graphics_family.value(), 0, &m_graphics_queue);
+  vkGetDeviceQueue(m_device, queue_family_indices.m_present_family.value(), 0, &m_present_queue);
 };
