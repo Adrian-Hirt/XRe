@@ -9,3 +9,6 @@ cmake-build-release
 
 # Personal todo list
 TODO.md
+
+# Debugging
+debug.cpp
