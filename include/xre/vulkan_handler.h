@@ -3,6 +3,11 @@
 // Vulkan includes
 #include <vulkan/vulkan.h>
 
+// OpenXR includes
+#define XR_USE_GRAPHICS_API_VULKAN
+#include <open_xr/openxr.h>
+#include <open_xr/openxr_platform.h>
+
 // XRe includes
 #include <xre/utils.h>
 #include <xre/structs.h>
@@ -17,16 +22,21 @@
 class VulkanHandler {
 public:
   VulkanHandler();
+  VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id);
+
+  VkInstance getInstance();
+  VkPhysicalDevice getPhysicalDevice();
+  VkDevice getLogicalDevice();
 
 private:
   // -------------------------------------------
   // Methods
   // -------------------------------------------
-  void initializeVulkan();
+  void initializeVulkan(XrInstance xr_instance, XrSystemId xr_system_id);
   void createInstance();
   void setupDebugMessenger();
   bool checkValidationLayerSupport();
-  void setupDevice();
+  void setupDevice(XrInstance xr_instance, XrSystemId xr_system_id);
 
 
   // -------------------------------------------
@@ -51,7 +61,7 @@ private:
   VkQueue m_present_queue;
 
   // Whether to enable or disable validation layers
-  #ifdef NDEBUG
+  #ifdef NULL
   const static bool s_enable_validation_layers = false;
   #else
   const static bool s_enable_validation_layers = true;

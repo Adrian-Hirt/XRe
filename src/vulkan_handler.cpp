@@ -11,14 +11,28 @@ const std::vector<const char*> s_device_extensions = {
   VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-VulkanHandler::VulkanHandler() {
-  initializeVulkan();
+VulkanHandler::VulkanHandler() {};
+
+VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
+  initializeVulkan(xr_instance, xr_system_id);
 }
 
-void VulkanHandler::initializeVulkan() {
+VkInstance VulkanHandler::getInstance() {
+  return m_vk_instance;
+}
+
+VkPhysicalDevice VulkanHandler::getPhysicalDevice() {
+  return m_physical_device;
+}
+
+VkDevice VulkanHandler::getLogicalDevice() {
+  return m_device;
+}
+
+void VulkanHandler::initializeVulkan(XrInstance xr_instance, XrSystemId xr_system_id) {
   createInstance();
-  setupDebugMessenger();
-  setupDevice();
+  // setupDebugMessenger(); TODO: this seems broken :(
+  setupDevice(xr_instance, xr_system_id);
 }
 
 void VulkanHandler::createInstance() {
@@ -132,26 +146,17 @@ void VulkanHandler::setupDebugMessenger() {
   }
 }
 
-void VulkanHandler::setupDevice() {
+void VulkanHandler::setupDevice(XrInstance xr_instance, XrSystemId xr_system_id) {
   VkResult result;
 
-  // Query the number of physical devices
-  uint32_t physical_device_count = 0;
-  result = vkEnumeratePhysicalDevices(m_vk_instance, &physical_device_count, nullptr);
+  XrResult xr_result;
 
-  // If there are no physical devices we can use, we cannot continue
-  if (physical_device_count == 0 || result != VK_SUCCESS) {
-    Utils::exitWithMessage("failed to find GPUs with Vulkan support!");
-  }
+  PFN_xrGetVulkanGraphicsDeviceKHR xrGetVulkanGraphicsDeviceKHR;
+	xr_result = xrGetInstanceProcAddr(xr_instance, "xrGetVulkanGraphicsDeviceKHR", (PFN_xrVoidFunction*)(&xrGetVulkanGraphicsDeviceKHR));
+  Utils::checkXrResult(xr_result, "Failed to retrieve the `xrGetVulkanGraphicsDeviceKHR` function");
 
-  // Get all the physical devices from the system
-  std::vector<VkPhysicalDevice> devices(physical_device_count);
-  result = vkEnumeratePhysicalDevices(m_vk_instance, &physical_device_count, devices.data());
-  Utils::checkVkResult(result, "Failes to enumerate physical devices");
-
-  // For now, simply pick the first device as the device to be used.
-  // TODO: select the device a bit smarter
-  m_physical_device = devices[0];
+  xr_result = xrGetVulkanGraphicsDeviceKHR(xr_instance, xr_system_id, m_vk_instance, &m_physical_device);
+  Utils::checkXrResult(xr_result, "Failed to retrieve the physical device for Vulkan");
 
   // Next, we need to setup the logical device.
   // Get the number of queue families

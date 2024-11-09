@@ -51,8 +51,8 @@ bool OpenXrHandler::initializeOpenxr() {
 	// Setup requested extensions
 	//------------------------------------------------------------------------------------------------------
   std::vector<const char *> requested_extensions = {
-    XR_KHR_VULKAN_ENABLE_EXTENSION_NAME,
-    XR_EXT_HAND_TRACKING_EXTENSION_NAME
+    XR_KHR_VULKAN_ENABLE_EXTENSION_NAME
+    // XR_EXT_HAND_TRACKING_EXTENSION_NAME
     // XR_EXT_HAND_INTERACTION_EXTENSION_NAME // Not supported on Quest at the moment it seems
   };
 
@@ -106,9 +106,7 @@ bool OpenXrHandler::initializeOpenxr() {
 	strcpy_s(instance_create_info.applicationInfo.applicationName, 128, m_application_name);
 
 	result = xrCreateInstance(&instance_create_info, &m_openxr_instance);
-	if (XR_FAILED(result)) {
-		return false;
-	}
+	Utils::checkXrResult(result, "Failed to create the OpenXR instance!");
 
 	//------------------------------------------------------------------------------------------------------
 	// OpenXR System
@@ -118,9 +116,7 @@ bool OpenXrHandler::initializeOpenxr() {
 	system_get_info.type = XR_TYPE_SYSTEM_GET_INFO;
 	system_get_info.formFactor = m_application_form_factor;
 	result = xrGetSystem(m_openxr_instance, &system_get_info, &m_openxr_system_id);
-	if (XR_FAILED(result)) {
-		return false;
-	}
+	Utils::checkXrResult(result, "Failed to get the OpenXR system!");
 
   // Get the systems properties for some information about the hardware. We also get system properties
   // about the hand tracking support.
@@ -135,18 +131,13 @@ bool OpenXrHandler::initializeOpenxr() {
 	// should return the blend modes in order of preference of the runtime, we can just pick the first one
 	uint32_t blend_count = 0; // Throwaway variable, but we need to pass in a pointer to a uint32_t, or the function call fails
 	result = xrEnumerateEnvironmentBlendModes(m_openxr_instance, m_openxr_system_id, m_application_view_type, 1, &blend_count, &m_openxr_blend_mode);
-	if (XR_FAILED(result)) {
-		return false;
-	}
+	Utils::checkXrResult(result, "Failed to enumerate the OpenXR environment blend modes!");
 
-  // TODO: do we need this??
-	// // Get the address of the ext funtions and store, such that we can call the function. This is the more portable
-  // // way of calling extension functions.
-  // PFN_xrGetVulkanGraphicsRequirementsKHR ext_xrGetD3D11GraphicsRequirementsKHR;
-	// result = xrGetInstanceProcAddr(m_openxr_instance, "xrGetVulkanGraphicsRequirementsKHR", (PFN_xrVoidFunction*)(&ext_xrGetD3D11GraphicsRequirementsKHR));
-  // if (XR_FAILED(result)) {
-  //   return false;
-  // };
+	// Get the address of the ext funtions and store, such that we can call the function. This is the more portable
+  // way of calling extension functions.
+  PFN_xrGetVulkanGraphicsRequirementsKHR ext_xrGetVulkanGraphicsRequirementsKHR;
+	result = xrGetInstanceProcAddr(m_openxr_instance, "xrGetVulkanGraphicsRequirementsKHR", (PFN_xrVoidFunction*)(&ext_xrGetVulkanGraphicsRequirementsKHR));
+  Utils::checkXrResult(result, "Failed to get the vulkan graphics requirements extension proc!");
 
   // // Only load the handtracking extensions if we actually can use them
   // if (m_openxr_hand_tracking_system_properties.supportsHandTracking) {
@@ -160,36 +151,33 @@ bool OpenXrHandler::initializeOpenxr() {
   //   Utils::checkXrResult(result, "Failed to get the xrLocateHandJointsEXT function pointer");
   // }
 
-  // TODO: do we need this??
-	// XrGraphicsRequirementsVulkanKHR graphics_requirements = {};
-	// graphics_requirements.type = XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN_KHR;
-	// // Call the function which retrieves the Vulkan API versions (min & max)
-	// result = ext_xrGetD3D11GraphicsRequirementsKHR(m_openxr_instance, m_openxr_system_id, &graphics_requirements);
-	// if (XR_FAILED(result)) {
-	// 	return false;
-	// }
+	XrGraphicsRequirementsVulkanKHR graphics_requirements = {};
+	graphics_requirements.type = XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN_KHR;
+	// Call the function which retrieves the Vulkan API versions (min & max)
+	result = ext_xrGetVulkanGraphicsRequirementsKHR(m_openxr_instance, m_openxr_system_id, &graphics_requirements);
+	Utils::checkXrResult(result, "Failed to get the Vulkan graphics requirements!");
 
 	// Create a new handler for the Vulkan related stuff.
- 	m_vulkan_handler = VulkanHandler();
+ 	m_vulkan_handler = VulkanHandler(m_openxr_instance, m_openxr_system_id);
 
-  std::cout << "Next!" << std::endl;
+	// Create a binding for the Vulkan device
+	XrGraphicsBindingVulkanKHR graphics_binding = { XR_TYPE_GRAPHICS_BINDING_VULKAN_KHR };
+  graphics_binding.instance = m_vulkan_handler.getInstance();
+  graphics_binding.physicalDevice = m_vulkan_handler.getPhysicalDevice();
+  graphics_binding.device = m_vulkan_handler.getLogicalDevice();
+	graphics_binding.queueFamilyIndex = 10000;
+  graphics_binding.queueIndex = 0u;
 
-	// // Create a binding for the D3D11 device
-	// XrGraphicsBindingD3D11KHR graphics_binding = {};
-	// graphics_binding.type = XR_TYPE_GRAPHICS_BINDING_D3D11_KHR;
-	// graphics_binding.device = m_dx11_handler.getDevice();
+	// Create the session info struct
+	XrSessionCreateInfo session_create_info = {};
+  session_create_info.createFlags = 0;
+	session_create_info.type = XR_TYPE_SESSION_CREATE_INFO;
+	session_create_info.next = &graphics_binding;
+	session_create_info.systemId = m_openxr_system_id;
 
-	// // Create the session info struct
-	// XrSessionCreateInfo session_create_info = {};
-	// session_create_info.type = XR_TYPE_SESSION_CREATE_INFO;
-	// session_create_info.next = &graphics_binding;
-	// session_create_info.systemId = m_openxr_system_id;
-
-	// // And finally create the openxr session
-	// result = xrCreateSession(m_openxr_instance, &session_create_info, &m_openxr_session);
-	// if (XR_FAILED(result)) {
-	// 	return false;
-	// }
+	// And finally create the openxr session
+	result = xrCreateSession(m_openxr_instance, &session_create_info, &m_openxr_session);
+  Utils::checkXrResult(result, "Failed to create the OpenXR session!");
 
 	// //------------------------------------------------------------------------------------------------------
 	// // Reference Spaces
