@@ -63,6 +63,9 @@ private:
   // Swapchain
   VkFormat m_swapchain_format;
 
+  // Render pass for the graphics pipeline
+  VkRenderPass m_render_pass;
+
   // Whether to enable or disable validation layers
   #ifdef NULL
   const static bool s_enable_validation_layers = false;
