@@ -16,15 +16,6 @@ namespace Utils {
     exit(EXIT_FAILURE);
   };
 
-  // inline void checkHresult(HRESULT result, const char *error_string){
-  //   if (FAILED(result)) {
-  //     _com_error err(result);
-  //     LPCTSTR error_message = err.ErrorMessage();
-  //     std::cout << error_message << std::endl;
-  //     exitWithMessage(error_string);
-  //   }
-  // }
-
   inline void checkVkResult(VkResult result, const char *error_string){
     if (result != VK_SUCCESS) {
       std::cout << result << std::endl;
