@@ -29,11 +29,11 @@ public:
   OpenXrHandler(const char *application_name);
   ~OpenXrHandler();
   void pollOpenxrEvents(bool &loop_running, bool &xr_running);
-  // void renderFrame(std::function<void()> draw_callback, std::function<void(XrTime)> update_simulation_callback);
-  // void renderLayer(XrTime predicted_time,
-  //                   std::vector<XrCompositionLayerProjectionView>& views,
-  //                   XrCompositionLayerProjection& layer_projection,
-  //                   std::function<void()> draw_callback);
+  void renderFrame(std::function<void()> draw_callback, std::function<void(XrTime)> update_simulation_callback);
+  void renderLayer(XrTime predicted_time,
+                    std::vector<XrCompositionLayerProjectionView>& views,
+                    XrCompositionLayerProjection& layer_projection,
+                    std::function<void()> draw_callback);
 
   // ID3D11Device* getDevice();
   // ID3D11DeviceContext* getDeviceContext();
@@ -83,26 +83,26 @@ private:
   // Hand *m_left_hand = NULL;
   // Hand *m_right_hand = NULL;
 
-  // // Actions
-  // XrActionSet m_default_action_set;
+  // Actions
+  XrActionSet m_default_action_set;
   // XrAction m_controller_pose_action;
   // XrAction m_controller_aim_action;
   // XrAction m_controller_grab_action;
   // XrAction m_controller_teleport_action;
 
-  // // For checking if the pose of a controller is valid
-  // const static XrSpaceLocationFlags s_pose_valid_flags = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
+  // For checking if the pose of a controller is valid
+  const static XrSpaceLocationFlags s_pose_valid_flags = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
 
   // DirectX::XMVECTOR m_headset_position = { 0.0f, 0.0f, 0.0f };
   // DirectX::XMVECTOR m_current_origin = { 0.0f, 0.0f, 0.0f };
 
   // Methods
   bool initializeOpenxr();
-  // void initializeOpenxrActions();
+  void initializeOpenxrActions();
   // void initializeHandTracking();
   // void setupActionBindings();
   // void suggestBindings(std::string interaction_profile, std::vector<XrActionSuggestedBinding> bindings);
-  // void pollOpenxrActions(XrTime predicted_time);
+  void pollOpenxrActions(XrTime predicted_time);
   // void updateControllerStates(Controller *controller, XrTime predicted_time);
   // void updateHandTrackingStates(Hand *hand, XrTime predicted_time);
   // void updateCurrentOriginForTeleport(DirectX::XMVECTOR teleport_location);

@@ -9,12 +9,12 @@ public:
     std::cout << "Setup" << std::endl;
   };
 
-  // void updateSimulation(XrTime predicted_time) override {
-
-  // };
+  void updateSimulation(XrTime predicted_time) override {
+    std::cout << "Update" << std::endl;
+  };
 
   void draw() override {
-
+    std::cout << "Draw" << std::endl;
   };
 };
 

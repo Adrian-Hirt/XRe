@@ -26,8 +26,8 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
   // Shader::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
   // Renderable::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
 
-  // // Instruct the handler to initialize the xr actions
-  // initializeOpenxrActions();
+  // Instruct the handler to initialize the xr actions
+  initializeOpenxrActions();
 
   // // Instruct the handler to initialize the hand tracking (will not do anything
   // // if hand tracking is not enabled).
@@ -368,17 +368,15 @@ bool OpenXrHandler::initializeOpenxr() {
   return true;
 }
 
-
-#if false
 //------------------------------------------------------------------------------------------------------
 // Initialize the OpenXR actions
 //------------------------------------------------------------------------------------------------------
 void OpenXrHandler::initializeOpenxrActions() {
 	XrResult result;
 
-	// Create controllers for left and right hands
-	m_left_controller = new Controller();
-	m_right_controller = new Controller();
+	// // Create controllers for left and right hands
+	// m_left_controller = new Controller();
+	// m_right_controller = new Controller();
 
 	// Create the action set for the application. Currently, we're only using
 	// a single action set for the whole application, later on we might add
@@ -390,100 +388,100 @@ void OpenXrHandler::initializeOpenxrActions() {
 	result = xrCreateActionSet(m_openxr_instance, &action_set_create_info, &m_default_action_set);
 	Utils::checkXrResult(result, "Could not create the default action set");
 
-	// Setup controller paths for the left and right hand, as we need these to
-	// get the poses of both hands.
-	result = xrStringToPath(m_openxr_instance, "/user/hand/left", &(m_left_controller->m_controller_path));
-	Utils::checkXrResult(result, "Coult not create path from string for left hand");
-	result = xrStringToPath(m_openxr_instance, "/user/hand/right", &(m_right_controller->m_controller_path));
-	Utils::checkXrResult(result, "Coult not create path from string for right hand");
+	// // Setup controller paths for the left and right hand, as we need these to
+	// // get the poses of both hands.
+	// result = xrStringToPath(m_openxr_instance, "/user/hand/left", &(m_left_controller->m_controller_path));
+	// Utils::checkXrResult(result, "Coult not create path from string for left hand");
+	// result = xrStringToPath(m_openxr_instance, "/user/hand/right", &(m_right_controller->m_controller_path));
+	// Utils::checkXrResult(result, "Coult not create path from string for right hand");
 
-	XrPath controller_paths[2] = { m_left_controller->m_controller_path, m_right_controller->m_controller_path };
-  XrPath left_controller_path[1] = { m_left_controller->m_controller_path };
-  XrPath right_controller_path[1] = { m_right_controller->m_controller_path };
+	// XrPath controller_paths[2] = { m_left_controller->m_controller_path, m_right_controller->m_controller_path };
+  // XrPath left_controller_path[1] = { m_left_controller->m_controller_path };
+  // XrPath right_controller_path[1] = { m_right_controller->m_controller_path };
 
-	// Create the action for tracking the pose of the controllers, such that we can get
-	// the position and orientation of each controller, render models and setup
-	// interactions with the scene based on the position of the controllers.
-	XrActionCreateInfo pose_action_create_info = {};
-	pose_action_create_info.type = XR_TYPE_ACTION_CREATE_INFO;								// Set the type of the create info
-	strcpy_s(pose_action_create_info.actionName, "controller_pose"); 					// Set a name for the action
-	strcpy_s(pose_action_create_info.localizedActionName, "Controller Pose"); // Add a "localized" name for the action
-	pose_action_create_info.countSubactionPaths = 2;                 				  // We'll be using two subaction paths (left / right controller)
-	pose_action_create_info.subactionPaths = controller_paths;       					// Pass in the controller paths
-	pose_action_create_info.actionType = XR_ACTION_TYPE_POSE_INPUT;  					// Finally, tell OpenXR that this input is a pose input
+	// // Create the action for tracking the pose of the controllers, such that we can get
+	// // the position and orientation of each controller, render models and setup
+	// // interactions with the scene based on the position of the controllers.
+	// XrActionCreateInfo pose_action_create_info = {};
+	// pose_action_create_info.type = XR_TYPE_ACTION_CREATE_INFO;								// Set the type of the create info
+	// strcpy_s(pose_action_create_info.actionName, "controller_pose"); 					// Set a name for the action
+	// strcpy_s(pose_action_create_info.localizedActionName, "Controller Pose"); // Add a "localized" name for the action
+	// pose_action_create_info.countSubactionPaths = 2;                 				  // We'll be using two subaction paths (left / right controller)
+	// pose_action_create_info.subactionPaths = controller_paths;       					// Pass in the controller paths
+	// pose_action_create_info.actionType = XR_ACTION_TYPE_POSE_INPUT;  					// Finally, tell OpenXR that this input is a pose input
 
-	result = xrCreateAction(m_default_action_set, &pose_action_create_info, &m_controller_pose_action);
-	Utils::checkXrResult(result, "Coult not create the controller pose action");
+	// result = xrCreateAction(m_default_action_set, &pose_action_create_info, &m_controller_pose_action);
+	// Utils::checkXrResult(result, "Coult not create the controller pose action");
 
-	// Create the action for tracking the aim of the controllers.
-	XrActionCreateInfo aim_action_create_info = {};
-	aim_action_create_info.type = XR_TYPE_ACTION_CREATE_INFO;               // Set the type of the create info
-	strcpy_s(aim_action_create_info.actionName, "controller_aim");          // Set a name for the action
-	strcpy_s(aim_action_create_info.localizedActionName, "Controller Aim"); // Add a "localized" name for the action
-	aim_action_create_info.countSubactionPaths = 2;                         // We'll be using two subaction paths (left / right controller)
-	aim_action_create_info.subactionPaths = controller_paths;               // Pass in the controller paths
-	aim_action_create_info.actionType = XR_ACTION_TYPE_POSE_INPUT;          // Finally, tell OpenXR that this input is a pose input
+	// // Create the action for tracking the aim of the controllers.
+	// XrActionCreateInfo aim_action_create_info = {};
+	// aim_action_create_info.type = XR_TYPE_ACTION_CREATE_INFO;               // Set the type of the create info
+	// strcpy_s(aim_action_create_info.actionName, "controller_aim");          // Set a name for the action
+	// strcpy_s(aim_action_create_info.localizedActionName, "Controller Aim"); // Add a "localized" name for the action
+	// aim_action_create_info.countSubactionPaths = 2;                         // We'll be using two subaction paths (left / right controller)
+	// aim_action_create_info.subactionPaths = controller_paths;               // Pass in the controller paths
+	// aim_action_create_info.actionType = XR_ACTION_TYPE_POSE_INPUT;          // Finally, tell OpenXR that this input is a pose input
 
-	result = xrCreateAction(m_default_action_set, &aim_action_create_info, &m_controller_aim_action);
-	Utils::checkXrResult(result, "Coult not create the controller aim action");
+	// result = xrCreateAction(m_default_action_set, &aim_action_create_info, &m_controller_aim_action);
+	// Utils::checkXrResult(result, "Coult not create the controller aim action");
 
-  // Create the action for grabbing with the controllers.
-	XrActionCreateInfo grab_action_create_info = {};
-	grab_action_create_info.type = XR_TYPE_ACTION_CREATE_INFO;                // Set the type of the create info
-	strcpy_s(grab_action_create_info.actionName, "controller_grab");          // Set a name for the action
-	strcpy_s(grab_action_create_info.localizedActionName, "Controller Grab"); // Add a "localized" name for the action
-	grab_action_create_info.countSubactionPaths = 2;                          // We'll be using two subaction paths (left / right controller)
-	grab_action_create_info.subactionPaths = controller_paths;                // Pass in the controller paths
-	grab_action_create_info.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;        // Finally, tell OpenXR that this input is a boolean input
+  // // Create the action for grabbing with the controllers.
+	// XrActionCreateInfo grab_action_create_info = {};
+	// grab_action_create_info.type = XR_TYPE_ACTION_CREATE_INFO;                // Set the type of the create info
+	// strcpy_s(grab_action_create_info.actionName, "controller_grab");          // Set a name for the action
+	// strcpy_s(grab_action_create_info.localizedActionName, "Controller Grab"); // Add a "localized" name for the action
+	// grab_action_create_info.countSubactionPaths = 2;                          // We'll be using two subaction paths (left / right controller)
+	// grab_action_create_info.subactionPaths = controller_paths;                // Pass in the controller paths
+	// grab_action_create_info.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;        // Finally, tell OpenXR that this input is a boolean input
 
-	result = xrCreateAction(m_default_action_set, &grab_action_create_info, &m_controller_grab_action);
-	Utils::checkXrResult(result, "Coult not create the grab action");
+	// result = xrCreateAction(m_default_action_set, &grab_action_create_info, &m_controller_grab_action);
+	// Utils::checkXrResult(result, "Coult not create the grab action");
 
-  // Create the action for teleporting with the controllers.
-	XrActionCreateInfo teleport_action_create_info = {};
-	teleport_action_create_info.type = XR_TYPE_ACTION_CREATE_INFO;                    // Set the type of the create info
-	strcpy_s(teleport_action_create_info.actionName, "controller_teleport");          // Set a name for the action
-	strcpy_s(teleport_action_create_info.localizedActionName, "Controller Teleport"); // Add a "localized" name for the action
-	teleport_action_create_info.countSubactionPaths = 2;                              // We'll be using two subaction paths (left / right controller)
-	teleport_action_create_info.subactionPaths = controller_paths;                    // Pass in the controller paths
-	teleport_action_create_info.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;            // Finally, tell OpenXR that this input is a boolean input
+  // // Create the action for teleporting with the controllers.
+	// XrActionCreateInfo teleport_action_create_info = {};
+	// teleport_action_create_info.type = XR_TYPE_ACTION_CREATE_INFO;                    // Set the type of the create info
+	// strcpy_s(teleport_action_create_info.actionName, "controller_teleport");          // Set a name for the action
+	// strcpy_s(teleport_action_create_info.localizedActionName, "Controller Teleport"); // Add a "localized" name for the action
+	// teleport_action_create_info.countSubactionPaths = 2;                              // We'll be using two subaction paths (left / right controller)
+	// teleport_action_create_info.subactionPaths = controller_paths;                    // Pass in the controller paths
+	// teleport_action_create_info.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;            // Finally, tell OpenXR that this input is a boolean input
 
-	result = xrCreateAction(m_default_action_set, &teleport_action_create_info, &m_controller_teleport_action);
-	Utils::checkXrResult(result, "Coult not create the teleport action");
+	// result = xrCreateAction(m_default_action_set, &teleport_action_create_info, &m_controller_teleport_action);
+	// Utils::checkXrResult(result, "Coult not create the teleport action");
 
-  setupActionBindings();
+  // setupActionBindings();
 
-	// Create the pose spaces for both controllers
-	XrActionSpaceCreateInfo grip_pose_space_create_info = {};
-	grip_pose_space_create_info.type = XR_TYPE_ACTION_SPACE_CREATE_INFO;
-	grip_pose_space_create_info.action = m_controller_pose_action;
-	grip_pose_space_create_info.poseInActionSpace = Geometry::XrPoseIdentity();
+	// // Create the pose spaces for both controllers
+	// XrActionSpaceCreateInfo grip_pose_space_create_info = {};
+	// grip_pose_space_create_info.type = XR_TYPE_ACTION_SPACE_CREATE_INFO;
+	// grip_pose_space_create_info.action = m_controller_pose_action;
+	// grip_pose_space_create_info.poseInActionSpace = Geometry::XrPoseIdentity();
 
-	// Create the space for the left controller
-	grip_pose_space_create_info.subactionPath = m_left_controller->m_controller_path;
-	result = xrCreateActionSpace(m_openxr_session, &grip_pose_space_create_info, &(m_left_controller->m_pose_space));
-	Utils::checkXrResult(result, "Failed to create the action space for pose of the left controller");
+	// // Create the space for the left controller
+	// grip_pose_space_create_info.subactionPath = m_left_controller->m_controller_path;
+	// result = xrCreateActionSpace(m_openxr_session, &grip_pose_space_create_info, &(m_left_controller->m_pose_space));
+	// Utils::checkXrResult(result, "Failed to create the action space for pose of the left controller");
 
-	// Create the space for the right controller
-	grip_pose_space_create_info.subactionPath = m_right_controller->m_controller_path;
-	result = xrCreateActionSpace(m_openxr_session, &grip_pose_space_create_info, &(m_right_controller->m_pose_space));
-	Utils::checkXrResult(result, "Failed to create the action space for pose of the right controller");
+	// // Create the space for the right controller
+	// grip_pose_space_create_info.subactionPath = m_right_controller->m_controller_path;
+	// result = xrCreateActionSpace(m_openxr_session, &grip_pose_space_create_info, &(m_right_controller->m_pose_space));
+	// Utils::checkXrResult(result, "Failed to create the action space for pose of the right controller");
 
-  // Create the aim spaces for both controllers
-	XrActionSpaceCreateInfo grip_aim_space_create_info = {};
-	grip_aim_space_create_info.type = XR_TYPE_ACTION_SPACE_CREATE_INFO;
-	grip_aim_space_create_info.action = m_controller_aim_action;
-	grip_aim_space_create_info.poseInActionSpace = Geometry::XrPoseIdentity();
+  // // Create the aim spaces for both controllers
+	// XrActionSpaceCreateInfo grip_aim_space_create_info = {};
+	// grip_aim_space_create_info.type = XR_TYPE_ACTION_SPACE_CREATE_INFO;
+	// grip_aim_space_create_info.action = m_controller_aim_action;
+	// grip_aim_space_create_info.poseInActionSpace = Geometry::XrPoseIdentity();
 
-	// Create the space for the left controller
-	grip_aim_space_create_info.subactionPath = m_left_controller->m_controller_path;
-	result = xrCreateActionSpace(m_openxr_session, &grip_aim_space_create_info, &(m_left_controller->m_aim_space));
-	Utils::checkXrResult(result, "Failed to create the action space for aim of the left controller");
+	// // Create the space for the left controller
+	// grip_aim_space_create_info.subactionPath = m_left_controller->m_controller_path;
+	// result = xrCreateActionSpace(m_openxr_session, &grip_aim_space_create_info, &(m_left_controller->m_aim_space));
+	// Utils::checkXrResult(result, "Failed to create the action space for aim of the left controller");
 
-	// Create the space for the right controller
-	grip_aim_space_create_info.subactionPath = m_right_controller->m_controller_path;
-	result = xrCreateActionSpace(m_openxr_session, &grip_aim_space_create_info, &(m_right_controller->m_aim_space));
-	Utils::checkXrResult(result, "Failed to create the action space for aim of the right controller");
+	// // Create the space for the right controller
+	// grip_aim_space_create_info.subactionPath = m_right_controller->m_controller_path;
+	// result = xrCreateActionSpace(m_openxr_session, &grip_aim_space_create_info, &(m_right_controller->m_aim_space));
+	// Utils::checkXrResult(result, "Failed to create the action space for aim of the right controller");
 
 	// Attach the action set that was created to the session
 	XrSessionActionSetsAttachInfo session_action_set_attach_info = {};
@@ -494,6 +492,7 @@ void OpenXrHandler::initializeOpenxrActions() {
 	Utils::checkXrResult(result, "Failed to attach the action set to the session");
 }
 
+#if false
 void OpenXrHandler::setupActionBindings() {
   XrResult result;
 
@@ -631,7 +630,6 @@ void OpenXrHandler::pollOpenxrEvents(bool &loop_running, bool &xr_running) {
   }
 }
 
-#if false
 //------------------------------------------------------------------------------------------------------
 // Poll the OpenXR actions
 //------------------------------------------------------------------------------------------------------
@@ -651,15 +649,15 @@ void OpenXrHandler::pollOpenxrActions(XrTime predicted_time) {
   result = xrSyncActions(m_openxr_session, &actions_sync_info);
 	Utils::checkXrResult(result, "Could not sync the openxr actions");
 
-	// Update the states of the controllers, in a separate method to avoid
-	// having to code this twice
-	updateControllerStates(m_left_controller, predicted_time);
-	updateControllerStates(m_right_controller, predicted_time);
+	// // Update the states of the controllers, in a separate method to avoid
+	// // having to code this twice
+	// updateControllerStates(m_left_controller, predicted_time);
+	// updateControllerStates(m_right_controller, predicted_time);
 
-  // Update the hand tracking (these methods will simply do nothing if
-  // hand tracking is not enabled);
-  updateHandTrackingStates(m_left_hand, predicted_time);
-  updateHandTrackingStates(m_right_hand, predicted_time);
+  // // Update the hand tracking (these methods will simply do nothing if
+  // // hand tracking is not enabled);
+  // updateHandTrackingStates(m_left_hand, predicted_time);
+  // updateHandTrackingStates(m_right_hand, predicted_time);
 
   // Update the location of the headset
   XrSpaceLocation space_location = {};
@@ -668,11 +666,12 @@ void OpenXrHandler::pollOpenxrActions(XrTime predicted_time) {
   result = xrLocateSpace(m_openxr_view_space, m_openxr_stage_space, predicted_time, &space_location);
   Utils::checkXrResult(result, "Can't get the view pose of the HMD in the stage space");
 
-  if ((space_location.locationFlags & s_pose_valid_flags) == s_pose_valid_flags) {
-    m_headset_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&space_location.pose.position);
-  }
+  // if ((space_location.locationFlags & s_pose_valid_flags) == s_pose_valid_flags) {
+  //   m_headset_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&space_location.pose.position);
+  // }
 }
 
+#if false
 void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predicted_time) {
 	XrResult result;
 
@@ -774,6 +773,7 @@ void OpenXrHandler::updateHandTrackingStates(Hand *hand, XrTime predicted_time) 
   // Run the logic computing the "grab" or "pinch" state of the hand
   hand->updateHandGrabAndPinchState();
 }
+#endif
 
 //------------------------------------------------------------------------------------------------------
 // Renders the next frame
@@ -808,45 +808,45 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
 	//------------------------------------------------------------------------------------------------------
 	pollOpenxrActions(xr_frame_state.predictedDisplayTime);
 
-  //------------------------------------------------------------------------------------------------------
-	// Update the interactions of the controllers and hands with the scene
-	//------------------------------------------------------------------------------------------------------
-  std::optional<DirectX::XMVECTOR> teleport_location_left, teleport_location_right;
-  teleport_location_left = m_left_controller->updateIntersectionSphereAndComputePossibleTeleport();
-  teleport_location_right = m_right_controller->updateIntersectionSphereAndComputePossibleTeleport();
+  // //------------------------------------------------------------------------------------------------------
+	// // Update the interactions of the controllers and hands with the scene
+	// //------------------------------------------------------------------------------------------------------
+  // std::optional<DirectX::XMVECTOR> teleport_location_left, teleport_location_right;
+  // teleport_location_left = m_left_controller->updateIntersectionSphereAndComputePossibleTeleport();
+  // teleport_location_right = m_right_controller->updateIntersectionSphereAndComputePossibleTeleport();
 
-  // Reset the interaction tracking booleans on the grabbable SceneNodes
-  SceneNode::resetInteractionStates();
+  // // Reset the interaction tracking booleans on the grabbable SceneNodes
+  // SceneNode::resetInteractionStates();
 
-  // As both might have a value, we arbitrarily decide to give the right controller
-  // precedende. Later, we might map the teleport action to a single controller anyway,
-  // so maybe this will not be needed anymore.
-  if (teleport_location_right.has_value()) {
-    updateCurrentOriginForTeleport(teleport_location_right.value());
-    // TODO: update position of grabbed model if we're currently grabbing something with either hand
-  }
-  else if (teleport_location_left.has_value()) {
-    updateCurrentOriginForTeleport(teleport_location_left.value());
-    // TODO: update position of grabbed model if we're currently grabbing something with either hand
-  }
-  else {
-    // If not teleporting, we can update the position of the controller, as well as their interactions
-    // with the scene
-    m_left_controller->updatePosition(m_current_origin);
-    m_right_controller->updatePosition(m_current_origin);
+  // // As both might have a value, we arbitrarily decide to give the right controller
+  // // precedende. Later, we might map the teleport action to a single controller anyway,
+  // // so maybe this will not be needed anymore.
+  // if (teleport_location_right.has_value()) {
+  //   updateCurrentOriginForTeleport(teleport_location_right.value());
+  //   // TODO: update position of grabbed model if we're currently grabbing something with either hand
+  // }
+  // else if (teleport_location_left.has_value()) {
+  //   updateCurrentOriginForTeleport(teleport_location_left.value());
+  //   // TODO: update position of grabbed model if we're currently grabbing something with either hand
+  // }
+  // else {
+  //   // If not teleporting, we can update the position of the controller, as well as their interactions
+  //   // with the scene
+  //   m_left_controller->updatePosition(m_current_origin);
+  //   m_right_controller->updatePosition(m_current_origin);
 
-    m_left_controller->computeSceneInteractions();
-    m_right_controller->computeSceneInteractions();
+  //   m_left_controller->computeSceneInteractions();
+  //   m_right_controller->computeSceneInteractions();
 
-    // Update the interactions with the scene and the hands, but only if the hands are enabled.
-    if (m_left_hand != nullptr && m_right_hand != nullptr) {
-      m_left_hand->updatePosition(m_current_origin);
-      m_right_hand->updatePosition(m_current_origin);
+  //   // Update the interactions with the scene and the hands, but only if the hands are enabled.
+  //   if (m_left_hand != nullptr && m_right_hand != nullptr) {
+  //     m_left_hand->updatePosition(m_current_origin);
+  //     m_right_hand->updatePosition(m_current_origin);
 
-      m_left_hand->computeSceneInteractions();
-      m_right_hand->computeSceneInteractions();
-    }
-  }
+  //     m_left_hand->computeSceneInteractions();
+  //     m_right_hand->computeSceneInteractions();
+  //   }
+  // }
 
 	//------------------------------------------------------------------------------------------------------
 	// Update simulation
@@ -860,7 +860,6 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
 	XrCompositionLayerProjection layer_projection = {};
 	layer_projection.type = XR_TYPE_COMPOSITION_LAYER_PROJECTION;
 	std::vector<XrCompositionLayerProjectionView> views;
-
 
 	// Check if the xrSession is in a state that we actually need to render. If the session isn't in the
 	// VISIBLE or in the FOCUSED state, we don't need to render the layer (e.g. when the user of the
@@ -924,63 +923,63 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 	// Render the layer for each view
 	//------------------------------------------------------------------------------------------------------
 	for (uint32_t i = 0; i < view_count; i++) {
-		// First, we need to acquire a swapchain image, as we need a render target to render the data
-		// to. As a reminder (from the CreateSwapchainRenderTargets method), a swapchain image
-		// in the context of D3D11 is the buffer we want to render to.
-		// As we don't pass a swapchain_image_id into the xrAcquireSwapchainImage call, the runtime decides
-		// which swapchain image we'll get
-		uint32_t swapchain_image_id;
-		XrSwapchainImageAcquireInfo swapchain_acquire_info = {};
-		swapchain_acquire_info.type = XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO;
-		result = xrAcquireSwapchainImage(m_swapchains[i].handle, &swapchain_acquire_info, &swapchain_image_id);
-		Utils::checkXrResult(result, "Could not acquire swapchain image");
+	// 	// First, we need to acquire a swapchain image, as we need a render target to render the data
+	// 	// to. As a reminder (from the CreateSwapchainRenderTargets method), a swapchain image
+	// 	// in the context of D3D11 is the buffer we want to render to.
+	// 	// As we don't pass a swapchain_image_id into the xrAcquireSwapchainImage call, the runtime decides
+	// 	// which swapchain image we'll get
+	// 	uint32_t swapchain_image_id;
+	// 	XrSwapchainImageAcquireInfo swapchain_acquire_info = {};
+	// 	swapchain_acquire_info.type = XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO;
+	// 	result = xrAcquireSwapchainImage(m_swapchains[i].handle, &swapchain_acquire_info, &swapchain_image_id);
+	// 	Utils::checkXrResult(result, "Could not acquire swapchain image");
 
-		// We need to wait until the swapchain image is available for writing, as the compositor
-		// could still be reading from it (writing while the compositor is still reading could
-		// result in tearing or otherwise badly rendered frames).
-		// For now, we set the timeout to infinite, but one could also set another timeout
-		// by passing in an xrDuration
-		XrSwapchainImageWaitInfo swapchain_wait_info = {};
-		swapchain_wait_info.type = XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO;
-		swapchain_wait_info.timeout = XR_INFINITE_DURATION;
-		result = xrWaitSwapchainImage(m_swapchains[i].handle, &swapchain_wait_info);
-		Utils::checkXrResult(result, "Could not wait for the swapchain image");
+	// 	// We need to wait until the swapchain image is available for writing, as the compositor
+	// 	// could still be reading from it (writing while the compositor is still reading could
+	// 	// result in tearing or otherwise badly rendered frames).
+	// 	// For now, we set the timeout to infinite, but one could also set another timeout
+	// 	// by passing in an xrDuration
+	// 	XrSwapchainImageWaitInfo swapchain_wait_info = {};
+	// 	swapchain_wait_info.type = XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO;
+	// 	swapchain_wait_info.timeout = XR_INFINITE_DURATION;
+	// 	result = xrWaitSwapchainImage(m_swapchains[i].handle, &swapchain_wait_info);
+	// 	Utils::checkXrResult(result, "Could not wait for the swapchain image");
 
-		// Setup the info we need to render the layer for the current view. The XrCompositionLayerProjectionView
-		// is a projection layer element, which has the pose of the current view (pose = location and orientation),
-		// the fov of the current view, and the swapchain sub image, which holds the data for the composition
-		// layer.
-		// The subimage is of type XrSwapchainSubImage, which has a field to the swapchain to display and an
-		// imageRect, which represents the valid portion of the image to use (in pixels)
-		views[i] = {};
-		views[i].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
-		views[i].pose = m_openxr_views[i].pose;
-		views[i].fov = m_openxr_views[i].fov;
-		views[i].subImage.swapchain = m_swapchains[i].handle;
-		views[i].subImage.imageRect.offset = { 0, 0 };
-		views[i].subImage.imageRect.extent = { m_swapchains[i].width, m_swapchains[i].height };
+	// 	// Setup the info we need to render the layer for the current view. The XrCompositionLayerProjectionView
+	// 	// is a projection layer element, which has the pose of the current view (pose = location and orientation),
+	// 	// the fov of the current view, and the swapchain sub image, which holds the data for the composition
+	// 	// layer.
+	// 	// The subimage is of type XrSwapchainSubImage, which has a field to the swapchain to display and an
+	// 	// imageRect, which represents the valid portion of the image to use (in pixels)
+	// 	views[i] = {};
+	// 	views[i].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
+	// 	views[i].pose = m_openxr_views[i].pose;
+	// 	views[i].fov = m_openxr_views[i].fov;
+	// 	views[i].subImage.swapchain = m_swapchains[i].handle;
+	// 	views[i].subImage.imageRect.offset = { 0, 0 };
+	// 	views[i].subImage.imageRect.extent = { m_swapchains[i].width, m_swapchains[i].height };
 
-		// Render the content to the swapchain, which is done by the D3D11 handler
-		m_dx11_handler.renderFrame(views[i], m_swapchains[i].swapchain_data[swapchain_image_id], draw_callback, m_current_origin);
+	// 	// Render the content to the swapchain, which is done by the D3D11 handler
+	// 	m_dx11_handler.renderFrame(views[i], m_swapchains[i].swapchain_data[swapchain_image_id], draw_callback, m_current_origin);
 
-		// Render the controllers
-		m_left_controller->render();
-		m_right_controller->render();
+	// 	// Render the controllers
+	// 	m_left_controller->render();
+	// 	m_right_controller->render();
 
-    // Render the hands if the hands are not null pointers
-    if (m_left_hand != nullptr && m_right_hand != nullptr) {
-      m_left_hand->render();
-      m_right_hand->render();
-    }
+  //   // Render the hands if the hands are not null pointers
+  //   if (m_left_hand != nullptr && m_right_hand != nullptr) {
+  //     m_left_hand->render();
+  //     m_right_hand->render();
+  //   }
 
-		// We're done rendering for the current view, so we can release the swapchain image (i.e. tell
-		// the OpenXR runtime that we're done with this swapchain image).
-		// We have to pass in a XrSwapchainImageReleaseInfo, but at the moment, this struct doesn't
-		// do anything special.
-		XrSwapchainImageReleaseInfo swapchain_release_info = {};
-		swapchain_release_info.type = XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO;
-		result = xrReleaseSwapchainImage(m_swapchains[i].handle, &swapchain_release_info);
-		Utils::checkXrResult(result, "Could not release the swapchain image");
+	// 	// We're done rendering for the current view, so we can release the swapchain image (i.e. tell
+	// 	// the OpenXR runtime that we're done with this swapchain image).
+	// 	// We have to pass in a XrSwapchainImageReleaseInfo, but at the moment, this struct doesn't
+	// 	// do anything special.
+	// 	XrSwapchainImageReleaseInfo swapchain_release_info = {};
+	// 	swapchain_release_info.type = XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO;
+	// 	result = xrReleaseSwapchainImage(m_swapchains[i].handle, &swapchain_release_info);
+	// 	Utils::checkXrResult(result, "Could not release the swapchain image");
 	}
 
 	//------------------------------------------------------------------------------------------------------
@@ -993,6 +992,7 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 	layer_projection.views = views.data();
 }
 
+#if false
 ID3D11Device* OpenXrHandler::getDevice() {
   return m_dx11_handler.getDevice();
 }

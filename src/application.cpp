@@ -23,10 +23,10 @@ void Application::run() {
     // Poll the OpenXR events, and if OpenXR reports to still be running, keep going on
     m_open_xr_handler.pollOpenxrEvents(loop_running, xr_running);
 
-    // if (xr_running) {
-    //   // Render frame
-    //   m_open_xr_handler.renderFrame(std::bind(&Application::draw, this), std::bind(&Application::updateSimulation, this, std::placeholders::_1));
-    // }
+    if (xr_running) {
+      // Render frame
+      m_open_xr_handler.renderFrame(std::bind(&Application::draw, this), std::bind(&Application::updateSimulation, this, std::placeholders::_1));
+    }
   }
 }
 
@@ -38,10 +38,10 @@ void Application::draw() {
   // Override this method to draw some stuff
 }
 
-// void Application::updateSimulation(XrTime predicted_time) {
-//   // Override this method to update the simulation based
-//   // on the predicted time the frame will be rendered
-// }
+void Application::updateSimulation(XrTime predicted_time) {
+  // Override this method to update the simulation based
+  // on the predicted time the frame will be rendered
+}
 
 // ID3D11Device* Application::getDevice() {
 //   return m_open_xr_handler.getDevice();
