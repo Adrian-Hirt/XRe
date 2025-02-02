@@ -923,41 +923,40 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 	// Render the layer for each view
 	//------------------------------------------------------------------------------------------------------
 	for (uint32_t i = 0; i < view_count; i++) {
-	// 	// First, we need to acquire a swapchain image, as we need a render target to render the data
-	// 	// to. As a reminder (from the CreateSwapchainRenderTargets method), a swapchain image
-	// 	// in the context of D3D11 is the buffer we want to render to.
-	// 	// As we don't pass a swapchain_image_id into the xrAcquireSwapchainImage call, the runtime decides
-	// 	// which swapchain image we'll get
-	// 	uint32_t swapchain_image_id;
-	// 	XrSwapchainImageAcquireInfo swapchain_acquire_info = {};
-	// 	swapchain_acquire_info.type = XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO;
-	// 	result = xrAcquireSwapchainImage(m_swapchains[i].handle, &swapchain_acquire_info, &swapchain_image_id);
-	// 	Utils::checkXrResult(result, "Could not acquire swapchain image");
+		// First, we need to acquire a swapchain image, as we need a render target to render the data to.
+		// As we don't pass a swapchain_image_id into the xrAcquireSwapchainImage call, the runtime decides
+		// which swapchain image we'll get
+		uint32_t swapchain_image_id;
+		XrSwapchainImageAcquireInfo swapchain_acquire_info = {};
+		swapchain_acquire_info.type = XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO;
+		result = xrAcquireSwapchainImage(m_swapchains[i].handle, &swapchain_acquire_info, &swapchain_image_id);
+		Utils::checkXrResult(result, "Could not acquire swapchain image");
+    std::cout << "acquired swapchain image" << std::endl;
 
-	// 	// We need to wait until the swapchain image is available for writing, as the compositor
-	// 	// could still be reading from it (writing while the compositor is still reading could
-	// 	// result in tearing or otherwise badly rendered frames).
-	// 	// For now, we set the timeout to infinite, but one could also set another timeout
-	// 	// by passing in an xrDuration
-	// 	XrSwapchainImageWaitInfo swapchain_wait_info = {};
-	// 	swapchain_wait_info.type = XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO;
-	// 	swapchain_wait_info.timeout = XR_INFINITE_DURATION;
-	// 	result = xrWaitSwapchainImage(m_swapchains[i].handle, &swapchain_wait_info);
-	// 	Utils::checkXrResult(result, "Could not wait for the swapchain image");
+		// We need to wait until the swapchain image is available for writing, as the compositor
+		// could still be reading from it (writing while the compositor is still reading could
+		// result in tearing or otherwise badly rendered frames).
+		// For now, we set the timeout to infinite, but one could also set another timeout
+		// by passing in an xrDuration
+		XrSwapchainImageWaitInfo swapchain_wait_info = {};
+		swapchain_wait_info.type = XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO;
+		swapchain_wait_info.timeout = XR_INFINITE_DURATION;
+		result = xrWaitSwapchainImage(m_swapchains[i].handle, &swapchain_wait_info);
+		Utils::checkXrResult(result, "Could not wait for the swapchain image");
 
-	// 	// Setup the info we need to render the layer for the current view. The XrCompositionLayerProjectionView
-	// 	// is a projection layer element, which has the pose of the current view (pose = location and orientation),
-	// 	// the fov of the current view, and the swapchain sub image, which holds the data for the composition
-	// 	// layer.
-	// 	// The subimage is of type XrSwapchainSubImage, which has a field to the swapchain to display and an
-	// 	// imageRect, which represents the valid portion of the image to use (in pixels)
-	// 	views[i] = {};
-	// 	views[i].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
-	// 	views[i].pose = m_openxr_views[i].pose;
-	// 	views[i].fov = m_openxr_views[i].fov;
-	// 	views[i].subImage.swapchain = m_swapchains[i].handle;
-	// 	views[i].subImage.imageRect.offset = { 0, 0 };
-	// 	views[i].subImage.imageRect.extent = { m_swapchains[i].width, m_swapchains[i].height };
+		// Setup the info we need to render the layer for the current view. The XrCompositionLayerProjectionView
+		// is a projection layer element, which has the pose of the current view (pose = location and orientation),
+		// the fov of the current view, and the swapchain sub image, which holds the data for the composition
+		// layer.
+		// The subimage is of type XrSwapchainSubImage, which has a field to the swapchain to display and an
+		// imageRect, which represents the valid portion of the image to use (in pixels)
+		views[i] = {};
+		views[i].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
+		views[i].pose = m_openxr_views[i].pose;
+		views[i].fov = m_openxr_views[i].fov;
+		views[i].subImage.swapchain = m_swapchains[i].handle;
+		views[i].subImage.imageRect.offset = { 0, 0 };
+		views[i].subImage.imageRect.extent = { m_swapchains[i].width, m_swapchains[i].height };
 
 	// 	// Render the content to the swapchain, which is done by the D3D11 handler
 	// 	m_dx11_handler.renderFrame(views[i], m_swapchains[i].swapchain_data[swapchain_image_id], draw_callback, m_current_origin);
@@ -972,14 +971,14 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
   //     m_right_hand->render();
   //   }
 
-	// 	// We're done rendering for the current view, so we can release the swapchain image (i.e. tell
-	// 	// the OpenXR runtime that we're done with this swapchain image).
-	// 	// We have to pass in a XrSwapchainImageReleaseInfo, but at the moment, this struct doesn't
-	// 	// do anything special.
-	// 	XrSwapchainImageReleaseInfo swapchain_release_info = {};
-	// 	swapchain_release_info.type = XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO;
-	// 	result = xrReleaseSwapchainImage(m_swapchains[i].handle, &swapchain_release_info);
-	// 	Utils::checkXrResult(result, "Could not release the swapchain image");
+		// We're done rendering for the current view, so we can release the swapchain image (i.e. tell
+		// the OpenXR runtime that we're done with this swapchain image).
+		// We have to pass in a XrSwapchainImageReleaseInfo, but at the moment, this struct doesn't
+		// do anything special.
+		XrSwapchainImageReleaseInfo swapchain_release_info = {};
+		swapchain_release_info.type = XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO;
+		result = xrReleaseSwapchainImage(m_swapchains[i].handle, &swapchain_release_info);
+		Utils::checkXrResult(result, "Could not release the swapchain image");
 	}
 
 	//------------------------------------------------------------------------------------------------------
