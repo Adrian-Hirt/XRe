@@ -36,12 +36,13 @@ public:
   VkInstance getInstance();
   VkPhysicalDevice getPhysicalDevice();
   VkDevice getLogicalDevice();
+  uint32_t getQueueFamilyIndex();
 
 private:
   // -------------------------------------------
   // Methods
   // -------------------------------------------
-  void createInstance();
+  void createInstance(XrInstance xr_instance, XrSystemId xr_system_id);
   void setupDebugMessenger();
   bool checkValidationLayerSupport();
   void setupDevice(XrInstance xr_instance, XrSystemId xr_system_id);

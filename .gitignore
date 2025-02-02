@@ -12,6 +12,7 @@ TODO.md
 
 # Debugging
 debug.cpp
+openxr_handler_old.cpp
 
 # Compiled shaders
 *.spv

@@ -6,11 +6,6 @@ const std::vector<const char*> s_validation_layers = {
   "VK_LAYER_KHRONOS_validation"
 };
 
-// Extensions for the device we wish to use
-const std::vector<const char*> s_device_extensions = {
-  VK_KHR_SWAPCHAIN_EXTENSION_NAME
-};
-
 VulkanHandler::VulkanHandler() {};
 
 VkInstance VulkanHandler::getInstance() {
@@ -26,18 +21,13 @@ VkDevice VulkanHandler::getLogicalDevice() {
 }
 
 void VulkanHandler::initializeVulkanAndDevices(XrInstance xr_instance, XrSystemId xr_system_id) {
-  createInstance();
+  createInstance(xr_instance, xr_system_id);
   // setupDebugMessenger(); TODO: this seems broken :(
   setupDevice(xr_instance, xr_system_id);
 }
 
-void VulkanHandler::createInstance() {
-  VkResult result;
-
-  // First, check if all of our validation layers we want to use are available
-  if (s_enable_validation_layers && !checkValidationLayerSupport()) {
-    Utils::exitWithMessage("validation layers requested, but not available!");
-  }
+void VulkanHandler::createInstance(XrInstance xr_instance, XrSystemId xr_system_id) {
+  XrResult result;
 
   // Setup the application information to create the instance later on
   VkApplicationInfo vulkan_app_info{};
@@ -54,8 +44,22 @@ void VulkanHandler::createInstance() {
   instance_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
   instance_create_info.pApplicationInfo = &vulkan_app_info;
 
-  // We simply assume we're only going to need these extensions for now.
-  std::vector<const char*> enabled_extensions = { VK_KHR_SURFACE_EXTENSION_NAME };
+  // Get the required extensions from the OpenXR runtime
+  PFN_xrGetVulkanInstanceExtensionsKHR ext_getVulkanInstanceExtensionsKHR;
+  result = xrGetInstanceProcAddr(xr_instance, "xrGetVulkanInstanceExtensionsKHR", (PFN_xrVoidFunction*)(&ext_getVulkanInstanceExtensionsKHR));
+  Utils::checkXrResult(result, "Failed to get the xrGetVulkanInstanceExtensionsKHR function pointer");
+
+  uint32_t vulkan_instance_extensions_count;
+  result = ext_getVulkanInstanceExtensionsKHR(xr_instance, xr_system_id, 0, &vulkan_instance_extensions_count, nullptr);
+  Utils::checkXrResult(result, "Failed to get the count of the required Vulkan instance extensions");
+
+  std::string buffer;
+  buffer.resize(vulkan_instance_extensions_count);
+  result = ext_getVulkanInstanceExtensionsKHR(xr_instance, xr_system_id, vulkan_instance_extensions_count, &vulkan_instance_extensions_count, buffer.data());
+  Utils::checkXrResult(result, "Failed to get the required Vulkan instance extensions");
+
+  std::vector<const char*> enabled_extensions = Utils::splitString(buffer, ' ');
+
   if (s_enable_validation_layers) {
     enabled_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
   }
@@ -63,18 +67,9 @@ void VulkanHandler::createInstance() {
   instance_create_info.enabledExtensionCount = static_cast<uint32_t>(enabled_extensions.size());
   instance_create_info.ppEnabledExtensionNames = enabled_extensions.data();
 
-  // If validation layers are enabled, add them to the create info.
-  if (s_enable_validation_layers) {
-    instance_create_info.enabledLayerCount = static_cast<uint32_t>(s_validation_layers.size());
-    instance_create_info.ppEnabledLayerNames = s_validation_layers.data();
-  }
-  else {
-    instance_create_info.enabledLayerCount = 0;
-  }
-
   // Create the vulkan instance
-  result = vkCreateInstance(&instance_create_info, nullptr, &m_vk_instance);
-  Utils::checkVkResult(result, "failed to create instance!");
+  VkResult vk_result = vkCreateInstance(&instance_create_info, nullptr, &m_vk_instance);
+  Utils::checkVkResult(vk_result, "failed to create instance!");
 }
 
 // Check that all of the validation layers we want are available
@@ -144,7 +139,6 @@ void VulkanHandler::setupDebugMessenger() {
 
 void VulkanHandler::setupDevice(XrInstance xr_instance, XrSystemId xr_system_id) {
   VkResult result;
-
   XrResult xr_result;
 
   PFN_xrGetVulkanGraphicsDeviceKHR xrGetVulkanGraphicsDeviceKHR;
@@ -183,52 +177,60 @@ void VulkanHandler::setupDevice(XrInstance xr_instance, XrSystemId xr_system_id)
     Utils::exitWithMessage("Failed to find a graphics queue family");
   }
 
-  // Create device queues for the present and the graphics families
-  std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
-  // TODO: currently this uses only a single queue family for the graphics and present
-  // queue, we probably need to adapt this to also support a present family.
-  std::set<uint32_t> queue_family_indices_set = {
-    m_queue_family_indices.m_graphics_family.value(),
-    m_queue_family_indices.m_present_family.value()
-  };
+  PFN_xrGetVulkanDeviceExtensionsKHR ext_xrGetVulkanDeviceExtensionsKHR;
+	xr_result = xrGetInstanceProcAddr(xr_instance, "xrGetVulkanDeviceExtensionsKHR", (PFN_xrVoidFunction*)(&ext_xrGetVulkanDeviceExtensionsKHR));
+  Utils::checkXrResult(xr_result, "Failed to retrieve the `xrGetVulkanDeviceExtensionsKHR` function");
 
+  // Get required Vulkan device extensions from OpenXR
+  uint32_t vk_device_extensions_count;
+  xr_result = ext_xrGetVulkanDeviceExtensionsKHR(xr_instance, xr_system_id, 0u, &vk_device_extensions_count, nullptr);
+  Utils::checkXrResult(xr_result, "Failed to enumerate required Vulkan device extensions");
+
+  std::string buffer;
+  buffer.resize(vk_device_extensions_count);
+  xr_result = ext_xrGetVulkanDeviceExtensionsKHR(xr_instance, xr_system_id, vk_device_extensions_count, &vk_device_extensions_count, buffer.data());
+  Utils::checkXrResult(xr_result, "Failed to retrieve required Vulkan device extensions");
+
+  std::vector<const char*> vulkanDeviceExtensions = Utils::splitString(buffer, ' ');
+
+  // Create device
   float queue_priority = 1.0f;
-  for (uint32_t queue_family : queue_family_indices_set) {
-    VkDeviceQueueCreateInfo queue_create_info{};
-    queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queue_create_info.queueFamilyIndex = queue_family;
-    queue_create_info.queueCount = 1;
-    queue_create_info.pQueuePriorities = &queue_priority;
-    queue_create_infos.push_back(queue_create_info);
-  }
+
+  VkDeviceQueueCreateInfo queue_create_info{VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO};
+  queue_create_info.queueFamilyIndex = m_queue_family_indices.m_graphics_family.value();
+  queue_create_info.queueCount = 1;
+  queue_create_info.pQueuePriorities = &queue_priority;
 
   // Specify used device features
   VkPhysicalDeviceFeatures device_features{};
   device_features.samplerAnisotropy = VK_TRUE;
+  device_features.shaderStorageImageMultisample = VK_TRUE;
+
+  // Verify that required physical device features are supported
+  VkPhysicalDeviceFeatures features;
+  vkGetPhysicalDeviceFeatures(m_physical_device, &features);
+  if (!features.shaderStorageImageMultisample) {
+    Utils::exitWithMessage("Required Vulkan physical device feature \"Shader Storage Image Multisample\" not supported");
+  }
+
+  if(!features.samplerAnisotropy) {
+    Utils::exitWithMessage("Required Vulkan physical device feature \"samplerAnisotropy\" not supported");
+  }
 
   // Create the logical device
   VkDeviceCreateInfo device_create_info{};
   device_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
   // add infos about the device queues we want to create
-  device_create_info.queueCreateInfoCount = static_cast<uint32_t>(queue_create_infos.size());
-  device_create_info.pQueueCreateInfos = queue_create_infos.data();
+  device_create_info.queueCreateInfoCount = 1;
+  device_create_info.pQueueCreateInfos = &queue_create_info;
 
   // And add infos about the device features we need
   device_create_info.pEnabledFeatures = &device_features;
 
   // Setup the extensions we wish to use
-  device_create_info.enabledExtensionCount = static_cast<uint32_t>(s_device_extensions.size());
-  device_create_info.ppEnabledExtensionNames = s_device_extensions.data();
-
-  // Obsolete code which is only put in for compability with older vulkan implementations
-  if (s_enable_validation_layers) {
-    device_create_info.enabledLayerCount = static_cast<uint32_t>(s_validation_layers.size());
-    device_create_info.ppEnabledLayerNames = s_validation_layers.data();
-  }
-  else {
-    device_create_info.enabledLayerCount = 0;
-  }
+  device_create_info.enabledExtensionCount = static_cast<uint32_t>(vulkanDeviceExtensions.size());
+  device_create_info.ppEnabledExtensionNames = vulkanDeviceExtensions.data();
 
   // create the device
   result = vkCreateDevice(m_physical_device, &device_create_info, nullptr, &m_device);
@@ -712,4 +714,8 @@ void VulkanHandler::createSyncObjects() {
     result = vkCreateFence(m_device, &fence_create_info, nullptr, &m_in_flight_fences[i]);
     Utils::checkVkResult(result, "Failed to create fence");
   }
+}
+
+uint32_t VulkanHandler::getQueueFamilyIndex() {
+  return m_queue_family_indices.m_graphics_family.value();
 }

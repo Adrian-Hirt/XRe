@@ -51,7 +51,7 @@ private:
   XrInstance m_openxr_instance; // OpenXR instance
   XrSystemId m_openxr_system_id = XR_NULL_SYSTEM_ID; // The ID of the OpenXR system
   XrSession m_openxr_session;
-  XrEnvironmentBlendMode m_openxr_blend_mode; // Blend mode (opaque / transparent) to use
+  XrEnvironmentBlendMode m_openxr_blend_mode = XR_ENVIRONMENT_BLEND_MODE_OPAQUE; // Blend mode (opaque / transparent) to use
   XrSpace m_openxr_stage_space;
   XrSpace m_openxr_view_space;
   std::vector<XrView> m_openxr_views;
@@ -64,7 +64,12 @@ private:
   // Swapchains
   std::vector<Swapchain> m_swapchains;
 
-  // // Pointers to ext functions we need to use
+  // Pointers to ext functions we need to use
+  PFN_xrGetVulkanInstanceExtensionsKHR m_ext_getVulkanInstanceExtensionsKHR = nullptr;
+  PFN_xrGetVulkanDeviceExtensionsKHR m_ext_getVulkanDeviceExtensionsKHR = nullptr;
+  PFN_xrGetVulkanGraphicsDeviceKHR m_ext_getVulkanGraphicsDeviceKHR = nullptr;
+  PFN_xrGetVulkanGraphicsRequirementsKHR m_ext_getVulkanGraphicsRequirementsKHR = nullptr;
+
   // PFN_xrGetD3D11GraphicsRequirementsKHR m_ext_xrGetD3D11GraphicsRequirementsKHR;
   // PFN_xrCreateHandTrackerEXT m_ext_xrCreateHandTrackerEXT;
   // PFN_xrDestroyHandTrackerEXT m_ext_xrDestroyHandTrackerEXT;

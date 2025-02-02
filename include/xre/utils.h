@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <sstream>
 
 // small header-only file which contains some utility functions
 
@@ -55,6 +56,21 @@ namespace Utils {
 
     return buffer;
   };
+
+  inline std::vector<const char*> splitString(const std::string& string, char delimiter) {
+    std::vector<const char*> result;
+    std::stringstream stream(string);
+    std::string word;
+
+    while (getline(stream, word, ' ')) {
+      const size_t len = word.size() + 1u;
+      char* str = new char[len];
+      memcpy(str, word.c_str(), len);
+      result.push_back(str);
+    }
+
+    return result;
+  }
 
   // inline std::string getFileLocation(const std::string &path) {
   //   std::string result;

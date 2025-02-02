@@ -120,6 +120,7 @@ bool OpenXrHandler::initializeOpenxr() {
 
   // Get the systems properties for some information about the hardware. We also get system properties
   // about the hand tracking support.
+  // TODO: do we need this?
   m_openxr_system_properties.next = &m_openxr_hand_tracking_system_properties;
   result = xrGetSystemProperties(m_openxr_instance, m_openxr_system_id, &m_openxr_system_properties);
   Utils::checkXrResult(result, "Failed to get system properties");
@@ -135,9 +136,8 @@ bool OpenXrHandler::initializeOpenxr() {
 
 	// Get the address of the ext funtions and store, such that we can call the function. This is the more portable
   // way of calling extension functions.
-  PFN_xrGetVulkanGraphicsRequirementsKHR ext_xrGetVulkanGraphicsRequirementsKHR;
-	result = xrGetInstanceProcAddr(m_openxr_instance, "xrGetVulkanGraphicsRequirementsKHR", (PFN_xrVoidFunction*)(&ext_xrGetVulkanGraphicsRequirementsKHR));
-  Utils::checkXrResult(result, "Failed to get the vulkan graphics requirements extension proc!");
+	result = xrGetInstanceProcAddr(m_openxr_instance, "xrGetVulkanGraphicsRequirementsKHR", (PFN_xrVoidFunction*)(&m_ext_getVulkanGraphicsRequirementsKHR));
+  Utils::checkXrResult(result, "Failed to get the xrGetVulkanGraphicsRequirementsKHR function pointer");
 
   // // Only load the handtracking extensions if we actually can use them
   // if (m_openxr_hand_tracking_system_properties.supportsHandTracking) {
@@ -154,7 +154,7 @@ bool OpenXrHandler::initializeOpenxr() {
 	XrGraphicsRequirementsVulkanKHR graphics_requirements = {};
 	graphics_requirements.type = XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN_KHR;
 	// Call the function which retrieves the Vulkan API versions (min & max)
-	result = ext_xrGetVulkanGraphicsRequirementsKHR(m_openxr_instance, m_openxr_system_id, &graphics_requirements);
+	result = m_ext_getVulkanGraphicsRequirementsKHR(m_openxr_instance, m_openxr_system_id, &graphics_requirements);
 	Utils::checkXrResult(result, "Failed to get the Vulkan graphics requirements!");
 
 	// Create a new handler for the Vulkan related stuff.
@@ -166,7 +166,7 @@ bool OpenXrHandler::initializeOpenxr() {
   graphics_binding.instance = m_vulkan_handler.getInstance();
   graphics_binding.physicalDevice = m_vulkan_handler.getPhysicalDevice();
   graphics_binding.device = m_vulkan_handler.getLogicalDevice();
-	graphics_binding.queueFamilyIndex = 10000;
+	graphics_binding.queueFamilyIndex = m_vulkan_handler.getQueueFamilyIndex();;
   graphics_binding.queueIndex = 0u;
 
 	// Create the session info struct
