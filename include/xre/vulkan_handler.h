@@ -8,6 +8,9 @@
 #include <open_xr/openxr.h>
 #include <open_xr/openxr_platform.h>
 
+// GLM includes
+#include <glm/glm/vec3.hpp>
+
 // XRe includes
 #include <xre/utils.h>
 #include <xre/structs.h>
@@ -18,6 +21,7 @@
 #include <array>
 #include <string>
 #include <set>
+#include <functional>
 
 class VulkanHandler {
 public:
@@ -32,6 +36,8 @@ public:
   void createCommandPool();
   void createCommandBuffers();
   void createSyncObjects();
+  void renderFrame(XrCompositionLayerProjectionView& view, std::function<void()> draw_callback,
+                   glm::vec3 current_origin, Swapchain swapchain, uint32_t swapchain_image_id, uint32_t image_index);
 
   VkInstance getInstance();
   VkPhysicalDevice getPhysicalDevice();

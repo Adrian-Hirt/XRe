@@ -931,7 +931,6 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 		swapchain_acquire_info.type = XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO;
 		result = xrAcquireSwapchainImage(m_swapchains[i].handle, &swapchain_acquire_info, &swapchain_image_id);
 		Utils::checkXrResult(result, "Could not acquire swapchain image");
-    std::cout << "acquired swapchain image" << std::endl;
 
 		// We need to wait until the swapchain image is available for writing, as the compositor
 		// could still be reading from it (writing while the compositor is still reading could
@@ -958,18 +957,18 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 		views[i].subImage.imageRect.offset = { 0, 0 };
 		views[i].subImage.imageRect.extent = { m_swapchains[i].width, m_swapchains[i].height };
 
-	// 	// Render the content to the swapchain, which is done by the D3D11 handler
-	// 	m_dx11_handler.renderFrame(views[i], m_swapchains[i].swapchain_data[swapchain_image_id], draw_callback, m_current_origin);
+		// Render the content to the swapchain, which is done by the Vulkan handler
+		m_vulkan_handler.renderFrame(views[i], draw_callback, m_current_origin, m_swapchains[i], swapchain_image_id, i);
 
-	// 	// Render the controllers
-	// 	m_left_controller->render();
-	// 	m_right_controller->render();
+    // 	// Render the controllers
+    // 	m_left_controller->render();
+    // 	m_right_controller->render();
 
-  //   // Render the hands if the hands are not null pointers
-  //   if (m_left_hand != nullptr && m_right_hand != nullptr) {
-  //     m_left_hand->render();
-  //     m_right_hand->render();
-  //   }
+    //   // Render the hands if the hands are not null pointers
+    //   if (m_left_hand != nullptr && m_right_hand != nullptr) {
+    //     m_left_hand->render();
+    //     m_right_hand->render();
+    //   }
 
 		// We're done rendering for the current view, so we can release the swapchain image (i.e. tell
 		// the OpenXR runtime that we're done with this swapchain image).

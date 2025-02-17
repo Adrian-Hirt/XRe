@@ -6,6 +6,7 @@ set(TARGET_ARCHITECTURE x64)
 
 # TODO: remove and fix warnings
 add_compile_options(-Wno-ignored-attributes)
+add_compile_options(-Wno-narrowing)
 
 set(CMAKE_CXX_STANDARD 20)
 

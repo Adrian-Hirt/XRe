@@ -10,6 +10,9 @@
 #include <open_xr/openxr.h>
 #include <open_xr/openxr_platform.h>
 
+// GLM includes
+#include <glm/glm/vec3.hpp>
+
 // XRe includes
 #include <xre/utils.h>
 #include <xre/geometry.h>
@@ -95,6 +98,7 @@ private:
 
   // DirectX::XMVECTOR m_headset_position = { 0.0f, 0.0f, 0.0f };
   // DirectX::XMVECTOR m_current_origin = { 0.0f, 0.0f, 0.0f };
+  glm::vec3 m_current_origin = { 0.0f, 0.0f, 0.0f };
 
   // Methods
   bool initializeOpenxr();

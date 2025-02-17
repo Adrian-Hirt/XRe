@@ -719,3 +719,99 @@ void VulkanHandler::createSyncObjects() {
 uint32_t VulkanHandler::getQueueFamilyIndex() {
   return m_queue_family_indices.m_graphics_family.value();
 }
+
+//------------------------------------------------------------------------------------------------------
+// Render a frame
+//------------------------------------------------------------------------------------------------------
+void VulkanHandler::renderFrame(XrCompositionLayerProjectionView& view, std::function<void()> draw_callback, glm::vec3 current_origin, Swapchain swapchain, uint32_t swapchain_image_id, uint32_t image_index) {
+  // TODO: use ability to render multiple frames in flight
+  int current_frame = image_index;
+
+  // TODO: only ever the first frame seems to work, it fails afterwards :(
+  if (current_frame > 0) {
+    return;
+  }
+
+  VkResult result;
+
+  // Wait for the previous frame to be finished (by waiting for the fence
+  // to be signalled)
+  vkWaitForFences(m_device, 1, &m_in_flight_fences[current_frame], VK_TRUE, UINT64_MAX);
+  // Reset the fence to the unsignalled state
+  vkResetFences(m_device, 1, &m_in_flight_fences[current_frame]);
+
+  // Reset the command buffer such that we can record into it
+  vkResetCommandBuffer(m_command_buffers[current_frame],  0);
+
+  // Begin recording the command buffer
+  VkCommandBufferBeginInfo begin_info{};
+  begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+  result = vkBeginCommandBuffer(m_command_buffers[current_frame], &begin_info);
+  Utils::checkVkResult(result, "failed to begin recording command buffer!");
+
+  // Values to use to clear the buffers (color, set to black, depth, set to 1);
+  std::array<VkClearValue, 2> clear_values{};
+  clear_values[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
+  clear_values[1].depthStencil = {1.0f, 0};
+
+  // Start the render pass
+  VkRenderPassBeginInfo render_pass_info{};
+  render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+  render_pass_info.renderPass = m_render_pass;
+  render_pass_info.framebuffer = m_swapchain_framebuffers[current_frame];
+  render_pass_info.renderArea.offset = { 0, 0 };
+  render_pass_info.renderArea.extent = { view.subImage.imageRect.extent.width, view.subImage.imageRect.extent.height };
+  render_pass_info.clearValueCount = static_cast<uint32_t>(clear_values.size());
+  render_pass_info.pClearValues = clear_values.data();
+  vkCmdBeginRenderPass(m_command_buffers[current_frame], &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
+
+  // Bind the graphics pipeline
+  vkCmdBindPipeline(m_command_buffers[current_frame], VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphics_pipeline);
+
+  draw_callback();
+
+  // End the render pass
+  vkCmdEndRenderPass(m_command_buffers[current_frame]);
+
+  // End recording the command buffer
+  result = vkEndCommandBuffer(m_command_buffers[current_frame]);
+  Utils::checkVkResult(result, "failed to record command buffer!");
+
+  // // Update the uniform buffers for the next frame
+  // updateUniformBuffer(currentFrame);
+
+  // Submit the command buffer
+  VkSubmitInfo submit_info{};
+  submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+  VkSemaphore wait_semaphores[] = { m_image_available_semaphores[current_frame] };
+  // We want to wait with writing colors to the image until it’s available.
+  VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+  submit_info.waitSemaphoreCount = 1;
+  submit_info.pWaitSemaphores = wait_semaphores;
+  submit_info.pWaitDstStageMask = wait_stages;
+  submit_info.commandBufferCount = 1;
+  submit_info.pCommandBuffers = &m_command_buffers[current_frame];
+  VkSemaphore signal_semaphores[] = {m_render_finished_semaphores[current_frame]};
+  submit_info.signalSemaphoreCount = 1;
+  submit_info.pSignalSemaphores = signal_semaphores;
+
+  // Actually submit the queue, which will also signal the `inFlightFence` on successful
+  // completion.
+  result = vkQueueSubmit(m_graphics_queue, 1, &submit_info, m_in_flight_fences[current_frame]);
+  Utils::checkVkResult(result, "failed to submit draw command buffer!");
+
+  // Present the result back to the swapchain such that we can show it on the screen
+  VkPresentInfoKHR present_info{};
+  present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+  present_info.waitSemaphoreCount = 1;
+  present_info.pWaitSemaphores = signal_semaphores;
+
+  VkSwapchainKHR swap_chains[] = { (VkSwapchainKHR)swapchain.handle };
+  present_info.swapchainCount = 1;
+  present_info.pSwapchains = swap_chains;
+  present_info.pImageIndices = &swapchain_image_id;
+
+  vkQueuePresentKHR(m_present_queue, &present_info);
+}

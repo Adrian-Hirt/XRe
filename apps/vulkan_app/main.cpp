@@ -10,7 +10,7 @@ public:
   };
 
   void updateSimulation(XrTime predicted_time) override {
-    std::cout << "Update" << std::endl;
+    std::cout << "Update at " << predicted_time << std::endl;
   };
 
   void draw() override {
