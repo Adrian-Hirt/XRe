@@ -36,13 +36,6 @@ public:
   void pollOpenxrEvents(bool &loop_running, bool &xr_running);
   void renderFrame(std::function<void()> draw_callback, std::function<void(XrTime)> update_simulation_callback);
   void renderLayer(XrTime predicted_time, XrCompositionLayerProjection& layer_projection, std::function<void()> draw_callback);
-  // void renderLayer(XrTime predicted_time,
-  //                   std::vector<XrCompositionLayerProjectionView>& views,
-  //                   XrCompositionLayerProjection& layer_projection,
-  //                   std::function<void()> draw_callback);
-
-  // // ID3D11Device* getDevice();
-  // // ID3D11DeviceContext* getDeviceContext();
 
   // Handlers
   VulkanHandler m_vulkan_handler;

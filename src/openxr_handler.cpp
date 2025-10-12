@@ -148,10 +148,10 @@ bool OpenXrHandler::initializeOpenxr() {
 	//------------------------------------------------------------------------------------------------------
   // Create session with Vulkan graphics binding
   XrGraphicsBindingVulkanKHR graphics_binding{ XR_TYPE_GRAPHICS_BINDING_VULKAN_KHR };
-  graphics_binding.device = m_vulkan_handler.m_device;
-  graphics_binding.instance = m_vulkan_handler.m_vk_instance;
-  graphics_binding.physicalDevice = m_vulkan_handler.m_physical_device;
-  graphics_binding.queueFamilyIndex = m_vulkan_handler.m_queue_family_index;
+  graphics_binding.device = m_vulkan_handler.getLogicalDevice();
+  graphics_binding.instance = m_vulkan_handler.getInstance();
+  graphics_binding.physicalDevice = m_vulkan_handler.getPhysicalDevice();
+  graphics_binding.queueFamilyIndex = m_vulkan_handler.getQueueFamilyIndex();
   graphics_binding.queueIndex = 0u;
 
   // TODO: add back once basic rendering works
@@ -320,7 +320,13 @@ bool OpenXrHandler::initializeOpenxr() {
       RenderTarget*& renderTarget = swapchainRenderTargets[j];
 
       VkImage image = swapchain_images[j].image;
-      renderTarget = new RenderTarget(m_vulkan_handler.m_device, image, getEyeResolution(i), VulkanHandler::s_color_format, m_vulkan_handler.m_render_pass);
+      renderTarget = new RenderTarget(
+        m_vulkan_handler.getLogicalDevice(),
+        image,
+        getEyeResolution(i),
+        VulkanHandler::s_color_format,
+        m_vulkan_handler.getRenderPass()
+      );
     }
   }
 
@@ -985,15 +991,6 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, XrCompositionLayerProject
   layer_projection.viewCount = static_cast<uint32_t>(m_projection_views.size());
   layer_projection.views = m_projection_views.data();
 }
-
-// #if false
-// ID3D11Device* OpenXrHandler::getDevice() {
-//   return m_dx11_handler.getDevice();
-// }
-
-// ID3D11DeviceContext* OpenXrHandler::getDeviceContext() {
-//   return m_dx11_handler.getDeviceContext();
-// }
 
 // void OpenXrHandler::updateCurrentOriginForTeleport(DirectX::XMVECTOR teleport_location) {
 //   DirectX::XMVECTOR difference_vector = teleport_location- m_headset_position;

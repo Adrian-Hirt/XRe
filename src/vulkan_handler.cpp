@@ -753,17 +753,25 @@ void VulkanHandler::render(glm::mat4 view, glm::mat4 projection, VkFramebuffer f
   Utils::checkVkResult(result, "failed to submit draw command buffer!");
 }
 
-// VkInstance VulkanHandler::getInstance() {
-//   return m_vk_instance;
-// }
+VkInstance VulkanHandler::getInstance() {
+  return m_vk_instance;
+}
 
-// VkPhysicalDevice VulkanHandler::getPhysicalDevice() {
-//   return m_physical_device;
-// }
+VkPhysicalDevice VulkanHandler::getPhysicalDevice() {
+  return m_physical_device;
+}
 
-// VkDevice VulkanHandler::getLogicalDevice() {
-//   return m_device;
-// }
+VkDevice VulkanHandler::getLogicalDevice() {
+  return m_device;
+}
+
+uint32_t VulkanHandler::getQueueFamilyIndex() {
+  return m_queue_family_index;
+}
+
+VkRenderPass VulkanHandler::getRenderPass() {
+  return m_render_pass;
+}
 
 // void VulkanHandler::initializeVulkanAndDevices(XrInstance xr_instance, XrSystemId xr_system_id) {
 //   createInstance(xr_instance, xr_system_id);
