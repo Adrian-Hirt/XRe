@@ -22,12 +22,13 @@ message(STATUS "***** CMake Build type: ${CMAKE_BUILD_TYPE} *****")
 set(ENV{VULKAN_SDK} "C:/VulkanSDK/1.3.290.0")
 find_package(Vulkan)
 
-
 # FILE(GLOB SRCFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 SET(SRCFILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/application.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/openxr_handler.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_handler.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/render_target.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/buffer.cpp
 )
 
 # Needed to access the include folders from the individual apps
@@ -37,7 +38,7 @@ SET(XRE_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}
 #   "${CMAKE_CURRENT_LIST_DIR}/ext/DirectXTex/WICTextureLoader11.cpp"
 # )
 
-set(SHADERS_FOLDER "\"${CMAKE_CURRENT_SOURCE_DIR}/shaders\"" STRING "")
-set(DATA_FOLDER "\"${CMAKE_CURRENT_SOURCE_DIR}/data\"" STRING "")
+set(SHADERS_FOLDER "\"${CMAKE_CURRENT_SOURCE_DIR}/shaders/\"" STRING "")
+set(DATA_FOLDER "\"${CMAKE_CURRENT_SOURCE_DIR}/data/\"" STRING "")
 
 add_subdirectory(apps)

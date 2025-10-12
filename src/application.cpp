@@ -25,7 +25,8 @@ void Application::run() {
 
     if (xr_running) {
       // Render frame
-      m_open_xr_handler.renderFrame(std::bind(&Application::draw, this), std::bind(&Application::updateSimulation, this, std::placeholders::_1));
+      // m_open_xr_handler.renderFrame(std::bind(&Application::draw, this), std::bind(&Application::updateSimulation, this, std::placeholders::_1));
+      m_open_xr_handler.renderFrame();
     }
   }
 }

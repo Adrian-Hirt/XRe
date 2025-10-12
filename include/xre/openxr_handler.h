@@ -18,6 +18,7 @@
 #include <xre/geometry.h>
 // #include <xre/structs.h>
 #include <xre/vulkan_handler.h>
+#include <xre/render_target.h>
 // #include <xre/controller.h>
 // #include <xre/hand.h>
 
@@ -31,15 +32,18 @@ public:
   OpenXrHandler();
   OpenXrHandler(const char *application_name);
   ~OpenXrHandler();
+  VkExtent2D getEyeResolution(size_t eyeIndex) const;
   void pollOpenxrEvents(bool &loop_running, bool &xr_running);
-  void renderFrame(std::function<void()> draw_callback, std::function<void(XrTime)> update_simulation_callback);
-  void renderLayer(XrTime predicted_time,
-                    std::vector<XrCompositionLayerProjectionView>& views,
-                    XrCompositionLayerProjection& layer_projection,
-                    std::function<void()> draw_callback);
+  void renderFrame();
+  // void renderFrame(std::function<void()> draw_callback, std::function<void(XrTime)> update_simulation_callback);
+  void renderLayer(XrTime predicted_time, XrCompositionLayerProjection& layer_projection);
+  // void renderLayer(XrTime predicted_time,
+  //                   std::vector<XrCompositionLayerProjectionView>& views,
+  //                   XrCompositionLayerProjection& layer_projection,
+  //                   std::function<void()> draw_callback);
 
-  // ID3D11Device* getDevice();
-  // ID3D11DeviceContext* getDeviceContext();
+  // // ID3D11Device* getDevice();
+  // // ID3D11DeviceContext* getDeviceContext();
 
   // Handlers
   VulkanHandler m_vulkan_handler;
@@ -64,14 +68,24 @@ private:
   XrSystemProperties m_openxr_system_properties = { XR_TYPE_SYSTEM_PROPERTIES };
   XrSystemHandTrackingPropertiesEXT m_openxr_hand_tracking_system_properties = { XR_TYPE_SYSTEM_HAND_TRACKING_PROPERTIES_EXT };
 
-  // Swapchains
-  std::vector<Swapchain> m_swapchains;
+  // New:
+  std::vector<XrCompositionLayerProjectionView> m_projection_views;
+  std::vector<XrSwapchain> m_swapchains;
+  std::vector<std::vector<RenderTarget*>> m_render_targets;
+  XrSessionState m_openxr_session_state = XR_SESSION_STATE_UNKNOWN;
+  uint32_t m_view_count = 0u;
+  std::vector<glm::mat4> m_view_matrices;
+  std::vector<glm::mat4> m_projection_matrices;
 
-  // Pointers to ext functions we need to use
-  PFN_xrGetVulkanInstanceExtensionsKHR m_ext_getVulkanInstanceExtensionsKHR = nullptr;
-  PFN_xrGetVulkanDeviceExtensionsKHR m_ext_getVulkanDeviceExtensionsKHR = nullptr;
-  PFN_xrGetVulkanGraphicsDeviceKHR m_ext_getVulkanGraphicsDeviceKHR = nullptr;
-  PFN_xrGetVulkanGraphicsRequirementsKHR m_ext_getVulkanGraphicsRequirementsKHR = nullptr;
+
+  // // Swapchains
+  // std::vector<Swapchain> m_swapchains;
+
+  // // Pointers to ext functions we need to use
+  // PFN_xrGetVulkanInstanceExtensionsKHR m_ext_getVulkanInstanceExtensionsKHR = nullptr;
+  // PFN_xrGetVulkanDeviceExtensionsKHR m_ext_getVulkanDeviceExtensionsKHR = nullptr;
+  // PFN_xrGetVulkanGraphicsDeviceKHR m_ext_getVulkanGraphicsDeviceKHR = nullptr;
+  // PFN_xrGetVulkanGraphicsRequirementsKHR m_ext_getVulkanGraphicsRequirementsKHR = nullptr;
 
   // PFN_xrGetD3D11GraphicsRequirementsKHR m_ext_xrGetD3D11GraphicsRequirementsKHR;
   // PFN_xrCreateHandTrackerEXT m_ext_xrCreateHandTrackerEXT;
@@ -87,26 +101,26 @@ private:
   // Hand *m_right_hand = NULL;
 
   // Actions
-  XrActionSet m_default_action_set;
+  // XrActionSet m_default_action_set;
   // XrAction m_controller_pose_action;
   // XrAction m_controller_aim_action;
   // XrAction m_controller_grab_action;
   // XrAction m_controller_teleport_action;
 
   // For checking if the pose of a controller is valid
-  const static XrSpaceLocationFlags s_pose_valid_flags = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
+  // const static XrSpaceLocationFlags s_pose_valid_flags = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
 
   // DirectX::XMVECTOR m_headset_position = { 0.0f, 0.0f, 0.0f };
   // DirectX::XMVECTOR m_current_origin = { 0.0f, 0.0f, 0.0f };
-  glm::vec3 m_current_origin = { 0.0f, 0.0f, 0.0f };
+  // glm::vec3 m_current_origin = { 0.0f, 0.0f, 0.0f };
 
   // Methods
   bool initializeOpenxr();
-  void initializeOpenxrActions();
+  // void initializeOpenxrActions();
   // void initializeHandTracking();
   // void setupActionBindings();
   // void suggestBindings(std::string interaction_profile, std::vector<XrActionSuggestedBinding> bindings);
-  void pollOpenxrActions(XrTime predicted_time);
+  // void pollOpenxrActions(XrTime predicted_time);
   // void updateControllerStates(Controller *controller, XrTime predicted_time);
   // void updateHandTrackingStates(Hand *hand, XrTime predicted_time);
   // void updateCurrentOriginForTeleport(DirectX::XMVECTOR teleport_location);
