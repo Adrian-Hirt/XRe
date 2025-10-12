@@ -29,7 +29,13 @@ typedef struct {
   VkImageView depth_image_view;
 } Swapchain;
 
-struct Vertex {
+typedef struct UniformBufferObject {
+  glm::mat4 world;
+  glm::mat4 view;
+  glm::mat4 projection;
+} UniformBufferObject;
+
+typedef struct Vertex {
   glm::vec3 position;
   glm::vec3 color;
   glm::vec2 texture_coord;
@@ -69,7 +75,7 @@ struct Vertex {
   bool operator==(const Vertex& other) const {
     return position == other.position && color == other.color && texture_coord == other.texture_coord;
   }
-};
+} Vertex;
 
 
 // typedef struct vertex_t {

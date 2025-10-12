@@ -20,7 +20,7 @@
 // Other includes
 #include <vector>
 #include <cstring>
-#include <array>
+#include <vector>
 #include <string>
 #include <set>
 #include <functional>
@@ -89,23 +89,4 @@ private:
 
   // Synchronization object
   VkFence m_fence = nullptr;
-
-  // TODO: remove later
-  static constexpr std::array<Vertex, 4> vertices_ren = {
-    Vertex({ -20.0f, 0.0f, -20.0f }, { 1.0f, 0.0f, 0.0f }), // 0
-    Vertex({ +20.0f, 0.0f, -20.0f }, { 0.0f, 1.0f, 0.0f }), // 1
-    Vertex({ -20.0f, 0.0f, +20.0f }, { 0.0f, 0.0f, 1.0f }), // 2
-    Vertex({ +20.0f, 0.0f, +20.0f }, { 1.0f, 0.0f, 1.0f })  // 3
-  };
-
-  static constexpr std::array<uint16_t, 6> indices_ren = {
-    0, 1, 2, // First triangle
-    2, 1, 3  // Second triangle
-  };
-
-  struct UniformBufferObject final {
-    glm::mat4 world;
-    glm::mat4 view;
-    glm::mat4 projection;
-  } ubo;
 };

@@ -41,12 +41,32 @@ Buffer::Buffer(VkDevice device, VkPhysicalDevice physical_device, VkDeviceSize s
   Utils::checkVkResult(result, "Failed to allocate bind memory for buffer");
 }
 
+void Buffer::loadData(std::vector<Vertex> input) {
+  void* data = map();
+  uint32_t size = sizeof(Vertex) * input.size();
+  memcpy(data, input.data(), size);
+  unmap();
+}
+
+void Buffer::loadData(std::vector<uint16_t> input) {
+  void* data = map();
+  uint32_t size = sizeof(uint16_t) * input.size();
+  memcpy(data, input.data(), size);
+  unmap();
+}
+
+void Buffer::loadData(UniformBufferObject input) {
+  void* data = map();
+  memcpy(data, &input, sizeof(input));
+  unmap();
+}
+
 void Buffer::destroy() {
   vkFreeMemory(m_device, m_device_memory, nullptr);
   vkDestroyBuffer(m_device, m_buffer, nullptr);
 }
 
-void* Buffer::map() const {
+void* Buffer::map() {
   void* data;
   VkResult result = vkMapMemory(m_device, m_device_memory, 0u, m_size, 0, &data);
   Utils::checkVkResult(result, "Failed to map memory for buffer");
@@ -54,11 +74,11 @@ void* Buffer::map() const {
   return data;
 }
 
-void Buffer::unmap() const {
+void Buffer::unmap() {
   vkUnmapMemory(m_device, m_device_memory);
 }
 
 
-VkBuffer Buffer::getBuffer() const {
+VkBuffer Buffer::getBuffer() {
   return m_buffer;
 }

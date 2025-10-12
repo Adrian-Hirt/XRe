@@ -562,21 +562,26 @@ void VulkanHandler::setupRenderer() {
   // Vertex buffer
   //------------------------------------------------------------------------------------------------------
   // TODO: how to handle other objects being added?
+  std::vector<Vertex> vertices_ren = {
+    Vertex({ -20.0f, 0.0f, -20.0f }, { 1.0f, 0.0f, 0.0f }), // 0
+    Vertex({ +20.0f, 0.0f, -20.0f }, { 0.0f, 1.0f, 0.0f }), // 1
+    Vertex({ -20.0f, 0.0f, +20.0f }, { 0.0f, 0.0f, 1.0f }), // 2
+    Vertex({ +20.0f, 0.0f, +20.0f }, { 1.0f, 0.0f, 1.0f })  // 3
+  };
+
+  std::vector<uint16_t> indices_ren = {
+    0, 1, 2, // First triangle
+    2, 1, 3  // Second triangle
+  };
+
   // Create vertex buffer
-  constexpr size_t size = sizeof(Vertex) * vertices_ren.size();
+  size_t size = sizeof(Vertex) * vertices_ren.size();
   m_vertex_buffer = new Buffer(m_device, m_physical_device, static_cast<VkDeviceSize>(size), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+  m_vertex_buffer->loadData(vertices_ren);
 
-  // Fill vertex buffer
-  void* data = m_vertex_buffer->map();
-  memcpy(data, vertices_ren.data(), size);
-  m_vertex_buffer->unmap();
-
-  constexpr size_t index_size = sizeof(Vertex) * indices_ren.size();
+  size_t index_size = sizeof(Vertex) * indices_ren.size();
   m_index_buffer = new Buffer(m_device, m_physical_device, static_cast<VkDeviceSize>(index_size), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-
-  void* index_data = m_index_buffer->map();
-  memcpy(index_data, indices_ren.data(), index_size);
-  m_index_buffer->unmap();
+  m_index_buffer->loadData(indices_ren);
 
   //------------------------------------------------------------------------------------------------------
   // Command pool
@@ -643,13 +648,12 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   //------------------------------------------------------------------------------------------------------
   // Update uniform buffer
   //------------------------------------------------------------------------------------------------------
+  UniformBufferObject ubo;
   ubo.world = glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f, 0.0f });
   ubo.view = view;
   ubo.projection = projection;
 
-  void* data = m_uniform_buffer->map();
-  memcpy(data, &ubo, sizeof(ubo));
-  m_uniform_buffer->unmap();
+  m_uniform_buffer->loadData(ubo);
 
   //------------------------------------------------------------------------------------------------------
   // Reset sync objects
@@ -736,7 +740,7 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   vkCmdBindIndexBuffer(m_command_buffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
   // Draw using indices
-  vkCmdDrawIndexed(m_command_buffer, static_cast<uint32_t>(indices_ren.size()), 1u, 0u, 0u, 0u);
+  vkCmdDrawIndexed(m_command_buffer, 6u, 1u, 0u, 0u, 0u);
 
   //------------------------------------------------------------------------------------------------------
   // End the render pass

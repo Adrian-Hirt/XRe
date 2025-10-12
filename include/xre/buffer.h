@@ -1,21 +1,28 @@
 #pragma once
 
+// Vulkan includes
 #include <vulkan/vulkan.h>
-#include "utils.h"
+
+// XRe includes
+#include <xre/utils.h>
+#include <xre/structs.h>
 
 class Buffer {
 public:
   Buffer(VkDevice device, VkPhysicalDevice physical_device, VkDeviceSize size, VkBufferUsageFlags buffer_usage_flags);
 
   void destroy();
-
-  void* map() const;
-  void unmap() const;
-  VkBuffer getBuffer() const;
+  VkBuffer getBuffer();
+  void loadData(std::vector<Vertex> input);
+  void loadData(std::vector<uint16_t> input);
+  void loadData(UniformBufferObject input);
 
 private:
   VkDevice m_device = nullptr;
   VkBuffer m_buffer = nullptr;
   VkDeviceMemory m_device_memory = nullptr;
   VkDeviceSize m_size = 0u;
+
+  void* map();
+  void unmap();
 };
