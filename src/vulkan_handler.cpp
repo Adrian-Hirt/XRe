@@ -622,15 +622,20 @@ VkShaderModule VulkanHandler::createShaderModule(const std::vector<char>& code) 
   return shader_module;
 }
 
-void VulkanHandler::render(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf, VkExtent2D resolution) {
+void VulkanHandler::render(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf, VkExtent2D resolution, std::function<void()> draw_callback) {
   VkResult result;
 
+  //------------------------------------------------------------------------------------------------------
+  // Wait for the previous frame
+  //------------------------------------------------------------------------------------------------------
   // Wait for the previous frame to be finished (by waiting for the fence
   // to be signalled)
   result = vkWaitForFences(m_device, 1u, &m_fence, VK_TRUE, UINT64_MAX);
   Utils::checkVkResult(result, "Failed to wait for memory fence");
 
+  //------------------------------------------------------------------------------------------------------
   // Update uniform buffer
+  //------------------------------------------------------------------------------------------------------
   ubo.world = glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f, 0.0f });
   ubo.view = view;
   ubo.projection = projection;
@@ -639,6 +644,9 @@ void VulkanHandler::render(glm::mat4 view, glm::mat4 projection, VkFramebuffer f
   memcpy(data, &ubo, sizeof(ubo));
   m_uniform_buffer->unmap();
 
+  //------------------------------------------------------------------------------------------------------
+  // Reset sync objects
+  //------------------------------------------------------------------------------------------------------
   // Reset the fence to the unsignalled state
   result = vkResetFences(m_device, 1u, &m_fence);
   Utils::checkVkResult(result, "Failed to reset fence to unsignalled state!");
@@ -647,13 +655,18 @@ void VulkanHandler::render(glm::mat4 view, glm::mat4 projection, VkFramebuffer f
   result = vkResetCommandBuffer(m_command_buffer,  0);
   Utils::checkVkResult(result, "failed to reset command buffer!");
 
+  //------------------------------------------------------------------------------------------------------
   // Begin recording the command buffer
+  //------------------------------------------------------------------------------------------------------
   VkCommandBufferBeginInfo begin_info{};
   begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
   result = vkBeginCommandBuffer(m_command_buffer, &begin_info);
   Utils::checkVkResult(result, "failed to begin recording command buffer!");
 
+  //------------------------------------------------------------------------------------------------------
+  // Setup render pass
+  //------------------------------------------------------------------------------------------------------
   // Values to use to clear the buffers (color, set to black, depth, set to 1);
   std::array<VkClearValue, 2> clear_values{};
   clear_values[0].color = {{0.5f, 0.5f, 0.5f, 1.0f}};
@@ -670,10 +683,14 @@ void VulkanHandler::render(glm::mat4 view, glm::mat4 projection, VkFramebuffer f
   render_pass_info.pClearValues = clear_values.data();
   vkCmdBeginRenderPass(m_command_buffer, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
 
+  //------------------------------------------------------------------------------------------------------
   // Bind the graphics pipeline
+  //------------------------------------------------------------------------------------------------------
   vkCmdBindPipeline(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphics_pipeline);
 
+  //------------------------------------------------------------------------------------------------------
   // Set viewport
+  //------------------------------------------------------------------------------------------------------
   VkViewport viewport;
   viewport.x = static_cast<float>(render_pass_info.renderArea.offset.x);
   viewport.y = static_cast<float>(render_pass_info.renderArea.offset.y);
@@ -683,16 +700,23 @@ void VulkanHandler::render(glm::mat4 view, glm::mat4 projection, VkFramebuffer f
   viewport.maxDepth = 1.0f;
   vkCmdSetViewport(m_command_buffer, 0u, 1u, &viewport);
 
+  //------------------------------------------------------------------------------------------------------
   // Set scissor
+  //------------------------------------------------------------------------------------------------------
   VkRect2D scissor;
   scissor.offset = render_pass_info.renderArea.offset;
   scissor.extent = render_pass_info.renderArea.extent;
   vkCmdSetScissor(m_command_buffer, 0u, 1u, &scissor);
 
+  //------------------------------------------------------------------------------------------------------
   // Bind uniform buffer
+  //------------------------------------------------------------------------------------------------------
   vkCmdBindDescriptorSets(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0u, 1u, &m_descriptor_set, 0u, nullptr);
 
-  // draw_callback();
+  //------------------------------------------------------------------------------------------------------
+  // Draw the scene
+  //------------------------------------------------------------------------------------------------------
+  draw_callback();
 
   // Bind vertex buffer and draw vertices
   // TODO: remove once we have something in the draw_callback
@@ -701,19 +725,28 @@ void VulkanHandler::render(glm::mat4 view, glm::mat4 projection, VkFramebuffer f
   vkCmdBindVertexBuffers(m_command_buffer, 0u, 1u, &buffer, &offset);
   vkCmdDraw(m_command_buffer, static_cast<uint32_t>(vertices_ren.size()), 1u, 0u, 0u);
 
+  //------------------------------------------------------------------------------------------------------
   // End the render pass
+  //------------------------------------------------------------------------------------------------------
   vkCmdEndRenderPass(m_command_buffer);
 
+  //------------------------------------------------------------------------------------------------------
   // End recording the command buffer
+  //------------------------------------------------------------------------------------------------------
   result = vkEndCommandBuffer(m_command_buffer);
   Utils::checkVkResult(result, "failed to record command buffer!");
 
+  //------------------------------------------------------------------------------------------------------
   // Submit the command buffer
+  //------------------------------------------------------------------------------------------------------
   VkSubmitInfo submit_info{};
   submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
   submit_info.commandBufferCount = 1u;
   submit_info.pCommandBuffers = &m_command_buffer;
 
+  //------------------------------------------------------------------------------------------------------
+  // Submit the queue
+  //------------------------------------------------------------------------------------------------------
   // Actually submit the queue, which will also signal the `inFlightFence` on successful
   // completion.
   result = vkQueueSubmit(m_graphics_queue, 1, &submit_info, m_fence);
@@ -1432,98 +1465,4 @@ void VulkanHandler::render(glm::mat4 view, glm::mat4 projection, VkFramebuffer f
 //   return m_queue_family_indices.m_graphics_family.value();
 // }
 
-// //------------------------------------------------------------------------------------------------------
-// // Render a frame
-// //------------------------------------------------------------------------------------------------------
-// void VulkanHandler::renderFrame(XrCompositionLayerProjectionView& view, std::function<void()> draw_callback, glm::vec3 current_origin, Swapchain swapchain, uint32_t swapchain_image_id, uint32_t image_index) {
-//   // TODO: use ability to render multiple frames in flight
-//   int current_frame = image_index;
 
-//   // TODO: only ever the first frame seems to work, it fails afterwards :(
-//   if (current_frame > 0) {
-//     return;
-//   }
-
-//   VkResult result;
-
-//   // Wait for the previous frame to be finished (by waiting for the fence
-//   // to be signalled)
-//   vkWaitForFences(m_device, 1, &m_in_flight_fences[current_frame], VK_TRUE, UINT64_MAX);
-//   // Reset the fence to the unsignalled state
-//   vkResetFences(m_device, 1, &m_in_flight_fences[current_frame]);
-
-//   // Reset the command buffer such that we can record into it
-//   vkResetCommandBuffer(m_command_buffers[current_frame],  0);
-
-//   // Begin recording the command buffer
-//   VkCommandBufferBeginInfo begin_info{};
-//   begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-//   result = vkBeginCommandBuffer(m_command_buffers[current_frame], &begin_info);
-//   Utils::checkVkResult(result, "failed to begin recording command buffer!");
-
-//   // Values to use to clear the buffers (color, set to black, depth, set to 1);
-//   std::array<VkClearValue, 2> clear_values{};
-//   clear_values[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
-//   clear_values[1].depthStencil = {1.0f, 0};
-
-//   // Start the render pass
-//   VkRenderPassBeginInfo render_pass_info{};
-//   render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-//   render_pass_info.renderPass = m_render_pass;
-//   render_pass_info.framebuffer = m_swapchain_framebuffers[current_frame];
-//   render_pass_info.renderArea.offset = { 0, 0 };
-//   render_pass_info.renderArea.extent = { view.subImage.imageRect.extent.width, view.subImage.imageRect.extent.height };
-//   render_pass_info.clearValueCount = static_cast<uint32_t>(clear_values.size());
-//   render_pass_info.pClearValues = clear_values.data();
-//   vkCmdBeginRenderPass(m_command_buffers[current_frame], &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
-
-//   // Bind the graphics pipeline
-//   vkCmdBindPipeline(m_command_buffers[current_frame], VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphics_pipeline);
-
-//   draw_callback();
-
-//   // End the render pass
-//   vkCmdEndRenderPass(m_command_buffers[current_frame]);
-
-//   // End recording the command buffer
-//   result = vkEndCommandBuffer(m_command_buffers[current_frame]);
-//   Utils::checkVkResult(result, "failed to record command buffer!");
-
-//   // // Update the uniform buffers for the next frame
-//   // updateUniformBuffer(currentFrame);
-
-//   // Submit the command buffer
-//   VkSubmitInfo submit_info{};
-//   submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-//   VkSemaphore wait_semaphores[] = { m_image_available_semaphores[current_frame] };
-//   // We want to wait with writing colors to the image until it’s available.
-//   VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-//   submit_info.waitSemaphoreCount = 1;
-//   submit_info.pWaitSemaphores = wait_semaphores;
-//   submit_info.pWaitDstStageMask = wait_stages;
-//   submit_info.commandBufferCount = 1;
-//   submit_info.pCommandBuffers = &m_command_buffers[current_frame];
-//   VkSemaphore signal_semaphores[] = {m_render_finished_semaphores[current_frame]};
-//   submit_info.signalSemaphoreCount = 1;
-//   submit_info.pSignalSemaphores = signal_semaphores;
-
-//   // Actually submit the queue, which will also signal the `inFlightFence` on successful
-//   // completion.
-//   result = vkQueueSubmit(m_graphics_queue, 1, &submit_info, m_in_flight_fences[current_frame]);
-//   Utils::checkVkResult(result, "failed to submit draw command buffer!");
-
-//   // Present the result back to the swapchain such that we can show it on the screen
-//   VkPresentInfoKHR present_info{};
-//   present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-//   present_info.waitSemaphoreCount = 1;
-//   present_info.pWaitSemaphores = signal_semaphores;
-
-//   VkSwapchainKHR swap_chains[] = { (VkSwapchainKHR)swapchain.handle };
-//   present_info.swapchainCount = 1;
-//   present_info.pSwapchains = swap_chains;
-//   present_info.pImageIndices = &swapchain_image_id;
-
-//   vkQueuePresentKHR(m_present_queue, &present_info);
-// }

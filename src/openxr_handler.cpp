@@ -354,8 +354,11 @@ bool OpenXrHandler::initializeOpenxr() {
 }
 
 VkExtent2D OpenXrHandler::getEyeResolution(size_t eyeIndex) const {
-  const XrViewConfigurationView& eyeInfo = m_openxr_view_configuration_views.at(eyeIndex);
-  return { eyeInfo.recommendedImageRectWidth, eyeInfo.recommendedImageRectHeight };
+  const XrViewConfigurationView& eye_info = m_openxr_view_configuration_views.at(eyeIndex);
+  return {
+    eye_info.recommendedImageRectWidth,
+    eye_info.recommendedImageRectHeight
+  };
 }
 
 // //------------------------------------------------------------------------------------------------------
@@ -768,8 +771,7 @@ void OpenXrHandler::pollOpenxrEvents(bool &loop_running, bool &xr_running) {
 // //------------------------------------------------------------------------------------------------------
 // // Renders the next frame
 // //------------------------------------------------------------------------------------------------------
-// void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::function<void(XrTime)> update_simulation_callback)
-void OpenXrHandler::renderFrame() {
+void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::function<void(XrTime)> update_simulation_callback) {
 	XrResult result;
 
   //------------------------------------------------------------------------------------------------------
@@ -840,7 +842,7 @@ void OpenXrHandler::renderFrame() {
 	//------------------------------------------------------------------------------------------------------
 	// Update simulation
 	//------------------------------------------------------------------------------------------------------
-	// update_simulation_callback(xr_frame_state.predictedDisplayTime);
+	update_simulation_callback(xr_frame_state.predictedDisplayTime);
 
 	//------------------------------------------------------------------------------------------------------
 	// Render the layer
@@ -855,7 +857,7 @@ void OpenXrHandler::renderFrame() {
 	// we need to keep the application (and the simulation) running, but there is no point in rendering
 	// anything.
 	if (xr_frame_state.shouldRender) {
-		renderLayer(xr_frame_state.predictedDisplayTime, layer_projection);
+		renderLayer(xr_frame_state.predictedDisplayTime, layer_projection, draw_callback);
 		layers.push_back((XrCompositionLayerBaseHeader *)&layer_projection);
 	}
 
@@ -875,14 +877,11 @@ void OpenXrHandler::renderFrame() {
 //------------------------------------------------------------------------------------------------------
 // Renders an OpenXR layer
 //------------------------------------------------------------------------------------------------------
-void OpenXrHandler::renderLayer(XrTime predicted_time, XrCompositionLayerProjection& layer_projection) {
+void OpenXrHandler::renderLayer(XrTime predicted_time, XrCompositionLayerProjection& layer_projection, std::function<void()> draw_callback) {
 	XrResult result;
 
 	uint32_t view_count = 0;
 
-	//------------------------------------------------------------------------------------------------------
-	// Setup the views for the predicted rendering time
-	//------------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------------------
 	// Setup the views for the predicted rendering time
 	//------------------------------------------------------------------------------------------------------
@@ -953,7 +952,8 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, XrCompositionLayerProject
       m_view_matrices[i],
       m_projection_matrices[i],
       m_render_targets[i][swapchain_image_id]->getFramebuffer(),
-      getEyeResolution(i)
+      getEyeResolution(i),
+      draw_callback
     );
 
     // 	// Render the controllers
