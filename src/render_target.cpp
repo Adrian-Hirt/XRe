@@ -4,31 +4,31 @@ RenderTarget::RenderTarget(VkDevice device, VkImage image, VkExtent2D size, VkFo
   VkResult result;
   
   // Create image view
-  VkImageViewCreateInfo imageViewCreateInfo{ VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
-  imageViewCreateInfo.image = image;
-  imageViewCreateInfo.format = format;
-  imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-  imageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-  imageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-  imageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-  imageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-  imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-  imageViewCreateInfo.subresourceRange.baseArrayLayer = 0u;
-  imageViewCreateInfo.subresourceRange.baseMipLevel = 0u;
-  imageViewCreateInfo.subresourceRange.layerCount = 1u;
-  imageViewCreateInfo.subresourceRange.levelCount = 1u;
-  result = vkCreateImageView(device, &imageViewCreateInfo, nullptr, &m_image_view);
+  VkImageViewCreateInfo image_view_create_info{ VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
+  image_view_create_info.image = image;
+  image_view_create_info.format = format;
+  image_view_create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+  image_view_create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+  image_view_create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+  image_view_create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+  image_view_create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+  image_view_create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+  image_view_create_info.subresourceRange.baseArrayLayer = 0u;
+  image_view_create_info.subresourceRange.baseMipLevel = 0u;
+  image_view_create_info.subresourceRange.layerCount = 1u;
+  image_view_create_info.subresourceRange.levelCount = 1u;
+  result = vkCreateImageView(device, &image_view_create_info, nullptr, &m_image_view);
   Utils::checkVkResult(result, "Failed to create image view for render target");
 
   // Create framebuffer
-  VkFramebufferCreateInfo framebufferCreateInfo{ VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO };
-  framebufferCreateInfo.renderPass = renderPass;
-  framebufferCreateInfo.attachmentCount = 1u;
-  framebufferCreateInfo.pAttachments = &m_image_view;
-  framebufferCreateInfo.width = size.width;
-  framebufferCreateInfo.height = size.height;
-  framebufferCreateInfo.layers = 1u;
-  result = vkCreateFramebuffer(device, &framebufferCreateInfo, nullptr, &m_framebuffer);
+  VkFramebufferCreateInfo framebuffer_create_info{ VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO };
+  framebuffer_create_info.renderPass = renderPass;
+  framebuffer_create_info.attachmentCount = 1u;
+  framebuffer_create_info.pAttachments = &m_image_view;
+  framebuffer_create_info.width = size.width;
+  framebuffer_create_info.height = size.height;
+  framebuffer_create_info.layers = 1u;
+  result = vkCreateFramebuffer(device, &framebuffer_create_info, nullptr, &m_framebuffer);
   Utils::checkVkResult(result, "Failed to create framebuffer for render target");
 }
 

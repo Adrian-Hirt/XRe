@@ -5,7 +5,7 @@
 
 class Buffer {
 public:
-  Buffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags bufferUsageFlags);
+  Buffer(VkDevice device, VkPhysicalDevice physical_device, VkDeviceSize size, VkBufferUsageFlags buffer_usage_flags);
 
   void destroy();
 

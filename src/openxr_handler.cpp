@@ -313,14 +313,14 @@ bool OpenXrHandler::initializeOpenxr() {
 		Utils::checkXrResult(result, "Failed to enumerate the swapchain images");
 
     // For each swapchain image, call the function to create a render target using that swapchain image.
-    std::vector<RenderTarget*>& swapchainRenderTargets = m_render_targets[i];
-    swapchainRenderTargets.resize(swapchain_images.size());
+    std::vector<RenderTarget*>& swapchain_render_targets = m_render_targets[i];
+    swapchain_render_targets.resize(swapchain_images.size());
 
     for (uint32_t j = 0; j < swapchain_image_count; j++) {
-      RenderTarget*& renderTarget = swapchainRenderTargets[j];
+      RenderTarget*& render_target = swapchain_render_targets[j];
 
       VkImage image = swapchain_images[j].image;
-      renderTarget = new RenderTarget(
+      render_target = new RenderTarget(
         m_vulkan_handler.getLogicalDevice(),
         image,
         getEyeResolution(i),
@@ -954,7 +954,7 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, XrCompositionLayerProject
 		Utils::checkXrResult(result, "Could not wait for the swapchain image");
 
     // Render the content to the swapchain, which is done by the Vulkan handler
-    m_vulkan_handler.render(
+    m_vulkan_handler.renderFrame(
       m_view_matrices[i],
       m_projection_matrices[i],
       m_render_targets[i][swapchain_image_id]->getFramebuffer(),

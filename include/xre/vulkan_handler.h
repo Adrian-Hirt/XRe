@@ -31,17 +31,7 @@ public:
   VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id);
 
   void setupRenderer();
-  // void initializeVulkanAndDevices(XrInstance xr_instance, XrSystemId xr_system_id);
-  // void createRenderPass(VkFormat swapchain_format);
-  // void createDescriptorSetLayout();
-  // VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-  // VkImageView createDepthImage(VkFormat format, uint32_t width, uint32_t height);
-  // void createFramebuffers(Swapchain swapchain);
-  // void createGraphicsPipeline(uint32_t viewport_height, uint32_t viewport_width);
-  // void createCommandPool();
-  // void createCommandBuffers();
-  // void createSyncObjects();
-  void render(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf, VkExtent2D resolution, std::function<void()> draw_callback);
+  void renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf, VkExtent2D resolution, std::function<void()> draw_callback);
   // void renderFrame(XrCompositionLayerProjectionView& view, std::function<void()> draw_callback,
   //                  glm::vec3 current_origin, Swapchain swapchain, uint32_t swapchain_image_id, uint32_t image_index);
 
@@ -111,16 +101,4 @@ private:
     glm::mat4 view;
     glm::mat4 projection;
   } ubo;
-
-
-  // -------------------------------------------
-  // Methods
-  // -------------------------------------------
-  // void createInstance(XrInstance xr_instance, XrSystemId xr_system_id);
-  // void setupDebugMessenger();
-  // bool checkValidationLayerSupport();
-  // void setupDevice(XrInstance xr_instance, XrSystemId xr_system_id);
-  // uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-  // void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
-  //                  VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 };
