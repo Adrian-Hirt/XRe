@@ -571,6 +571,13 @@ void VulkanHandler::setupRenderer() {
   memcpy(data, vertices_ren.data(), size);
   m_vertex_buffer->unmap();
 
+  constexpr size_t index_size = sizeof(Vertex) * indices_ren.size();
+  m_index_buffer = new Buffer(m_device, m_physical_device, static_cast<VkDeviceSize>(index_size), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+
+  void* index_data = m_index_buffer->map();
+  memcpy(index_data, indices_ren.data(), index_size);
+  m_index_buffer->unmap();
+
   //------------------------------------------------------------------------------------------------------
   // Command pool
   //------------------------------------------------------------------------------------------------------
@@ -721,9 +728,15 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   // Bind vertex buffer and draw vertices
   // TODO: remove once we have something in the draw_callback
   const VkDeviceSize offset = 0u;
-  const VkBuffer buffer = m_vertex_buffer->getBuffer();
-  vkCmdBindVertexBuffers(m_command_buffer, 0u, 1u, &buffer, &offset);
-  vkCmdDraw(m_command_buffer, static_cast<uint32_t>(vertices_ren.size()), 1u, 0u, 0u);
+  const VkBuffer vertexBuffer = m_vertex_buffer->getBuffer();
+  vkCmdBindVertexBuffers(m_command_buffer, 0u, 1u, &vertexBuffer, &offset);
+
+  // Bind the index buffer
+  const VkBuffer indexBuffer = m_index_buffer->getBuffer(); // Your new index buffer
+  vkCmdBindIndexBuffer(m_command_buffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+  // Draw using indices
+  vkCmdDrawIndexed(m_command_buffer, static_cast<uint32_t>(indices_ren.size()), 1u, 0u, 0u, 0u);
 
   //------------------------------------------------------------------------------------------------------
   // End the render pass

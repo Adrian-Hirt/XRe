@@ -70,6 +70,7 @@ private:
   VkQueue m_graphics_queue = nullptr;
   Buffer *m_uniform_buffer = nullptr;
   Buffer *m_vertex_buffer = nullptr;
+  Buffer *m_index_buffer = nullptr;
 
   // Specifies the types of resources that are going to be accessed by the pipeline
   VkDescriptorSetLayout m_descriptor_set_layout = nullptr;
@@ -90,10 +91,16 @@ private:
   VkFence m_fence = nullptr;
 
   // TODO: remove later
-  static constexpr std::array vertices_ren = {
-    Vertex({ -20.0f, 0.0f, -20.0f }, { 1.0f, 0.0f, 0.0f }), Vertex({ +20.0f, 0.0f, -20.0f }, { 0.0f, 1.0f, 0.0f }),
-    Vertex({ -20.0f, 0.0f, +20.0f }, { 0.0f, 0.0f, 1.0f }), Vertex({ -20.0f, 0.0f, +20.0f }, { 0.0f, 0.0f, 1.0f }),
-    Vertex({ +20.0f, 0.0f, -20.0f }, { 0.0f, 1.0f, 0.0f }), Vertex({ +20.0f, 0.0f, +20.0f }, { 1.0f, 0.0f, 1.0f })
+  static constexpr std::array<Vertex, 4> vertices_ren = {
+    Vertex({ -20.0f, 0.0f, -20.0f }, { 1.0f, 0.0f, 0.0f }), // 0
+    Vertex({ +20.0f, 0.0f, -20.0f }, { 0.0f, 1.0f, 0.0f }), // 1
+    Vertex({ -20.0f, 0.0f, +20.0f }, { 0.0f, 0.0f, 1.0f }), // 2
+    Vertex({ +20.0f, 0.0f, +20.0f }, { 1.0f, 0.0f, 1.0f })  // 3
+  };
+
+  static constexpr std::array<uint16_t, 6> indices_ren = {
+    0, 1, 2, // First triangle
+    2, 1, 3  // Second triangle
   };
 
   struct UniformBufferObject final {
