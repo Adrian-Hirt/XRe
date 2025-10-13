@@ -24,7 +24,7 @@ public:
 
   void run();
   virtual void setup();
-  virtual void draw();
+  virtual void draw(VkCommandBuffer command_buffer);
   virtual void updateSimulation(XrTime predicted_time);
 
 //   ID3D11Device* getDevice();

@@ -25,7 +25,10 @@ void Application::run() {
 
     if (xr_running) {
       // Render frame
-      m_open_xr_handler.renderFrame(std::bind(&Application::draw, this), std::bind(&Application::updateSimulation, this, std::placeholders::_1));
+      m_open_xr_handler.renderFrame(
+        std::bind(&Application::draw, this, std::placeholders::_1), 
+        std::bind(&Application::updateSimulation, this, std::placeholders::_1)
+      );
     }
   }
 }
@@ -34,7 +37,7 @@ void Application::setup() {
   // Override this method to setup your scene etc.
 }
 
-void Application::draw() {
+void Application::draw(VkCommandBuffer command_buffer) {
   // Override this method to draw some stuff
 }
 

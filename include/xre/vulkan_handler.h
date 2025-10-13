@@ -32,7 +32,8 @@ public:
   VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id);
 
   void setupRenderer();
-  void renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf, VkExtent2D resolution, std::function<void()> draw_callback);
+  void renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf,
+                   VkExtent2D resolution, std::function<void(VkCommandBuffer)> draw_callback);
   // void renderFrame(XrCompositionLayerProjectionView& view, std::function<void()> draw_callback,
   //                  glm::vec3 current_origin, Swapchain swapchain, uint32_t swapchain_image_id, uint32_t image_index);
 

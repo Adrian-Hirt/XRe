@@ -609,26 +609,9 @@ VkShaderModule VulkanHandler::createShaderModule(const std::vector<char>& code) 
   return shader_module;
 }
 
-void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf, VkExtent2D resolution, std::function<void()> draw_callback) {
+void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf,
+                                VkExtent2D resolution, std::function<void(VkCommandBuffer)> draw_callback) {
   VkResult result;
-
-  //------------------------------------------------------------------------------------------------------
-  // Vertex buffer
-  //------------------------------------------------------------------------------------------------------
-  // TODO: how to handle other objects being added?
-  std::vector<Vertex> vertices_ren = {
-    Vertex({ -20.0f, 0.0f, -20.0f }, { 1.0f, 0.0f, 0.0f }), // 0
-    Vertex({ +20.0f, 0.0f, -20.0f }, { 0.0f, 1.0f, 0.0f }), // 1
-    Vertex({ -20.0f, 0.0f, +20.0f }, { 0.0f, 0.0f, 1.0f }), // 2
-    Vertex({ +20.0f, 0.0f, +20.0f }, { 1.0f, 0.0f, 1.0f })  // 3
-  };
-
-  std::vector<uint16_t> indices_ren = {
-    0, 1, 2, // First triangle
-    2, 1, 3  // Second triangle
-  };
-
-  Renderable *renderable = new Renderable(vertices_ren, indices_ren);
 
   //------------------------------------------------------------------------------------------------------
   // Wait for the previous frame
@@ -720,9 +703,7 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   //------------------------------------------------------------------------------------------------------
   // Draw the scene
   //------------------------------------------------------------------------------------------------------
-  draw_callback();
-
-  renderable->render(m_command_buffer);
+  draw_callback(m_command_buffer);
 
   //------------------------------------------------------------------------------------------------------
   // End the render pass
