@@ -3,6 +3,9 @@
 // OpenXR includes
 #include <open_xr/openxr.h>
 
+// Vulkan includes
+#include <vulkan/vulkan.h>
+
 // Other includes
 #include <iostream>
 #include <vector>

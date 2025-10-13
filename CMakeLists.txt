@@ -29,6 +29,7 @@ SET(SRCFILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_handler.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/render_target.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/buffer.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/renderable.cpp
 )
 
 # Needed to access the include folders from the individual apps

@@ -559,31 +559,6 @@ void VulkanHandler::setupRenderer() {
   vkDestroyShaderModule(m_device, vertex_shader_module, nullptr);
 
   //------------------------------------------------------------------------------------------------------
-  // Vertex buffer
-  //------------------------------------------------------------------------------------------------------
-  // TODO: how to handle other objects being added?
-  std::vector<Vertex> vertices_ren = {
-    Vertex({ -20.0f, 0.0f, -20.0f }, { 1.0f, 0.0f, 0.0f }), // 0
-    Vertex({ +20.0f, 0.0f, -20.0f }, { 0.0f, 1.0f, 0.0f }), // 1
-    Vertex({ -20.0f, 0.0f, +20.0f }, { 0.0f, 0.0f, 1.0f }), // 2
-    Vertex({ +20.0f, 0.0f, +20.0f }, { 1.0f, 0.0f, 1.0f })  // 3
-  };
-
-  std::vector<uint16_t> indices_ren = {
-    0, 1, 2, // First triangle
-    2, 1, 3  // Second triangle
-  };
-
-  // Create vertex buffer
-  size_t size = sizeof(Vertex) * vertices_ren.size();
-  m_vertex_buffer = new Buffer(m_device, m_physical_device, static_cast<VkDeviceSize>(size), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-  m_vertex_buffer->loadData(vertices_ren);
-
-  size_t index_size = sizeof(Vertex) * indices_ren.size();
-  m_index_buffer = new Buffer(m_device, m_physical_device, static_cast<VkDeviceSize>(index_size), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-  m_index_buffer->loadData(indices_ren);
-
-  //------------------------------------------------------------------------------------------------------
   // Command pool
   //------------------------------------------------------------------------------------------------------
   VkCommandPoolCreateInfo pool_create_info{};
@@ -636,6 +611,24 @@ VkShaderModule VulkanHandler::createShaderModule(const std::vector<char>& code) 
 
 void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf, VkExtent2D resolution, std::function<void()> draw_callback) {
   VkResult result;
+
+  //------------------------------------------------------------------------------------------------------
+  // Vertex buffer
+  //------------------------------------------------------------------------------------------------------
+  // TODO: how to handle other objects being added?
+  std::vector<Vertex> vertices_ren = {
+    Vertex({ -20.0f, 0.0f, -20.0f }, { 1.0f, 0.0f, 0.0f }), // 0
+    Vertex({ +20.0f, 0.0f, -20.0f }, { 0.0f, 1.0f, 0.0f }), // 1
+    Vertex({ -20.0f, 0.0f, +20.0f }, { 0.0f, 0.0f, 1.0f }), // 2
+    Vertex({ +20.0f, 0.0f, +20.0f }, { 1.0f, 0.0f, 1.0f })  // 3
+  };
+
+  std::vector<uint16_t> indices_ren = {
+    0, 1, 2, // First triangle
+    2, 1, 3  // Second triangle
+  };
+
+  Renderable *renderable = new Renderable(vertices_ren, indices_ren);
 
   //------------------------------------------------------------------------------------------------------
   // Wait for the previous frame
@@ -729,18 +722,7 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   //------------------------------------------------------------------------------------------------------
   draw_callback();
 
-  // Bind vertex buffer and draw vertices
-  // TODO: remove once we have something in the draw_callback
-  const VkDeviceSize offset = 0u;
-  const VkBuffer vertexBuffer = m_vertex_buffer->getBuffer();
-  vkCmdBindVertexBuffers(m_command_buffer, 0u, 1u, &vertexBuffer, &offset);
-
-  // Bind the index buffer
-  const VkBuffer indexBuffer = m_index_buffer->getBuffer(); // Your new index buffer
-  vkCmdBindIndexBuffer(m_command_buffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
-
-  // Draw using indices
-  vkCmdDrawIndexed(m_command_buffer, 6u, 1u, 0u, 0u, 0u);
+  renderable->render(m_command_buffer);
 
   //------------------------------------------------------------------------------------------------------
   // End the render pass

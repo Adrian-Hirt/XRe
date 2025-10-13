@@ -16,6 +16,7 @@
 #include <xre/utils.h>
 #include <xre/structs.h>
 #include <xre/buffer.h>
+#include <xre/renderable.h>
 
 // Other includes
 #include <vector>
