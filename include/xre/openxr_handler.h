@@ -16,7 +16,7 @@
 // XRe includes
 #include <xre/utils.h>
 #include <xre/geometry.h>
-// #include <xre/structs.h>
+#include <xre/structs.h>
 #include <xre/vulkan_handler.h>
 #include <xre/render_target.h>
 #include <xre/renderable.h>

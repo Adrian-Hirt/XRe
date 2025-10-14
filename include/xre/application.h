@@ -9,6 +9,7 @@
 // #include <xre/mesh.h>
 // #include <xre/model.h>
 #include <xre/openxr_handler.h>
+#include <xre/renderable.h>
 // #include <xre/model_factory.h>
 // #include <xre/text.h>
 // #include <xre/scene_node.h>
