@@ -37,7 +37,7 @@ void Application::setup() {
   // Override this method to setup your scene etc.
 }
 
-void Application::draw(VkCommandBuffer command_buffer) {
+void Application::draw(RenderContext& ctx) {
   // Override this method to draw some stuff
 }
 

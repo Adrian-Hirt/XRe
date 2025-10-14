@@ -28,9 +28,9 @@ public:
     std::cout << "Update at " << predicted_time << std::endl;
   };
 
-  void draw(VkCommandBuffer command_buffer) override {
+  void draw(RenderContext& ctx) override {
     // std::cout << "Draw" << std::endl;
-    renderable->render(command_buffer);
+    renderable->render(ctx);
   };
 };
 

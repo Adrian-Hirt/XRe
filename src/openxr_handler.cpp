@@ -774,10 +774,11 @@ void OpenXrHandler::pollOpenxrEvents(bool &loop_running, bool &xr_running) {
 // }
 // #endif
 
-// //------------------------------------------------------------------------------------------------------
-// // Renders the next frame
-// //------------------------------------------------------------------------------------------------------
-void OpenXrHandler::renderFrame(std::function<void(VkCommandBuffer)> draw_callback, std::function<void(XrTime)> update_simulation_callback) {
+//------------------------------------------------------------------------------------------------------
+// Renders the next frame
+//------------------------------------------------------------------------------------------------------
+void OpenXrHandler::renderFrame(std::function<void(RenderContext&)> draw_callback,
+                                std::function<void(XrTime)> update_simulation_callback) {
 	XrResult result;
 
   //------------------------------------------------------------------------------------------------------
@@ -883,7 +884,8 @@ void OpenXrHandler::renderFrame(std::function<void(VkCommandBuffer)> draw_callba
 //------------------------------------------------------------------------------------------------------
 // Renders an OpenXR layer
 //------------------------------------------------------------------------------------------------------
-void OpenXrHandler::renderLayer(XrTime predicted_time, XrCompositionLayerProjection& layer_projection, std::function<void(VkCommandBuffer)> draw_callback) {
+void OpenXrHandler::renderLayer(XrTime predicted_time, XrCompositionLayerProjection& layer_projection,
+                                std::function<void(RenderContext&)> draw_callback) {
 	XrResult result;
 
 	uint32_t view_count = 0;

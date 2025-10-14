@@ -57,15 +57,15 @@ void Renderable::registerDeviceAndPhysicalDevice(VkDevice device, VkPhysicalDevi
 //   return m_bounding_box;
 // }
 
-void Renderable::render(VkCommandBuffer command_buffer) {
+void Renderable::render(RenderContext& ctx) {
   const VkDeviceSize offset = 0u;
   const VkBuffer vertexBuffer = m_vertex_buffer->getBuffer();
-  vkCmdBindVertexBuffers(command_buffer, 0u, 1u, &vertexBuffer, &offset);
+  vkCmdBindVertexBuffers(ctx.command_buffer, 0u, 1u, &vertexBuffer, &offset);
 
   // Bind the index buffer
   const VkBuffer indexBuffer = m_index_buffer->getBuffer(); // Your new index buffer
-  vkCmdBindIndexBuffer(command_buffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+  vkCmdBindIndexBuffer(ctx.command_buffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
   // Draw using indices
-  vkCmdDrawIndexed(command_buffer, 6u, 1u, 0u, 0u, 0u);
+  vkCmdDrawIndexed(ctx.command_buffer, 6u, 1u, 0u, 0u, 0u);
 }

@@ -3,6 +3,9 @@
 // OpenXR includes
 #include <open_xr/openxr.h>
 
+// Vulkan includes
+#include <vulkan/vulkan.h>
+
 // GLM
 #include <glm/glm/glm.hpp>
 
@@ -10,6 +13,10 @@
 #include <vector>
 #include <array>
 #include <optional>
+
+typedef struct RenderContext {
+  VkCommandBuffer command_buffer;
+} RenderContext;
 
 typedef struct UniformBufferObject {
   glm::mat4 world;

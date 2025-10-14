@@ -610,7 +610,7 @@ VkShaderModule VulkanHandler::createShaderModule(const std::vector<char>& code) 
 }
 
 void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf,
-                                VkExtent2D resolution, std::function<void(VkCommandBuffer)> draw_callback) {
+                                VkExtent2D resolution, std::function<void(RenderContext&)> draw_callback) {
   VkResult result;
 
   //------------------------------------------------------------------------------------------------------
@@ -703,7 +703,8 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   //------------------------------------------------------------------------------------------------------
   // Draw the scene
   //------------------------------------------------------------------------------------------------------
-  draw_callback(m_command_buffer);
+  RenderContext ctx{ m_command_buffer };
+  draw_callback(ctx);
 
   //------------------------------------------------------------------------------------------------------
   // End the render pass

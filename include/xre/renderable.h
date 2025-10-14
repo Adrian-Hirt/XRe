@@ -20,7 +20,7 @@
 class Renderable {
 public:
   Renderable(std::vector<Vertex> vertices, std::vector<uint16_t> indices);
-  virtual void render(VkCommandBuffer command_buffer);
+  virtual void render(RenderContext& ctx);
   // DirectX::BoundingOrientedBox getBoundingBox();
 
   static void registerDeviceAndPhysicalDevice(VkDevice device, VkPhysicalDevice physical_device);

@@ -35,9 +35,9 @@ public:
   ~OpenXrHandler();
   VkExtent2D getEyeResolution(size_t eyeIndex) const;
   void pollOpenxrEvents(bool &loop_running, bool &xr_running);
-  void renderFrame(std::function<void(VkCommandBuffer)> draw_callback, std::function<void(XrTime)> update_simulation_callback);
+  void renderFrame(std::function<void(RenderContext&)> draw_callback, std::function<void(XrTime)> update_simulation_callback);
   void renderLayer(XrTime predicted_time, XrCompositionLayerProjection& layer_projection,
-                   std::function<void(VkCommandBuffer)> draw_callback);
+                   std::function<void(RenderContext&)> draw_callback);
 
   // Handlers
   VulkanHandler m_vulkan_handler;
