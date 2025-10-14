@@ -1,10 +1,5 @@
 #include <xre/renderable.h>
 
-// TODO: remove later on, as this should only be a base-class other classes sub-class
-Renderable::Renderable(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
-  initialize(vertices, indices);
-}
-
 // Function to initialize the "common" data of a mesh, to avoid code-duplication
 void Renderable::initialize(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
   // Check that the device and physical device have been set

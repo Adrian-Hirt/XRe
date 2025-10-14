@@ -19,7 +19,6 @@
 // can be rendered to display some output in the program.
 class Renderable {
 public:
-  Renderable(std::vector<Vertex> vertices, std::vector<uint16_t> indices);
   virtual void render(RenderContext& ctx);
   // DirectX::BoundingOrientedBox getBoundingBox();
 
