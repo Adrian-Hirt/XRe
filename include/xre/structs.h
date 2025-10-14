@@ -11,24 +11,6 @@
 #include <array>
 #include <optional>
 
-// struct to hold the indices of the queue families
-typedef struct {
-  std::optional<uint32_t> m_graphics_family;
-  std::optional<uint32_t> m_present_family;
-
-  bool isComplete() {
-    return m_graphics_family.has_value() && m_present_family.has_value();
-  }
-} QueueFamilyIndices;
-
-typedef struct {
-  XrSwapchain handle;
-  int32_t width;
-  int32_t height;
-  std::vector<VkImageView> image_views;
-  VkImageView depth_image_view;
-} Swapchain;
-
 typedef struct UniformBufferObject {
   glm::mat4 world;
   glm::mat4 view;
@@ -77,12 +59,6 @@ typedef struct Vertex {
   }
 } Vertex;
 
-
-// typedef struct vertex_t {
-//   DirectX::XMFLOAT3 coordinates;
-//   DirectX::XMFLOAT3 normal;
-//   DirectX::XMFLOAT2 texture_coordinates;
-// } vertex_t;
 
 // typedef struct per_frame_const_buffer_t {
 //   DirectX::XMMATRIX view_projection;
