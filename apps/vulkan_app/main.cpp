@@ -4,7 +4,10 @@ class VulkanApp : public Application {
 public:
   VulkanApp(const char *application_name) : Application(application_name) {};
 
-  Mesh *mesh = nullptr;
+  // Mesh *mesh = nullptr;
+  Model *floor = nullptr;
+  Model *square = nullptr;
+  Model *sphere = nullptr;
 
   void setup() override {
     std::cout << "Setup" << std::endl;
@@ -21,16 +24,22 @@ public:
       2, 1, 3  // Second triangle
     };
 
-    mesh = new Mesh(vertices, indices);
+    Mesh *mesh = new Mesh(vertices, indices);
+    std::vector<Mesh*> meshes = { mesh };
+    floor = new Model(meshes);
+    square = new Model(DATA_FOLDER "models/square.obj");
+    sphere = new Model(DATA_FOLDER "models/sphere.obj");
   };
 
   void updateSimulation(XrTime predicted_time) override {
-    std::cout << "Update at " << predicted_time << std::endl;
+    // std::cout << "Update at " << predicted_time << std::endl;
   };
 
   void draw(RenderContext& ctx) override {
     // std::cout << "Draw" << std::endl;
-    mesh->render(ctx);
+    square->render(ctx);
+    // sphere->render(ctx);
+    // floor->render(ctx);
   };
 };
 
