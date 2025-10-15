@@ -622,16 +622,6 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   Utils::checkVkResult(result, "Failed to wait for memory fence");
 
   //------------------------------------------------------------------------------------------------------
-  // Update uniform buffer
-  //------------------------------------------------------------------------------------------------------
-  UniformBufferObject ubo;
-  ubo.world = glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f, 0.0f });
-  ubo.view = view;
-  ubo.projection = projection;
-
-  m_uniform_buffer->loadData(ubo);
-
-  //------------------------------------------------------------------------------------------------------
   // Reset sync objects
   //------------------------------------------------------------------------------------------------------
   // Reset the fence to the unsignalled state
@@ -701,9 +691,17 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   vkCmdBindDescriptorSets(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0u, 1u, &m_descriptor_set, 0u, nullptr);
 
   //------------------------------------------------------------------------------------------------------
+  // Prepare uniform buffer
+  //------------------------------------------------------------------------------------------------------
+  // We'll assign the world later on, for every object
+  UniformBufferObject ubo;
+  ubo.view = view;
+  ubo.projection = projection;
+  
+  //------------------------------------------------------------------------------------------------------
   // Draw the scene
   //------------------------------------------------------------------------------------------------------
-  RenderContext ctx{ m_command_buffer };
+  RenderContext ctx{ m_command_buffer, m_uniform_buffer, ubo };
   draw_callback(ctx);
 
   //------------------------------------------------------------------------------------------------------

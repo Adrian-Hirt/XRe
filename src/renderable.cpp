@@ -53,6 +53,15 @@ void Renderable::registerDeviceAndPhysicalDevice(VkDevice device, VkPhysicalDevi
 // }
 
 void Renderable::render(RenderContext& ctx) {
+  //------------------------------------------------------------------------------------------------------
+  // Update uniform buffer
+  //------------------------------------------------------------------------------------------------------
+  ctx.uniform_buffer_object.world = glm::translate(glm::mat4(1.0f), { 10.0f, 0.0f, 0.0f });
+  ctx.uniform_buffer->loadData(ctx.uniform_buffer_object);
+
+  //------------------------------------------------------------------------------------------------------
+  // Bind buffers
+  //------------------------------------------------------------------------------------------------------
   const VkDeviceSize offset = 0u;
   const VkBuffer vertexBuffer = m_vertex_buffer->getBuffer();
   vkCmdBindVertexBuffers(ctx.command_buffer, 0u, 1u, &vertexBuffer, &offset);
@@ -61,6 +70,9 @@ void Renderable::render(RenderContext& ctx) {
   const VkBuffer indexBuffer = m_index_buffer->getBuffer(); // Your new index buffer
   vkCmdBindIndexBuffer(ctx.command_buffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
+  //------------------------------------------------------------------------------------------------------
+  // Draw
+  //------------------------------------------------------------------------------------------------------
   // Draw using indices
   vkCmdDrawIndexed(ctx.command_buffer, m_index_count, 1u, 0u, 0u, 0u);
 }

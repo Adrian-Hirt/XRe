@@ -9,6 +9,10 @@
 // Include vector header
 #include <vector>
 
+// GLM includes
+#include <glm/glm/vec3.hpp>
+#include <glm/glm/gtc/matrix_transform.hpp>
+
 // XRe includes
 #include <xre/utils.h>
 #include <xre/structs.h>

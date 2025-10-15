@@ -27,15 +27,7 @@ public:
   virtual void setup();
   virtual void draw(RenderContext& ctx);
   virtual void updateSimulation(XrTime predicted_time);
-
-//   ID3D11Device* getDevice();
-//   ID3D11DeviceContext* getDeviceContext();
-
-//   void setCcwCullMode();
-//   void setCwCullMode();
-//   void setWireframeMode();
 private:
   // Handlers
   OpenXrHandler m_open_xr_handler;
-//   Dx11Handler* m_dx11_handler;
 };

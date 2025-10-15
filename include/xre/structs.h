@@ -14,15 +14,20 @@
 #include <array>
 #include <optional>
 
-typedef struct RenderContext {
-  VkCommandBuffer command_buffer;
-} RenderContext;
+// Forward declaration of the buffer class
+class Buffer;
 
 typedef struct UniformBufferObject {
   glm::mat4 world;
   glm::mat4 view;
   glm::mat4 projection;
 } UniformBufferObject;
+
+typedef struct RenderContext {
+  VkCommandBuffer command_buffer;
+  Buffer *uniform_buffer;
+  UniformBufferObject uniform_buffer_object;
+} RenderContext;
 
 typedef struct Vertex {
   glm::vec3 position;
