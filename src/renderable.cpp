@@ -54,12 +54,6 @@ void Renderable::registerDeviceAndPhysicalDevice(VkDevice device, VkPhysicalDevi
 
 void Renderable::render(RenderContext& ctx) {
   //------------------------------------------------------------------------------------------------------
-  // Update uniform buffer
-  //------------------------------------------------------------------------------------------------------
-  ctx.uniform_buffer_object.world = glm::translate(glm::mat4(1.0f), { 10.0f, 0.0f, 0.0f });
-  ctx.uniform_buffer->loadData(ctx.uniform_buffer_object);
-
-  //------------------------------------------------------------------------------------------------------
   // Bind buffers
   //------------------------------------------------------------------------------------------------------
   const VkDeviceSize offset = 0u;

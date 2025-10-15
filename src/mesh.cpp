@@ -16,6 +16,10 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
   initialize(vertices, indices);
 }
 
+void Mesh::render(RenderContext& ctx) {
+  Renderable::render(ctx);
+}
+
 // //------------------------------------------------------------------------------------------------------
 // // Initialize the mesh.
 // // Arguments:

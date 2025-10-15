@@ -23,7 +23,6 @@
 // can be rendered to display some output in the program.
 class Renderable {
 public:
-  virtual void render(RenderContext& ctx);
   // DirectX::BoundingOrientedBox getBoundingBox();
 
   static void registerDeviceAndPhysicalDevice(VkDevice device, VkPhysicalDevice physical_device);
@@ -36,6 +35,9 @@ protected:
   // Any renderable has a bounding box by default. Subclasses which do not
   // can override this method to disable bounding boxes.
   virtual inline bool hasBoundingBox() { return true; };
+
+  // Protected as only subclasses may use it
+  virtual void render(RenderContext& ctx);
 
   // vertex and index buffers
   Buffer *m_vertex_buffer = nullptr;

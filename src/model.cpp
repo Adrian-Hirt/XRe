@@ -29,6 +29,11 @@ Model::Model(const char *model_path, glm::vec3 color) {
 }
 
 void Model::render(RenderContext& ctx) {
+  // Update uniform buffer
+  ctx.uniform_buffer_object.world = glm::translate(glm::mat4(1.0f), { 10.0f, 0.0f, 0.0f });
+  ctx.uniform_buffer->loadData(ctx.uniform_buffer_object);
+
+  // Render meshes of this model
   for (Mesh mesh : m_meshes) {
     mesh.render(ctx);
   }
