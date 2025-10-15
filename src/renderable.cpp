@@ -62,5 +62,5 @@ void Renderable::render(RenderContext& ctx) {
   vkCmdBindIndexBuffer(ctx.command_buffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
   // Draw using indices
-  vkCmdDrawIndexed(ctx.command_buffer, 6u, 1u, 0u, 0u, 0u);
+  vkCmdDrawIndexed(ctx.command_buffer, m_index_count, 1u, 0u, 0u, 0u);
 }

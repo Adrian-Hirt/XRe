@@ -14,8 +14,8 @@
 class Model {
 public:
   Model();
-  Model(std::vector<Mesh*> meshes);
-  Model(std::vector<Mesh*> meshes, glm::vec3 color);
+  Model(std::vector<Mesh> meshes);
+  Model(std::vector<Mesh> meshes, glm::vec3 color);
 
   Model(const char *model_path);
   Model(const char *model_path, glm::vec3 color);
@@ -31,7 +31,7 @@ public:
 
 private:
   // Vector holding all the meshes of this model
-  std::vector<Mesh*> m_meshes;
+  std::vector<Mesh> m_meshes;
 
   // Color of the model, which will be applied to all meshes
   glm::vec3 m_model_color;

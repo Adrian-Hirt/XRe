@@ -14,8 +14,8 @@ Model::Model() {}
 //  1) Vector of meshes for this model
 //  2) Color of the model
 //------------------------------------------------------------------------------------------------------
-Model::Model(std::vector<Mesh*> meshes) : Model::Model(meshes, glm::vec3(0.8f, 0.8f, 0.8f)) {}
-Model::Model(std::vector<Mesh*> meshes, glm::vec3 color)  {
+Model::Model(std::vector<Mesh> meshes) : Model::Model(meshes, glm::vec3(0.8f, 0.8f, 0.8f)) {}
+Model::Model(std::vector<Mesh> meshes, glm::vec3 color)  {
   m_meshes = meshes;
   m_original_model_color = color;
   m_model_color = color;
@@ -29,8 +29,8 @@ Model::Model(const char *model_path, glm::vec3 color) {
 }
 
 void Model::render(RenderContext& ctx) {
-  for (Mesh* mesh : m_meshes) {
-    mesh->render(ctx);
+  for (Mesh mesh : m_meshes) {
+    mesh.render(ctx);
   }
 }
 
@@ -119,13 +119,20 @@ void Model::loadObj(const char *model_path) {
 
         // It's nessecary to "reverse" the order of the indices, as otherwise
         // the models will be rendered inside out
-        mesh_indices.push_back(index_offset + (face_vertices_count - 1) - vertex_index);
+        mesh_indices.push_back(index.vertex_index);
       }
 
       index_offset += face_vertices_count;
     }
 
-    auto mesh = new Mesh(mesh_vertices, mesh_indices);
+    for (auto i : mesh_indices) {
+      std::cout << i << ", ";
+    }
+    std::cout << std::endl;
+
+    exit(0);
+
+    Mesh mesh = Mesh(mesh_vertices, mesh_indices);
     m_meshes.push_back(mesh);
   };
 }
