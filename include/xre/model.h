@@ -9,6 +9,7 @@
 #include <xre/utils.h>
 #include <xre/structs.h>
 #include <xre/mesh.h>
+#include <xre/geometry.h>
 // #include <xre/bounding_box_mesh.h>
 
 class Model {
@@ -29,7 +30,22 @@ public:
 
   // std::vector<DirectX::XMFLOAT3> getMeshBoundingBoxCorners();
 
+  // Store the translation
+  glm::vec3 m_translation = glm::zero<glm::vec3>();
+
+  // Store the rotation
+  glm::quat m_rotation = glm::identity<glm::quat>();
+
+  // Store the scaling
+  glm::vec3 m_scaling = glm::one<glm::vec3>();
+
 private:
+  // Keep track of the global index of the model
+  inline static uint32_t s_model_index = 0;
+
+  // The index of the current model itself
+  uint32_t m_model_index;
+
   // Vector holding all the meshes of this model
   std::vector<Mesh> m_meshes;
 

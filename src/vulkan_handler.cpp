@@ -323,11 +323,23 @@ VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
 void VulkanHandler::setupRenderer() {
   VkResult result;
 
+  // Round up to minUniformBufferOffsetAlignment
+  VkDeviceSize ubo_size = sizeof(UniformBufferObject);
+  VkPhysicalDeviceProperties properties{};
+  vkGetPhysicalDeviceProperties(m_physical_device, &properties);
+  VkDeviceSize min_alignment = properties.limits.minUniformBufferOffsetAlignment;
+  m_aligned_size = (ubo_size + min_alignment - 1) & ~(min_alignment - 1);
+
   //------------------------------------------------------------------------------------------------------
   // Uniform buffer
   //------------------------------------------------------------------------------------------------------
   // Create uniform buffer
-  m_uniform_buffer = new Buffer(m_device, m_physical_device, static_cast<VkDeviceSize>(sizeof(UniformBufferObject)), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
+  m_uniform_buffer = new Buffer(
+    m_device,
+    m_physical_device,
+    m_aligned_size * s_max_models_in_scene,
+    VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
+  );
 
   //------------------------------------------------------------------------------------------------------
   // Descriptor set layout
@@ -335,7 +347,7 @@ void VulkanHandler::setupRenderer() {
   // Uniform buffer object
   VkDescriptorSetLayoutBinding ubo_layout_binding{};
   ubo_layout_binding.binding = 0;
-  ubo_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+  ubo_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
   ubo_layout_binding.descriptorCount = 1;
   ubo_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
@@ -364,7 +376,7 @@ void VulkanHandler::setupRenderer() {
   // Create descriptor pool
   VkDescriptorPool descriptor_pool;
   VkDescriptorPoolSize descriptor_pool_size;
-  descriptor_pool_size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+  descriptor_pool_size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
   descriptor_pool_size.descriptorCount = 1u;
 
   VkDescriptorPoolCreateInfo descriptor_pool_create_info{ VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO };
@@ -393,7 +405,7 @@ void VulkanHandler::setupRenderer() {
   VkWriteDescriptorSet write_descriptor_set{ VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
   write_descriptor_set.dstSet = m_descriptor_set;
   write_descriptor_set.pBufferInfo = &descriptor_buffer_info;
-  write_descriptor_set.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+  write_descriptor_set.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
   write_descriptor_set.descriptorCount = 1u;
   write_descriptor_set.dstBinding = 0u;
   write_descriptor_set.dstArrayElement = 0u;
@@ -684,24 +696,20 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   scissor.offset = render_pass_info.renderArea.offset;
   scissor.extent = render_pass_info.renderArea.extent;
   vkCmdSetScissor(m_command_buffer, 0u, 1u, &scissor);
-
-  //------------------------------------------------------------------------------------------------------
-  // Bind uniform buffer
-  //------------------------------------------------------------------------------------------------------
-  vkCmdBindDescriptorSets(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0u, 1u, &m_descriptor_set, 0u, nullptr);
-
-  //------------------------------------------------------------------------------------------------------
-  // Prepare uniform buffer
-  //------------------------------------------------------------------------------------------------------
-  // We'll assign the world later on, for every object
-  UniformBufferObject ubo;
-  ubo.view = view;
-  ubo.projection = projection;
   
   //------------------------------------------------------------------------------------------------------
   // Draw the scene
   //------------------------------------------------------------------------------------------------------
-  RenderContext ctx{ m_command_buffer, m_uniform_buffer, ubo };
+  // Prepare the render context
+  RenderContext ctx{};
+  ctx.command_buffer = m_command_buffer;
+  ctx.uniform_buffer = m_uniform_buffer;
+  ctx.pipeline_layout = m_pipeline_layout;
+  ctx.descriptor_set = m_descriptor_set;
+  ctx.aligned_size = m_aligned_size;
+  ctx.view = view;
+  ctx.projection = projection;
+
   draw_callback(ctx);
 
   //------------------------------------------------------------------------------------------------------

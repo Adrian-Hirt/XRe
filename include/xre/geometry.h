@@ -40,4 +40,13 @@ namespace Geometry {
     projectionMatrix[3] = { 0.0f, 0.0f, -(farClip * (nearClip + nearClip)) / (farClip - nearClip), 0.0f };
     return projectionMatrix;
   }
+
+  inline glm::mat4 composeWorldMatrix(const glm::vec3& translation,
+                                      const glm::quat& rotation,
+                                      const glm::vec3& scale) {
+    glm::mat4 T = glm::translate(glm::mat4(1.0f), translation);
+    glm::mat4 R = glm::mat4_cast(rotation);
+    glm::mat4 S = glm::scale(glm::mat4(1.0f), scale);
+    return T * R * S;
+}
 }

@@ -43,6 +43,7 @@ public:
   VkRenderPass getRenderPass();
 
   static constexpr VkFormat s_color_format = VK_FORMAT_R8G8B8A8_SRGB;
+  static constexpr uint32_t s_max_models_in_scene = 256;
 private:
   // -------------------------------------------
   // Methods
@@ -90,4 +91,7 @@ private:
 
   // Synchronization object
   VkFence m_fence = nullptr;
+
+  // Aligned size for the uniform buffer
+  VkDeviceSize m_aligned_size;
 };

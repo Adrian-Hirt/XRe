@@ -19,6 +19,8 @@ Model::Model(std::vector<Mesh> meshes, glm::vec3 color)  {
   m_meshes = meshes;
   m_original_model_color = color;
   m_model_color = color;
+  // TODO: check that we haven't reached the max number of models
+  m_model_index = s_model_index++;
 }
 
 Model::Model(const char *model_path) : Model::Model(model_path, glm::vec3(0.8f, 0.8f, 0.8f)) {}
@@ -26,12 +28,38 @@ Model::Model(const char *model_path, glm::vec3 color) {
   loadObj(model_path);
   m_model_color = color;
   m_original_model_color = color;
+  m_model_index = s_model_index++;
 }
 
 void Model::render(RenderContext& ctx) {
+  // Compute the world matrix
+  auto world_matrix = Geometry::composeWorldMatrix(
+    m_translation,
+    m_rotation,
+    m_scaling
+  );
+
+  // Prepare uniform buffer
+  UniformBufferObject ubo;
+  ubo.view = ctx.view;
+  ubo.projection = ctx.projection;
+  ubo.world = world_matrix;
+
   // Update uniform buffer
-  ctx.uniform_buffer_object.world = glm::translate(glm::mat4(1.0f), { 10.0f, 0.0f, 0.0f });
-  ctx.uniform_buffer->loadData(ctx.uniform_buffer_object);
+  const uint32_t offset = m_model_index * ctx.aligned_size;
+  ctx.uniform_buffer->loadData(ubo, offset);
+
+  // Bind descriptor set
+  vkCmdBindDescriptorSets(
+    ctx.command_buffer,
+    VK_PIPELINE_BIND_POINT_GRAPHICS,
+    ctx.pipeline_layout,
+    0u,
+    1u,
+    &ctx.descriptor_set,
+    1,
+    &offset
+  );
 
   // Render meshes of this model
   for (Mesh mesh : m_meshes) {

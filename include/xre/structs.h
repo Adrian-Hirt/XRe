@@ -26,7 +26,11 @@ typedef struct UniformBufferObject {
 typedef struct RenderContext {
   VkCommandBuffer command_buffer;
   Buffer *uniform_buffer;
-  UniformBufferObject uniform_buffer_object;
+  VkPipelineLayout pipeline_layout;
+  VkDescriptorSet descriptor_set;
+  VkDeviceSize aligned_size;
+  glm::mat4 view;
+  glm::mat4 projection;
 } RenderContext;
 
 typedef struct Vertex {
