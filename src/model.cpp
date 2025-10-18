@@ -45,7 +45,7 @@ void Model::render(RenderContext& ctx) {
 
   // Update uniform buffer
   const uint32_t offset = m_model_index * ctx.aligned_size;
-  ctx.uniform_buffer->loadData(uniform_buffer_object, offset);
+  ctx.model_uniform_buffer->loadData(uniform_buffer_object, offset);
 
   // Bind descriptor set
   vkCmdBindDescriptorSets(

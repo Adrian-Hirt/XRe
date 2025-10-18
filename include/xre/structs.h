@@ -23,16 +23,17 @@ struct ModelUniformBufferObject {
 
 struct GlobalUniformBufferObject {
   glm::mat4 view_projection;
+  glm::vec3 light_vector;
+  glm::vec3 light_color;
+  glm::vec3 ambient_color;
 };
 
 typedef struct RenderContext {
   VkCommandBuffer command_buffer;
-  Buffer *uniform_buffer;
+  Buffer *model_uniform_buffer;
   VkPipelineLayout pipeline_layout;
   VkDescriptorSet descriptor_set;
   VkDeviceSize aligned_size;
-  glm::mat4 view;
-  glm::mat4 projection;
 } RenderContext;
 
 typedef struct Vertex {
@@ -83,11 +84,6 @@ typedef struct Vertex {
     return position == other.position && color == other.color && texture_coord == other.texture_coord;
   }
 } Vertex;
-
-
-// typedef struct per_frame_const_buffer_t {
-//   DirectX::XMMATRIX view_projection;
-// } per_frame_const_buffer_t;
 
 // typedef struct lighting_const_buffer_t {
 //   DirectX::XMFLOAT4 light_vector;

@@ -770,16 +770,18 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   // Prepare the render context
   RenderContext ctx{};
   ctx.command_buffer = m_command_buffer;
-  ctx.uniform_buffer = m_uniform_buffer;
+  ctx.model_uniform_buffer = m_uniform_buffer;
   ctx.pipeline_layout = m_pipeline_layout;
   ctx.descriptor_set = m_descriptor_set;
   ctx.aligned_size = m_aligned_size;
-  ctx.view = view;
-  ctx.projection = projection;
 
   // Update global buffer
   GlobalUniformBufferObject global_uniform_buffer_object{};
   global_uniform_buffer_object.view_projection = projection * view;
+  global_uniform_buffer_object.light_vector = glm::normalize(glm::vec3(1.0f, 1.0f, 1.0f));
+  global_uniform_buffer_object.light_color = glm::vec3(0.5f, 0.5f, 0.5f);
+  global_uniform_buffer_object.ambient_color = glm::vec3(0.2f, 0.2f, 0.2f);
+
   m_global_uniform_buffer->loadData(global_uniform_buffer_object);
 
   // Bind global descriptor set (camera)
