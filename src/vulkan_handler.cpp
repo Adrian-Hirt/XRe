@@ -324,11 +324,11 @@ void VulkanHandler::setupRenderer() {
   VkResult result;
 
   // Round up to minUniformBufferOffsetAlignment
-  VkDeviceSize ubo_size = sizeof(UniformBufferObject);
+  VkDeviceSize model_uniform_buffer_object_size = sizeof(ModelUniformBufferObject);
   VkPhysicalDeviceProperties properties{};
   vkGetPhysicalDeviceProperties(m_physical_device, &properties);
   VkDeviceSize min_alignment = properties.limits.minUniformBufferOffsetAlignment;
-  m_aligned_size = (ubo_size + min_alignment - 1) & ~(min_alignment - 1);
+  m_aligned_size = (model_uniform_buffer_object_size + min_alignment - 1) & ~(min_alignment - 1);
 
   //------------------------------------------------------------------------------------------------------
   // Uniform buffer
@@ -341,10 +341,33 @@ void VulkanHandler::setupRenderer() {
     VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
   );
 
+  // Create global uniform buffer
+  m_global_uniform_buffer = new Buffer(
+    m_device,
+    m_physical_device,
+    sizeof(GlobalUniformBufferObject),
+    VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
+  );
+
   //------------------------------------------------------------------------------------------------------
-  // Descriptor set layout
+  // Descriptor set layouts
   //------------------------------------------------------------------------------------------------------
-  // Uniform buffer object
+  // Global UBO layout (set = 0)
+  VkDescriptorSetLayoutBinding global_ubo_layout_binding{};
+  global_ubo_layout_binding.binding = 0;
+  global_ubo_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+  global_ubo_layout_binding.descriptorCount = 1;
+  global_ubo_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+  VkDescriptorSetLayoutCreateInfo global_layout_create_info{};
+  global_layout_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+  global_layout_create_info.bindingCount = 1;
+  global_layout_create_info.pBindings = &global_ubo_layout_binding;
+
+  result = vkCreateDescriptorSetLayout(m_device, &global_layout_create_info, nullptr, &m_global_descriptor_set_layout);
+  Utils::checkVkResult(result, "Failed to create global descriptor set layout");
+  
+  // Model uniform buffer object (set = 1)
   VkDescriptorSetLayoutBinding ubo_layout_binding{};
   ubo_layout_binding.binding = 0;
   ubo_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
@@ -360,12 +383,10 @@ void VulkanHandler::setupRenderer() {
   // sampler_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
   // std::array<VkDescriptorSetLayoutBinding, 2> bindings = { ubo_layout_binding, sampler_layout_binding };
-  std::array<VkDescriptorSetLayoutBinding, 1> bindings = { ubo_layout_binding };
-
   VkDescriptorSetLayoutCreateInfo layout_create_info{};
   layout_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-  layout_create_info.bindingCount = static_cast<uint32_t>(bindings.size());
-  layout_create_info.pBindings = bindings.data();
+  layout_create_info.bindingCount = 1;
+  layout_create_info.pBindings = &ubo_layout_binding;
 
   result = vkCreateDescriptorSetLayout(m_device, &layout_create_info, nullptr, &m_descriptor_set_layout);
   Utils::checkVkResult(result, "Failed to create the descriptor set layout");
@@ -373,8 +394,21 @@ void VulkanHandler::setupRenderer() {
   //------------------------------------------------------------------------------------------------------
   // Descriptor pool
   //------------------------------------------------------------------------------------------------------
-  // Create descriptor pool
-  VkDescriptorPool descriptor_pool;
+  // Create global descriptor pool
+  VkDescriptorPoolSize global_descriptor_pool_size{};
+  global_descriptor_pool_size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+  global_descriptor_pool_size.descriptorCount = 1;
+
+  VkDescriptorPoolCreateInfo global_descriptor_pool_create_info{ VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO };
+  global_descriptor_pool_create_info.poolSizeCount = 1;
+  global_descriptor_pool_create_info.pPoolSizes = &global_descriptor_pool_size;
+  global_descriptor_pool_create_info.maxSets = 1;
+
+  VkDescriptorPool global_descriptor_pool;
+  result = vkCreateDescriptorPool(m_device, &global_descriptor_pool_create_info, nullptr, &global_descriptor_pool);
+  Utils::checkVkResult(result, "Failed to create global descriptor pool");
+
+  // Create local descriptor pool
   VkDescriptorPoolSize descriptor_pool_size;
   descriptor_pool_size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
   descriptor_pool_size.descriptorCount = 1u;
@@ -383,17 +417,44 @@ void VulkanHandler::setupRenderer() {
   descriptor_pool_create_info.poolSizeCount = 1u;
   descriptor_pool_create_info.pPoolSizes = &descriptor_pool_size;
   descriptor_pool_create_info.maxSets = 1u;
+
+  VkDescriptorPool descriptor_pool;
   result = vkCreateDescriptorPool(m_device, &descriptor_pool_create_info, nullptr, &descriptor_pool);
   Utils::checkVkResult(result, "Failed to create descriptor pool");
 
   //------------------------------------------------------------------------------------------------------
   // Descriptor set
   //------------------------------------------------------------------------------------------------------
-  // Allocate descriptor set
+  // Allocate global descriptor set
+  VkDescriptorSetAllocateInfo global_descriptor_set_allocate_info{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
+  global_descriptor_set_allocate_info.descriptorPool = global_descriptor_pool;
+  global_descriptor_set_allocate_info.descriptorSetCount = 1;
+  global_descriptor_set_allocate_info.pSetLayouts = &m_global_descriptor_set_layout;
+
+  result = vkAllocateDescriptorSets(m_device, &global_descriptor_set_allocate_info, &m_global_descriptor_set);
+  Utils::checkVkResult(result, "Failed to allocate global descriptor set from pool");
+
+  VkDescriptorBufferInfo global_descriptor_buffer_info{};
+  global_descriptor_buffer_info.buffer = m_global_uniform_buffer->getBuffer();
+  global_descriptor_buffer_info.offset = 0;
+  global_descriptor_buffer_info.range = VK_WHOLE_SIZE;
+
+  VkWriteDescriptorSet global_write_descriptor_set{ VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
+  global_write_descriptor_set.dstSet = m_global_descriptor_set;
+  global_write_descriptor_set.pBufferInfo = &global_descriptor_buffer_info;
+  global_write_descriptor_set.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+  global_write_descriptor_set.descriptorCount = 1;
+  global_write_descriptor_set.dstBinding = 0;
+  global_write_descriptor_set.dstArrayElement = 0;
+
+  vkUpdateDescriptorSets(m_device, 1, &global_write_descriptor_set, 0, nullptr);
+
+  // Allocate local descriptor set
   VkDescriptorSetAllocateInfo descriptor_set_allocate_info{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
   descriptor_set_allocate_info.descriptorPool = descriptor_pool;
   descriptor_set_allocate_info.descriptorSetCount = 1u;
   descriptor_set_allocate_info.pSetLayouts = &m_descriptor_set_layout;
+
   result = vkAllocateDescriptorSets(m_device, &descriptor_set_allocate_info, &m_descriptor_set);
   Utils::checkVkResult(result, "Failed to allocate descriptor set from pool");
 
@@ -409,15 +470,21 @@ void VulkanHandler::setupRenderer() {
   write_descriptor_set.descriptorCount = 1u;
   write_descriptor_set.dstBinding = 0u;
   write_descriptor_set.dstArrayElement = 0u;
+
   vkUpdateDescriptorSets(m_device, 1u, &write_descriptor_set, 0u, nullptr);
 
   //------------------------------------------------------------------------------------------------------
   // Pipeline layout
   //------------------------------------------------------------------------------------------------------
+  std::array<VkDescriptorSetLayout, 2> set_layouts = {
+    m_global_descriptor_set_layout,  // set = 0
+    m_descriptor_set_layout          // set = 1 (local UBO)
+  };
+
   VkPipelineLayoutCreateInfo pipeline_layout_info{};
   pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-  pipeline_layout_info.setLayoutCount = 1;
-  pipeline_layout_info.pSetLayouts = &m_descriptor_set_layout;
+  pipeline_layout_info.setLayoutCount = static_cast<uint32_t>(set_layouts.size());
+  pipeline_layout_info.pSetLayouts = set_layouts.data();
 
   result = vkCreatePipelineLayout(m_device, &pipeline_layout_info, nullptr, &m_pipeline_layout);
   Utils::checkVkResult(result, "Failed to create pipeline layout");
@@ -709,6 +776,20 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   ctx.aligned_size = m_aligned_size;
   ctx.view = view;
   ctx.projection = projection;
+
+  // Update global buffer
+  GlobalUniformBufferObject global_uniform_buffer_object{};
+  global_uniform_buffer_object.view_projection = projection * view;
+  m_global_uniform_buffer->loadData(global_uniform_buffer_object);
+
+  // Bind global descriptor set (camera)
+  vkCmdBindDescriptorSets(
+    m_command_buffer,
+    VK_PIPELINE_BIND_POINT_GRAPHICS,
+    m_pipeline_layout,
+    0, 1, &m_global_descriptor_set, // set = 0
+    0, nullptr
+  );
 
   draw_callback(ctx);
 

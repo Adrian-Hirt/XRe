@@ -70,13 +70,21 @@ private:
 
   // Graphics queue used for rendering
   VkQueue m_graphics_queue = nullptr;
+
+  // Uniform buffers
   Buffer *m_uniform_buffer = nullptr;
+  Buffer *m_global_uniform_buffer = nullptr;
+
+  // Vertex and index buffers
   Buffer *m_vertex_buffer = nullptr;
   Buffer *m_index_buffer = nullptr;
 
   // Specifies the types of resources that are going to be accessed by the pipeline
   VkDescriptorSetLayout m_descriptor_set_layout = nullptr;
   VkDescriptorSet m_descriptor_set = nullptr;
+
+  VkDescriptorSetLayout m_global_descriptor_set_layout = nullptr;
+  VkDescriptorSet m_global_descriptor_set = nullptr;
 
   // Layout of the graphics pipeline (holds `uniform` values in shaders)
   VkPipelineLayout m_pipeline_layout = nullptr;

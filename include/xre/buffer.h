@@ -15,7 +15,8 @@ public:
   VkBuffer getBuffer();
   void loadData(std::vector<Vertex> input);
   void loadData(std::vector<uint16_t> input);
-  void loadData(UniformBufferObject input, VkDeviceSize offset);
+  void loadData(ModelUniformBufferObject input, VkDeviceSize offset);
+  void loadData(GlobalUniformBufferObject input);
 
 private:
   VkDevice m_device = nullptr;

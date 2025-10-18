@@ -39,22 +39,20 @@ void Model::render(RenderContext& ctx) {
     m_scaling
   );
 
-  // Prepare uniform buffer
-  UniformBufferObject ubo;
-  ubo.view = ctx.view;
-  ubo.projection = ctx.projection;
-  ubo.world = world_matrix;
+  // Prepare model uniform buffer
+  ModelUniformBufferObject uniform_buffer_object{};
+  uniform_buffer_object.world = world_matrix;
 
   // Update uniform buffer
   const uint32_t offset = m_model_index * ctx.aligned_size;
-  ctx.uniform_buffer->loadData(ubo, offset);
+  ctx.uniform_buffer->loadData(uniform_buffer_object, offset);
 
   // Bind descriptor set
   vkCmdBindDescriptorSets(
     ctx.command_buffer,
     VK_PIPELINE_BIND_POINT_GRAPHICS,
     ctx.pipeline_layout,
-    0u,
+    1u,
     1u,
     &ctx.descriptor_set,
     1,

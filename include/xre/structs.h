@@ -17,11 +17,13 @@
 // Forward declaration of the buffer class
 class Buffer;
 
-typedef struct UniformBufferObject {
+struct ModelUniformBufferObject {
   glm::mat4 world;
-  glm::mat4 view;
-  glm::mat4 projection;
-} UniformBufferObject;
+};
+
+struct GlobalUniformBufferObject {
+  glm::mat4 view_projection;
+};
 
 typedef struct RenderContext {
   VkCommandBuffer command_buffer;

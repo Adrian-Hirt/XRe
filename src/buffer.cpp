@@ -55,10 +55,16 @@ void Buffer::loadData(std::vector<uint16_t> input) {
   unmap();
 }
 
-void Buffer::loadData(UniformBufferObject input, VkDeviceSize offset) {
+void Buffer::loadData(ModelUniformBufferObject input, VkDeviceSize offset) {
   void* data = map();
   // Copy at given offset
   memcpy(static_cast<uint8_t*>(data) + offset, &input, sizeof(input));
+  unmap();
+}
+
+void Buffer::loadData(GlobalUniformBufferObject input) {
+  void* data = map();
+  memcpy(data, &input, sizeof(input));
   unmap();
 }
 
