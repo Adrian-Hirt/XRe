@@ -124,17 +124,17 @@ void Model::loadObj(const char *model_path) {
         // Assign the model color for now
         current_vertex.color = m_model_color;
 
-        // // Check whether we can load the normals, if not we set unit normals (please note
-        // // that lighting will not work correctly in that case).
-        // if (index.normal_index >= 0) {
-        //   tinyobj::real_t normal_x = attrib.normals[3 * index.normal_index + 0];
-        //   tinyobj::real_t normal_y = attrib.normals[3 * index.normal_index + 1];
-        //   tinyobj::real_t normal_z = attrib.normals[3 * index.normal_index + 2];
-        //   current_vertex.normal = DirectX::XMFLOAT3(normal_x, normal_y, normal_z);
-        // }
-        // else {
-        //   current_vertex.normal = DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f);
-        // }
+        // Check whether we can load the normals, if not we set unit normals (please note
+        // that lighting will not work correctly in that case).
+        if (index.normal_index >= 0) {
+          tinyobj::real_t normal_x = attrib.normals[3 * index.normal_index + 0];
+          tinyobj::real_t normal_y = attrib.normals[3 * index.normal_index + 1];
+          tinyobj::real_t normal_z = attrib.normals[3 * index.normal_index + 2];
+          current_vertex.normal = glm::vec3(normal_x, normal_y, normal_z);
+        }
+        else {
+          current_vertex.normal = glm::vec3(1.0f, 0.0f, 0.0f);
+        }
 
         // Check whether we can load the texture coordinates, if not we set 0,0 (please note
         // that textures will not work correctly in that case).

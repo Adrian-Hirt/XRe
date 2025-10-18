@@ -36,6 +36,7 @@ typedef struct RenderContext {
 typedef struct Vertex {
   glm::vec3 position;
   glm::vec3 color;
+  glm::vec3 normal;
   glm::vec2 texture_coord;
 
   static VkVertexInputBindingDescription getBindingDescription() {
@@ -47,8 +48,8 @@ typedef struct Vertex {
     return binding_description;
   }
 
-  static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
-    std::array<VkVertexInputAttributeDescription, 3> attribute_descriptions{};
+  static std::array<VkVertexInputAttributeDescription, 4> getAttributeDescriptions() {
+    std::array<VkVertexInputAttributeDescription, 4> attribute_descriptions{};
     // Binding for position
     attribute_descriptions[0].binding = 0;
     attribute_descriptions[0].location = 0;
@@ -61,11 +62,17 @@ typedef struct Vertex {
     attribute_descriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
     attribute_descriptions[1].offset = offsetof(Vertex, color);
 
-    // Binding for texture coordinates
+    // Binding for normal vector
     attribute_descriptions[2].binding = 0;
     attribute_descriptions[2].location = 2;
-    attribute_descriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-    attribute_descriptions[2].offset = offsetof(Vertex, texture_coord);
+    attribute_descriptions[2].format = VK_FORMAT_R32G32B32_SFLOAT;
+    attribute_descriptions[2].offset = offsetof(Vertex, normal);
+
+    // Binding for texture coordinates
+    attribute_descriptions[3].binding = 0;
+    attribute_descriptions[3].location = 3;
+    attribute_descriptions[3].format = VK_FORMAT_R32G32_SFLOAT;
+    attribute_descriptions[3].offset = offsetof(Vertex, texture_coord);
 
     return attribute_descriptions;
   }
