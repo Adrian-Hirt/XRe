@@ -25,15 +25,17 @@ void main() {
   // Transform to clip space
   gl_Position = globalUBO.view_projection * pos;
 
-  // Ambient + diffuse lighting
-  vec3 norm = normalize(inNormal);
-  float diffuse = clamp(dot(norm, normalize(modelUBO.light_vector)), 0.0, 1.0);
+  // Extract rotation+scale, then fix for non-uniform scaling
+  mat3 normalMatrix = transpose(inverse(mat3(modelUBO.world)));
+  vec3 norm = normalize(normalMatrix * inNormal);
 
-  vec3 diffuseLight = modelUBO.light_color * diffuse;
+  // Compute diffuse lighting
+  float diffuse = clamp(dot(norm, normalize(globalUBO.light_vector)), 0.0, 1.0);
+  vec3 diffuseLight = globalUBO.light_color * diffuse;
 
   // Combine with ambient
-  color = modelUBO.ambient_color + diffuseLight;
+  color = globalUBO.ambient_color + diffuseLight;
 
-  // Optionally, you can multiply by vertex color if you want:
+  // Tint by vertex color
   color *= inColor;
 }
