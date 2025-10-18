@@ -85,12 +85,6 @@ typedef struct Vertex {
   }
 } Vertex;
 
-// typedef struct lighting_const_buffer_t {
-//   DirectX::XMFLOAT4 light_vector;
-//   DirectX::XMFLOAT4 light_color;
-//   DirectX::XMFLOAT4 ambient_color;
-// } lighting_const_buffer_t;
-
 // typedef struct per_model_const_buffer_t {
 //   DirectX::XMMATRIX model;
 //   DirectX::XMMATRIX normal_rotation;
