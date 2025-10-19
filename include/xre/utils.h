@@ -108,22 +108,4 @@ namespace Utils {
   //   MultiByteToWideChar(CP_UTF8, 0, string.c_str(), -1, &result[0], string_size_needed);
   //   return result;
   // }
-
-  // inline void printVector(DirectX::XMVECTOR input) {
-  //   DirectX::XMFLOAT3 vector;
-  //   DirectX::XMStoreFloat3(&vector, input);
-  //   std::cout << vector.x << ", " << vector.y << ", " << vector.z << std::endl;
-  // }
-
-  // inline void printVector(XrVector3f input) {
-  //   std::cout << input.x << ", " << input.y << ", " << input.z << std::endl;
-  // }
-
-  // inline void printVector(DirectX::XMFLOAT4 input) {
-  //   std::cout << input.x << ", " << input.y << ", " << input.z << ", " << input.w << std::endl;
-  // }
-
-  // inline void printVector(DirectX::XMFLOAT3 input) {
-  //   std::cout << input.x << ", " << input.y << ", " << input.z << std::endl;
-  // }
 }

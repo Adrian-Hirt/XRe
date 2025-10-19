@@ -28,15 +28,15 @@ struct GlobalUniformBufferObject {
   glm::vec3 ambient_color;
 };
 
-typedef struct RenderContext {
+struct RenderContext {
   VkCommandBuffer command_buffer;
   Buffer *model_uniform_buffer;
   VkPipelineLayout pipeline_layout;
   VkDescriptorSet descriptor_set;
   VkDeviceSize aligned_size;
-} RenderContext;
+};
 
-typedef struct Vertex {
+struct Vertex {
   glm::vec3 position;
   glm::vec3 color;
   glm::vec3 normal;
@@ -83,13 +83,7 @@ typedef struct Vertex {
   bool operator==(const Vertex& other) const {
     return position == other.position && color == other.color && texture_coord == other.texture_coord;
   }
-} Vertex;
-
-// typedef struct per_model_const_buffer_t {
-//   DirectX::XMMATRIX model;
-//   DirectX::XMMATRIX normal_rotation;
-//   DirectX::XMFLOAT4 color;
-// } per_model_const_buffer_t;
+};
 
 // typedef struct text_char_t {
 //   float left;
