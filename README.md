@@ -27,16 +27,6 @@ XRe currently has the following features:
 * Various shaders (e.g. ambient lighting, textured models)
 * Basic hand tracking
 
-### Screenshots
-
-Simple scene:
-
-![](doc/img/screenshot_mr_portal_1.png)
-
-Hand tracking:
-
-![](doc/img/hand_tracking.jpeg)
-
 ## Hints
 
 When setting up a new machine to work on XRe, you need to have the OpenXR Loader in your path.
