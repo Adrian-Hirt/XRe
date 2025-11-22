@@ -1,7 +1,7 @@
 #pragma once
 
-// DirectX includes
-#include <DirectXMath/DirectXMath.h>
+// // DirectX includes
+// #include <DirectXMath/DirectXMath.h>
 
 // Other includes
 #include <optional>
@@ -11,10 +11,11 @@
 
 // XRe includes
 #include <xre/model.h>
-#include <xre/shader.h>
+// #include <xre/shader.h>
 #include <xre/model_factory.h>
-#include <xre/line.h>
+// #include <xre/line.h>
 #include <xre/scene_node.h>
+#include <xre/structs.h>
 
 class Controller {
 public:
@@ -22,16 +23,16 @@ public:
   Controller();
 
   // Render the controller
-  void render();
+  void render(RenderContext& ctx);
 
-  // Check whether we want to teleport
-  std::optional<DirectX::XMVECTOR> updateIntersectionSphereAndComputePossibleTeleport();
+  // // Check whether we want to teleport
+  // std::optional<DirectX::XMVECTOR> updateIntersectionSphereAndComputePossibleTeleport();
 
-  // Update the position of the controller
-  void updatePosition(DirectX::XMVECTOR current_origin);
+  // // Update the position of the controller
+  // void updatePosition(DirectX::XMVECTOR current_origin);
 
-  // Compute scene interactions of the controllers
-  void computeSceneInteractions();
+  // // Compute scene interactions of the controllers
+  // void computeSceneInteractions();
 
   // Whether the controller is active or not
   bool m_active = false;
@@ -58,24 +59,24 @@ public:
   XrPosef m_aim;
 
 private:
-  // Threshold for showing the line intersection point
-  static constexpr float s_line_intersection_threshold = 6.0f;
+  // // Threshold for showing the line intersection point
+  // static constexpr float s_line_intersection_threshold = 6.0f;
 
   // Model for the controller
   Model m_model;
 
-  // Line for visualizing the aim direction
-  Line m_aim_line;
+  // // Line for visualizing the aim direction
+  // Line m_aim_line;
 
-  // Model to visualize intersections of the aim line
-  // and models marked as interactable
-  Model m_aim_indicator_sphere;
+  // // Model to visualize intersections of the aim line
+  // // and models marked as interactable
+  // Model m_aim_indicator_sphere;
 
   // Scene nodes
   SceneNode m_root_node;
   SceneNode m_model_node;
-  SceneNode m_intersection_sphere_node;
-  SceneNode m_aim_line_node;
+  // SceneNode m_intersection_sphere_node;
+  // SceneNode m_aim_line_node;
 
-  float computeAimIndicatorSpherePosition(std::unordered_set<SceneNode *> models);
+  // float computeAimIndicatorSpherePosition(std::unordered_set<SceneNode *> models);
 };

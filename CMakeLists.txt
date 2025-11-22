@@ -33,6 +33,7 @@ SET(SRCFILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/mesh.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/model.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/scene_node.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.cpp
 )
 
 # Needed to access the include folders from the individual apps
