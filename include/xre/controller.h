@@ -25,14 +25,14 @@ public:
   // Render the controller
   void render(RenderContext& ctx);
 
-  // // Check whether we want to teleport
-  // std::optional<DirectX::XMVECTOR> updateIntersectionSphereAndComputePossibleTeleport();
+  // Check whether we want to teleport
+  std::optional<glm::vec3> updateIntersectionSphereAndComputePossibleTeleport();
 
-  // // Update the position of the controller
-  // void updatePosition(DirectX::XMVECTOR current_origin);
+  // Update the position of the controller
+  void updatePosition(glm::vec3 current_origin);
 
-  // // Compute scene interactions of the controllers
-  // void computeSceneInteractions();
+  // Compute scene interactions of the controllers
+  void computeSceneInteractions();
 
   // Whether the controller is active or not
   bool m_active = false;

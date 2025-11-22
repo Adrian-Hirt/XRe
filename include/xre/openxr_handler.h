@@ -104,8 +104,7 @@ private:
   const static XrSpaceLocationFlags s_pose_valid_flags = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
 
   // DirectX::XMVECTOR m_headset_position = { 0.0f, 0.0f, 0.0f };
-  // DirectX::XMVECTOR m_current_origin = { 0.0f, 0.0f, 0.0f };
-  // glm::vec3 m_current_origin = { 0.0f, 0.0f, 0.0f };
+  glm::vec3 m_current_origin = { 0.0f, 0.0f, 0.0f };
 
   // Methods
   bool initializeOpenxr();

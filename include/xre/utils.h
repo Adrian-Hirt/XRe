@@ -6,6 +6,12 @@
 // Vulkan includes
 #include <vulkan/vulkan.h>
 
+#define GLM_ENABLE_EXPERIMENTAL
+
+// GLM
+#include <glm/glm/glm.hpp>
+#include <glm/glm/gtx/quaternion.hpp>
+
 // Other includes
 #include <iostream>
 #include <vector>
@@ -73,6 +79,14 @@ namespace Utils {
     }
 
     return result;
+  }
+
+  inline glm::vec3 toVec3(const XrVector3f& vec) {
+    return glm::vec3(vec.x, vec.y, vec.z);
+  }
+
+  inline glm::quat toQuat(const XrQuaternionf& quat) {
+    return glm::quat(quat.x, quat.y, quat.z, quat.w);
   }
 
   // inline std::string getFileLocation(const std::string &path) {

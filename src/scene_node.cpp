@@ -272,9 +272,9 @@ glm::vec3 SceneNode::getPosition() {
 //   return getTransformedBoundingBox().Intersects(line_start, line_direction, *out_distance);
 // }
 
-// void SceneNode::resetInteractionStates() {
-//   for (SceneNode* current_node : s_grabbable_instances) {
-//     current_node->m_intersected_in_current_frame = false;
-//     current_node->m_grabbed = false;
-//   }
-// }
+void SceneNode::resetInteractionStates() {
+  for (SceneNode* current_node : s_grabbable_instances) {
+    current_node->m_intersected_in_current_frame = false;
+    current_node->m_grabbed = false;
+  }
+}

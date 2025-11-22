@@ -801,45 +801,45 @@ void OpenXrHandler::renderFrame(std::function<void(RenderContext&)> draw_callbac
 	//------------------------------------------------------------------------------------------------------
 	pollOpenxrActions(xr_frame_state.predictedDisplayTime);
 
-  // //------------------------------------------------------------------------------------------------------
-	// // Update the interactions of the controllers and hands with the scene
-	// //------------------------------------------------------------------------------------------------------
-  // std::optional<DirectX::XMVECTOR> teleport_location_left, teleport_location_right;
-  // teleport_location_left = m_left_controller->updateIntersectionSphereAndComputePossibleTeleport();
-  // teleport_location_right = m_right_controller->updateIntersectionSphereAndComputePossibleTeleport();
+  //------------------------------------------------------------------------------------------------------
+	// Update the interactions of the controllers and hands with the scene
+	//------------------------------------------------------------------------------------------------------
+  std::optional<glm::vec3> teleport_location_left, teleport_location_right;
+  teleport_location_left = m_left_controller->updateIntersectionSphereAndComputePossibleTeleport();
+  teleport_location_right = m_right_controller->updateIntersectionSphereAndComputePossibleTeleport();
 
-  // // Reset the interaction tracking booleans on the grabbable SceneNodes
-  // SceneNode::resetInteractionStates();
+  // Reset the interaction tracking booleans on the grabbable SceneNodes
+  SceneNode::resetInteractionStates();
 
-  // // As both might have a value, we arbitrarily decide to give the right controller
-  // // precedende. Later, we might map the teleport action to a single controller anyway,
-  // // so maybe this will not be needed anymore.
-  // if (teleport_location_right.has_value()) {
-  //   updateCurrentOriginForTeleport(teleport_location_right.value());
-  //   // TODO: update position of grabbed model if we're currently grabbing something with either hand
-  // }
-  // else if (teleport_location_left.has_value()) {
-  //   updateCurrentOriginForTeleport(teleport_location_left.value());
-  //   // TODO: update position of grabbed model if we're currently grabbing something with either hand
-  // }
-  // else {
-  //   // If not teleporting, we can update the position of the controller, as well as their interactions
-  //   // with the scene
-  //   m_left_controller->updatePosition(m_current_origin);
-  //   m_right_controller->updatePosition(m_current_origin);
+  // As both might have a value, we arbitrarily decide to give the right controller
+  // precedende. Later, we might map the teleport action to a single controller anyway,
+  // so maybe this will not be needed anymore.
+  if (teleport_location_right.has_value()) {
+    // updateCurrentOriginForTeleport(teleport_location_right.value());
+    // TODO: update position of grabbed model if we're currently grabbing something with either hand
+  }
+  else if (teleport_location_left.has_value()) {
+    // updateCurrentOriginForTeleport(teleport_location_left.value());
+    // TODO: update position of grabbed model if we're currently grabbing something with either hand
+  }
+  else {
+    // If not teleporting, we can update the position of the controller, as well as their interactions
+    // with the scene
+    m_left_controller->updatePosition(m_current_origin);
+    m_right_controller->updatePosition(m_current_origin);
 
-  //   m_left_controller->computeSceneInteractions();
-  //   m_right_controller->computeSceneInteractions();
+    m_left_controller->computeSceneInteractions();
+    m_right_controller->computeSceneInteractions();
 
-  //   // Update the interactions with the scene and the hands, but only if the hands are enabled.
-  //   if (m_left_hand != nullptr && m_right_hand != nullptr) {
-  //     m_left_hand->updatePosition(m_current_origin);
-  //     m_right_hand->updatePosition(m_current_origin);
+    // // Update the interactions with the scene and the hands, but only if the hands are enabled.
+    // if (m_left_hand != nullptr && m_right_hand != nullptr) {
+    //   m_left_hand->updatePosition(m_current_origin);
+    //   m_right_hand->updatePosition(m_current_origin);
 
-  //     m_left_hand->computeSceneInteractions();
-  //     m_right_hand->computeSceneInteractions();
-  //   }
-  // }
+    //   m_left_hand->computeSceneInteractions();
+    //   m_right_hand->computeSceneInteractions();
+    // }
+  }
 
 	//------------------------------------------------------------------------------------------------------
 	// Update simulation

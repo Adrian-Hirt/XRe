@@ -28,8 +28,6 @@ void Controller::render(RenderContext& ctx) {
     return;
   }
 
-  m_root_node.updateTransformation();
-
 //   // Color the model a different color depending on the "grab"
 //   // state of the controller
 //   if (m_grabbing) {
@@ -42,36 +40,36 @@ void Controller::render(RenderContext& ctx) {
   m_root_node.render(ctx);
 }
 
-// void Controller::updatePosition(DirectX::XMVECTOR current_origin) {
-//   // Return early if the controller is not active
-//   if (!m_active) {
-//     return;
-//   }
+void Controller::updatePosition(glm::vec3 current_origin) {
+  // Return early if the controller is not active
+  if (!m_active) {
+    return;
+  }
 
-//   DirectX::XMVECTOR controller_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&m_pose.position);
-//   DirectX::XMVECTOR controller_orientation = DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&m_pose.orientation);
+  glm::vec3 controller_position = Utils::toVec3(m_pose.position);
+  glm::quat controller_orientation = Utils::toQuat(m_pose.orientation);
 
-//   // Apply the global teleport translation from moving the origin
-//   controller_position = DirectX::XMVectorAdd(controller_position, current_origin);
+  // Apply the global teleport translation from moving the origin
+  controller_position = controller_position + current_origin;
 
-//   // Set position and orientation of the scene node
-//   m_model_node.setPosition(controller_position);
-//   m_model_node.setRotation(controller_orientation);
+  // Set position and orientation of the scene node
+  m_model_node.setPosition(controller_position);
+  m_model_node.setRotation(controller_orientation);
 
-//   // Update the aim line
-//   m_aim_line.updateAimLineFromControllerPose(controller_position,
-//                                              DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&m_aim.orientation),
-//                                              current_origin,
-//                                              Controller::s_line_intersection_threshold);
-// }
+  // // Update the aim line
+  // m_aim_line.updateAimLineFromControllerPose(controller_position,
+  //                                            DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&m_aim.orientation),
+  //                                            current_origin,
+  //                                            Controller::s_line_intersection_threshold);
+}
 
-// void Controller::computeSceneInteractions() {
-//   // Nothing to do if the controller is not active
-//   if(!m_active) {
-//     return;
-//   }
+void Controller::computeSceneInteractions() {
+  // Nothing to do if the controller is not active
+  if(!m_active) {
+    return;
+  }
 
-//   m_root_node.updateTransformation();
+  m_root_node.updateTransformation();
 
 //   DirectX::BoundingOrientedBox controller_bounding_box = m_model_node.getTransformedBoundingBox();
 
@@ -95,12 +93,12 @@ void Controller::render(RenderContext& ctx) {
 //       }
 //     }
 //   }
-// }
+}
 
-// std::optional<DirectX::XMVECTOR> Controller::updateIntersectionSphereAndComputePossibleTeleport() {
-//   if(!m_active) {
-//     return std::nullopt;
-//   }
+std::optional<glm::vec3> Controller::updateIntersectionSphereAndComputePossibleTeleport() {
+  if(!m_active) {
+    return std::nullopt;
+  }
 
 //   // Next, check if we need to render the aim intersection sphere
 //   m_intersection_sphere_node.setActive(false);
@@ -130,8 +128,8 @@ void Controller::render(RenderContext& ctx) {
 //     }
 //   }
 
-//   return std::nullopt;
-// }
+  return std::nullopt;
+}
 
 // float Controller::computeAimIndicatorSpherePosition(std::unordered_set<SceneNode *> nodes) {
 //   // As we only want to highlight the intersection with the closest model,

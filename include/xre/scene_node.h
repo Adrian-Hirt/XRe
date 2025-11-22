@@ -11,6 +11,7 @@
 // Other includes
 #include <vector>
 #include <glm/glm/vec3.hpp>
+#include <unordered_set>
 
 class SceneNode {
 public:
@@ -67,10 +68,10 @@ public:
 //   // distance of the intersection point as an out parameter)
 //   bool intersects(DirectX::XMVECTOR line_start, DirectX::XMVECTOR line_direction, float *out_distance);
 
-//   bool m_grabbed = false;
-//   bool m_intersected_in_current_frame = false;
+  bool m_grabbed = false;
+  bool m_intersected_in_current_frame = false;
 
-//   static void resetInteractionStates();
+  static void resetInteractionStates();
 private:
   // Parent node (which might be null for the root node)
   SceneNode* m_parent;
@@ -104,8 +105,8 @@ private:
 //   DirectX::BoundingOrientedBox m_model_bounding_box;
 //   BoundingBoxMesh m_model_bounding_box_mesh;
 
-//   // Set of all instances we marked as grabbable
-//   inline static std::unordered_set<SceneNode*> s_grabbable_instances;
+  // Set of all instances we marked as grabbable
+  inline static std::unordered_set<SceneNode*> s_grabbable_instances;
 
 //   inline static std::unordered_set<SceneNode*> s_terrain_instances;
 
