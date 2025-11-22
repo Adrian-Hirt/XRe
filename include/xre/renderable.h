@@ -61,4 +61,7 @@ protected:
   // Shader m_shader;
 
   void initialize(std::vector<Vertex> vertices, std::vector<uint16_t> indices);
+
+  // Scene Node can call render() directly
+  friend class SceneNode;
 };

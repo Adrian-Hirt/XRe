@@ -87,9 +87,9 @@ void SceneNode::render(RenderContext& ctx) {
 //     // compute intersections).
 //     m_model_bounding_box_mesh.render();
   }
-  // else if (m_renderable) {
-  //   m_renderable->render(ctx);
-  // }
+  else if (m_renderable) {
+    m_renderable->render(ctx);
+  }
 
   for (SceneNode *child : m_children) {
     child->render(ctx);
