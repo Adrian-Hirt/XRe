@@ -1,5 +1,9 @@
 # XRe
 
+> [!IMPORTANT]
+> This branch contains the archived version of XRe that uses DirectX. See the `main` branch for the most
+> recent version that uses Vulkan as the rendering API, ensuring cross-platform compatibility.
+
 XRe is a project to build a XR engine from scratch using OpenXR and DirectX.
 
 _Please note that XRe is a WIP project and mainly intended for me to learn more about OpenXR, DirectX and XR development for the moment. It is
