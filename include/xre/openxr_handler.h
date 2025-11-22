@@ -19,7 +19,7 @@
 #include <xre/structs.h>
 #include <xre/vulkan_handler.h>
 #include <xre/render_target.h>
-// #include <xre/controller.h>
+#include <xre/controller.h>
 // #include <xre/hand.h>
 
 // Other includes
@@ -85,23 +85,23 @@ private:
   // PFN_xrDestroyHandTrackerEXT m_ext_xrDestroyHandTrackerEXT;
   // PFN_xrLocateHandJointsEXT m_ext_xrLocateHandJointsEXT;
 
-  // // Controllers
-  // Controller *m_left_controller = NULL;
-  // Controller *m_right_controller = NULL;
+  // Controllers
+  Controller *m_left_controller = NULL;
+  Controller *m_right_controller = NULL;
 
   // // Hands
   // Hand *m_left_hand = NULL;
   // Hand *m_right_hand = NULL;
 
   // Actions
-  // XrActionSet m_default_action_set;
-  // XrAction m_controller_pose_action;
-  // XrAction m_controller_aim_action;
-  // XrAction m_controller_grab_action;
-  // XrAction m_controller_teleport_action;
+  XrActionSet m_default_action_set;
+  XrAction m_controller_pose_action;
+  XrAction m_controller_aim_action;
+  XrAction m_controller_grab_action;
+  XrAction m_controller_teleport_action;
 
   // For checking if the pose of a controller is valid
-  // const static XrSpaceLocationFlags s_pose_valid_flags = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
+  const static XrSpaceLocationFlags s_pose_valid_flags = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
 
   // DirectX::XMVECTOR m_headset_position = { 0.0f, 0.0f, 0.0f };
   // DirectX::XMVECTOR m_current_origin = { 0.0f, 0.0f, 0.0f };
@@ -109,13 +109,14 @@ private:
 
   // Methods
   bool initializeOpenxr();
-  // void initializeOpenxrActions();
+  void initializeOpenxrActions();
   // void initializeHandTracking();
-  // void setupActionBindings();
-  // void suggestBindings(std::string interaction_profile, std::vector<XrActionSuggestedBinding> bindings);
-  // void pollOpenxrActions(XrTime predicted_time);
-  // void updateControllerStates(Controller *controller, XrTime predicted_time);
+  void setupActionBindings();
+  void suggestBindings(std::string interaction_profile, std::vector<XrActionSuggestedBinding> bindings);
+  void pollOpenxrActions(XrTime predicted_time);
+  void updateControllerStates(Controller *controller, XrTime predicted_time);
+  void renderInteractions(RenderContext& ctx);
   // void updateHandTrackingStates(Hand *hand, XrTime predicted_time);
   // void updateCurrentOriginForTeleport(DirectX::XMVECTOR teleport_location);
-  // XrPath getXrPathFromString(std::string string);
+  XrPath getXrPathFromString(std::string string);
 };

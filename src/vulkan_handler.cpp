@@ -666,7 +666,8 @@ VkShaderModule VulkanHandler::createShaderModule(const std::vector<char>& code) 
 }
 
 void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf,
-                                VkExtent2D resolution, std::function<void(RenderContext&)> draw_callback) {
+                                VkExtent2D resolution, std::function<void(RenderContext&)> draw_callback,
+                                std::function<void(RenderContext&)> draw_interactions_callback) {
   VkResult result;
 
   //------------------------------------------------------------------------------------------------------
@@ -702,7 +703,7 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   //------------------------------------------------------------------------------------------------------
   // Values to use to clear the buffers (color, set to black, depth, set to 1);
   std::array<VkClearValue, 2> clear_values{};
-  clear_values[0].color = {{0.5f, 0.5f, 0.5f, 1.0f}};
+  clear_values[0].color = {{0.1f, 0.1f, 0.5f, 1.0f}};
   clear_values[1].depthStencil = {1.0f, 0};
 
   // Start the render pass
@@ -770,7 +771,11 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
     0, nullptr
   );
 
+  // Draw scene
   draw_callback(ctx);
+
+  // Draw the interactions (e.g. controllers, hands etc.)
+  draw_interactions_callback(ctx);
 
   //------------------------------------------------------------------------------------------------------
   // End the render pass

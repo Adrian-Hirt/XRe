@@ -28,6 +28,8 @@ void Controller::render(RenderContext& ctx) {
     return;
   }
 
+  m_root_node.updateTransformation();
+
 //   // Color the model a different color depending on the "grab"
 //   // state of the controller
 //   if (m_grabbing) {
