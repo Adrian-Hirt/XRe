@@ -147,35 +147,35 @@ void SceneNode::updateTransformation() {
 //   return transformed;
 // }
 
-// void SceneNode::rotate(float roll, float pitch, float yaw) {
-//   DirectX::XMVECTOR rotation = DirectX::XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
-//   rotate(rotation);
-// }
+void SceneNode::rotate(float roll, float pitch, float yaw) {
+  auto rotation = glm::quat(glm::vec3(pitch, yaw, roll));
+  rotate(rotation);
+}
 
-// void SceneNode::rotate(DirectX::XMVECTOR rotation) {
-//   m_rotation = DirectX::XMQuaternionMultiply(m_rotation, rotation);
-//   m_transform_needs_update = true;
-// }
+void SceneNode::rotate(glm::quat rotation) {
+  m_rotation = m_rotation * rotation;
+  m_transform_needs_update = true;
+}
 
-// void SceneNode::translate(float x, float y, float z) {
-//   DirectX::XMVECTOR translation = DirectX::XMVECTORF32({x, y, z});
-//   translate(translation);
-// }
+void SceneNode::translate(float x, float y, float z) {
+  auto translation = glm::vec3({x, y, z});
+  translate(translation);
+}
 
-// void SceneNode::translate(DirectX::XMVECTOR translation) {
-//   m_translation = DirectX::XMVectorAdd(m_translation, translation);
-//   m_transform_needs_update = true;
-// }
+void SceneNode::translate(glm::vec3 translation) {
+  m_translation =m_translation + translation;
+  m_transform_needs_update = true;
+}
 
-// void SceneNode::scale(float x, float y, float z) {
-//   DirectX::XMVECTOR scaling = DirectX::XMVECTORF32({x, y, z});
-//   scale(scaling);
-// }
+void SceneNode::scale(float x, float y, float z) {
+  auto scaling = glm::vec3({x, y, z});
+  scale(scaling);
+}
 
-// void SceneNode::scale(DirectX::XMVECTOR scaling) {
-//   m_scaling = DirectX::XMVectorMultiply(m_scaling, scaling);
-//   m_transform_needs_update = true;
-// }
+void SceneNode::scale(glm::vec3 scaling) {
+  m_scaling = m_scaling * scaling;
+  m_transform_needs_update = true;
+}
 
 void SceneNode::setRotation(glm::quat rotation) {
   m_rotation = rotation;

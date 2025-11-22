@@ -28,15 +28,15 @@ public:
   void buildBoundingBox();
 //   DirectX::BoundingOrientedBox getTransformedBoundingBox();
 
-//   // These methods apply the rotation / translation / scaling
-//   // to the values we already have, e.g. to simply double the
-//   // scale you could pass in a value of 2 to the `scale` method
-//   void rotate(float roll, float pitch, float yaw);
-//   void rotate(DirectX::XMVECTOR rotation);
-//   void translate(float x, float y, float z);
-//   void translate(DirectX::XMVECTOR translation);
-//   void scale(float x, float y, float z);
-//   void scale(DirectX::XMVECTOR scaling);
+  // These methods apply the rotation / translation / scaling
+  // to the values we already have, e.g. to simply double the
+  // scale you could pass in a value of 2 to the `scale` method
+  void rotate(float roll, float pitch, float yaw);
+  void rotate(glm::quat rotation);
+  void translate(float x, float y, float z);
+  void translate(glm::vec3 translation);
+  void scale(float x, float y, float z);
+  void scale(glm::vec3 scaling);
 
   // These methods set the rotation / translation / scaling to
   // the values passed in, use this if you already calculated the
