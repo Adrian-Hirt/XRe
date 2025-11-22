@@ -68,8 +68,6 @@ void SceneNode::render(RenderContext& ctx) {
   }
 
   if (m_model) {
-//     m_model->m_shader.activate();
-
 //     // Update the shader with the transform
 //     m_model->m_shader.setModelMatrix(m_world_transform);
 //     m_model->m_shader.setNormalRotationMatrix(m_world_rotation_matrix);
@@ -80,6 +78,11 @@ void SceneNode::render(RenderContext& ctx) {
 //       m_model->m_shader.setModelColor(m_model->getColor());
 //     }
 //     m_model->m_shader.updatePerModelConstantBuffer();
+
+    // Update the render context with the transform
+    m_model->setWorldMatrix(m_world_transform);
+
+    // And render the model
     m_model->render(ctx);
 
 //     // Set shader variables to identities, as the bounding box is already updated
@@ -96,56 +99,47 @@ void SceneNode::render(RenderContext& ctx) {
   }
 }
 
-// void SceneNode::updateTransformation() {
-//   // Update the `m_transform_needs_update` flag with the flag from parent node, as this node itself
-//   // might not have been changed, but its parent might be (which means this node needs to
-//   // update its transformation as well, which needs to be reflected in its children).
-//   m_transform_needs_update = m_transform_needs_update || m_parent && m_parent->m_transform_needs_update;
+void SceneNode::updateTransformation() {
+  // Update the `m_transform_needs_update` flag with the flag from parent node, as this node itself
+  // might not have been changed, but its parent might be (which means this node needs to
+  // update its transformation as well, which needs to be reflected in its children).
+  m_transform_needs_update = m_transform_needs_update || m_parent && m_parent->m_transform_needs_update;
 
-//   // We only need to update the transform for the current element
-//   // if its `m_transform_needs_update` flag or the one of its parent is set to `true`
-//   if (m_transform_needs_update) {
-//     // Update the local transform
-//     m_local_transform = DirectX::XMMatrixTranspose(
-//       DirectX::XMMatrixAffineTransformation(
-//         m_scaling,
-//         DirectX::g_XMZero,
-//         m_rotation,
-//         m_translation
-//       )
-//     );
+  // We only need to update the transform for the current element
+  // if its `m_transform_needs_update` flag or the one of its parent is set to `true`
+  if (m_transform_needs_update) {
+    // Update the local transform
+    m_local_transform = Geometry::composeWorldMatrix(
+      m_translation,
+      m_rotation,
+      m_scaling
+    );
 
-//     if (m_parent) {
-//       m_world_transform = DirectX::XMMatrixMultiply(
-//         m_parent->m_world_transform,
-//         m_local_transform
-//       );
+    if (m_parent) {
+      m_world_transform = m_parent->m_world_transform * m_local_transform;
+      m_world_rotation_matrix = glm::toMat4(m_parent->m_rotation * m_rotation);
+    }
+    else {
+      // No parent, is the root node, which means its local transform
+      // is also its world transform, since the local transform is applied
+      // relative to the origin point.
+      m_world_transform = m_local_transform;
+      m_world_rotation_matrix = glm::toMat4(m_rotation);
+    }
 
-//       m_world_rotation_matrix = DirectX::XMMatrixRotationQuaternion(
-//         DirectX::XMQuaternionMultiply(m_parent->m_rotation, m_rotation)
-//       );
-//     }
-//     else {
-//       // No parent, is the root node, which means its local transform
-//       // is also its world transform, since the local transform is applied
-//       // relative to the origin point.
-//       m_world_transform = m_local_transform;
-//       m_world_rotation_matrix = DirectX::XMMatrixRotationQuaternion(m_rotation);
-//     }
+    // if (m_model) {
+    //   m_model_bounding_box_mesh.updateVerticesFromBoundingBox(getTransformedBoundingBox());
+    // }
+  }
 
-//     if (m_model) {
-//       m_model_bounding_box_mesh.updateVerticesFromBoundingBox(getTransformedBoundingBox());
-//     }
-//   }
+  // Update the transforms of all the children.
+  for (SceneNode *child : m_children) {
+    child->updateTransformation();
+  }
 
-//   // Update the transforms of all the children.
-//   for (SceneNode *child : m_children) {
-//     child->updateTransformation();
-//   }
-
-//   // And then reset the `m_transform_needs_update` flag
-//   m_transform_needs_update = false;
-// }
+  // And then reset the `m_transform_needs_update` flag
+  m_transform_needs_update = false;
+}
 
 // DirectX::BoundingOrientedBox SceneNode::getTransformedBoundingBox() {
 //   DirectX::BoundingOrientedBox transformed;
@@ -183,42 +177,42 @@ void SceneNode::render(RenderContext& ctx) {
 //   m_transform_needs_update = true;
 // }
 
-// void SceneNode::setRotation(DirectX::XMVECTOR rotation) {
-//   m_rotation = rotation;
-//   m_transform_needs_update = true;
-// }
+void SceneNode::setRotation(glm::quat rotation) {
+  m_rotation = rotation;
+  m_transform_needs_update = true;
+}
 
-// void SceneNode::setScale(float x, float y, float z) {
-//   DirectX::XMVECTOR scaling = DirectX::XMVECTORF32({x, y, z});
-//   setScale(scaling);
-// }
+void SceneNode::setScale(float x, float y, float z) {
+  auto scaling = glm::vec3({x, y, z});
+  setScale(scaling);
+}
 
-// void SceneNode::setScale(DirectX::XMVECTOR scaling) {
-//   m_scaling = scaling;
-//   m_transform_needs_update = true;
-// }
+void SceneNode::setScale(glm::vec3 scaling) {
+  m_scaling = scaling;
+  m_transform_needs_update = true;
+}
 
-// void SceneNode::setPosition(float x, float y, float z) {
-//   DirectX::XMVECTOR position = DirectX::XMVECTORF32({x, y, z});
-//   setPosition(position);
-// }
+void SceneNode::setPosition(float x, float y, float z) {
+ auto position = glm::vec3({x, y, z});
+  setPosition(position);
+}
 
-// void SceneNode::setPosition(DirectX::XMVECTOR position) {
-//   m_translation = position;
-//   m_transform_needs_update = true;
-// }
+void SceneNode::setPosition(glm::vec3 position) {
+  m_translation = position;
+  m_transform_needs_update = true;
+}
 
-// DirectX::XMVECTOR SceneNode::getRotation() {
-//   return m_rotation;
-// }
+glm::quat SceneNode::getRotation() {
+  return m_rotation;
+}
 
-// DirectX::XMVECTOR SceneNode::getScale() {
-//   return m_scaling;
-// }
+glm::vec3 SceneNode::getScale() {
+  return m_scaling;
+}
 
-// DirectX::XMVECTOR SceneNode::getPosition() {
-//   return m_translation;
-// }
+glm::vec3 SceneNode::getPosition() {
+  return m_translation;
+}
 
 // void SceneNode::setGrabbable(bool grabbable) {
 //   if (grabbable) {

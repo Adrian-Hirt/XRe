@@ -32,16 +32,9 @@ Model::Model(const char *model_path, glm::vec3 color) {
 }
 
 void Model::render(RenderContext& ctx) {
-  // Compute the world matrix
-  auto world_matrix = Geometry::composeWorldMatrix(
-    m_translation,
-    m_rotation,
-    m_scaling
-  );
-
   // Prepare model uniform buffer
   ModelUniformBufferObject uniform_buffer_object{};
-  uniform_buffer_object.world = world_matrix;
+  uniform_buffer_object.world = m_world_matrix;
 
   // Update uniform buffer
   const uint32_t offset = m_model_index * ctx.aligned_size;
@@ -166,6 +159,10 @@ void Model::loadObj(const char *model_path) {
     Mesh mesh = Mesh(mesh_vertices, mesh_indices);
     m_meshes.push_back(mesh);
   };
+}
+
+void Model::setWorldMatrix(glm::mat4 world_matrix) {
+  m_world_matrix = world_matrix;
 }
 
 // std::vector<DirectX::XMFLOAT3> Model::getMeshBoundingBoxCorners() {

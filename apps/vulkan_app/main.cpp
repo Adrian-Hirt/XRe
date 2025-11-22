@@ -14,8 +14,15 @@ public:
 
   void setup() override {
     std::cout << "Setup" << std::endl;
+
+    // Setup scene graph
     root_node.addChildNode(&cube_node);
     root_node.addChildNode(&floor_node);
+
+    // Update initial transforms
+    cube_node.setScale(0.1f, 0.1f, 0.1f);
+    cube_node.setPosition(0.0f, 1.5f, -2.0f);
+    root_node.updateTransformation();
   };
 
   void updateSimulation(XrTime predicted_time) override {
@@ -34,7 +41,11 @@ public:
 
     // apply rotation around Y axis
     glm::quat delta = glm::angleAxis(glm::radians(angle), glm::vec3(0,1,0));
-    cube.m_rotation = glm::normalize(delta * cube.m_rotation);
+    auto rotation = glm::normalize(delta * cube_node.getRotation());
+    cube_node.setRotation(rotation);
+
+    // Update transformation
+    root_node.updateTransformation();
   };
 
   void draw(RenderContext& ctx) override {

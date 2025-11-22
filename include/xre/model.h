@@ -21,7 +21,8 @@ public:
   Model(const char *model_path);
   Model(const char *model_path, glm::vec3 color);
 
-  void render(RenderContext& ctx);
+  // Set the world transform
+  void setWorldMatrix(glm::mat4 world_matrix);
 
   // // Set the color of the model
   // void setColor(DirectX::XMFLOAT4 color);
@@ -29,15 +30,6 @@ public:
   // DirectX::XMFLOAT4 getColor();
 
   // std::vector<DirectX::XMFLOAT3> getMeshBoundingBoxCorners();
-
-  // Store the translation
-  glm::vec3 m_translation = glm::zero<glm::vec3>();
-
-  // Store the rotation
-  glm::quat m_rotation = glm::identity<glm::quat>();
-
-  // Store the scaling
-  glm::vec3 m_scaling = glm::one<glm::vec3>();
 
 private:
   // Keep track of the global index of the model
@@ -55,5 +47,12 @@ private:
   // Store the original color
   glm::vec3 m_original_model_color;
 
+  // Store the world transform
+  glm::mat4 m_world_matrix;
+
   void loadObj(const char *model_path);
+  void render(RenderContext& ctx);
+
+  // Scene Node can call render() directly
+  friend class SceneNode;
 };

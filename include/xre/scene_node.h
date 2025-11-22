@@ -10,6 +10,7 @@
 
 // Other includes
 #include <vector>
+#include <glm/glm/vec3.hpp>
 
 class SceneNode {
 public:
@@ -23,7 +24,7 @@ public:
 //   void addChildNode(SceneNode &child);
   void addChildNode(SceneNode *child);
   void render(RenderContext& ctx);
-//   void updateTransformation();
+  void updateTransformation();
   void buildBoundingBox();
 //   DirectX::BoundingOrientedBox getTransformedBoundingBox();
 
@@ -37,19 +38,19 @@ public:
 //   void scale(float x, float y, float z);
 //   void scale(DirectX::XMVECTOR scaling);
 
-//   // These methods set the rotation / translation / scaling to
-//   // the values passed in, use this if you already calculated the
-//   // new values to use beforehand.
-//   void setRotation(DirectX::XMVECTOR rotation);
-//   void setScale(float x, float y, float z);
-//   void setScale(DirectX::XMVECTOR scaling);
-//   void setPosition(float x, float y, float z);
-//   void setPosition(DirectX::XMVECTOR position);
+  // These methods set the rotation / translation / scaling to
+  // the values passed in, use this if you already calculated the
+  // new values to use beforehand.
+  void setRotation(glm::quat rotation);
+  void setScale(float x, float y, float z);
+  void setScale(glm::vec3 scaling);
+  void setPosition(float x, float y, float z);
+  void setPosition(glm::vec3 position);
 
-//   // Getters for position, scale and rotation
-//   DirectX::XMVECTOR getRotation();
-//   DirectX::XMVECTOR getScale();
-//   DirectX::XMVECTOR getPosition();
+  // Getters for position, scale and rotation
+  glm::quat getRotation();
+  glm::vec3 getScale();
+  glm::vec3 getPosition();
 
 //   static std::unordered_set<SceneNode*> getGrabbableInstances();
 //   void setGrabbable(bool grabbable);
@@ -82,23 +83,23 @@ private:
   Model* m_model = nullptr;
   Renderable* m_renderable = nullptr;
 
-//   // Position, scale and rotation of the SceneNode. These are all LOCAL,
-//   // i.e. in relation to the transform of the parent node!
-//   // Scale factors, initialize to use the scale of 1 for X, Y and Z
-//   DirectX::XMVECTOR m_scaling = DirectX::XMVECTORF32({1.0f, 1.0f, 1.0f});
-//   // The position of the object in world coordinates
-//   DirectX::XMVECTOR m_translation = DirectX::XMVECTORF32({0.0f, 0.0f, 0.0f});
-//   // The rotation of the SceneNode
-//   DirectX::XMVECTOR m_rotation = DirectX::XMQuaternionIdentity();
+  // Position, scale and rotation of the SceneNode. These are all LOCAL,
+  // i.e. in relation to the transform of the parent node!
+  // Scale factors, initialize to use the scale of 1 for X, Y and Z
+  glm::vec3 m_scaling = glm::one<glm::vec3>();
+  // The position of the object in world coordinates
+  glm::vec3 m_translation = glm::zero<glm::vec3>();
+  // The rotation of the SceneNode
+  glm::quat m_rotation = glm::identity<glm::quat>();
 
-//   // Transform relative to world coordinates
-//   DirectX::XMMATRIX m_world_transform;
+  // Transform relative to world coordinates
+  glm::mat4 m_world_transform;
 
-//   // Transform relative to parent
-//   DirectX::XMMATRIX m_local_transform;
+  // Transform relative to parent
+  glm::mat4 m_local_transform;
 
-//   // Rotation relative to world
-//   DirectX::XMMATRIX m_world_rotation_matrix;
+  // Rotation relative to world
+  glm::mat4 m_world_rotation_matrix;
 
 //   DirectX::BoundingOrientedBox m_model_bounding_box;
 //   BoundingBoxMesh m_model_bounding_box_mesh;
@@ -108,7 +109,7 @@ private:
 
 //   inline static std::unordered_set<SceneNode*> s_terrain_instances;
 
-//   bool m_transform_needs_update = true;
+  bool m_transform_needs_update = true;
 
   bool m_is_active = true;
 };
