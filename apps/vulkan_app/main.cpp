@@ -8,8 +8,14 @@ public:
   Model cube = ModelFactory::createCube({0.0f, 1.0f, 0.0f});
   XrTime last_time = 0;
 
+  SceneNode root_node = SceneNode();
+  SceneNode floor_node = SceneNode(&floor);
+  SceneNode cube_node = SceneNode(&cube);
+
   void setup() override {
     std::cout << "Setup" << std::endl;
+    root_node.addChildNode(&cube_node);
+    root_node.addChildNode(&floor_node);
   };
 
   void updateSimulation(XrTime predicted_time) override {
@@ -33,8 +39,7 @@ public:
 
   void draw(RenderContext& ctx) override {
     // std::cout << "Draw" << std::endl;
-    cube.render(ctx);
-    floor.render(ctx);
+    root_node.render(ctx);
   };
 };
 
