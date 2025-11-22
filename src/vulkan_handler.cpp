@@ -250,31 +250,9 @@ VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
   color_attachment_reference.attachment = 0;
   color_attachment_reference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-  // Retrieve the depth attachment format
-  std::vector<VkFormat> depth_attachment_format_candidates = { VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT };
-  VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL;
-  VkFormatFeatureFlags format_features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
-  VkFormat found_format = VK_FORMAT_UNDEFINED;
-
-  for (VkFormat format : depth_attachment_format_candidates) {
-    VkFormatProperties properties;
-    vkGetPhysicalDeviceFormatProperties(m_physical_device, format, &properties);
-
-    if (tiling == VK_IMAGE_TILING_LINEAR && (properties.linearTilingFeatures & format_features) == format_features) {
-      found_format = format;
-    }
-    else if (tiling == VK_IMAGE_TILING_OPTIMAL && (properties.optimalTilingFeatures & format_features) == format_features) {
-      found_format = format;
-    }
-  }
-
-  if (found_format == VK_FORMAT_UNDEFINED) {
-    Utils::exitWithMessage("Failed to find a valid depth attachment format!");
-  }
-
   // And we have a single depth buffer attachment
   VkAttachmentDescription depth_attachment{};
-  depth_attachment.format = found_format;
+  depth_attachment.format = VK_FORMAT_D32_SFLOAT;
   depth_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
   depth_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
   depth_attachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -293,28 +271,27 @@ VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
   subpass_description.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
   subpass_description.colorAttachmentCount = 1;
   subpass_description.pColorAttachments = &color_attachment_reference;
-  // subpass_description.pDepthStencilAttachment = &depth_attachment_reference;
+  subpass_description.pDepthStencilAttachment = &depth_attachment_reference;
 
-  // TODO: re-enable later on
-  // VkSubpassDependency dependency{};
-  // dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-  // dependency.dstSubpass = 0;
-  // dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
-  // dependency.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-  // dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-  // dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+  // Create render subpass dependency
+  VkSubpassDependency dependency{};
+  dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+  dependency.dstSubpass = 0;
+  dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+  dependency.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+  dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+  dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
   // Create the render pass
-  // std::array<VkAttachmentDescription, 2> attachments = { color_attachment, depth_attachment };
-  std::array<VkAttachmentDescription, 1> attachments = { color_attachment };
+  std::array<VkAttachmentDescription, 2> attachments = { color_attachment, depth_attachment };
   VkRenderPassCreateInfo renderPassInfo{};
   renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
   renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
   renderPassInfo.pAttachments = attachments.data();
   renderPassInfo.subpassCount = 1;
   renderPassInfo.pSubpasses = &subpass_description;
-  // renderPassInfo.dependencyCount = 1;
-  // renderPassInfo.pDependencies = &dependency;
+  renderPassInfo.dependencyCount = 1;
+  renderPassInfo.pDependencies = &dependency;
 
   result = vkCreateRenderPass(m_device, &renderPassInfo, nullptr, &m_render_pass);
   Utils::checkVkResult(result, "Failed to create render pass");

@@ -322,6 +322,7 @@ bool OpenXrHandler::initializeOpenxr() {
       VkImage image = swapchain_images[j].image;
       render_target = new RenderTarget(
         m_vulkan_handler.getLogicalDevice(),
+        m_vulkan_handler.getPhysicalDevice(),
         image,
         getEyeResolution(i),
         VulkanHandler::s_color_format,

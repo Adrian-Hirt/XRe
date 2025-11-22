@@ -6,6 +6,7 @@
 // XRe includes
 #include <xre/utils.h>
 #include <xre/structs.h>
+#include <xre/vulkan_utils.h>
 
 class Buffer {
 public:

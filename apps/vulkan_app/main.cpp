@@ -33,8 +33,8 @@ public:
 
   void draw(RenderContext& ctx) override {
     // std::cout << "Draw" << std::endl;
-    floor.render(ctx);
     cube.render(ctx);
+    floor.render(ctx);
   };
 };
 

@@ -18,22 +18,11 @@ Buffer::Buffer(VkDevice device, VkPhysicalDevice physical_device, VkDeviceSize s
 
   const uint32_t properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
   const VkMemoryPropertyFlags type_filter = memory_requirements.memoryTypeBits;
-  uint32_t memoryTypeIndex = 0u;
-  bool memory_type_found = false;
-  for (uint32_t i = 0u; i < memory_properties.memoryTypeCount; ++i) {
-    const VkMemoryPropertyFlags property_flags = memory_properties.memoryTypes[i].propertyFlags;
-    if (type_filter & (1 << i) && (property_flags & properties) == properties) {
-      memoryTypeIndex = i;
-      memory_type_found = true;
-      break;
-    }
-  }
-
-  Utils::checkBoolResult(memory_type_found, "Failed to find suitable memory type for buffer");
+  uint32_t memory_type_index = VulkanUtils::findMemoryType(physical_device, type_filter, properties);
 
   VkMemoryAllocateInfo memory_allocate_info{ VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO };
   memory_allocate_info.allocationSize = memory_requirements.size;
-  memory_allocate_info.memoryTypeIndex = memoryTypeIndex;
+  memory_allocate_info.memoryTypeIndex = memory_type_index;
   result = vkAllocateMemory(device, &memory_allocate_info, nullptr, &m_device_memory);
   Utils::checkVkResult(result, "Failed to allocate memory for buffer");
 
