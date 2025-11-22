@@ -2,8 +2,9 @@
 
 XRe is a project to build a XR engine from scratch using OpenXR and Vulkan.
 
-_Please note that XRe is a WIP project and mainly intended for me to learn more about OpenXR, Vulkan and XR development for the moment. It is
-not (yet) meant to be used for XR development directly._
+> [!WARNING]
+> Please note that XRe is a WIP project and mainly intended for me to learn more about OpenXR, Vulkan and XR 
+> development for the moment. It is not (yet) meant to be used for XR development directly.
 
 > [!NOTE]
 > The `main` branch contains the ongoing development using Vulkan. For the archived version using
