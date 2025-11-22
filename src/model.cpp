@@ -35,6 +35,7 @@ void Model::render(RenderContext& ctx) {
   // Prepare model uniform buffer
   ModelUniformBufferObject uniform_buffer_object{};
   uniform_buffer_object.world = m_world_matrix;
+  uniform_buffer_object.color = m_model_color;
 
   // Update uniform buffer
   const uint32_t offset = m_model_index * ctx.aligned_size;
@@ -68,17 +69,17 @@ void Model::render(RenderContext& ctx) {
 //   renderMeshes();
 // }
 
-// void Model::setColor(DirectX::XMFLOAT4 color) {
-//   m_model_color = color;
-// }
+void Model::setColor(glm::vec3 color) {
+  m_model_color = color;
+}
 
-// void Model::resetColor() {
-//   m_model_color = m_original_model_color;
-// }
+void Model::resetColor() {
+  m_model_color = m_original_model_color;
+}
 
-// DirectX::XMFLOAT4 Model::getColor() {
-//   return m_model_color;
-// }
+glm::vec3 Model::getColor() {
+  return m_model_color;
+}
 
 void Model::loadObj(const char *model_path) {
   tinyobj::attrib_t attrib;
@@ -111,9 +112,6 @@ void Model::loadObj(const char *model_path) {
         tinyobj::real_t vertex_y = attrib.vertices[3 * index.vertex_index + 1];
         tinyobj::real_t vertex_z = attrib.vertices[3 * index.vertex_index + 2];
         current_vertex.position = glm::vec3(vertex_x, vertex_y, vertex_z);
-
-        // Assign the model color for now
-        current_vertex.color = m_model_color;
 
         // Check whether we can load the normals, if not we set unit normals (please note
         // that lighting will not work correctly in that case).

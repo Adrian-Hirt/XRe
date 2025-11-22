@@ -24,10 +24,10 @@ public:
   // Set the world transform
   void setWorldMatrix(glm::mat4 world_matrix);
 
-  // // Set the color of the model
-  // void setColor(DirectX::XMFLOAT4 color);
-  // void resetColor();
-  // DirectX::XMFLOAT4 getColor();
+  // Set the color of the model
+  void setColor(glm::vec3 color);
+  void resetColor();
+  glm::vec3 getColor();
 
   // std::vector<DirectX::XMFLOAT3> getMeshBoundingBoxCorners();
 

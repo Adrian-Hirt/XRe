@@ -28,14 +28,14 @@ void Controller::render(RenderContext& ctx) {
     return;
   }
 
-//   // Color the model a different color depending on the "grab"
-//   // state of the controller
-//   if (m_grabbing) {
-//     m_model.setColor({1.0f, 0.0f, 0.0f, 1.0f});
-//   }
-//   else {
-//     m_model.setColor({0.67f, 0.84f, 0.9f, 1.0f});
-//   }
+  // Color the model a different color depending on the "grab"
+  // state of the controller
+  if (m_grabbing) {
+    m_model.setColor({1.0f, 0.0f, 0.0f});
+  }
+  else {
+    m_model.resetColor();
+  }
 
   m_root_node.render(ctx);
 }
