@@ -53,13 +53,13 @@ public:
   glm::vec3 getScale();
   glm::vec3 getPosition();
 
-//   static std::unordered_set<SceneNode*> getGrabbableInstances();
-//   void setGrabbable(bool grabbable);
-//   static std::unordered_set<SceneNode*> getTerrainInstances();
-//   void setIsTerrain(bool is_terrain);
+  static std::unordered_set<SceneNode*> getGrabbableInstances();
+  void setGrabbable(bool grabbable);
+  static std::unordered_set<SceneNode*> getTerrainInstances();
+  void setIsTerrain(bool is_terrain);
 
-//   void setActive(bool is_active);
-//   bool isActive();
+  void setActive(bool is_active);
+  bool isActive();
 
 //   // Check whether a node intersects with a bounding box
 //   bool intersects(DirectX::BoundingOrientedBox other);
@@ -108,7 +108,7 @@ private:
   // Set of all instances we marked as grabbable
   inline static std::unordered_set<SceneNode*> s_grabbable_instances;
 
-//   inline static std::unordered_set<SceneNode*> s_terrain_instances;
+  inline static std::unordered_set<SceneNode*> s_terrain_instances;
 
   bool m_transform_needs_update = true;
 

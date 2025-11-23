@@ -214,55 +214,55 @@ glm::vec3 SceneNode::getPosition() {
   return m_translation;
 }
 
-// void SceneNode::setGrabbable(bool grabbable) {
-//   if (grabbable) {
-//     SceneNode::s_grabbable_instances.insert(this);
-//   }
-//   else {
-//     SceneNode::s_grabbable_instances.erase(this);
-//   }
-// }
+void SceneNode::setGrabbable(bool grabbable) {
+  if (grabbable) {
+    SceneNode::s_grabbable_instances.insert(this);
+  }
+  else {
+    SceneNode::s_grabbable_instances.erase(this);
+  }
+}
 
-// std::unordered_set<SceneNode*> SceneNode::getGrabbableInstances() {
-//   std::unordered_set<SceneNode*> result;
+std::unordered_set<SceneNode*> SceneNode::getGrabbableInstances() {
+  std::unordered_set<SceneNode*> result;
 
-//   for (SceneNode *current_node : s_grabbable_instances) {
-//     if (current_node->isActive()) {
-//       result.insert(current_node);
-//     }
-//   }
+  for (SceneNode *current_node : s_grabbable_instances) {
+    if (current_node->isActive()) {
+      result.insert(current_node);
+    }
+  }
 
-//   return result;
-// }
+  return result;
+}
 
-// void SceneNode::setIsTerrain(bool is_terrain) {
-//   if (is_terrain) {
-//     SceneNode::s_terrain_instances.insert(this);
-//   }
-//   else {
-//     SceneNode::s_terrain_instances.erase(this);
-//   }
-// }
+void SceneNode::setIsTerrain(bool is_terrain) {
+  if (is_terrain) {
+    SceneNode::s_terrain_instances.insert(this);
+  }
+  else {
+    SceneNode::s_terrain_instances.erase(this);
+  }
+}
 
-// void SceneNode::setActive(bool is_active) {
-//   m_is_active = is_active;
-// }
+void SceneNode::setActive(bool is_active) {
+  m_is_active = is_active;
+}
 
-// bool SceneNode::isActive() {
-//   return m_is_active;
-// }
+bool SceneNode::isActive() {
+  return m_is_active;
+}
 
-// std::unordered_set<SceneNode*> SceneNode::getTerrainInstances() {
-//   std::unordered_set<SceneNode*> result;
+std::unordered_set<SceneNode*> SceneNode::getTerrainInstances() {
+  std::unordered_set<SceneNode*> result;
 
-//   for (SceneNode *current_node : s_terrain_instances) {
-//     if (current_node->isActive()) {
-//       result.insert(current_node);
-//     }
-//   }
+  for (SceneNode *current_node : s_terrain_instances) {
+    if (current_node->isActive()) {
+      result.insert(current_node);
+    }
+  }
 
-//   return result;
-// }
+  return result;
+}
 
 // bool SceneNode::intersects(DirectX::BoundingOrientedBox other) {
 //   return getTransformedBoundingBox().Intersects(other);
