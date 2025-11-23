@@ -19,11 +19,11 @@ public:
   // Update the position of the hand
   void updatePosition(glm::vec3 current_origin);
 
-//   // Compute scene interactions of the hand
-//   void computeSceneInteractions();
+  // Compute scene interactions of the hand
+  void computeSceneInteractions();
 
 
-//   void updateHandGrabAndPinchState();
+  void updateHandGrabAndPinchState();
 
   XrHandTrackerEXT m_hand_tracker;
   XrHandJointLocationEXT m_joint_locations[XR_HAND_JOINT_COUNT_EXT];

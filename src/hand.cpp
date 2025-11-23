@@ -43,44 +43,40 @@ void Hand::render(RenderContext &ctx) {
   m_hand_root_node->render(ctx);
 }
 
-// void Hand::updateHandGrabAndPinchState() {
-//   // Nothing to do if the hand is not active
-//   if (!m_active) {
-//     return;
-//   }
+void Hand::updateHandGrabAndPinchState() {
+  // Nothing to do if the hand is not active
+  if (!m_active) {
+    return;
+  }
 
-//   // Nothing to do if we can't track the thumb
-//   if ((m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].locationFlags & s_pose_valid_flags) != s_pose_valid_flags) {
-//     return;
-//   }
+  // Nothing to do if we can't track the thumb
+  if ((m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].locationFlags & s_pose_valid_flags) != s_pose_valid_flags) {
+    return;
+  }
 
-//   // Reset pinching state
-//   m_pinching = false;
+  // Reset pinching state
+  m_pinching = false;
 
-//   // Compute whether the hand is pinching. For now, "pinching" means at least
-//   // the tip of one finger is within a small threshold of the tip of the thumb.
-//   DirectX::XMVECTOR thumb_position =  DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].pose.position);
+  // Compute whether the hand is pinching. For now, "pinching" means at least
+  // the tip of one finger is within a small threshold of the tip of the thumb.
+  glm::vec3 thumb_position = Utils::toVec3(m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].pose.position);
 
-//   const float pinch_threshold = 0.05f; // 1.5 cm
+  const float pinch_threshold = 0.05f; // 5 cm
 
-//   for (XrHandJointEXT fingertip : s_fingertips) {
-//     DirectX::XMVECTOR tip_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&m_joint_locations[fingertip].pose.position);
-//     DirectX::XMVECTOR tip_distance = DirectX::XMVector3Length(DirectX::XMVectorSubtract(thumb_position, tip_position));
-//     SceneNode *current_node = m_joint_nodes[fingertip];
+  for (XrHandJointEXT fingertip : s_fingertips) {
+    glm::vec3 tip_position = Utils::toVec3(m_joint_locations[fingertip].pose.position);
+    float tip_distance = glm::length(thumb_position - tip_position);
 
-//     float distance = 0;
-//     DirectX::XMStoreFloat(&distance, tip_distance);
+    // Interactions with pinching (e.g. to move an object) should
+    // probably happen based on the position of the thumb.
+    if (tip_distance < pinch_threshold) {
+      m_pinching = true;
+    }
+  }
 
-//     // Interactions with pinching (e.g. to move an object) should
-//     // probably happen based on the position of the thumb.
-//     if (distance < pinch_threshold) {
-//       m_pinching = true;
-//     }
-//   }
-
-//   // TODO: Track whether the hand is closed (approach for pinching above might
-//   // incorrectly report closing hand as pinching).
-// }
+  // TODO: Track whether the hand is closed (approach for pinching above might
+  // incorrectly report closing hand as pinching).
+}
 
 void Hand::updatePosition(glm::vec3 current_origin) {
   // Nothing to do if the hand is not active
@@ -113,27 +109,25 @@ void Hand::updatePosition(glm::vec3 current_origin) {
   m_hand_root_node->updateTransformation();
 }
 
-// void Hand::computeSceneInteractions() {
-//   // Nothing to do if the hand is not active
-//   if (!m_active) {
-//     return;
-//   }
+void Hand::computeSceneInteractions() {
+  // Nothing to do if the hand is not active
+  if (!m_active) {
+    return;
+  }
 
-//   // Nothing to do if either the thumb or the palm is not valid
-//   bool thumb_valid = (m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].locationFlags & s_pose_valid_flags) == s_pose_valid_flags;
-//   bool palm_valid = (m_joint_locations[XR_HAND_JOINT_PALM_EXT].locationFlags & s_pose_valid_flags) == s_pose_valid_flags;
+  // Nothing to do if either the thumb or the palm is not valid
+  bool thumb_valid = (m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].locationFlags & s_pose_valid_flags) == s_pose_valid_flags;
+  bool palm_valid = (m_joint_locations[XR_HAND_JOINT_PALM_EXT].locationFlags & s_pose_valid_flags) == s_pose_valid_flags;
 
-//   if (!thumb_valid || !palm_valid) {
-//     return;
-//   }
+  if (!thumb_valid || !palm_valid) {
+    return;
+  }
 
 //   // Check if the hand is intersecting a grabbable node. To make it simpler for the moment, we only
 //   // check intersection with the palm and the tip of the thumb (as for "grab", both the thumb and the
 //   // center of the palm should intersect, and for "pinch", the tip of the thumb needs to intersect).
 //   DirectX::BoundingOrientedBox thumb_bounding_box = m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT]->getTransformedBoundingBox();
 //   DirectX::BoundingOrientedBox palm_bounding_box = m_joint_nodes[XR_HAND_JOINT_PALM_EXT]->getTransformedBoundingBox();
-
-//   // Utils::printVector(thumb_position);
 
 //   for(SceneNode *current_node : SceneNode::getGrabbableInstances()) {
 //     // Skip this if we already are grabbing this node with another controller or a hand
@@ -154,7 +148,7 @@ void Hand::updatePosition(glm::vec3 current_origin) {
 //     }
 //   }
 
-//   // TODO: If the hand is closed, we need to check for intersection with the central
-//   // palm joint position, to determine whether the hand is grabbing something.
-// }
+  // TODO: If the hand is closed, we need to check for intersection with the central
+  // palm joint position, to determine whether the hand is grabbing something.
+}
 

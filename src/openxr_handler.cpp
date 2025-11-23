@@ -762,7 +762,7 @@ void OpenXrHandler::updateHandTrackingStates(Hand *hand, XrTime predicted_time) 
   hand->m_active = hand_joint_locations.isActive;
 
   // Run the logic computing the "grab" or "pinch" state of the hand
-  // hand->updateHandGrabAndPinchState();
+  hand->updateHandGrabAndPinchState();
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -832,8 +832,8 @@ void OpenXrHandler::renderFrame(std::function<void(RenderContext&)> draw_callbac
       m_left_hand->updatePosition(m_current_origin);
       m_right_hand->updatePosition(m_current_origin);
 
-      // m_left_hand->computeSceneInteractions();
-      // m_right_hand->computeSceneInteractions();
+      m_left_hand->computeSceneInteractions();
+      m_right_hand->computeSceneInteractions();
     }
   }
 
