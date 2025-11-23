@@ -82,6 +82,13 @@ namespace ModelFactory {
     return Model({ cube_mesh }, color);
   }
 
+  inline Model* createCubePtr(glm::vec3 color) {
+    auto [vertices, indices] = getCubeVerticesAndIndices();
+
+    Mesh cube_mesh = Mesh(vertices, indices);
+    return new Model({ cube_mesh }, color);
+  }
+
   inline Model createGroundPlane(float extent) {
     auto [vertices, indices] = getGroundVerticesAndIndices(extent);
 

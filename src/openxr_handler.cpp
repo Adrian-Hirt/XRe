@@ -32,11 +32,9 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
   // Instruct the handler to initialize the xr actions
   initializeOpenxrActions();
 
-//   // // Instruct the handler to initialize the hand tracking (will not do anything
-//   // // if hand tracking is not enabled).
-//   // initializeHandTracking();
-
-//   std::cout << "Aight :)" << std::endl;
+  // Instruct the handler to initialize the hand tracking (will not do anything
+  // if hand tracking is not enabled).
+  initializeHandTracking();
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -54,8 +52,8 @@ bool OpenXrHandler::initializeOpenxr() {
 	// Setup requested extensions
 	//------------------------------------------------------------------------------------------------------
 	std::vector<const char *> requested_extensions = {
-		XR_KHR_VULKAN_ENABLE_EXTENSION_NAME
-		// XR_EXT_HAND_TRACKING_EXTENSION_NAME
+		XR_KHR_VULKAN_ENABLE_EXTENSION_NAME,
+		XR_EXT_HAND_TRACKING_EXTENSION_NAME
 		// XR_EXT_HAND_INTERACTION_EXTENSION_NAME // Not supported on Quest at the moment it seems
   };
 
@@ -154,18 +152,17 @@ bool OpenXrHandler::initializeOpenxr() {
   graphics_binding.queueFamilyIndex = m_vulkan_handler.getQueueFamilyIndex();
   graphics_binding.queueIndex = 0u;
 
-  // TODO: add back once basic rendering works
-  // // Only load the handtracking extensions if we actually can use them
-  // if (m_openxr_hand_tracking_system_properties.supportsHandTracking) {
-  //   result = xrGetInstanceProcAddr(m_openxr_instance, "xrCreateHandTrackerEXT", (PFN_xrVoidFunction*)(&m_ext_xrCreateHandTrackerEXT));
-  //   Utils::checkXrResult(result, "Failed to get the xrCreateHandTrackerEXT function pointer");
+  // Only load the handtracking extensions if we actually can use them
+  if (m_openxr_hand_tracking_system_properties.supportsHandTracking) {
+    result = xrGetInstanceProcAddr(m_openxr_instance, "xrCreateHandTrackerEXT", reinterpret_cast<PFN_xrVoidFunction*>(&m_ext_xrCreateHandTrackerEXT));
+    Utils::checkXrResult(result, "Failed to get the xrCreateHandTrackerEXT function pointer");
 
-  //   result = xrGetInstanceProcAddr(m_openxr_instance, "xrDestroyHandTrackerEXT", (PFN_xrVoidFunction*)(&m_ext_xrDestroyHandTrackerEXT));
-  //   Utils::checkXrResult(result, "Failed to get the xrDestroyHandTrackerEXT function pointer");
+    result = xrGetInstanceProcAddr(m_openxr_instance, "xrDestroyHandTrackerEXT", reinterpret_cast<PFN_xrVoidFunction*>(&m_ext_xrDestroyHandTrackerEXT));
+    Utils::checkXrResult(result, "Failed to get the xrDestroyHandTrackerEXT function pointer");
 
-  //   result = xrGetInstanceProcAddr(m_openxr_instance, "xrLocateHandJointsEXT", (PFN_xrVoidFunction*)(&m_ext_xrLocateHandJointsEXT));
-  //   Utils::checkXrResult(result, "Failed to get the xrLocateHandJointsEXT function pointer");
-  // }
+    result = xrGetInstanceProcAddr(m_openxr_instance, "xrLocateHandJointsEXT", reinterpret_cast<PFN_xrVoidFunction*>(&m_ext_xrLocateHandJointsEXT));
+    Utils::checkXrResult(result, "Failed to get the xrLocateHandJointsEXT function pointer");
+  }
 
   // Create the session info struct
 	XrSessionCreateInfo session_create_info = {};
@@ -649,10 +646,10 @@ void OpenXrHandler::pollOpenxrActions(XrTime predicted_time) {
 	updateControllerStates(m_left_controller, predicted_time);
 	updateControllerStates(m_right_controller, predicted_time);
 
-//   // // Update the hand tracking (these methods will simply do nothing if
-//   // // hand tracking is not enabled);
-//   // updateHandTrackingStates(m_left_hand, predicted_time);
-//   // updateHandTrackingStates(m_right_hand, predicted_time);
+  // Update the hand tracking (these methods will simply do nothing if
+  // hand tracking is not enabled);
+  updateHandTrackingStates(m_left_hand, predicted_time);
+  updateHandTrackingStates(m_right_hand, predicted_time);
 
 //   // Update the location of the headset
 //   XrSpaceLocation space_location = {};
@@ -730,44 +727,43 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
   }
 }
 
-// void OpenXrHandler::updateHandTrackingStates(Hand *hand, XrTime predicted_time) {
-//   XrResult result;
+void OpenXrHandler::updateHandTrackingStates(Hand *hand, XrTime predicted_time) {
+  XrResult result;
 
-//   // Return if the runtime does not support hand tracking
-//   if (!m_openxr_hand_tracking_system_properties.supportsHandTracking) {
-//     return;
-//   }
+  // Return if the runtime does not support hand tracking
+  if (!m_openxr_hand_tracking_system_properties.supportsHandTracking) {
+    return;
+  }
 
-//   // Throw an error if the hand is a nullptr
-//   if (hand == nullptr) {
-//     Utils::exitWithMessage("Hand is a nullptr!");
-//   }
+  // Throw an error if the hand is a nullptr
+  if (hand == nullptr) {
+    Utils::exitWithMessage("Hand is a nullptr!");
+  }
 
-//   // Update the hand joints locations
-//   XrHandJointsMotionRangeInfoEXT hand_joints_motion_range_info = {};
-//   hand_joints_motion_range_info.type = XR_TYPE_HAND_JOINTS_MOTION_RANGE_INFO_EXT;
-//   hand_joints_motion_range_info.handJointsMotionRange = XR_HAND_JOINTS_MOTION_RANGE_UNOBSTRUCTED_EXT;
+  // Update the hand joints locations
+  XrHandJointsMotionRangeInfoEXT hand_joints_motion_range_info = {};
+  hand_joints_motion_range_info.type = XR_TYPE_HAND_JOINTS_MOTION_RANGE_INFO_EXT;
+  hand_joints_motion_range_info.handJointsMotionRange = XR_HAND_JOINTS_MOTION_RANGE_UNOBSTRUCTED_EXT;
 
-//   XrHandJointsLocateInfoEXT hand_joints_locate_info = {};
-//   hand_joints_locate_info.type = XR_TYPE_HAND_JOINTS_LOCATE_INFO_EXT;
-//   hand_joints_locate_info.next = &hand_joints_motion_range_info;
-//   hand_joints_locate_info.baseSpace = m_openxr_stage_space;
-//   hand_joints_locate_info.time = predicted_time;
+  XrHandJointsLocateInfoEXT hand_joints_locate_info = {};
+  hand_joints_locate_info.type = XR_TYPE_HAND_JOINTS_LOCATE_INFO_EXT;
+  hand_joints_locate_info.next = &hand_joints_motion_range_info;
+  hand_joints_locate_info.baseSpace = m_openxr_stage_space;
+  hand_joints_locate_info.time = predicted_time;
 
-//   XrHandJointLocationsEXT hand_joint_locations = {};
-//   hand_joint_locations.type = XR_TYPE_HAND_JOINT_LOCATIONS_EXT;
-//   hand_joint_locations.jointCount = (uint32_t) XR_HAND_JOINT_COUNT_EXT;
-//   hand_joint_locations.jointLocations = hand->m_joint_locations;
-//   result = m_ext_xrLocateHandJointsEXT(hand->m_hand_tracker, &hand_joints_locate_info, &hand_joint_locations);
-//   Utils::checkXrResult(result, "Failed to locate hand joints");
+  XrHandJointLocationsEXT hand_joint_locations = {};
+  hand_joint_locations.type = XR_TYPE_HAND_JOINT_LOCATIONS_EXT;
+  hand_joint_locations.jointCount = (uint32_t) XR_HAND_JOINT_COUNT_EXT;
+  hand_joint_locations.jointLocations = hand->m_joint_locations;
+  result = m_ext_xrLocateHandJointsEXT(hand->m_hand_tracker, &hand_joints_locate_info, &hand_joint_locations);
+  Utils::checkXrResult(result, "Failed to locate hand joints");
 
-//   // Update the active state of the hand
-//   hand->m_active = hand_joint_locations.isActive;
+  // Update the active state of the hand
+  hand->m_active = hand_joint_locations.isActive;
 
-//   // Run the logic computing the "grab" or "pinch" state of the hand
-//   hand->updateHandGrabAndPinchState();
-// }
-// #endif
+  // Run the logic computing the "grab" or "pinch" state of the hand
+  // hand->updateHandGrabAndPinchState();
+}
 
 //------------------------------------------------------------------------------------------------------
 // Renders the next frame
@@ -831,14 +827,14 @@ void OpenXrHandler::renderFrame(std::function<void(RenderContext&)> draw_callbac
     m_left_controller->computeSceneInteractions();
     m_right_controller->computeSceneInteractions();
 
-    // // Update the interactions with the scene and the hands, but only if the hands are enabled.
-    // if (m_left_hand != nullptr && m_right_hand != nullptr) {
-    //   m_left_hand->updatePosition(m_current_origin);
-    //   m_right_hand->updatePosition(m_current_origin);
+    // Update the interactions with the scene and the hands, but only if the hands are enabled.
+    if (m_left_hand != nullptr && m_right_hand != nullptr) {
+      m_left_hand->updatePosition(m_current_origin);
+      m_right_hand->updatePosition(m_current_origin);
 
-    //   m_left_hand->computeSceneInteractions();
-    //   m_right_hand->computeSceneInteractions();
-    // }
+      // m_left_hand->computeSceneInteractions();
+      // m_right_hand->computeSceneInteractions();
+    }
   }
 
 	//------------------------------------------------------------------------------------------------------
@@ -985,11 +981,11 @@ void OpenXrHandler::renderInteractions(RenderContext& ctx) {
   m_left_controller->render(ctx);
   m_right_controller->render(ctx);
 
-  //   // Render the hands if the hands are not null pointers
-  //   if (m_left_hand != nullptr && m_right_hand != nullptr) {
-  //     m_left_hand->render();
-  //     m_right_hand->render();
-  //   }
+    // Render the hands if the hands are not null pointers
+    if (m_left_hand != nullptr && m_right_hand != nullptr) {
+      m_left_hand->render(ctx);
+      m_right_hand->render(ctx);
+    }
 }
 
 // void OpenXrHandler::updateCurrentOriginForTeleport(DirectX::XMVECTOR teleport_location) {
@@ -1013,24 +1009,23 @@ XrPath OpenXrHandler::getXrPathFromString(std::string string) {
   return path;
 }
 
-// void OpenXrHandler::initializeHandTracking() {
-//   XrResult result;
+void OpenXrHandler::initializeHandTracking() {
+  XrResult result;
 
-//   // Return if the runtime does not support hand tracking
-//   if (!m_openxr_hand_tracking_system_properties.supportsHandTracking) {
-//     return;
-//   }
+  // Return if the runtime does not support hand tracking
+  if (!m_openxr_hand_tracking_system_properties.supportsHandTracking) {
+    return;
+  }
 
-//   m_left_hand = new Hand(XR_HAND_LEFT_EXT);
-//   m_right_hand = new Hand(XR_HAND_RIGHT_EXT);
+  m_left_hand = new Hand(XR_HAND_LEFT_EXT);
+  m_right_hand = new Hand(XR_HAND_RIGHT_EXT);
 
-//   for (Hand *hand : { m_left_hand, m_right_hand }) {
-//     XrHandTrackerCreateInfoEXT hand_tracker_create_info = {};
-//     hand_tracker_create_info.type = XR_TYPE_HAND_TRACKER_CREATE_INFO_EXT;
-//     hand_tracker_create_info.hand = hand->m_hand_identifier;
-//     hand_tracker_create_info.handJointSet = XR_HAND_JOINT_SET_DEFAULT_EXT;
-//     result = m_ext_xrCreateHandTrackerEXT(m_openxr_session, &hand_tracker_create_info, &hand->m_hand_tracker);
-//     Utils::checkXrResult(result, "Failed to create the hand tracker extension");
-//   }
-// }
-// #endif
+  for (Hand *hand : { m_left_hand, m_right_hand }) {
+    XrHandTrackerCreateInfoEXT hand_tracker_create_info = {};
+    hand_tracker_create_info.type = XR_TYPE_HAND_TRACKER_CREATE_INFO_EXT;
+    hand_tracker_create_info.hand = hand->m_hand_identifier;
+    hand_tracker_create_info.handJointSet = XR_HAND_JOINT_SET_DEFAULT_EXT;
+    result = m_ext_xrCreateHandTrackerEXT(m_openxr_session, &hand_tracker_create_info, &hand->m_hand_tracker);
+    Utils::checkXrResult(result, "Failed to create the hand tracker extension");
+  }
+}

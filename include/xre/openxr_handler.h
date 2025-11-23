@@ -20,7 +20,7 @@
 #include <xre/vulkan_handler.h>
 #include <xre/render_target.h>
 #include <xre/controller.h>
-// #include <xre/hand.h>
+#include <xre/hand.h>
 
 // Other includes
 #include <iostream>
@@ -80,18 +80,17 @@ private:
   // PFN_xrGetVulkanGraphicsDeviceKHR m_ext_getVulkanGraphicsDeviceKHR = nullptr;
   // PFN_xrGetVulkanGraphicsRequirementsKHR m_ext_getVulkanGraphicsRequirementsKHR = nullptr;
 
-  // PFN_xrGetD3D11GraphicsRequirementsKHR m_ext_xrGetD3D11GraphicsRequirementsKHR;
-  // PFN_xrCreateHandTrackerEXT m_ext_xrCreateHandTrackerEXT;
-  // PFN_xrDestroyHandTrackerEXT m_ext_xrDestroyHandTrackerEXT;
-  // PFN_xrLocateHandJointsEXT m_ext_xrLocateHandJointsEXT;
+  PFN_xrCreateHandTrackerEXT m_ext_xrCreateHandTrackerEXT;
+  PFN_xrDestroyHandTrackerEXT m_ext_xrDestroyHandTrackerEXT;
+  PFN_xrLocateHandJointsEXT m_ext_xrLocateHandJointsEXT;
 
   // Controllers
   Controller *m_left_controller = NULL;
   Controller *m_right_controller = NULL;
 
-  // // Hands
-  // Hand *m_left_hand = NULL;
-  // Hand *m_right_hand = NULL;
+  // Hands
+  Hand *m_left_hand = NULL;
+  Hand *m_right_hand = NULL;
 
   // Actions
   XrActionSet m_default_action_set;
@@ -109,13 +108,13 @@ private:
   // Methods
   bool initializeOpenxr();
   void initializeOpenxrActions();
-  // void initializeHandTracking();
+  void initializeHandTracking();
   void setupActionBindings();
   void suggestBindings(std::string interaction_profile, std::vector<XrActionSuggestedBinding> bindings);
   void pollOpenxrActions(XrTime predicted_time);
   void updateControllerStates(Controller *controller, XrTime predicted_time);
   void renderInteractions(RenderContext& ctx);
-  // void updateHandTrackingStates(Hand *hand, XrTime predicted_time);
+  void updateHandTrackingStates(Hand *hand, XrTime predicted_time);
   // void updateCurrentOriginForTeleport(DirectX::XMVECTOR teleport_location);
   XrPath getXrPathFromString(std::string string);
 };
