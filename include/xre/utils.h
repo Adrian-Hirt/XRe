@@ -86,7 +86,7 @@ namespace Utils {
   }
 
   inline glm::quat toQuat(const XrQuaternionf& quat) {
-    return glm::quat(quat.x, quat.y, quat.z, quat.w);
+    return glm::quat(quat.w, quat.x, quat.y, quat.z);
   }
 
   // inline std::string getFileLocation(const std::string &path) {

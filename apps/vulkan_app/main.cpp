@@ -6,6 +6,7 @@ public:
 
   Model floor = ModelFactory::createGroundPlane(10);
   Model cube = ModelFactory::createCube({0.0f, 1.0f, 0.0f});
+  Line line = Line(0.003f, 2.0f, {1.0f, 0.0f, 0.0f});
   XrTime last_time = 0;
 
   SceneNode root_node = SceneNode();
@@ -51,6 +52,8 @@ public:
   void draw(RenderContext& ctx) override {
     // std::cout << "Draw" << std::endl;
     root_node.render(ctx);
+
+    line.render(ctx);
   };
 };
 

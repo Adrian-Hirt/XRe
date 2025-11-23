@@ -16,10 +16,8 @@ Controller::Controller() {
   m_root_node.addChildNode(&m_model_node);
 //   m_root_node.addChildNode(m_intersection_sphere_node);
 
-//   // Create the line for the aim direction
-//   m_aim_line = Line({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
-//   m_aim_line_node = SceneNode(&m_aim_line);
-//   m_root_node.addChildNode(m_aim_line_node);
+  // Create the line for the aim direction
+  m_aim_line = Line(0.003f, 2.0f, {1.0f, 0.0f, 0.0f});
 }
 
 void Controller::render(RenderContext& ctx) {
@@ -38,6 +36,7 @@ void Controller::render(RenderContext& ctx) {
   }
 
   m_root_node.render(ctx);
+  m_aim_line.render(ctx);
 }
 
 void Controller::updatePosition(glm::vec3 current_origin) {
@@ -56,11 +55,11 @@ void Controller::updatePosition(glm::vec3 current_origin) {
   m_model_node.setPosition(controller_position);
   m_model_node.setRotation(controller_orientation);
 
-  // // Update the aim line
-  // m_aim_line.updateAimLineFromControllerPose(controller_position,
-  //                                            DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&m_aim.orientation),
-  //                                            current_origin,
-  //                                            Controller::s_line_intersection_threshold);
+  // Update the aim line
+  m_aim_line.updateAimLineFromControllerPose(controller_position,
+                                             Utils::toQuat(m_aim.orientation),
+                                             current_origin,
+                                             Controller::s_line_intersection_threshold);
 }
 
 void Controller::computeSceneInteractions() {

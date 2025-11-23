@@ -4,7 +4,7 @@
 // #include <xre/utils.h>
 // #include <xre/geometry.h>
 // #include <xre/shader.h>
-// #include <xre/line.h>
+#include <xre/line.h>
 // #include <xre/bitmap.h>
 #include <xre/openxr_handler.h>
 #include <xre/renderable.h>

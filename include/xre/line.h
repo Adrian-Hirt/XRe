@@ -1,28 +1,33 @@
 #pragma once
 
 // XRe includes
-#include <xre/renderable.h>
+#include <xre/model.h>
+#include <xre/scene_node.h>
+#include <xre/model_factory.h>
+#include <xre/structs.h>
 
-class Line : public Renderable {
+class Line {
 public:
-  Line(DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
-  Line(DirectX::XMFLOAT3 line_start, DirectX::XMFLOAT3 line_end, DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+  Line();
+  Line(float thickness, float length);
+  Line(float thickness, float length, glm::vec3 color);
 
-  void render() override;
-  void updateAimLineFromControllerPose(DirectX::XMVECTOR controller_position, DirectX::XMVECTOR controller_orientation, DirectX::XMVECTOR current_origin, float length);
-
-  DirectX::XMVECTOR getLineStart();
-  DirectX::XMVECTOR getLineDirection();
+  void render(RenderContext &ctx);
+  void updateAimLineFromControllerPose(glm::vec3 controller_position,
+                                       glm::quat controller_orientation,
+                                       glm::vec3 current_origin,
+                                       float length);
+  glm::vec3 getLineStart();
+  glm::vec3 getLineDirection();
 
 private:
-  // A line does not have a bounding box
-  inline bool hasBoundingBox() override { return false; };
+  // Model for the line
+  Model* m_model;
 
-  inline bool usesStaticBuffers() override { return false; };
-
-  std::vector<vertex_t> verticesFromPoints(DirectX::XMFLOAT3 start, DirectX::XMFLOAT3 end);
-
-  DirectX::XMFLOAT4 m_line_color;
-  DirectX::XMVECTOR m_line_start = { 0.0f, 0.0f, 0.0f };
-  DirectX::XMVECTOR m_line_direction = { 0.0f, 0.0f, -1.0f };
+  // Scene node for the line
+  SceneNode m_scene_node;
+  
+  glm::vec3 m_line_color;
+  glm::vec3 m_line_start = glm::zero<glm::vec3>();;
+  glm::vec3 m_line_direction = { 0.0f, 0.0f, -1.0f };
 };

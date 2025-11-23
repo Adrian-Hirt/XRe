@@ -11,9 +11,8 @@
 
 // XRe includes
 #include <xre/model.h>
-// #include <xre/shader.h>
 #include <xre/model_factory.h>
-// #include <xre/line.h>
+#include <xre/line.h>
 #include <xre/scene_node.h>
 #include <xre/structs.h>
 
@@ -59,14 +58,14 @@ public:
   XrPosef m_aim;
 
 private:
-  // // Threshold for showing the line intersection point
-  // static constexpr float s_line_intersection_threshold = 6.0f;
+  // Threshold for showing the line intersection point
+  static constexpr float s_line_intersection_threshold = 6.0f;
 
   // Model for the controller
   Model m_model;
 
-  // // Line for visualizing the aim direction
-  // Line m_aim_line;
+  // Line for visualizing the aim direction
+  Line m_aim_line;
 
   // // Model to visualize intersections of the aim line
   // // and models marked as interactable
