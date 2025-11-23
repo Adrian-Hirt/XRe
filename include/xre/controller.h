@@ -1,7 +1,7 @@
 #pragma once
 
-// DirectX includes
-#include <DirectXMath/DirectXMath.h>
+// // DirectX includes
+// #include <DirectXMath/DirectXMath.h>
 
 // Other includes
 #include <optional>
@@ -11,10 +11,10 @@
 
 // XRe includes
 #include <xre/model.h>
-#include <xre/shader.h>
 #include <xre/model_factory.h>
 #include <xre/line.h>
 #include <xre/scene_node.h>
+#include <xre/structs.h>
 
 class Controller {
 public:
@@ -22,13 +22,13 @@ public:
   Controller();
 
   // Render the controller
-  void render();
+  void render(RenderContext& ctx);
 
   // Check whether we want to teleport
-  std::optional<DirectX::XMVECTOR> updateIntersectionSphereAndComputePossibleTeleport();
+  std::optional<glm::vec3> updateIntersectionSphereAndComputePossibleTeleport();
 
   // Update the position of the controller
-  void updatePosition(DirectX::XMVECTOR current_origin);
+  void updatePosition(glm::vec3 current_origin);
 
   // Compute scene interactions of the controllers
   void computeSceneInteractions();
@@ -67,15 +67,15 @@ private:
   // Line for visualizing the aim direction
   Line m_aim_line;
 
-  // Model to visualize intersections of the aim line
-  // and models marked as interactable
-  Model m_aim_indicator_sphere;
+  // // Model to visualize intersections of the aim line
+  // // and models marked as interactable
+  // Model m_aim_indicator_sphere;
 
   // Scene nodes
   SceneNode m_root_node;
   SceneNode m_model_node;
-  SceneNode m_intersection_sphere_node;
-  SceneNode m_aim_line_node;
+  // SceneNode m_intersection_sphere_node;
+  // SceneNode m_aim_line_node;
 
-  float computeAimIndicatorSpherePosition(std::unordered_set<SceneNode *> models);
+  // float computeAimIndicatorSpherePosition(std::unordered_set<SceneNode *> models);
 };

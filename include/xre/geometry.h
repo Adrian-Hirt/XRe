@@ -3,58 +3,50 @@
 // OpenXR includes
 #include <open_xr/openxr.h>
 
-// DirectX includes
-#include <d3d11.h>
-#include <DirectXMath/DirectXMath.h>
+#define GLM_ENABLE_EXPERIMENTAL
+
+// GLM includes
+#include <glm/glm/mat4x4.hpp>
+#include <glm/glm/gtx/quaternion.hpp>
 
 namespace Geometry {
-  inline DirectX::XMMATRIX computeViewProjectionMatrix(XrCompositionLayerProjectionView &view, DirectX::XMVECTOR current_origin) {
-    // First, we need to build the projection matrix
-
-    // Set values for the near and far clipping plane. Usually, the near plane is
-    // clipped at 1, but for XR applications, this seems to be too close, and as
-    // such a lower value is used.
-    const float far_clipping = 100.0f;
-    const float near_clipping = 0.05f;
-
-    // Compute the four coordinates of the view at the near clipping plane.
-    // We get the FOV from OpenXR, in the form of four angles, which we need
-    // to compute the tan from then and then multiply with the near clipping
-    // value to get the positions.
-    float view_left = near_clipping * tanf(view.fov.angleLeft);
-    float view_right = near_clipping * tanf(view.fov.angleRight);
-    float view_top = near_clipping * tanf(view.fov.angleUp);
-    float view_bottom = near_clipping * tanf(view.fov.angleDown);
-
-    // Then we can compute the perspective matrix from the values
-    // we just computed.
-    DirectX::XMMATRIX perspective_matrix = DirectX::XMMatrixPerspectiveOffCenterRH(view_left,
-                                                                                  view_right,
-                                                                                  view_bottom,
-                                                                                  view_top,
-                                                                                  near_clipping,
-                                                                                  far_clipping);
-
-    // Build the view matrix
-
-    // Load the rotation quaternion and the position vector into a vector
-    DirectX::XMVECTOR view_rotation = DirectX::XMLoadFloat4((DirectX::XMFLOAT4 *)&view.pose.orientation);
-    DirectX::XMVECTOR view_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&view.pose.position);
-
-    // Apply the translation given by teleportation
-    view_position = DirectX::XMVectorAdd(view_position, current_origin);
-
-    // Build an affine transformation matrix from the rotation & position. The First
-    // Param is a scaling factor, which we set to all ones, as we currently don't want
-    // any scaling to be applied. The second param is the rotation origin, which we set
-    // to a vector of all zeroes, such that we rotate about the origin.
-    DirectX::XMMATRIX view_matrix = DirectX::XMMatrixInverse(NULL, DirectX::XMMatrixAffineTransformation(DirectX::g_XMOne, DirectX::g_XMZero, view_rotation, view_position));
-
-    // Return the transposed product of the view and the perspective matrix
-    return DirectX::XMMatrixTranspose(view_matrix * perspective_matrix);
-  };
-
   inline XrPosef XrPoseIdentity() {
     return {{0, 0, 0, 1}, {0, 0, 0}};
   };
+
+  inline glm::mat4 poseToMatrix(const XrPosef& pose){
+    const glm::mat4 translation =
+      glm::translate(glm::mat4(1.0f), glm::vec3(pose.position.x, pose.position.y, pose.position.z));
+
+    const glm::mat4 rotation =
+      glm::toMat4(glm::quat(pose.orientation.w, pose.orientation.x, pose.orientation.y, pose.orientation.z));
+
+    return glm::inverse(translation * rotation);
+  }
+
+  inline glm::mat4 createProjectionMatrix(XrFovf fov, float nearClip, float farClip){
+    const float l = glm::tan(fov.angleLeft);
+    const float r = glm::tan(fov.angleRight);
+    const float d = glm::tan(fov.angleDown);
+    const float u = glm::tan(fov.angleUp);
+
+    const float w = r - l;
+    const float h = d - u;
+
+    glm::mat4 projectionMatrix;
+    projectionMatrix[0] = { 2.0f / w, 0.0f, 0.0f, 0.0f };
+    projectionMatrix[1] = { 0.0f, 2.0f / h, 0.0f, 0.0f };
+    projectionMatrix[2] = { (r + l) / w, (u + d) / h, -(farClip + nearClip) / (farClip - nearClip), -1.0f };
+    projectionMatrix[3] = { 0.0f, 0.0f, -(farClip * (nearClip + nearClip)) / (farClip - nearClip), 0.0f };
+    return projectionMatrix;
+  }
+
+  inline glm::mat4 composeWorldMatrix(const glm::vec3& translation,
+                                      const glm::quat& rotation,
+                                      const glm::vec3& scale) {
+    glm::mat4 T = glm::translate(glm::mat4(1.0f), translation);
+    glm::mat4 R = glm::mat4_cast(rotation);
+    glm::mat4 S = glm::scale(glm::mat4(1.0f), scale);
+    return T * R * S;
+}
 }

@@ -1,9 +1,14 @@
 # XRe
 
-XRe is a project to build a XR engine from scratch using OpenXR and DirectX.
+XRe is a project to build a XR engine from scratch using OpenXR and Vulkan.
 
-_Please note that XRe is a WIP project and mainly intended for me to learn more about OpenXR, DirectX and XR development for the moment. It is
-not (yet) meant to be used for XR development directly._
+> [!WARNING]
+> Please note that XRe is a WIP project and mainly intended for me to learn more about OpenXR, Vulkan and XR 
+> development for the moment. It is not (yet) meant to be used for XR development directly.
+
+> [!NOTE]
+> The `main` branch contains the ongoing development using Vulkan. For the archived version using
+> DirectX 11, please see the [archive_dx11 branch](https://github.com/Adrian-Hirt/XRe/tree/archive_dx11).
 
 ## Features
 
@@ -22,18 +27,12 @@ XRe currently has the following features:
 * Various shaders (e.g. ambient lighting, textured models)
 * Basic hand tracking
 
-### Screenshots
+## Hints
 
-Simple scene:
-
-![](doc/img/screenshot_mr_portal_1.png)
-
-Hand tracking:
-
-![](doc/img/hand_tracking.jpeg)
+When setting up a new machine to work on XRe, you need to have the OpenXR Loader in your path.
+For Windows, the file is in `bin/openxr_loader.dll`, which you need to add to your `PATH` in order
+to launch the applications.
 
 ## Acknowledgements
 
 * The textures in `data/textures` were downloaded from https://ambientcg.com/, licensed under the Creative Commons CC0 1.0 Universal License.
-* XRe is using [DirectXMath](https://github.com/microsoft/DirectXMath), February 2024 version, licensed under the MIT license.
-* XRe is using [DirectXTex](https://github.com/microsoft/DirectXTex), licensed under the MIT license.

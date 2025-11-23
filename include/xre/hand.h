@@ -1,15 +1,10 @@
 #pragma once
 
-// DirectX includes
-#include <d3d11.h>
-#include <DirectXMath/DirectXMath.h>
-
 // OpenXR includes
 #include <open_xr/openxr.h>
 
 // XRe includes
 #include <xre/model.h>
-#include <xre/shader.h>
 #include <xre/model_factory.h>
 #include <xre/scene_node.h>
 
@@ -19,12 +14,12 @@ public:
   Hand(XrHandEXT hand_identifier);
 
   // Render the hand
-  void render();
+  void render(RenderContext &ctx);
 
-  // Update the position of the controller
-  void updatePosition(DirectX::XMVECTOR current_origin);
+  // Update the position of the hand
+  void updatePosition(glm::vec3 current_origin);
 
-  // Compute scene interactions of the controllers
+  // Compute scene interactions of the hand
   void computeSceneInteractions();
 
 
@@ -37,9 +32,7 @@ public:
   bool m_active = false;
 
 private:
-  Shader m_joint_shader;
-  Model m_joint_model;
-  SceneNode m_hand_root_node;
+  SceneNode* m_hand_root_node;
   std::vector<SceneNode*> m_joint_nodes;
 
   bool m_pinching = false;

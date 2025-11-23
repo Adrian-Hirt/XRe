@@ -19,12 +19,15 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
   // Check if we were successful in creating the openxr system.
   Utils::checkBoolResult(result, "Initializing OpenXR failed!");
 
-	// Initialize the global buffers for the shaders
-  Shader::createGlobalBuffers(getDevice(), getDeviceContext());
+  // Setup the vulkan renderer
+  m_vulkan_handler.setupRenderer();
+
+// 	// // Initialize the global buffers for the shaders
+//   // Shader::createGlobalBuffers(getDevice(), getDeviceContext());
 
   // Register the device & device_context with the classes that need them
-  Shader::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
-  Renderable::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
+//   // Shader::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
+  Renderable::registerDeviceAndPhysicalDevice(m_vulkan_handler.getLogicalDevice(), m_vulkan_handler.getPhysicalDevice());
 
   // Instruct the handler to initialize the xr actions
   initializeOpenxrActions();
@@ -45,13 +48,13 @@ OpenXrHandler::~OpenXrHandler() {}
 bool OpenXrHandler::initializeOpenxr() {
   XrResult result;
 
-  //------------------------------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------------------------------
 	// Setup requested extensions
 	//------------------------------------------------------------------------------------------------------
-  std::vector<const char *> requested_extensions = {
-    XR_KHR_D3D11_ENABLE_EXTENSION_NAME,
-    XR_EXT_HAND_TRACKING_EXTENSION_NAME
-    // XR_EXT_HAND_INTERACTION_EXTENSION_NAME // Not supported on Quest at the moment it seems
+	std::vector<const char *> requested_extensions = {
+		XR_KHR_VULKAN_ENABLE_EXTENSION_NAME,
+		XR_EXT_HAND_TRACKING_EXTENSION_NAME
+		// XR_EXT_HAND_INTERACTION_EXTENSION_NAME // Not supported on Quest at the moment it seems
   };
 
   //------------------------------------------------------------------------------------------------------
@@ -64,15 +67,15 @@ bool OpenXrHandler::initializeOpenxr() {
 		return false;
 	}
 
-	// Now that we know how many extensions we have, create a vector containing the data
+  // Now that we know how many extensions we have, create a vector containing the data
   std::vector<XrExtensionProperties> extension_properties(extension_count, { XR_TYPE_EXTENSION_PROPERTIES });
 
-	// Now we again call xrEnumerateViewConfigurationViews, this time we set the 4th param
-	// to the number of our viewports, such that the method fills the xr_view_configurations
-	// vector with the actual view configurations
-	result = xrEnumerateInstanceExtensionProperties(NULL, extension_count, &extension_count, extension_properties.data());
-	if (XR_FAILED(result)) {
-		return false;
+  // Now we again call xrEnumerateViewConfigurationViews, this time we set the 4th param
+  // to the number of our viewports, such that the method fills the xr_view_configurations
+  // vector with the actual view configurations
+  result = xrEnumerateInstanceExtensionProperties(NULL, extension_count, &extension_count, extension_properties.data());
+  if (XR_FAILED(result)) {
+    return false;
   }
 
   // Check for each requested extension that it is available.
@@ -92,7 +95,7 @@ bool OpenXrHandler::initializeOpenxr() {
     }
   }
 
-	//------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------
 	// OpenXR Instance
 	//------------------------------------------------------------------------------------------------------
   // Create the param struct
@@ -101,14 +104,13 @@ bool OpenXrHandler::initializeOpenxr() {
 	instance_create_info.enabledExtensionCount = requested_extensions.size();
 	instance_create_info.enabledExtensionNames = requested_extensions.data();
 	instance_create_info.applicationInfo.apiVersion = XR_CURRENT_API_VERSION;
-	strcpy_s(instance_create_info.applicationInfo.applicationName, 128, m_application_name);
+	strncpy_s(instance_create_info.applicationInfo.applicationName, m_application_name, XR_MAX_APPLICATION_NAME_SIZE);
+  strncpy_s(instance_create_info.applicationInfo.engineName, "XRe", XR_MAX_ENGINE_NAME_SIZE);
 
-	result = xrCreateInstance(&instance_create_info, &m_openxr_instance);
-	if (XR_FAILED(result)) {
-		return false;
-	}
+  result = xrCreateInstance(&instance_create_info, &m_openxr_instance);
+	Utils::checkXrResult(result, "Failed to create the OpenXR instance!");
 
-	//------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------
 	// OpenXR System
 	//------------------------------------------------------------------------------------------------------
 	// Next, setup the OpenXR system, which is rather simple
@@ -116,76 +118,62 @@ bool OpenXrHandler::initializeOpenxr() {
 	system_get_info.type = XR_TYPE_SYSTEM_GET_INFO;
 	system_get_info.formFactor = m_application_form_factor;
 	result = xrGetSystem(m_openxr_instance, &system_get_info, &m_openxr_system_id);
-	if (XR_FAILED(result)) {
-		return false;
-	}
+	Utils::checkXrResult(result, "Failed to get the OpenXR system!");
 
   // Get the systems properties for some information about the hardware. We also get system properties
   // about the hand tracking support.
+  // TODO: do we need this?
   m_openxr_system_properties.next = &m_openxr_hand_tracking_system_properties;
   result = xrGetSystemProperties(m_openxr_instance, m_openxr_system_id, &m_openxr_system_properties);
   Utils::checkXrResult(result, "Failed to get system properties");
 
-	//------------------------------------------------------------------------------------------------------
-	// OpenXR Session
+  //------------------------------------------------------------------------------------------------------
+	// Blend modes
 	//------------------------------------------------------------------------------------------------------
 	// Get the blend modes for the XR device. As the function call to xrEnumerateEnvironmentBlendModes
 	// should return the blend modes in order of preference of the runtime, we can just pick the first one
 	uint32_t blend_count = 0; // Throwaway variable, but we need to pass in a pointer to a uint32_t, or the function call fails
 	result = xrEnumerateEnvironmentBlendModes(m_openxr_instance, m_openxr_system_id, m_application_view_type, 1, &blend_count, &m_openxr_blend_mode);
-	if (XR_FAILED(result)) {
-		return false;
-	}
+	Utils::checkXrResult(result, "Failed to enumerate the OpenXR environment blend modes!");
 
-	// Get the address of the ext funtions and store, such that we can call the function. This is the more portable
-  // way of calling extension functions.
-	result = xrGetInstanceProcAddr(m_openxr_instance, "xrGetD3D11GraphicsRequirementsKHR", (PFN_xrVoidFunction*)(&m_ext_xrGetD3D11GraphicsRequirementsKHR));
-  if (XR_FAILED(result)) {
-    return false;
-  };
+   //------------------------------------------------------------------------------------------------------
+	// Vulkan handler
+	//------------------------------------------------------------------------------------------------------
+  m_vulkan_handler = VulkanHandler(m_openxr_instance, m_openxr_system_id);
+
+	//------------------------------------------------------------------------------------------------------
+	// OpenXR Session
+	//------------------------------------------------------------------------------------------------------
+  // Create session with Vulkan graphics binding
+  XrGraphicsBindingVulkanKHR graphics_binding{ XR_TYPE_GRAPHICS_BINDING_VULKAN_KHR };
+  graphics_binding.device = m_vulkan_handler.getLogicalDevice();
+  graphics_binding.instance = m_vulkan_handler.getInstance();
+  graphics_binding.physicalDevice = m_vulkan_handler.getPhysicalDevice();
+  graphics_binding.queueFamilyIndex = m_vulkan_handler.getQueueFamilyIndex();
+  graphics_binding.queueIndex = 0u;
 
   // Only load the handtracking extensions if we actually can use them
   if (m_openxr_hand_tracking_system_properties.supportsHandTracking) {
-    result = xrGetInstanceProcAddr(m_openxr_instance, "xrCreateHandTrackerEXT", (PFN_xrVoidFunction*)(&m_ext_xrCreateHandTrackerEXT));
+    result = xrGetInstanceProcAddr(m_openxr_instance, "xrCreateHandTrackerEXT", reinterpret_cast<PFN_xrVoidFunction*>(&m_ext_xrCreateHandTrackerEXT));
     Utils::checkXrResult(result, "Failed to get the xrCreateHandTrackerEXT function pointer");
 
-    result = xrGetInstanceProcAddr(m_openxr_instance, "xrDestroyHandTrackerEXT", (PFN_xrVoidFunction*)(&m_ext_xrDestroyHandTrackerEXT));
+    result = xrGetInstanceProcAddr(m_openxr_instance, "xrDestroyHandTrackerEXT", reinterpret_cast<PFN_xrVoidFunction*>(&m_ext_xrDestroyHandTrackerEXT));
     Utils::checkXrResult(result, "Failed to get the xrDestroyHandTrackerEXT function pointer");
 
-    result = xrGetInstanceProcAddr(m_openxr_instance, "xrLocateHandJointsEXT", (PFN_xrVoidFunction*)(&m_ext_xrLocateHandJointsEXT));
+    result = xrGetInstanceProcAddr(m_openxr_instance, "xrLocateHandJointsEXT", reinterpret_cast<PFN_xrVoidFunction*>(&m_ext_xrLocateHandJointsEXT));
     Utils::checkXrResult(result, "Failed to get the xrLocateHandJointsEXT function pointer");
   }
 
-	XrGraphicsRequirementsD3D11KHR graphics_requirements = {};
-	graphics_requirements.type = XR_TYPE_GRAPHICS_REQUIREMENTS_D3D11_KHR;
-	// Call the function which retrieves the D3D11 feature level and graphic device requirements for an instance and system
-	// The graphics_requirements param is a XrGraphicsRequirementsD3D11KHR struct, where
-	// the field "adapterLuid" identifies the graphics device to be used, and the field "minFeatureLevel" specifies
-	// the minimum feature level the D3D11 device must be initialized with
-	result = m_ext_xrGetD3D11GraphicsRequirementsKHR(m_openxr_instance, m_openxr_system_id, &graphics_requirements);
-	if (XR_FAILED(result)) {
-		return false;
-	}
-
-	// Create a new handler for the DirectX 11 related stuff.
- 	m_dx11_handler = Dx11Handler(graphics_requirements.adapterLuid);
-
-	// Create a binding for the D3D11 device
-	XrGraphicsBindingD3D11KHR graphics_binding = {};
-	graphics_binding.type = XR_TYPE_GRAPHICS_BINDING_D3D11_KHR;
-	graphics_binding.device = m_dx11_handler.getDevice();
-
-	// Create the session info struct
+  // Create the session info struct
 	XrSessionCreateInfo session_create_info = {};
+  session_create_info.createFlags = 0;
 	session_create_info.type = XR_TYPE_SESSION_CREATE_INFO;
 	session_create_info.next = &graphics_binding;
 	session_create_info.systemId = m_openxr_system_id;
 
-	// And finally create the openxr session
+  // And finally create the openxr session
 	result = xrCreateSession(m_openxr_instance, &session_create_info, &m_openxr_session);
-	if (XR_FAILED(result)) {
-		return false;
-	}
+  Utils::checkXrResult(result, "Failed to create the OpenXR session!");
 
 	//------------------------------------------------------------------------------------------------------
 	// Reference Spaces
@@ -216,7 +204,7 @@ bool OpenXrHandler::initializeOpenxr() {
 		return false;
 	}
 
-	//------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------
 	// View ports
 	//------------------------------------------------------------------------------------------------------
 	// Devices running OpenXR code can have multiple viewports (views we need to render). For a stereo
@@ -227,107 +215,154 @@ bool OpenXrHandler::initializeOpenxr() {
 	// As such, we first need to find out how many views we need to support. If we set the 4th param of
 	// the xrEnumerateViewConfigurationViews function call to zero, it will retrieve the required
 	// number of viewports and store it in the 5th param
-	uint32_t viewport_count = 0;
-	result = xrEnumerateViewConfigurationViews(m_openxr_instance, m_openxr_system_id, m_application_view_type, 0, &viewport_count, NULL);
-	if (XR_FAILED(result)) {
+	result = xrEnumerateViewConfigurationViews(m_openxr_instance, m_openxr_system_id, m_application_view_type, 0, &m_view_count, NULL);
+	if (XR_FAILED(result) || m_view_count == 0u) {
 		return false;
 	}
 
-	// Now that we know how many views we need to render, resize the vector that contains the view
+  // Now that we know how many views we need to render, resize the vector that contains the view
 	// configurations (each XrViewConfigurationView specifies properties related to rendering an
 	// individual view) and the vector containing the views (each XrView specifies the pose and
 	// the fov of the view. Basically, a XrView is a view matrix in "traditional" rendering).
-	m_openxr_view_configuration_views.resize(viewport_count, { XR_TYPE_VIEW_CONFIGURATION_VIEW });
-	m_openxr_views.resize(viewport_count, { XR_TYPE_VIEW });
+	m_openxr_view_configuration_views.resize(m_view_count, { XR_TYPE_VIEW_CONFIGURATION_VIEW });
+	m_openxr_views.resize(m_view_count, { XR_TYPE_VIEW });
 
-	// Now we again call xrEnumerateViewConfigurationViews, this time we set the 4th param
+  // Now we again call xrEnumerateViewConfigurationViews, this time we set the 4th param
 	// to the number of our viewports, such that the method fills the xr_view_configurations
 	// vector with the actual view configurations
-	result = xrEnumerateViewConfigurationViews(m_openxr_instance, m_openxr_system_id, m_application_view_type, viewport_count, &viewport_count, m_openxr_view_configuration_views.data());
+	result = xrEnumerateViewConfigurationViews(m_openxr_instance, m_openxr_system_id, m_application_view_type, m_view_count, &m_view_count, m_openxr_view_configuration_views.data());
 	if (XR_FAILED(result)) {
 		return false;
 	}
 
-	//------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------
 	// Swapchains
 	//------------------------------------------------------------------------------------------------------
 	// For each viewport, we need to setup a swapchain. A swapchain consists of multiple buffers, where one
 	// is used to draw the data to the screen, and another is used to render the deta from the simulation
 	// to. With this approach, tearing (that might occur because the scene is updated while it's drawn
 	// to the screen) should not occur
-	for (uint32_t i = 0; i < viewport_count; i++) {
-		// Get the current view configuration we're interested in
+  // Select the format for the swapchains as we need to pass this to the vulkan handler as well
+  uint32_t swapchain_format_count = 0;
+	result = xrEnumerateSwapchainFormats(m_openxr_session, 0, &swapchain_format_count, NULL);
+	Utils::checkXrResult(result, "Failed to enumerate the swapchain formats");
+
+  std::vector<int64_t> swapchain_formats(swapchain_format_count);
+  result = xrEnumerateSwapchainFormats(m_openxr_session, swapchain_format_count, &swapchain_format_count, swapchain_formats.data());
+	Utils::checkXrResult(result, "Failed to enumerate the swapchain formats");
+
+  // Search the chosen format
+  bool format_found = false;
+  for (const auto& available_format : swapchain_formats) {
+    if (available_format == VulkanHandler::s_color_format) {
+      format_found = true;
+      break;
+    }
+  }
+
+  Utils::checkBoolResult(format_found, "Required OpenXR swapchain format not supported");
+
+  // Create swapchain and render targets
+  m_swapchains.resize(m_view_count);
+  m_render_targets.resize(m_view_count);
+
+  for (uint32_t i = 0; i < m_view_count; i++) {
+    // Get the current view configuration we're interested in
 		XrViewConfigurationView& current_view_configuration = m_openxr_view_configuration_views[i];
 
-		// Create a create info struct to create the swapchain
+    // Get a reference to the current swapchain
+    XrSwapchain& swapchain = m_swapchains[i];
+
+    // Create a create info struct to create the swapchain
 		XrSwapchainCreateInfo swapchain_create_info = {};
 		swapchain_create_info.type = { XR_TYPE_SWAPCHAIN_CREATE_INFO };
 		swapchain_create_info.arraySize = 1; // Number of array layers
 		swapchain_create_info.mipCount = 1; // Only use one mipmap level, bigger numbers would only be useful for textures
 		swapchain_create_info.faceCount = 1; // Number of faces to render, 1 should be used, other option would be 6 for cubemaps
-		swapchain_create_info.format = m_dx11_handler.m_d3d11_swapchain_format;
+		swapchain_create_info.format = VulkanHandler::s_color_format;;
 		swapchain_create_info.width = current_view_configuration.recommendedImageRectWidth; // Just use the recommended width that the runtime gave us
 		swapchain_create_info.height = current_view_configuration.recommendedImageRectHeight; // Just use the recommended height that the runtime gave us
 		swapchain_create_info.sampleCount = current_view_configuration.recommendedSwapchainSampleCount; // Just use the recommended sample count that the runtime gave us
 		swapchain_create_info.usageFlags = XR_SWAPCHAIN_USAGE_SAMPLED_BIT | XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT;
 
-		// Create the OpenXR swapchain
-		XrSwapchain swapchain_handle;
-		result = xrCreateSwapchain(m_openxr_session, &swapchain_create_info, &swapchain_handle);
-		if (XR_FAILED(result)) {
-			return false;
-		}
+    // Create the OpenXR swapchain
+    result = xrCreateSwapchain(m_openxr_session, &swapchain_create_info, &swapchain);
+    Utils::checkXrResult(result, "Failed to create a swapchain");
 
-		// OpenXR can create an arbitrary number of swapchain images (from which we'll create our buffers),
+    // OpenXR can create an arbitrary number of swapchain images (from which we'll create our buffers),
 		// so we need to find out how many were created by the runtime
 		// If we pass zero as the 2nd param, we request the number of swapchain images and store it
 		// in the 3rd param
 		uint32_t swapchain_image_count = 0;
-		result = xrEnumerateSwapchainImages(swapchain_handle, 0, &swapchain_image_count, NULL);
-		if (XR_FAILED(result)) {
-			return false;
-		}
+		result = xrEnumerateSwapchainImages(swapchain, 0, &swapchain_image_count, NULL);
+		Utils::checkXrResult(result, "Failed to enumerate the swapchain images");
+    Utils::checkBoolResult(swapchain_image_count != 0u, "Found zero swapchain images!");
 
 		// We need a vector to store the swapchain images. The swapchain images store
 		// the image data in a structured way. As we only need these to create the swapchains,
 		// we put them in a temporary vector which we won't use afterwards
-		std::vector<XrSwapchainImageD3D11KHR> swapchain_images;
-		swapchain_images.resize(swapchain_image_count, {XR_TYPE_SWAPCHAIN_IMAGE_D3D11_KHR});
+		std::vector<XrSwapchainImageVulkanKHR> swapchain_images;
+		swapchain_images.resize(swapchain_image_count, { XR_TYPE_SWAPCHAIN_IMAGE_VULKAN_KHR });
 
+    // Now call the xrEnumerateSwapchainImages function again, this time with the 2nd param set to the number
+		// of swapchain images that got created by OpenXR.
+		result = xrEnumerateSwapchainImages(swapchain, swapchain_image_count, &swapchain_image_count, (XrSwapchainImageBaseHeader *)swapchain_images.data());
+		Utils::checkXrResult(result, "Failed to enumerate the swapchain images");
 
-		// Now we can create the swapchain struct, that stores the swapchain handle, the height
-		// and width of the swapchains (which usually should match the size of the window / view
-		// we render to, and the swapchain_data structs (which contain the backbuffer & depthbuffer
-		// of the many swapchains we get)
-		swapchain_t swapchain = {};
+    // For each swapchain image, call the function to create a render target using that swapchain image.
+    std::vector<RenderTarget*>& swapchain_render_targets = m_render_targets[i];
+    swapchain_render_targets.resize(swapchain_images.size());
 
-		swapchain.width = swapchain_create_info.width;
-		swapchain.height = swapchain_create_info.height;
-		swapchain.handle = swapchain_handle;
-		swapchain.swapchain_data.resize(swapchain_image_count);
+    for (uint32_t j = 0; j < swapchain_image_count; j++) {
+      RenderTarget*& render_target = swapchain_render_targets[j];
 
-		// Now call the xrEnumerateSwapchainImages function again, this time with the 2nd param set to the number
-		// of swapchain images that got created by OpenXR. That way, we can store the swapchain images into our
-		// temporary vector and use them to create the swapchains
-		result = xrEnumerateSwapchainImages(swapchain_handle, swapchain_image_count, &swapchain_image_count, (XrSwapchainImageBaseHeader *)swapchain_images.data());
-		if (XR_FAILED(result)) {
-      return false;
-		}
-
-    // For each swapchain image, call the function to create a render target using that swapchain image
-    // We also directly release the texture object, as we don't need it anymore after we created the
-    // render target with it
-    for (uint32_t i = 0; i < swapchain_image_count; i++) {
-        swapchain.swapchain_data[i] = m_dx11_handler.createRenderTargets(*swapchain_images[i].texture);
-        swapchain_images[i].texture->Release();
+      VkImage image = swapchain_images[j].image;
+      render_target = new RenderTarget(
+        m_vulkan_handler.getLogicalDevice(),
+        m_vulkan_handler.getPhysicalDevice(),
+        image,
+        getEyeResolution(i),
+        VulkanHandler::s_color_format,
+        m_vulkan_handler.getRenderPass()
+      );
     }
+  }
 
-    // We're done creating that swapchain, we can now add it to the vector of our swapchains (as we have multiple,
-    // as mentioned before one for each view
-    m_swapchains.push_back(swapchain);
-	}
+  //------------------------------------------------------------------------------------------------------
+	// Projection views
+	//------------------------------------------------------------------------------------------------------
+  m_projection_views.resize(m_view_count);
+
+  for (uint32_t i = 0u; i <m_view_count; i++) {
+    XrCompositionLayerProjectionView& projection_view = m_projection_views[i];
+    const XrViewConfigurationView& view_configuration = m_openxr_view_configuration_views[i];
+
+    // Setup basic informations
+    projection_view.type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
+    projection_view.next = nullptr;
+
+    // Associate this view with its corresponding swapchain
+    projection_view.subImage.swapchain = m_swapchains.at(i);
+    projection_view.subImage.imageArrayIndex = 0u;
+    projection_view.subImage.imageRect.offset.x = 0;
+    projection_view.subImage.imageRect.offset.y = 0;
+    projection_view.subImage.imageRect.extent.width = view_configuration.recommendedImageRectWidth;
+    projection_view.subImage.imageRect.extent.height = view_configuration.recommendedImageRectHeight;
+  }
+
+  // Allocate view and projection matrices
+  m_view_matrices.resize(m_view_count);
+  m_projection_matrices.resize(m_view_count);
 
   return true;
+}
+
+VkExtent2D OpenXrHandler::getEyeResolution(size_t eyeIndex) const {
+  const XrViewConfigurationView& eye_info = m_openxr_view_configuration_views.at(eyeIndex);
+  return {
+    eye_info.recommendedImageRectWidth,
+    eye_info.recommendedImageRectHeight
+  };
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -460,52 +495,49 @@ void OpenXrHandler::setupActionBindings() {
   // Setup the suggested bindings, i.e. we suggest the runtime what path we want to
 	// bind a specific action to. As the name says, this is only a suggestion and the
 	// runtime may change a binding, e.g. if a user re-maps inputs on their device.
+  std::vector<XrActionSuggestedBinding> suggested_action_bindings;
+  std::string interaction_profile;
 
-  // Setup the bindings for the khr/simple_controller binding
-  {
-    std::vector<XrActionSuggestedBinding> suggested_action_bindings;
-
-    // Pose
-    suggested_action_bindings.push_back({ m_controller_pose_action, getXrPathFromString("/user/hand/left/input/grip/pose") });
-    suggested_action_bindings.push_back({ m_controller_pose_action, getXrPathFromString("/user/hand/right/input/grip/pose") });
-
-    // Aim
-    suggested_action_bindings.push_back({ m_controller_aim_action, getXrPathFromString("/user/hand/left/input/aim/pose") });
-    suggested_action_bindings.push_back({ m_controller_aim_action, getXrPathFromString("/user/hand/right/input/aim/pose") });
-
-    // Grab
-    suggested_action_bindings.push_back({ m_controller_grab_action, getXrPathFromString("/user/hand/right/input/select/click") });
-
-    // Teleport
-    suggested_action_bindings.push_back({ m_controller_teleport_action, getXrPathFromString("/user/hand/left/input/select/click") });
-
-    suggestBindings("/interaction_profiles/khr/simple_controller", suggested_action_bindings);
-  }
-
-#ifdef ENABLE_ACTION_BINDINGS
+#ifdef ENABLE_OCULUS_TOUCH_BINDINGS
   // Setup bindings for oculus/touch_controller
-  {
-    std::vector<XrActionSuggestedBinding> suggested_action_bindings;
+  interaction_profile = "/interaction_profiles/oculus/touch_controller";
 
-    // Pose
-    suggested_action_bindings.push_back({ m_controller_pose_action, getXrPathFromString("/user/hand/left/input/grip/pose") });
-    suggested_action_bindings.push_back({ m_controller_pose_action, getXrPathFromString("/user/hand/right/input/grip/pose") });
+  // Pose
+  suggested_action_bindings.push_back({ m_controller_pose_action, getXrPathFromString("/user/hand/left/input/grip/pose") });
+  suggested_action_bindings.push_back({ m_controller_pose_action, getXrPathFromString("/user/hand/right/input/grip/pose") });
 
-    // Aim
-    suggested_action_bindings.push_back({ m_controller_aim_action, getXrPathFromString("/user/hand/left/input/aim/pose") });
-    suggested_action_bindings.push_back({ m_controller_aim_action, getXrPathFromString("/user/hand/right/input/aim/pose") });
+  // Aim
+  suggested_action_bindings.push_back({ m_controller_aim_action, getXrPathFromString("/user/hand/left/input/aim/pose") });
+  suggested_action_bindings.push_back({ m_controller_aim_action, getXrPathFromString("/user/hand/right/input/aim/pose") });
 
-    // Grab
-    suggested_action_bindings.push_back({ m_controller_grab_action, getXrPathFromString("/user/hand/left/input/squeeze/value") });
-    suggested_action_bindings.push_back({ m_controller_grab_action, getXrPathFromString("/user/hand/right/input/squeeze/value") });
+  // Grab
+  suggested_action_bindings.push_back({ m_controller_grab_action, getXrPathFromString("/user/hand/left/input/squeeze/value") });
+  suggested_action_bindings.push_back({ m_controller_grab_action, getXrPathFromString("/user/hand/right/input/squeeze/value") });
 
-    // Teleport
-    suggested_action_bindings.push_back({ m_controller_teleport_action, getXrPathFromString("/user/hand/left/input/x/click") });
-    suggested_action_bindings.push_back({ m_controller_teleport_action, getXrPathFromString("/user/hand/right/input/a/click") });
+  // Teleport
+  suggested_action_bindings.push_back({ m_controller_teleport_action, getXrPathFromString("/user/hand/left/input/x/click") });
+  suggested_action_bindings.push_back({ m_controller_teleport_action, getXrPathFromString("/user/hand/right/input/a/click") });
+#else
+  // Setup the bindings for the khr/simple_controller binding
+  interaction_profile = "/interaction_profiles/khr/simple_controller";
 
-    suggestBindings("/interaction_profiles/oculus/touch_controller", suggested_action_bindings);
-  }
+  // Pose
+  suggested_action_bindings.push_back({ m_controller_pose_action, getXrPathFromString("/user/hand/left/input/grip/pose") });
+  suggested_action_bindings.push_back({ m_controller_pose_action, getXrPathFromString("/user/hand/right/input/grip/pose") });
+
+  // Aim
+  suggested_action_bindings.push_back({ m_controller_aim_action, getXrPathFromString("/user/hand/left/input/aim/pose") });
+  suggested_action_bindings.push_back({ m_controller_aim_action, getXrPathFromString("/user/hand/right/input/aim/pose") });
+
+  // Grab
+  suggested_action_bindings.push_back({ m_controller_grab_action, getXrPathFromString("/user/hand/right/input/select/click") });
+
+  // Teleport
+  suggested_action_bindings.push_back({ m_controller_teleport_action, getXrPathFromString("/user/hand/left/input/select/click") });
 #endif
+
+  // Suggest bindings 
+  suggestBindings(interaction_profile, suggested_action_bindings);
 }
 
 void OpenXrHandler::suggestBindings(std::string interaction_profile, std::vector<XrActionSuggestedBinding> bindings) {
@@ -590,7 +622,7 @@ void OpenXrHandler::pollOpenxrEvents(bool &loop_running, bool &xr_running) {
   }
 }
 
-//------------------------------------------------------------------------------------------------------
+// //------------------------------------------------------------------------------------------------------
 // Poll the OpenXR actions
 //------------------------------------------------------------------------------------------------------
 void OpenXrHandler::pollOpenxrActions(XrTime predicted_time) {
@@ -619,16 +651,16 @@ void OpenXrHandler::pollOpenxrActions(XrTime predicted_time) {
   updateHandTrackingStates(m_left_hand, predicted_time);
   updateHandTrackingStates(m_right_hand, predicted_time);
 
-  // Update the location of the headset
-  XrSpaceLocation space_location = {};
-  space_location.type = XR_TYPE_SPACE_LOCATION;
-  space_location.pose = Geometry::XrPoseIdentity();
-  result = xrLocateSpace(m_openxr_view_space, m_openxr_stage_space, predicted_time, &space_location);
-  Utils::checkXrResult(result, "Can't get the view pose of the HMD in the stage space");
+//   // Update the location of the headset
+//   XrSpaceLocation space_location = {};
+//   space_location.type = XR_TYPE_SPACE_LOCATION;
+//   space_location.pose = Geometry::XrPoseIdentity();
+//   result = xrLocateSpace(m_openxr_view_space, m_openxr_stage_space, predicted_time, &space_location);
+//   Utils::checkXrResult(result, "Can't get the view pose of the HMD in the stage space");
 
-  if ((space_location.locationFlags & s_pose_valid_flags) == s_pose_valid_flags) {
-    m_headset_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&space_location.pose.position);
-  }
+//   // if ((space_location.locationFlags & s_pose_valid_flags) == s_pose_valid_flags) {
+//   //   m_headset_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&space_location.pose.position);
+//   // }
 }
 
 void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predicted_time) {
@@ -736,10 +768,11 @@ void OpenXrHandler::updateHandTrackingStates(Hand *hand, XrTime predicted_time) 
 //------------------------------------------------------------------------------------------------------
 // Renders the next frame
 //------------------------------------------------------------------------------------------------------
-void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::function<void(XrTime)> update_simulation_callback) {
+void OpenXrHandler::renderFrame(std::function<void(RenderContext&)> draw_callback,
+                                std::function<void(XrTime)> update_simulation_callback) {
 	XrResult result;
 
-	//------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------
 	// Setup the frame
 	//------------------------------------------------------------------------------------------------------
 	// The call to xrWait frame will fill in the frame_state struct, where the field we'll
@@ -748,18 +781,16 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
 	// place objects, viewpoints, controllers etc. in the view
 	XrFrameState xr_frame_state = {};
 	xr_frame_state.type = XR_TYPE_FRAME_STATE;
-	result = xrWaitFrame(m_openxr_session, NULL, &xr_frame_state);
-	if(XR_FAILED(result)) {
-		return;
-	}
+  XrFrameWaitInfo frame_wait_info{ XR_TYPE_FRAME_WAIT_INFO };
+	result = xrWaitFrame(m_openxr_session, &frame_wait_info, &xr_frame_state);
+	Utils::checkXrResult(result, "Failed to wait for frame");
 
 	//------------------------------------------------------------------------------------------------------
 	// Begin the frame
 	//------------------------------------------------------------------------------------------------------
-	result = xrBeginFrame(m_openxr_session, NULL);
-	if (XR_FAILED(result)) {
-		return;
-	}
+  XrFrameBeginInfo frame_begin_info{ XR_TYPE_FRAME_BEGIN_INFO };
+	result = xrBeginFrame(m_openxr_session, &frame_begin_info);
+	Utils::checkXrResult(result, "Failed to begin frame");
 
 	//------------------------------------------------------------------------------------------------------
 	// Poll the openxr actions for this frame
@@ -769,7 +800,7 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
   //------------------------------------------------------------------------------------------------------
 	// Update the interactions of the controllers and hands with the scene
 	//------------------------------------------------------------------------------------------------------
-  std::optional<DirectX::XMVECTOR> teleport_location_left, teleport_location_right;
+  std::optional<glm::vec3> teleport_location_left, teleport_location_right;
   teleport_location_left = m_left_controller->updateIntersectionSphereAndComputePossibleTeleport();
   teleport_location_right = m_right_controller->updateIntersectionSphereAndComputePossibleTeleport();
 
@@ -780,11 +811,11 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
   // precedende. Later, we might map the teleport action to a single controller anyway,
   // so maybe this will not be needed anymore.
   if (teleport_location_right.has_value()) {
-    updateCurrentOriginForTeleport(teleport_location_right.value());
+    // updateCurrentOriginForTeleport(teleport_location_right.value());
     // TODO: update position of grabbed model if we're currently grabbing something with either hand
   }
   else if (teleport_location_left.has_value()) {
-    updateCurrentOriginForTeleport(teleport_location_left.value());
+    // updateCurrentOriginForTeleport(teleport_location_left.value());
     // TODO: update position of grabbed model if we're currently grabbing something with either hand
   }
   else {
@@ -817,16 +848,14 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
 	std::vector<XrCompositionLayerBaseHeader*> layers;
 	XrCompositionLayerProjection layer_projection = {};
 	layer_projection.type = XR_TYPE_COMPOSITION_LAYER_PROJECTION;
-	std::vector<XrCompositionLayerProjectionView> views;
 
-
-	// Check if the xrSession is in a state that we actually need to render. If the session isn't in the
+  // Check if the xrSession is in a state that we actually need to render. If the session isn't in the
 	// VISIBLE or in the FOCUSED state, we don't need to render the layer (e.g. when the user of the
 	// application takes off the vr headset while the application still is running. In that case,
 	// we need to keep the application (and the simulation) running, but there is no point in rendering
 	// anything.
 	if (xr_frame_state.shouldRender) {
-		renderLayer(xr_frame_state.predictedDisplayTime, views, layer_projection, draw_callback);
+		renderLayer(xr_frame_state.predictedDisplayTime, layer_projection, draw_callback);
 		layers.push_back((XrCompositionLayerBaseHeader *)&layer_projection);
 	}
 
@@ -836,18 +865,18 @@ void OpenXrHandler::renderFrame(std::function<void()> draw_callback, std::functi
 	XrFrameEndInfo frame_end_info = {};
 	frame_end_info.type = XR_TYPE_FRAME_END_INFO;
 	frame_end_info.displayTime = xr_frame_state.predictedDisplayTime;
-	frame_end_info.environmentBlendMode = m_openxr_blend_mode;
+	frame_end_info.environmentBlendMode = XR_ENVIRONMENT_BLEND_MODE_OPAQUE;
 	frame_end_info.layerCount = layers.size();
 	frame_end_info.layers = layers.data();
-	xrEndFrame(m_openxr_session, &frame_end_info);
+	result = xrEndFrame(m_openxr_session, &frame_end_info);
+  Utils::checkXrResult(result, "Failed to end OpenXR frame");
 }
 
 //------------------------------------------------------------------------------------------------------
 // Renders an OpenXR layer
 //------------------------------------------------------------------------------------------------------
-void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrCompositionLayerProjectionView>& views,
-																	 XrCompositionLayerProjection& layer_projection,
-																	 std::function<void()> draw_callback) {
+void OpenXrHandler::renderLayer(XrTime predicted_time, XrCompositionLayerProjection& layer_projection,
+                                std::function<void(RenderContext&)> draw_callback) {
 	XrResult result;
 
 	uint32_t view_count = 0;
@@ -870,27 +899,40 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 	view_locate_info.displayTime = predicted_time;
 	view_locate_info.space = m_openxr_stage_space;
 
-	// Call xrLocateViews, which will give us the number of views we have to render (stored in view_count), as
-	// well as fill in the xr_views vector with the predicted views (which is basically a struct containing
-	// the pose of the view, as well as the fov for that view. We'll use these two later to render with D3D11,
-	// as we need to modify the objects and the view before rendering.
+  // Call xrLocateViews, which will give us the number of views we have to render (stored in view_count).
 	result = xrLocateViews(m_openxr_session, &view_locate_info, &view_state, (uint32_t)m_openxr_views.size(), &view_count, m_openxr_views.data());
 	Utils::checkXrResult(result, "Could not locate views!");
-	views.resize(view_count);
+
+  if (view_count != m_view_count) {
+    Utils::exitWithMessage("Number of views does not match number of eyes");
+  }
+
+  //------------------------------------------------------------------------------------------------------
+	// Update view render informations as well as the matrices
+	//------------------------------------------------------------------------------------------------------
+	for (uint32_t i = 0; i < view_count; i++) {
+    // Copy eye pose into eye render info
+    m_projection_views[i].pose = m_openxr_views[i].pose;
+    m_projection_views[i].fov = m_openxr_views[i].fov;
+
+    // Update view matrix
+    m_view_matrices[i] = Geometry::poseToMatrix(m_projection_views[i].pose);
+
+    // Update projection matrix
+    m_projection_matrices[i] = Geometry::createProjectionMatrix(m_projection_views[i].fov, 0.1f, 250.0f);
+  }
 
 	//------------------------------------------------------------------------------------------------------
 	// Render the layer for each view
 	//------------------------------------------------------------------------------------------------------
 	for (uint32_t i = 0; i < view_count; i++) {
-		// First, we need to acquire a swapchain image, as we need a render target to render the data
-		// to. As a reminder (from the CreateSwapchainRenderTargets method), a swapchain image
-		// in the context of D3D11 is the buffer we want to render to.
+		// First, we need to acquire a swapchain image, as we need a render target to render the data to.
 		// As we don't pass a swapchain_image_id into the xrAcquireSwapchainImage call, the runtime decides
 		// which swapchain image we'll get
 		uint32_t swapchain_image_id;
 		XrSwapchainImageAcquireInfo swapchain_acquire_info = {};
 		swapchain_acquire_info.type = XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO;
-		result = xrAcquireSwapchainImage(m_swapchains[i].handle, &swapchain_acquire_info, &swapchain_image_id);
+		result = xrAcquireSwapchainImage(m_swapchains[i], &swapchain_acquire_info, &swapchain_image_id);
 		Utils::checkXrResult(result, "Could not acquire swapchain image");
 
 		// We need to wait until the swapchain image is available for writing, as the compositor
@@ -901,35 +943,18 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 		XrSwapchainImageWaitInfo swapchain_wait_info = {};
 		swapchain_wait_info.type = XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO;
 		swapchain_wait_info.timeout = XR_INFINITE_DURATION;
-		result = xrWaitSwapchainImage(m_swapchains[i].handle, &swapchain_wait_info);
+		result = xrWaitSwapchainImage(m_swapchains[i], &swapchain_wait_info);
 		Utils::checkXrResult(result, "Could not wait for the swapchain image");
 
-		// Setup the info we need to render the layer for the current view. The XrCompositionLayerProjectionView
-		// is a projection layer element, which has the pose of the current view (pose = location and orientation),
-		// the fov of the current view, and the swapchain sub image, which holds the data for the composition
-		// layer.
-		// The subimage is of type XrSwapchainSubImage, which has a field to the swapchain to display and an
-		// imageRect, which represents the valid portion of the image to use (in pixels)
-		views[i] = {};
-		views[i].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
-		views[i].pose = m_openxr_views[i].pose;
-		views[i].fov = m_openxr_views[i].fov;
-		views[i].subImage.swapchain = m_swapchains[i].handle;
-		views[i].subImage.imageRect.offset = { 0, 0 };
-		views[i].subImage.imageRect.extent = { m_swapchains[i].width, m_swapchains[i].height };
-
-		// Render the content to the swapchain, which is done by the D3D11 handler
-		m_dx11_handler.renderFrame(views[i], m_swapchains[i].swapchain_data[swapchain_image_id], draw_callback, m_current_origin);
-
-		// Render the controllers
-		m_left_controller->render();
-		m_right_controller->render();
-
-    // Render the hands if the hands are not null pointers
-    if (m_left_hand != nullptr && m_right_hand != nullptr) {
-      m_left_hand->render();
-      m_right_hand->render();
-    }
+    // Render the content to the swapchain, which is done by the Vulkan handler
+    m_vulkan_handler.renderFrame(
+      m_view_matrices[i],
+      m_projection_matrices[i],
+      m_render_targets[i][swapchain_image_id]->getFramebuffer(),
+      getEyeResolution(i),
+      draw_callback,
+      std::bind(&OpenXrHandler::renderInteractions, this, std::placeholders::_1)
+    );
 
 		// We're done rendering for the current view, so we can release the swapchain image (i.e. tell
 		// the OpenXR runtime that we're done with this swapchain image).
@@ -937,37 +962,41 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, std::vector<XrComposition
 		// do anything special.
 		XrSwapchainImageReleaseInfo swapchain_release_info = {};
 		swapchain_release_info.type = XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO;
-		result = xrReleaseSwapchainImage(m_swapchains[i].handle, &swapchain_release_info);
+		result = xrReleaseSwapchainImage(m_swapchains[i], &swapchain_release_info);
 		Utils::checkXrResult(result, "Could not release the swapchain image");
 	}
 
 	//------------------------------------------------------------------------------------------------------
-	// Set the rendered data to be displayed
-	//------------------------------------------------------------------------------------------------------
-	// Now thta we're done rendering all views, we can update the layer projection we got passed into
-	// the method with the rendered views, such that we can display them.
-	layer_projection.space = m_openxr_stage_space;
-	layer_projection.viewCount = (uint32_t)views.size();
-	layer_projection.views = views.data();
+  // Set the rendered data to be displayed
+  //------------------------------------------------------------------------------------------------------
+  // Now that we're done rendering all views, we can update the layer projection we got passed into
+  // the method with the rendered views, such that we can display them.
+  layer_projection.space = m_openxr_stage_space;
+  layer_projection.viewCount = static_cast<uint32_t>(m_projection_views.size());
+  layer_projection.views = m_projection_views.data();
 }
 
-ID3D11Device* OpenXrHandler::getDevice() {
-  return m_dx11_handler.getDevice();
+void OpenXrHandler::renderInteractions(RenderContext& ctx) {
+  // Render the controllers
+  m_left_controller->render(ctx);
+  m_right_controller->render(ctx);
+
+    // Render the hands if the hands are not null pointers
+    if (m_left_hand != nullptr && m_right_hand != nullptr) {
+      m_left_hand->render(ctx);
+      m_right_hand->render(ctx);
+    }
 }
 
-ID3D11DeviceContext* OpenXrHandler::getDeviceContext() {
-  return m_dx11_handler.getDeviceContext();
-}
+// void OpenXrHandler::updateCurrentOriginForTeleport(DirectX::XMVECTOR teleport_location) {
+//   DirectX::XMVECTOR difference_vector = teleport_location- m_headset_position;
+//   m_current_origin = difference_vector;
 
-void OpenXrHandler::updateCurrentOriginForTeleport(DirectX::XMVECTOR teleport_location) {
-  DirectX::XMVECTOR difference_vector = teleport_location- m_headset_position;
-  m_current_origin = difference_vector;
-
-  // FIXME: Set the Y value to 0, such that we don't teleport "down" into the floor.
-  // We'll need to have some reliable method to determine the current y value of the floor
-  // (i.e. mesh with terrain flag) under the HMD position to fix this.
-  m_current_origin = DirectX::XMVectorSetY(m_current_origin, 0.0f);
-}
+//   // FIXME: Set the Y value to 0, such that we don't teleport "down" into the floor.
+//   // We'll need to have some reliable method to determine the current y value of the floor
+//   // (i.e. mesh with terrain flag) under the HMD position to fix this.
+//   m_current_origin = DirectX::XMVectorSetY(m_current_origin, 0.0f);
+// }
 
 XrPath OpenXrHandler::getXrPathFromString(std::string string) {
   XrPath path;

@@ -7,53 +7,56 @@
 namespace ModelFactory {
   // "Private" method using an anonymous namespace
   namespace {
-    inline std::tuple<std::vector<vertex_t>, std::vector<unsigned int>> getGroundVerticesAndIndices(float extent) {
-      std::vector<vertex_t> vertices = {
-        {  DirectX::XMFLOAT3(-extent, 0.0f, -extent), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(extent, 0.0f) },
-        {  DirectX::XMFLOAT3(-extent, 0.0f,  extent), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(0.0f, 0.0f) },
-        {  DirectX::XMFLOAT3( extent, 0.0f,  extent), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(0.0f, extent) },
-        {  DirectX::XMFLOAT3( extent, 0.0f, -extent), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), DirectX::XMFLOAT2(extent, extent) }
+    inline std::tuple<std::vector<Vertex>, std::vector<uint16_t>> getGroundVerticesAndIndices(float extent) {
+      std::vector<Vertex> vertices = {
+        {  glm::vec3(-extent, 0.0f, -extent), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f) },
+        {  glm::vec3(-extent, 0.0f,  extent), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f) },
+        {  glm::vec3( extent, 0.0f,  extent), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f) },
+        {  glm::vec3( extent, 0.0f, -extent), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f) }
       };
 
-      std::vector<unsigned int> indices = {0, 2, 1, 0, 3, 2};
+      std::vector<uint16_t> indices = {
+        0, 2, 1,
+        0, 3, 2
+      };
 
       return { vertices, indices };
     }
 
-    inline std::tuple<std::vector<vertex_t>, std::vector<unsigned int>> getCubeVerticesAndIndices() {
-      std::vector<vertex_t> vertices {
-        { DirectX::XMFLOAT3(-1.0f, -1.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f), DirectX::XMFLOAT2(0.0f, 0.0f) },
-        { DirectX::XMFLOAT3( 1.0f, -1.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f), DirectX::XMFLOAT2(1.0f, 0.0f) },
-        { DirectX::XMFLOAT3(-1.0f, 1.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f), DirectX::XMFLOAT2(0.0f, 1.0f) },
-        { DirectX::XMFLOAT3( 1.0f, 1.0f, 1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f), DirectX::XMFLOAT2(1.0f, 1.0f) },
+    inline std::tuple<std::vector<Vertex>, std::vector<uint16_t>> getCubeVerticesAndIndices() {
+      std::vector<Vertex> vertices {
+        { glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f) },
+        { glm::vec3( 1.0f, -1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f) },
+        { glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f) },
+        { glm::vec3( 1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f) },
 
-        { DirectX::XMFLOAT3(-1.0f, -1.0f, -1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f), DirectX::XMFLOAT2(0.0f, 0.0f) },
-        { DirectX::XMFLOAT3(-1.0f,  1.0f, -1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f), DirectX::XMFLOAT2(1.0f, 0.0f) },
-        { DirectX::XMFLOAT3( 1.0f, -1.0f, -1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f), DirectX::XMFLOAT2(0.0f, 1.0f) },
-        { DirectX::XMFLOAT3( 1.0f,  1.0f, -1.0f), DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f), DirectX::XMFLOAT2(1.0f, 1.0f) },
+        { glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f) },
+        { glm::vec3(-1.0f,  1.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f) },
+        { glm::vec3( 1.0f, -1.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f) },
+        { glm::vec3( 1.0f,  1.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f) },
 
-        { DirectX::XMFLOAT3(-1.0f, 1.0f, -1.0f), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),  DirectX::XMFLOAT2(0.0f, 0.0f) },
-        { DirectX::XMFLOAT3(-1.0f, 1.0f,  1.0f), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),  DirectX::XMFLOAT2(1.0f, 0.0f) },
-        { DirectX::XMFLOAT3( 1.0f, 1.0f, -1.0f), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),  DirectX::XMFLOAT2(0.0f, 1.0f) },
-        { DirectX::XMFLOAT3( 1.0f, 1.0f,  1.0f), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),  DirectX::XMFLOAT2(1.0f, 1.0f) },
+        { glm::vec3(-1.0f, 1.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f) },
+        { glm::vec3(-1.0f, 1.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f) },
+        { glm::vec3( 1.0f, 1.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f) },
+        { glm::vec3( 1.0f, 1.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f) },
 
-        { DirectX::XMFLOAT3(-1.0f, -1.0f, -1.0f), DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f),  DirectX::XMFLOAT2(0.0f, 0.0f) },
-        { DirectX::XMFLOAT3( 1.0f, -1.0f, -1.0f), DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f),  DirectX::XMFLOAT2(1.0f, 0.0f) },
-        { DirectX::XMFLOAT3(-1.0f, -1.0f,  1.0f), DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f),  DirectX::XMFLOAT2(0.0f, 1.0f) },
-        { DirectX::XMFLOAT3( 1.0f, -1.0f,  1.0f), DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f),  DirectX::XMFLOAT2(1.0f, 1.0f) },
+        { glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f) },
+        { glm::vec3( 1.0f, -1.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f) },
+        { glm::vec3(-1.0f, -1.0f,  1.0f), glm::vec3(0.0f, -1.0f, 0.0f) },
+        { glm::vec3( 1.0f, -1.0f,  1.0f), glm::vec3(0.0f, -1.0f, 0.0f) },
 
-        { DirectX::XMFLOAT3(1.0f, -1.0f, -1.0f), DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT2(0.0f, 0.0f) },
-        { DirectX::XMFLOAT3(1.0f,  1.0f, -1.0f), DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT2(1.0f, 0.0f) },
-        { DirectX::XMFLOAT3(1.0f, -1.0f,  1.0f), DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT2(0.0f, 1.0f) },
-        { DirectX::XMFLOAT3(1.0f,  1.0f,  1.0f), DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT2(1.0f, 1.0f) },
+        { glm::vec3(1.0f, -1.0f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f) },
+        { glm::vec3(1.0f,  1.0f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f) },
+        { glm::vec3(1.0f, -1.0f,  1.0f), glm::vec3(1.0f, 0.0f, 0.0f) },
+        { glm::vec3(1.0f,  1.0f,  1.0f), glm::vec3(1.0f, 0.0f, 0.0f) },
 
-        { DirectX::XMFLOAT3(-1.0f, -1.0f, -1.0f), DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT2(0.0f, 0.0f) },
-        { DirectX::XMFLOAT3(-1.0f, -1.0f,  1.0f), DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT2(1.0f, 0.0f) },
-        { DirectX::XMFLOAT3(-1.0f,  1.0f, -1.0f), DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT2(0.0f, 1.0f) },
-        { DirectX::XMFLOAT3(-1.0f,  1.0f,  1.0f), DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f),  DirectX::XMFLOAT2(1.0f, 1.0f) }
+        { glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(-1.0f, 0.0f, 0.0f) },
+        { glm::vec3(-1.0f, -1.0f,  1.0f), glm::vec3(-1.0f, 0.0f, 0.0f) },
+        { glm::vec3(-1.0f,  1.0f, -1.0f), glm::vec3(-1.0f, 0.0f, 0.0f) },
+        { glm::vec3(-1.0f,  1.0f,  1.0f), glm::vec3(-1.0f, 0.0f, 0.0f) }
       };
 
-      std::vector<unsigned int> indices{
+      std::vector<uint16_t> indices{
         2, 1, 0,    // side 1
         3, 1, 2,
         6, 5, 4,    // side 2
@@ -72,18 +75,18 @@ namespace ModelFactory {
     }
   }
 
-  inline Model createCube(DirectX::XMFLOAT4 color) {
+  inline Model createCube(glm::vec3 color) {
     auto [vertices, indices] = getCubeVerticesAndIndices();
 
     Mesh cube_mesh = Mesh(vertices, indices);
     return Model({ cube_mesh }, color);
   }
 
-  inline Model createCube(const char *texture_path) {
+  inline Model* createCubePtr(glm::vec3 color) {
     auto [vertices, indices] = getCubeVerticesAndIndices();
 
-    Mesh cube_mesh = Mesh(vertices, indices, texture_path);
-    return Model({ cube_mesh }, SHADERS_FOLDER "/ambient_texture.hlsl");
+    Mesh cube_mesh = Mesh(vertices, indices);
+    return new Model({ cube_mesh }, color);
   }
 
   inline Model createGroundPlane(float extent) {
@@ -91,13 +94,6 @@ namespace ModelFactory {
 
     Mesh ground_mesh = Mesh(vertices, indices);
     return Model({ ground_mesh });
-  }
-
-  inline Model createGroundPlane(float extent, const char *texture_path) {
-    auto [vertices, indices] = getGroundVerticesAndIndices(extent);
-
-    Mesh ground_mesh = Mesh(vertices, indices, texture_path);
-    return Model({ ground_mesh }, SHADERS_FOLDER "/ambient_texture.hlsl");
   }
 
   inline Model createSphere() {

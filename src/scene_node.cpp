@@ -29,70 +29,73 @@ SceneNode::SceneNode(Renderable* renderable, SceneNode &parent) {
 }
 
 void SceneNode::buildBoundingBox() {
-  std::vector<DirectX::XMFLOAT3> bounding_box_corners = m_model->getMeshBoundingBoxCorners();
-  size_t points_count = bounding_box_corners.size();
+//   std::vector<DirectX::XMFLOAT3> bounding_box_corners = m_model->getMeshBoundingBoxCorners();
+//   size_t points_count = bounding_box_corners.size();
 
-  // Build the bounding box
-  DirectX::BoundingOrientedBox::CreateFromPoints(m_model_bounding_box, points_count, bounding_box_corners.data(), sizeof(DirectX::XMFLOAT3));
+//   // Build the bounding box
+//   DirectX::BoundingOrientedBox::CreateFromPoints(m_model_bounding_box, points_count, bounding_box_corners.data(), sizeof(DirectX::XMFLOAT3));
 
-  // Create the bounding box mesh, such that we can render it
-  DirectX::XMFLOAT3 corners[m_model_bounding_box.CORNER_COUNT];
-  m_model_bounding_box.GetCorners(corners);
-  std::vector<vertex_t> bounding_box_vertices;
+//   // Create the bounding box mesh, such that we can render it
+//   DirectX::XMFLOAT3 corners[m_model_bounding_box.CORNER_COUNT];
+//   m_model_bounding_box.GetCorners(corners);
+//   std::vector<vertex_t> bounding_box_vertices;
 
-  // Create vertices from the corners of the bounding box
-  for (int i = 0; i < m_model_bounding_box.CORNER_COUNT; i++) {
-    bounding_box_vertices.push_back({ corners[i], { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
-  }
+//   // Create vertices from the corners of the bounding box
+//   for (int i = 0; i < m_model_bounding_box.CORNER_COUNT; i++) {
+//     bounding_box_vertices.push_back({ corners[i], { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
+//   }
 
-  m_model_bounding_box_mesh = BoundingBoxMesh(bounding_box_vertices);
+//   m_model_bounding_box_mesh = BoundingBoxMesh(bounding_box_vertices);
 }
 
 SceneNode::~SceneNode() {
  m_children.clear();
 }
 
-void SceneNode::addChildNode(SceneNode &child) {
-  m_children.push_back(&child);
-  child.m_parent = this;
-}
+// void SceneNode::addChildNode(SceneNode &child) {
+//   m_children.push_back(&child);
+//   child.m_parent = this;
+// }
 
 void SceneNode::addChildNode(SceneNode *child) {
   m_children.push_back(child);
   child->m_parent = this;
 }
 
-void SceneNode::render() {
+void SceneNode::render(RenderContext& ctx) {
   if (!m_is_active) {
     return;
   }
 
   if (m_model) {
-    m_model->m_shader.activate();
+//     // Update the shader with the transform
+//     m_model->m_shader.setModelMatrix(m_world_transform);
+//     m_model->m_shader.setNormalRotationMatrix(m_world_rotation_matrix);
+//     if (m_intersected_in_current_frame) {
+//       m_model->m_shader.setModelColor({1.0f, 0.0f, 0.0f, 1.0f});
+//     }
+//     else {
+//       m_model->m_shader.setModelColor(m_model->getColor());
+//     }
+//     m_model->m_shader.updatePerModelConstantBuffer();
 
-    // Update the shader with the transform
-    m_model->m_shader.setModelMatrix(m_world_transform);
-    m_model->m_shader.setNormalRotationMatrix(m_world_rotation_matrix);
-    if (m_intersected_in_current_frame) {
-      m_model->m_shader.setModelColor({1.0f, 0.0f, 0.0f, 1.0f});
-    }
-    else {
-      m_model->m_shader.setModelColor(m_model->getColor());
-    }
-    m_model->m_shader.updatePerModelConstantBuffer();
-    m_model->render();
+    // Update the render context with the transform
+    m_model->setWorldMatrix(m_world_transform);
 
-    // Set shader variables to identities, as the bounding box is already updated
-    // with the correct position (as we need the correct position to be able to
-    // compute intersections).
-    m_model_bounding_box_mesh.render();
+    // And render the model
+    m_model->render(ctx);
+
+//     // Set shader variables to identities, as the bounding box is already updated
+//     // with the correct position (as we need the correct position to be able to
+//     // compute intersections).
+//     m_model_bounding_box_mesh.render();
   }
   else if (m_renderable) {
-    m_renderable->render();
+    m_renderable->render(ctx);
   }
 
   for (SceneNode *child : m_children) {
-    child->render();
+    child->render(ctx);
   }
 }
 
@@ -106,36 +109,27 @@ void SceneNode::updateTransformation() {
   // if its `m_transform_needs_update` flag or the one of its parent is set to `true`
   if (m_transform_needs_update) {
     // Update the local transform
-    m_local_transform = DirectX::XMMatrixTranspose(
-      DirectX::XMMatrixAffineTransformation(
-        m_scaling,
-        DirectX::g_XMZero,
-        m_rotation,
-        m_translation
-      )
+    m_local_transform = Geometry::composeWorldMatrix(
+      m_translation,
+      m_rotation,
+      m_scaling
     );
 
     if (m_parent) {
-      m_world_transform = DirectX::XMMatrixMultiply(
-        m_parent->m_world_transform,
-        m_local_transform
-      );
-
-      m_world_rotation_matrix = DirectX::XMMatrixRotationQuaternion(
-        DirectX::XMQuaternionMultiply(m_parent->m_rotation, m_rotation)
-      );
+      m_world_transform = m_parent->m_world_transform * m_local_transform;
+      m_world_rotation_matrix = glm::toMat4(m_parent->m_rotation * m_rotation);
     }
     else {
       // No parent, is the root node, which means its local transform
       // is also its world transform, since the local transform is applied
       // relative to the origin point.
       m_world_transform = m_local_transform;
-      m_world_rotation_matrix = DirectX::XMMatrixRotationQuaternion(m_rotation);
+      m_world_rotation_matrix = glm::toMat4(m_rotation);
     }
 
-    if (m_model) {
-      m_model_bounding_box_mesh.updateVerticesFromBoundingBox(getTransformedBoundingBox());
-    }
+    // if (m_model) {
+    //   m_model_bounding_box_mesh.updateVerticesFromBoundingBox(getTransformedBoundingBox());
+    // }
   }
 
   // Update the transforms of all the children.
@@ -147,76 +141,76 @@ void SceneNode::updateTransformation() {
   m_transform_needs_update = false;
 }
 
-DirectX::BoundingOrientedBox SceneNode::getTransformedBoundingBox() {
-  DirectX::BoundingOrientedBox transformed;
-  m_model_bounding_box.Transform(transformed, DirectX::XMMatrixTranspose(m_world_transform));
-  return transformed;
-}
+// DirectX::BoundingOrientedBox SceneNode::getTransformedBoundingBox() {
+//   DirectX::BoundingOrientedBox transformed;
+//   m_model_bounding_box.Transform(transformed, DirectX::XMMatrixTranspose(m_world_transform));
+//   return transformed;
+// }
 
 void SceneNode::rotate(float roll, float pitch, float yaw) {
-  DirectX::XMVECTOR rotation = DirectX::XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
+  auto rotation = glm::quat(glm::vec3(pitch, yaw, roll));
   rotate(rotation);
 }
 
-void SceneNode::rotate(DirectX::XMVECTOR rotation) {
-  m_rotation = DirectX::XMQuaternionMultiply(m_rotation, rotation);
+void SceneNode::rotate(glm::quat rotation) {
+  m_rotation = m_rotation * rotation;
   m_transform_needs_update = true;
 }
 
 void SceneNode::translate(float x, float y, float z) {
-  DirectX::XMVECTOR translation = DirectX::XMVECTORF32({x, y, z});
+  auto translation = glm::vec3({x, y, z});
   translate(translation);
 }
 
-void SceneNode::translate(DirectX::XMVECTOR translation) {
-  m_translation = DirectX::XMVectorAdd(m_translation, translation);
+void SceneNode::translate(glm::vec3 translation) {
+  m_translation =m_translation + translation;
   m_transform_needs_update = true;
 }
 
 void SceneNode::scale(float x, float y, float z) {
-  DirectX::XMVECTOR scaling = DirectX::XMVECTORF32({x, y, z});
+  auto scaling = glm::vec3({x, y, z});
   scale(scaling);
 }
 
-void SceneNode::scale(DirectX::XMVECTOR scaling) {
-  m_scaling = DirectX::XMVectorMultiply(m_scaling, scaling);
+void SceneNode::scale(glm::vec3 scaling) {
+  m_scaling = m_scaling * scaling;
   m_transform_needs_update = true;
 }
 
-void SceneNode::setRotation(DirectX::XMVECTOR rotation) {
+void SceneNode::setRotation(glm::quat rotation) {
   m_rotation = rotation;
   m_transform_needs_update = true;
 }
 
 void SceneNode::setScale(float x, float y, float z) {
-  DirectX::XMVECTOR scaling = DirectX::XMVECTORF32({x, y, z});
+  auto scaling = glm::vec3({x, y, z});
   setScale(scaling);
 }
 
-void SceneNode::setScale(DirectX::XMVECTOR scaling) {
+void SceneNode::setScale(glm::vec3 scaling) {
   m_scaling = scaling;
   m_transform_needs_update = true;
 }
 
 void SceneNode::setPosition(float x, float y, float z) {
-  DirectX::XMVECTOR position = DirectX::XMVECTORF32({x, y, z});
+ auto position = glm::vec3({x, y, z});
   setPosition(position);
 }
 
-void SceneNode::setPosition(DirectX::XMVECTOR position) {
+void SceneNode::setPosition(glm::vec3 position) {
   m_translation = position;
   m_transform_needs_update = true;
 }
 
-DirectX::XMVECTOR SceneNode::getRotation() {
+glm::quat SceneNode::getRotation() {
   return m_rotation;
 }
 
-DirectX::XMVECTOR SceneNode::getScale() {
+glm::vec3 SceneNode::getScale() {
   return m_scaling;
 }
 
-DirectX::XMVECTOR SceneNode::getPosition() {
+glm::vec3 SceneNode::getPosition() {
   return m_translation;
 }
 
@@ -270,13 +264,13 @@ std::unordered_set<SceneNode*> SceneNode::getTerrainInstances() {
   return result;
 }
 
-bool SceneNode::intersects(DirectX::BoundingOrientedBox other) {
-  return getTransformedBoundingBox().Intersects(other);
-}
+// bool SceneNode::intersects(DirectX::BoundingOrientedBox other) {
+//   return getTransformedBoundingBox().Intersects(other);
+// }
 
-bool SceneNode::intersects(DirectX::XMVECTOR line_start, DirectX::XMVECTOR line_direction, float *out_distance) {
-  return getTransformedBoundingBox().Intersects(line_start, line_direction, *out_distance);
-}
+// bool SceneNode::intersects(DirectX::XMVECTOR line_start, DirectX::XMVECTOR line_direction, float *out_distance) {
+//   return getTransformedBoundingBox().Intersects(line_start, line_direction, *out_distance);
+// }
 
 void SceneNode::resetInteractionStates() {
   for (SceneNode* current_node : s_grabbable_instances) {

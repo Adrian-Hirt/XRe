@@ -1,67 +1,67 @@
 #pragma once
 
 // DirectX includes
-#include <d3d11.h>
-#include <DirectXMath/DirectXMath.h>
-#include <DirectXTex/WICTextureLoader11.h>
-#include <DirectXMath/DirectXCollision.h>
+// #include <d3d11.h>
+// #include <DirectXMath/DirectXMath.h>
+// #include <DirectXTex/WICTextureLoader11.h>
+// #include <DirectXMath/DirectXCollision.h>
 
 // Include vector header
 #include <vector>
 
+// GLM includes
+#include <glm/glm/vec3.hpp>
+#include <glm/glm/gtc/matrix_transform.hpp>
+
 // XRe includes
 #include <xre/utils.h>
 #include <xre/structs.h>
-#include <xre/shader.h>
+#include <xre/buffer.h>
+// #include <xre/shader.h>
 
 // Base class which is subclassed by other classes that are "renderable", i.e.
 // can be rendered to display some output in the program.
 class Renderable {
 public:
-  virtual void render();
-  DirectX::BoundingOrientedBox getBoundingBox();
+  // DirectX::BoundingOrientedBox getBoundingBox();
 
-  static void registerDx11DeviceAndDeviceContext(ID3D11Device *device, ID3D11DeviceContext *device_context);
+  static void registerDeviceAndPhysicalDevice(VkDevice device, VkPhysicalDevice physical_device);
 
 protected:
-  inline static ID3D11Device *s_device = NULL;
-  inline static ID3D11DeviceContext *s_device_context = NULL;
-  inline static ID3D11ShaderResourceView *s_nulltexture = NULL;
+  inline static VkDevice s_device = VK_NULL_HANDLE;
+  inline static VkPhysicalDevice s_physical_device = VK_NULL_HANDLE;
+  // inline static ID3D11ShaderResourceView *s_nulltexture = NULL;
 
   // Any renderable has a bounding box by default. Subclasses which do not
   // can override this method to disable bounding boxes.
   virtual inline bool hasBoundingBox() { return true; };
 
-  // Whether the mesh should be changeable (i.e. the vertex and index buffers need
-  // to be updateable or not).
-  virtual inline bool usesStaticBuffers() { return true; };
+  // Protected as only subclasses may use it
+  virtual void render(RenderContext& ctx);
 
   // vertex and index buffers
-  ID3D11Buffer *m_vertex_buffer;
-  ID3D11Buffer *m_index_buffer;
+  Buffer *m_vertex_buffer = nullptr;
+  Buffer *m_index_buffer = nullptr; 
 
   // Vertex and index buffer for bounding volumes, which mainly are used
   // for debugging purposes.
-  ID3D11Buffer *m_bounding_box_vertex_buffer;
-  ID3D11Buffer *m_bounding_box_index_buffer;
+  Buffer *m_bounding_box_vertex_buffer = nullptr;
+  Buffer *m_bounding_box_index_buffer = nullptr;
 
-  // The applied texture
-  ID3D11ShaderResourceView *m_texture_view = NULL;
+  // // The applied texture
+  // ID3D11ShaderResourceView *m_texture_view = NULL;
 
   // Number of vertices and indices
   size_t m_vertex_count;
   size_t m_index_count;
 
-  // The bounding box of this mesh
-  DirectX::BoundingOrientedBox m_bounding_box;
+  // // The bounding box of this mesh
+  // DirectX::BoundingOrientedBox m_bounding_box;
 
-  // Whether the mesh should be changeable (i.e. the vertex and index buffers need
-  // to be updateable or not).
-  bool m_static_buffers = true;
+  // Shader m_shader;
 
-  Shader m_shader;
+  void initialize(std::vector<Vertex> vertices, std::vector<uint16_t> indices);
 
-  void initialize(std::vector<vertex_t> vertices, std::vector<unsigned int> indices);
-  void createVertexBuffer(std::vector<vertex_t> data, ID3D11Buffer **target_buffer);
-  void createIndexBuffer(std::vector<unsigned int> data, ID3D11Buffer **target_buffer);
+  // Scene Node can call render() directly
+  friend class SceneNode;
 };
