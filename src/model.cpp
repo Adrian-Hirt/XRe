@@ -191,10 +191,10 @@ void Model::setWorldMatrix(glm::mat4 world_matrix) {
 
 bool Model::intersects(Model other) {
   for (auto mesh : m_meshes) {
-    auto thisOOBB = mesh.getObjectOrientedBoundingBox().transformed(m_world_matrix);
-    for (auto otherMesh : other.m_meshes) {
-      auto otherOOBB = otherMesh.getObjectOrientedBoundingBox().transformed(other.m_world_matrix);
-      if (thisOOBB.intersects(otherOOBB)) {
+    auto this_OOBB = mesh.getObjectOrientedBoundingBox().transformed(m_world_matrix);
+    for (auto other_mesh : other.m_meshes) {
+      auto other_OOBB = other_mesh.getObjectOrientedBoundingBox().transformed(other.m_world_matrix);
+      if (this_OOBB.intersects(other_OOBB)) {
         return true;
       }
     }

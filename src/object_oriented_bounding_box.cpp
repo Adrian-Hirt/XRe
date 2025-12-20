@@ -3,12 +3,12 @@
 // ------------------------------------
 // Power iteration eigenvector solver
 // ------------------------------------
-glm::vec3 OOBB::powerIteration(const glm::mat3& A, int maxIterations = 50) {
+glm::vec3 OOBB::powerIteration(const glm::mat3& matrix, int max_iterations = 50) {
   // Use a vector with all ones as the "starting" vector
   glm::vec3 b = glm::one<glm::vec3>();
 
-  for (int i = 0; i < maxIterations; i++) {
-    glm::vec3 b2 = A * b;
+  for (int i = 0; i < max_iterations; i++) {
+    glm::vec3 b2 = matrix * b;
     float norm = glm::length(b2);
     if (norm < 1e-6f) {
       break;
@@ -43,40 +43,40 @@ OOBB::OOBB(const std::vector<glm::vec3>& points) {
   // 2. Compute covariance matrix
   // -------------------------------
   // Build the covariance matrix of the points
-  glm::mat3 C = glm::zero<glm::mat3>();
+  glm::mat3 covariance = glm::zero<glm::mat3>();
 
   for (auto& p : points) {
     glm::vec3 d = p - centroid;
-    C[0][0] += d.x * d.x;
-    C[0][1] += d.x * d.y;
-    C[0][2] += d.x * d.z;
-    C[1][0] += d.y * d.x;
-    C[1][1] += d.y * d.y;
-    C[1][2] += d.y * d.z;
-    C[2][0] += d.z * d.x;
-    C[2][1] += d.z * d.y;
-    C[2][2] += d.z * d.z;
+    covariance[0][0] += d.x * d.x;
+    covariance[0][1] += d.x * d.y;
+    covariance[0][2] += d.x * d.z;
+    covariance[1][0] += d.y * d.x;
+    covariance[1][1] += d.y * d.y;
+    covariance[1][2] += d.y * d.z;
+    covariance[2][0] += d.z * d.x;
+    covariance[2][1] += d.z * d.y;
+    covariance[2][2] += d.z * d.z;
   }
 
-  C /= (float) points.size();
+  covariance /= (float) points.size();
 
   // -------------------------------
   // 3. Compute eigenvectors (principal axes)
   // -------------------------------
   // First eigenvector, directly computed from the power iteration
   // method.
-  glm::vec3 e1 = powerIteration(C);
+  glm::vec3 e1 = powerIteration(covariance);
 
   // Approx eigenvalue for the first eigenvector we computed beforehand.
-  float lambda1 = glm::dot(e1, C * e1);
+  float lambda1 = glm::dot(e1, covariance * e1);
 
   // Deflate matrix (remove component of first eigenvector), such that
   // computing the largest eigenvector of the matrix C2 gives us the
   // second largest eigenvector of the original C.
-  glm::mat3 C2 = C - lambda1 * glm::outerProduct(e1, e1);
+  glm::mat3 deflated_covariance = covariance - lambda1 * glm::outerProduct(e1, e1);
 
   // Compute eigenvector and approximate the second eigenvalue
-  glm::vec3 e2 = powerIteration(C2);
+  glm::vec3 e2 = powerIteration(deflated_covariance);
 
   // Check if e1 and e2 are too parallel, which might happen e.g. with cubes,
   // which means computing the principal components will fail.
@@ -89,7 +89,7 @@ OOBB::OOBB(const std::vector<glm::vec3>& points) {
       e2 = glm::normalize(glm::cross(e1, glm::vec3(0,1,0)));
     }
   }
-  float lambda2 = glm::dot(e2, C * e2);
+  float lambda2 = glm::dot(e2, covariance * e2);
 
   // Third eigenvector is orthogonal to the first two
   glm::vec3 e3 = glm::normalize(glm::cross(e1, e2));
@@ -113,15 +113,15 @@ OOBB::OOBB(const std::vector<glm::vec3>& points) {
   // away from the origin (== centroid) to compute the extends. Once we have
   // this, we effectively have an AABB, which we then can undo the transformation
   // to get an OOBB.
-  glm::mat3 R = axes;
-  glm::mat3 R_T = glm::transpose(R);
+  glm::mat3 rotation = axes;
+  glm::mat3 rotation_transposed = glm::transpose(rotation);
 
   glm::vec3 minv( std::numeric_limits<float>::max());
   glm::vec3 maxv(-std::numeric_limits<float>::max());
 
   for (auto& p : points) {
     glm::vec3 d = p - centroid;
-    glm::vec3 q = R_T * d;
+    glm::vec3 q = rotation_transposed * d;
 
     minv = glm::min(minv, q);
     maxv = glm::max(maxv, q);
@@ -131,10 +131,10 @@ OOBB::OOBB(const std::vector<glm::vec3>& points) {
   // 5. Compute extents and center
   // -------------------------------
   glm::vec3 extents = 0.5f * (maxv - minv);
-  glm::vec3 localCenter = 0.5f * (maxv + minv);
-  glm::vec3 worldCenter = R * localCenter + centroid;
+  glm::vec3 local_center = 0.5f * (maxv + minv);
+  glm::vec3 world_center = rotation * local_center + centroid;
 
-  m_center = worldCenter;
+  m_center = world_center;
   m_extents = extents;
   m_axes = axes;
 }
@@ -248,7 +248,7 @@ bool OOBB::intersects(OOBB& other) {
   constexpr float EPS = 1e-8f;
 
   // Center-to-center vector
-  glm::vec3 centerToCenterVector = other.getCenter() - m_center;
+  glm::vec3 center_to_center_vector = other.getCenter() - m_center;
 
   // Convenience access
   const glm::mat3& other_axes = other.getAxes();
@@ -258,7 +258,7 @@ bool OOBB::intersects(OOBB& other) {
   //
   // If the projections of the two OOBBs onto this axis do NOT overlap,
   // then this axis separates the boxes and they do not intersect.
-  auto isSeparatingAxis = [](glm::vec3& axis, OOBB& self, OOBB& other, glm::vec3 centerToCenter) {
+  auto isSeparatingAxis = [](glm::vec3& axis, OOBB& self, OOBB& other, glm::vec3 center_to_center) {
     // Helper lambda that computes the projection "radius" of an OOBB
     // onto the given axis.
     //
@@ -277,32 +277,32 @@ bool OOBB::intersects(OOBB& other) {
 
     // Project both boxes onto the axis and compute their radii
     float radius = projectedRadius(self, axis);
-    float otherRadius = projectedRadius(other, axis);
+    float other_radius = projectedRadius(other, axis);
 
     // Project the center-to-center vector onto the axis.
     // This gives the distance between the two projection centers
     // along this axis.
-    float centerDistance = fabs(glm::dot(centerToCenter, axis));
+    float center_distance = fabs(glm::dot(center_to_center, axis));
 
     // If the distance between centers is greater than the sum of
     // the projection radii, the intervals do not overlap.
     //
     // This means the axis separates the two OOBBs.
-    return centerDistance > radius + otherRadius;
+    return center_distance > radius + other_radius;
   };
 
   // Test the current bounding box axes
   for (int i = 0; i < 3; ++i) {
-    glm::vec3 currentAxis = m_axes[i];
-    if (isSeparatingAxis(currentAxis, *this, other, centerToCenterVector)) {
+    glm::vec3 current_axis = m_axes[i];
+    if (isSeparatingAxis(current_axis, *this, other, center_to_center_vector)) {
       return false;
     }
   }
 
   // Test the axes of the other bounding box
   for (int i = 0; i < 3; ++i) {
-    glm::vec3 otherCurrentAxis = other_axes[i];
-    if (isSeparatingAxis(otherCurrentAxis, *this, other, centerToCenterVector)) {
+    glm::vec3 other_current_axis = other_axes[i];
+    if (isSeparatingAxis(other_current_axis, *this, other, center_to_center_vector)) {
       return false;
     }
   }
@@ -311,15 +311,15 @@ bool OOBB::intersects(OOBB& other) {
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
       // Compute cross-product
-      glm::vec3 crossProduct = glm::cross(m_axes[i], other_axes[j]);
-      if (glm::length2(crossProduct) < EPS) {
+      glm::vec3 cross_product = glm::cross(m_axes[i], other_axes[j]);
+      if (glm::length2(cross_product) < EPS) {
         continue; // parallel axes
       }
 
       // Normalize
-      crossProduct = glm::normalize(crossProduct);
+      cross_product = glm::normalize(cross_product);
 
-      if (isSeparatingAxis(crossProduct, *this, other, centerToCenterVector)) {
+      if (isSeparatingAxis(cross_product, *this, other, center_to_center_vector)) {
         return false;
       }
     }

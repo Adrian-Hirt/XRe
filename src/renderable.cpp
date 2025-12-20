@@ -89,12 +89,12 @@ void Renderable::render(RenderContext& ctx) {
   // Bind buffers
   //------------------------------------------------------------------------------------------------------
   const VkDeviceSize offset = 0u;
-  const VkBuffer vertexBuffer = m_vertex_buffer->getBuffer();
-  vkCmdBindVertexBuffers(ctx.command_buffer, 0u, 1u, &vertexBuffer, &offset);
+  const VkBuffer vertex_buffer = m_vertex_buffer->getBuffer();
+  vkCmdBindVertexBuffers(ctx.command_buffer, 0u, 1u, &vertex_buffer, &offset);
 
   // Bind the index buffer
-  const VkBuffer indexBuffer = m_index_buffer->getBuffer(); // Your new index buffer
-  vkCmdBindIndexBuffer(ctx.command_buffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+  const VkBuffer index_buffer = m_index_buffer->getBuffer(); // Your new index buffer
+  vkCmdBindIndexBuffer(ctx.command_buffer, index_buffer, 0, VK_INDEX_TYPE_UINT16);
 
   //------------------------------------------------------------------------------------------------------
   // Draw
@@ -108,12 +108,12 @@ void Renderable::renderBoundingBox(RenderContext& ctx) {
   // Bind buffers for bounding boxes
   //------------------------------------------------------------------------------------------------------
   const VkDeviceSize offset = 0u;
-  const VkBuffer bboxVertexBuffer = m_bounding_box_vertex_buffer->getBuffer();
-  vkCmdBindVertexBuffers(ctx.command_buffer, 0u, 1u, &bboxVertexBuffer, &offset);
+  const VkBuffer bbox_vertex_buffer = m_bounding_box_vertex_buffer->getBuffer();
+  vkCmdBindVertexBuffers(ctx.command_buffer, 0u, 1u, &bbox_vertex_buffer, &offset);
 
   // Bind the index buffer
-  const VkBuffer bboxIndexBuffer = m_bounding_box_index_buffer->getBuffer(); // Your new index buffer
-  vkCmdBindIndexBuffer(ctx.command_buffer, bboxIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
+  const VkBuffer bbox_index_buffer = m_bounding_box_index_buffer->getBuffer(); // Your new index buffer
+  vkCmdBindIndexBuffer(ctx.command_buffer, bbox_index_buffer, 0, VK_INDEX_TYPE_UINT16);
 
   //------------------------------------------------------------------------------------------------------
   // Draw
