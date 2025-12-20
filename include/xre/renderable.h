@@ -17,6 +17,7 @@
 #include <xre/utils.h>
 #include <xre/structs.h>
 #include <xre/buffer.h>
+#include <xre/object_oriented_bounding_box.h>
 // #include <xre/shader.h>
 
 // Base class which is subclassed by other classes that are "renderable", i.e.
@@ -55,8 +56,8 @@ protected:
   size_t m_vertex_count;
   size_t m_index_count;
 
-  // // The bounding box of this mesh
-  // DirectX::BoundingOrientedBox m_bounding_box;
+  // The bounding box of this renderable
+  OOBB m_bounding_box;
 
   // Shader m_shader;
 

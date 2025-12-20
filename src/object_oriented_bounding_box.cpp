@@ -18,9 +18,8 @@ glm::vec3 OOBB::powerIteration(const glm::mat3& A, int maxIterations = 50) {
   return glm::normalize(b);
 }
 
-// ------------------------------------
-// Compute OOBB
-// ------------------------------------
+OOBB::OOBB() {}
+
 OOBB::OOBB(const std::vector<glm::vec3>& points) {
   if (points.empty()) {
     m_center = glm::zero<glm::vec3>();
@@ -78,6 +77,18 @@ OOBB::OOBB(const std::vector<glm::vec3>& points) {
 
   // Compute eigenvector and approximate the second eigenvalue
   glm::vec3 e2 = powerIteration(C2);
+
+  // Check if e1 and e2 are too parallel, which might happen e.g. with cubes,
+  // which means computing the principal components will fail.
+  if(glm::length2(glm::cross(e1,e2)) < 1e-6f) {
+    // Pick any vector orthogonal to e1
+    if(fabs(e1.x) < 0.9f) {
+      e2 = glm::normalize(glm::cross(e1, glm::vec3(1,0,0)));
+    }
+    else {
+      e2 = glm::normalize(glm::cross(e1, glm::vec3(0,1,0)));
+    }
+  }
   float lambda2 = glm::dot(e2, C * e2);
 
   // Third eigenvector is orthogonal to the first two
@@ -139,3 +150,26 @@ glm::vec3 OOBB::getExtents() {
 glm::mat3 OOBB::getAxes() {
   return m_axes;
 };
+
+void OOBB::print() {
+  std::cout << "Center: " 
+            << m_center.x << ", " 
+            << m_center.y << ", " 
+            << m_center.z << "\n";
+
+  std::cout << "Extents: "
+            << m_extents.x << ", "
+            << m_extents.y << ", "
+            << m_extents.z << "\n";
+
+  std::cout << "Axes: (columns)\n";
+
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      std::cout << m_axes[i][j] << ", ";
+    }
+    std::cout << std::endl;
+  }
+
+  std::cout << "--------------" << std::endl;
+}

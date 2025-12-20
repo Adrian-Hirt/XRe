@@ -3,18 +3,24 @@
 // GLM includes
 #include <glm/glm/vec3.hpp>
 #include <glm/glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/glm/gtx/quaternion.hpp>
 
 // Other includes
 #include <vector>
 #include <limits>
+#include <iostream>
 
 class OOBB {
 public:
+  OOBB();
   OOBB(const std::vector<glm::vec3>& points);
 
   glm::vec3 getCenter();
   glm::vec3 getExtents();
   glm::mat3 getAxes();
+
+  void print();
 
 private:
   glm::vec3 m_center;

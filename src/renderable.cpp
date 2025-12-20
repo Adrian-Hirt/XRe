@@ -30,17 +30,19 @@ void Renderable::initialize(std::vector<Vertex> vertices, std::vector<uint16_t> 
   );
   m_index_buffer->loadData(indices);
 
-//   if (hasBoundingBox()) {
-//     // Store vertex positions temporary
-//     DirectX::XMFLOAT3 vertex_positions[m_vertex_count];
+  if (hasBoundingBox()) {
+    // Store vertex positions temporary
+    std::vector<glm::vec3> vertex_positions;
 
-//     for(int i = 0; i < m_vertex_count; i++) {
-//       vertex_positions[i] = vertices[i].coordinates;
-//     }
+    for(int i = 0; i < m_vertex_count; i++) {
+      vertex_positions.push_back(vertices[i].position);
+    }
 
-//     // Create the bounding box for this mesh
-//     DirectX::BoundingOrientedBox::CreateFromPoints(m_bounding_box, m_vertex_count, vertex_positions, sizeof(DirectX::XMFLOAT3));
-//   }
+    // Create the bounding box for this mesh
+    m_bounding_box = OOBB(vertex_positions);
+
+    m_bounding_box.print();
+  }
 }
 
 void Renderable::registerDeviceAndPhysicalDevice(VkDevice device, VkPhysicalDevice physical_device) {
