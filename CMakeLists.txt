@@ -36,6 +36,7 @@ SET(SRCFILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/hand.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/line.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/object_oriented_bounding_box.cpp
 )
 
 # Needed to access the include folders from the individual apps

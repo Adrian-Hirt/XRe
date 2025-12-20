@@ -1,0 +1,141 @@
+#include <xre/object_oriented_bounding_box.h>
+
+// ------------------------------------
+// Power iteration eigenvector solver
+// ------------------------------------
+glm::vec3 OOBB::powerIteration(const glm::mat3& A, int maxIterations = 50) {
+  // Use a vector with all ones as the "starting" vector
+  glm::vec3 b = glm::one<glm::vec3>();
+
+  for (int i = 0; i < maxIterations; i++) {
+    glm::vec3 b2 = A * b;
+    float norm = glm::length(b2);
+    if (norm < 1e-6f) {
+      break;
+    }
+    b = b2 / norm;
+  }
+  return glm::normalize(b);
+}
+
+// ------------------------------------
+// Compute OOBB
+// ------------------------------------
+OOBB::OOBB(const std::vector<glm::vec3>& points) {
+  if (points.empty()) {
+    m_center = glm::zero<glm::vec3>();
+    m_extents = glm::zero<glm::vec3>();
+    m_axes = glm::identity<glm::mat3>();
+    return;
+  }
+
+  // -------------------------------
+  // 1. Compute centroid
+  // -------------------------------
+  // Sum up all points and then divide by the number of points
+  // to find the center of mass of the points.
+  glm::vec3 centroid = glm::zero<glm::vec3>();
+  for (auto& p : points) {
+    centroid += p;
+  }
+  centroid /= (float)points.size();
+
+  // -------------------------------
+  // 2. Compute covariance matrix
+  // -------------------------------
+  // Build the covariance matrix of the points
+  glm::mat3 C = glm::zero<glm::mat3>();
+
+  for (auto& p : points) {
+    glm::vec3 d = p - centroid;
+    C[0][0] += d.x * d.x;
+    C[0][1] += d.x * d.y;
+    C[0][2] += d.x * d.z;
+    C[1][0] += d.y * d.x;
+    C[1][1] += d.y * d.y;
+    C[1][2] += d.y * d.z;
+    C[2][0] += d.z * d.x;
+    C[2][1] += d.z * d.y;
+    C[2][2] += d.z * d.z;
+  }
+
+  C /= (float) points.size();
+
+  // -------------------------------
+  // 3. Compute eigenvectors (principal axes)
+  // -------------------------------
+  // First eigenvector, directly computed from the power iteration
+  // method.
+  glm::vec3 e1 = powerIteration(C);
+
+  // Approx eigenvalue for the first eigenvector we computed beforehand.
+  float lambda1 = glm::dot(e1, C * e1);
+
+  // Deflate matrix (remove component of first eigenvector), such that
+  // computing the largest eigenvector of the matrix C2 gives us the
+  // second largest eigenvector of the original C.
+  glm::mat3 C2 = C - lambda1 * glm::outerProduct(e1, e1);
+
+  // Compute eigenvector and approximate the second eigenvalue
+  glm::vec3 e2 = powerIteration(C2);
+  float lambda2 = glm::dot(e2, C * e2);
+
+  // Third eigenvector is orthogonal to the first two
+  glm::vec3 e3 = glm::normalize(glm::cross(e1, e2));
+
+  // Orthonormalize e2 to remove small numerical errors
+  e2 = glm::normalize(glm::cross(e3, e1));
+
+  // Store the eigenvectors in a matrix for later usage
+  glm::mat3 axes;
+  axes[0] = e1;
+  axes[1] = e2;
+  axes[2] = e3;
+
+  // -------------------------------
+  // 4. Transform all points to local space
+  // -------------------------------
+  // local = R^T (p - centroid). The part (p - centroid) moves the pointcloud
+  // such that the centroid is at the origin, and R^T rotates the pointcloud
+  // such that the principal components now align with the XYZ axies of the
+  // coordinate system. At that point we only need to compute the points that are the furthest
+  // away from the origin (== centroid) to compute the extends. Once we have
+  // this, we effectively have an AABB, which we then can undo the transformation
+  // to get an OOBB.
+  glm::mat3 R = axes;
+  glm::mat3 R_T = glm::transpose(R);
+
+  glm::vec3 minv( std::numeric_limits<float>::max());
+  glm::vec3 maxv(-std::numeric_limits<float>::max());
+
+  for (auto& p : points) {
+    glm::vec3 d = p - centroid;
+    glm::vec3 q = R_T * d;
+
+    minv = glm::min(minv, q);
+    maxv = glm::max(maxv, q);
+  }
+
+  // -------------------------------
+  // 5. Compute extents and center
+  // -------------------------------
+  glm::vec3 extents = 0.5f * (maxv - minv);
+  glm::vec3 localCenter = 0.5f * (maxv + minv);
+  glm::vec3 worldCenter = R * localCenter + centroid;
+
+  m_center = worldCenter;
+  m_extents = extents;
+  m_axes = axes;
+}
+
+glm::vec3 OOBB::getCenter() {
+  return m_center;
+};
+
+glm::vec3 OOBB::getExtents() {
+  return m_extents;
+};
+
+glm::mat3 OOBB::getAxes() {
+  return m_axes;
+};
