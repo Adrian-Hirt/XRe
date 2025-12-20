@@ -56,7 +56,15 @@ void Model::render(RenderContext& ctx) {
   // Render meshes of this model
   for (Mesh mesh : m_meshes) {
     mesh.render(ctx);
+
+    if (m_render_bounding_boxes) {
+      mesh.renderBoundingBox(ctx);
+    }
   }
+}
+
+void Model::toggleRenderBoundingBoxes() {
+  m_render_bounding_boxes = !m_render_bounding_boxes;
 }
 
 // void Model::renderWithTransparency() {
@@ -180,3 +188,17 @@ void Model::setWorldMatrix(glm::mat4 world_matrix) {
 
 //   return all_corners;
 // }
+
+bool Model::intersects(Model other) {
+  for (auto mesh : m_meshes) {
+    auto thisOOBB = mesh.getObjectOrientedBoundingBox().transformed(m_world_matrix);
+    for (auto otherMesh : other.m_meshes) {
+      auto otherOOBB = otherMesh.getObjectOrientedBoundingBox().transformed(other.m_world_matrix);
+      if (thisOOBB.intersects(otherOOBB)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}

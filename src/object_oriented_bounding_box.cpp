@@ -174,6 +174,76 @@ void OOBB::print() {
   std::cout << "--------------" << std::endl;
 }
 
+OOBB OOBB::transformed(const glm::mat4& model) const {
+  OOBB transformed_bounding_box;
+
+  // 1. Transform center (full transform)
+  transformed_bounding_box.m_center = glm::vec3(model * glm::vec4(m_center, 1.0f));
+
+  // 2. Extract rotation + scale (upper-left 3x3)
+  glm::mat3 rotation_scale_matrix = glm::mat3(model);
+
+  // 3. Transform axes (rotation only, normalize!)
+  for (int i = 0; i < 3; ++i) {
+    transformed_bounding_box.m_axes[i] = glm::normalize(rotation_scale_matrix * m_axes[i]);
+  }
+
+  // 4. Extract scale factors (length of basis vectors)
+  glm::vec3 scale(
+    glm::length(rotation_scale_matrix[0]),
+    glm::length(rotation_scale_matrix[1]),
+    glm::length(rotation_scale_matrix[2])
+  );
+
+  // 5. Scale extents
+  transformed_bounding_box.m_extents = m_extents * scale;
+
+  return transformed_bounding_box;
+}
+
+std::vector<glm::vec3> OOBB::getCorners() const {
+  std::vector<glm::vec3> vertices;
+  vertices.reserve(8);
+
+  glm::vec3 ex = m_axes[0] * m_extents.x;
+  glm::vec3 ey = m_axes[1] * m_extents.y;
+  glm::vec3 ez = m_axes[2] * m_extents.z;
+
+  vertices.push_back(m_center + ex + ey + ez); // 0
+  vertices.push_back(m_center + ex + ey - ez); // 1
+  vertices.push_back(m_center + ex - ey + ez); // 2
+  vertices.push_back(m_center + ex - ey - ez); // 3
+  vertices.push_back(m_center - ex + ey + ez); // 4
+  vertices.push_back(m_center - ex + ey - ez); // 5
+  vertices.push_back(m_center - ex - ey + ez); // 6
+  vertices.push_back(m_center - ex - ey - ez); // 7
+
+  return vertices;
+}
+
+std::vector<uint16_t> OOBB::getLineIndices() const {
+  return {
+    // +X face
+    0, 2, 3,
+    3, 1, 0,
+    // -X face
+    4, 5, 7,
+    7, 6, 4,
+    // +Y face
+    0, 1, 5,
+    5, 4, 0,
+    // -Y face
+    2, 6, 7,
+    7, 3, 2,
+    // +Z face
+    0, 4, 6,
+    6, 2, 0,
+    // -Z face
+    1, 3, 7,
+    7, 5, 1
+  };
+}
+
 bool OOBB::intersects(OOBB& other) {
   constexpr float EPS = 1e-8f;
 

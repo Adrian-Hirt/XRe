@@ -21,7 +21,7 @@ void Renderable::initialize(std::vector<Vertex> vertices, std::vector<uint16_t> 
   m_vertex_buffer->loadData(vertices);
 
   // Create index buffer
-  size_t index_size = sizeof(Vertex) * indices.size();
+  size_t index_size = sizeof(uint16_t) * indices.size();
   m_index_buffer = new Buffer(
     s_device,
     s_physical_device,
@@ -41,7 +41,37 @@ void Renderable::initialize(std::vector<Vertex> vertices, std::vector<uint16_t> 
     // Create the bounding box for this mesh
     m_bounding_box = OOBB(vertex_positions);
 
-    m_bounding_box.print();
+    // Store the vertices from the OOBB
+    auto bounding_box_corners = m_bounding_box.getCorners();
+    std::vector<Vertex> bbox_vertices;
+
+    // Create vertices
+    for (auto corner : bounding_box_corners) {
+      Vertex vert;
+      vert.position = corner;
+      bbox_vertices.push_back(vert);
+    }
+
+    // Create vertex buffer for object oriented bounding boxes.
+    size_t size = sizeof(Vertex) * bbox_vertices.size();
+    m_bounding_box_vertex_buffer = new Buffer(
+      s_device,
+      s_physical_device,
+      static_cast<VkDeviceSize>(size),
+      VK_BUFFER_USAGE_VERTEX_BUFFER_BIT
+    );
+    m_bounding_box_vertex_buffer->loadData(bbox_vertices);
+    m_bbox_index_count = m_bounding_box.getLineIndices().size();
+
+    // Create index buffer for object oriented bounding boxes.
+    size_t index_size = sizeof(uint16_t) * m_bbox_index_count;
+    m_bounding_box_index_buffer = new Buffer(
+      s_device,
+      s_physical_device,
+      static_cast<VkDeviceSize>(index_size),
+      VK_BUFFER_USAGE_INDEX_BUFFER_BIT
+    );
+    m_bounding_box_index_buffer->loadData(m_bounding_box.getLineIndices());
   }
 }
 
@@ -72,3 +102,27 @@ void Renderable::render(RenderContext& ctx) {
   // Draw using indices
   vkCmdDrawIndexed(ctx.command_buffer, m_index_count, 1u, 0u, 0u, 0u);
 }
+
+void Renderable::renderBoundingBox(RenderContext& ctx) {
+  //------------------------------------------------------------------------------------------------------
+  // Bind buffers for bounding boxes
+  //------------------------------------------------------------------------------------------------------
+  const VkDeviceSize offset = 0u;
+  const VkBuffer bboxVertexBuffer = m_bounding_box_vertex_buffer->getBuffer();
+  vkCmdBindVertexBuffers(ctx.command_buffer, 0u, 1u, &bboxVertexBuffer, &offset);
+
+  // Bind the index buffer
+  const VkBuffer bboxIndexBuffer = m_bounding_box_index_buffer->getBuffer(); // Your new index buffer
+  vkCmdBindIndexBuffer(ctx.command_buffer, bboxIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+  //------------------------------------------------------------------------------------------------------
+  // Draw
+  //------------------------------------------------------------------------------------------------------
+  // Draw using indices
+  vkCmdDrawIndexed(ctx.command_buffer, m_bbox_index_count, 1u, 0u, 0u, 0u);
+}
+
+OOBB Renderable::getObjectOrientedBoundingBox() {
+  return m_bounding_box;
+}
+

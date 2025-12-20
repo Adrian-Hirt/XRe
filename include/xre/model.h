@@ -29,6 +29,9 @@ public:
   void resetColor();
   glm::vec3 getColor();
 
+  bool intersects(Model other);
+  void toggleRenderBoundingBoxes();
+
   // std::vector<DirectX::XMFLOAT3> getMeshBoundingBoxCorners();
 
 private:
@@ -52,6 +55,8 @@ private:
 
   void loadObj(const char *model_path);
   void render(RenderContext& ctx);
+
+  bool m_render_bounding_boxes = false;
 
   // Scene Node can call render() directly
   friend class SceneNode;
