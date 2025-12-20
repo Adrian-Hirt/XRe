@@ -173,3 +173,88 @@ void OOBB::print() {
 
   std::cout << "--------------" << std::endl;
 }
+
+bool OOBB::intersects(OOBB& other) {
+  constexpr float EPS = 1e-8f;
+
+  // Center-to-center vector
+  glm::vec3 centerToCenterVector = other.getCenter() - m_center;
+
+  // Convenience access
+  const glm::mat3& other_axes = other.getAxes();
+
+  // Lambda used to test whether a given axis is a separating axis
+  // between two oriented bounding boxes (SAT test).
+  //
+  // If the projections of the two OOBBs onto this axis do NOT overlap,
+  // then this axis separates the boxes and they do not intersect.
+  auto isSeparatingAxis = [](glm::vec3& axis, OOBB& self, OOBB& other, glm::vec3 centerToCenter) {
+    // Helper lambda that computes the projection "radius" of an OOBB
+    // onto the given axis.
+    //
+    // Conceptually:
+    //  - Each OOBB is projected onto the axis
+    //  - The projection is a 1D interval centered at the box center
+    //  - This function computes half the length of that interval
+    //
+    // The radius is the sum of each local axis contribution,
+    // weighted by the box's half-extents.
+    auto projectedRadius = [](OOBB& box, glm::vec3& axis) {
+        return box.getExtents().x * fabs(glm::dot(axis, box.getAxes()[0])) +
+              box.getExtents().y * fabs(glm::dot(axis, box.getAxes()[1])) +
+              box.getExtents().z * fabs(glm::dot(axis, box.getAxes()[2]));
+    };
+
+    // Project both boxes onto the axis and compute their radii
+    float radius = projectedRadius(self, axis);
+    float otherRadius = projectedRadius(other, axis);
+
+    // Project the center-to-center vector onto the axis.
+    // This gives the distance between the two projection centers
+    // along this axis.
+    float centerDistance = fabs(glm::dot(centerToCenter, axis));
+
+    // If the distance between centers is greater than the sum of
+    // the projection radii, the intervals do not overlap.
+    //
+    // This means the axis separates the two OOBBs.
+    return centerDistance > radius + otherRadius;
+  };
+
+  // Test the current bounding box axes
+  for (int i = 0; i < 3; ++i) {
+    glm::vec3 currentAxis = m_axes[i];
+    if (isSeparatingAxis(currentAxis, *this, other, centerToCenterVector)) {
+      return false;
+    }
+  }
+
+  // Test the axes of the other bounding box
+  for (int i = 0; i < 3; ++i) {
+    glm::vec3 otherCurrentAxis = other_axes[i];
+    if (isSeparatingAxis(otherCurrentAxis, *this, other, centerToCenterVector)) {
+      return false;
+    }
+  }
+
+  // Test cross-product axes
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      // Compute cross-product
+      glm::vec3 crossProduct = glm::cross(m_axes[i], other_axes[j]);
+      if (glm::length2(crossProduct) < EPS) {
+        continue; // parallel axes
+      }
+
+      // Normalize
+      crossProduct = glm::normalize(crossProduct);
+
+      if (isSeparatingAxis(crossProduct, *this, other, centerToCenterVector)) {
+        return false;
+      }
+    }
+  }
+
+  // No separating axis found
+  return true;
+}
