@@ -93,15 +93,26 @@ OOBB::OOBB(const std::vector<glm::vec3>& points) {
 
   // Third eigenvector is orthogonal to the first two
   glm::vec3 e3 = glm::normalize(glm::cross(e1, e2));
+  float lambda3 = glm::dot(e3, covariance * e3);
 
   // Orthonormalize e2 to remove small numerical errors
   e2 = glm::normalize(glm::cross(e3, e1));
 
   // Store the eigenvectors in a matrix for later usage
   glm::mat3 axes;
-  axes[0] = e1;
-  axes[1] = e2;
-  axes[2] = e3;
+
+  // 4. Check for degenerate case (cube or sphere), where otherwise
+  // the bounding boxes would be rotated by 45 degrees.
+  float eps = 1e-5f;
+  if (fabs(lambda1 - lambda2) < eps && fabs(lambda2 - lambda3) < eps) {
+    // fallback to world axes
+    axes = glm::identity<glm::mat3>();
+  }
+  else {
+    axes[0] = e1;
+    axes[1] = e2;
+    axes[2] = e3;
+  }
 
   // -------------------------------
   // 4. Transform all points to local space
