@@ -71,12 +71,9 @@ void SceneNode::render(RenderContext& ctx) {
 //     // Update the shader with the transform
 //     m_model->m_shader.setModelMatrix(m_world_transform);
 //     m_model->m_shader.setNormalRotationMatrix(m_world_rotation_matrix);
-    if (m_intersected_in_current_frame) {
-      m_model->setColor({1.0f, 0.0f, 0.0f});
-    }
-    else {
-      m_model->resetColor();
-    }
+
+    // Keep track if there is an interaction with the model
+    m_model->setInteractedState(m_intersected_in_current_frame);
 
     // Update the render context with the transform
     m_model->setWorldMatrix(m_world_transform);

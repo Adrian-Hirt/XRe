@@ -37,6 +37,11 @@ void Model::render(RenderContext& ctx) {
   uniform_buffer_object.world = m_world_matrix;
   uniform_buffer_object.color = m_model_color;
 
+  // Render a different color if the model is interacted with.
+  if (m_interacted) {
+    uniform_buffer_object.color = ColorUtils::lighten(m_model_color, 0.5f);
+  }
+
   // Update uniform buffer
   const uint32_t offset = m_model_index * ctx.aligned_size;
   ctx.model_uniform_buffer->loadData(uniform_buffer_object, offset);
@@ -205,4 +210,8 @@ bool Model::intersects(Model other) {
   }
 
   return false;
+}
+
+void Model::setInteractedState(bool interacted) {
+  m_interacted = interacted;
 }
