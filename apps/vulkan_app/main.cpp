@@ -37,6 +37,9 @@ public:
 
     cube1.toggleRenderBoundingBoxes();
     cube2.toggleRenderBoundingBoxes();
+
+    cube1_node.setGrabbable(true);
+    cube2_node.setGrabbable(true);
   };
 
   void updateSimulation(XrTime predicted_time) override {

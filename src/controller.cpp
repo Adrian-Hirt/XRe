@@ -70,28 +70,26 @@ void Controller::computeSceneInteractions() {
 
   m_root_node.updateTransformation();
 
-//   DirectX::BoundingOrientedBox controller_bounding_box = m_model_node.getTransformedBoundingBox();
+  // Check if any of our controllers is grabbing a grabbable node
+  for(SceneNode *current_node : SceneNode::getGrabbableInstances()) {
+    // Skip this if we already are grabbing this node with another controller or a hand
+    if (current_node->m_grabbed) {
+      continue;
+    }
 
-//   // Check if any of our controllers is grabbing a grabbable node
-//   for(SceneNode *current_node : SceneNode::getGrabbableInstances()) {
-//     // Skip this if we already are grabbing this node with another controller or a hand
-//     if (current_node->m_grabbed) {
-//       continue;
-//     }
+    if(current_node->intersects(m_model_node)) {
+      // Keep track that we're intersecting with this model
+      current_node->m_intersected_in_current_frame = true;
 
-//     if(current_node->intersects(controller_bounding_box)) {
-//       // Keep track that we're intersecting with this model
-//       current_node->m_intersected_in_current_frame = true;
-
-//       // Also, if the controller is grabbing, set the position and the rotation of the
-//       // model to those of the controller
-//       if (m_grabbing) {
-//         current_node->m_grabbed = true;
-//         current_node->setPosition(m_model_node.getPosition());
-//         current_node->setRotation(m_model_node.getRotation());
-//       }
-//     }
-//   }
+      // Also, if the controller is grabbing, set the position and the rotation of the
+      // model to those of the controller
+      if (m_grabbing) {
+        current_node->m_grabbed = true;
+        current_node->setPosition(m_model_node.getPosition());
+        current_node->setRotation(m_model_node.getRotation());
+      }
+    }
+  }
 }
 
 std::optional<glm::vec3> Controller::updateIntersectionSphereAndComputePossibleTeleport() {
