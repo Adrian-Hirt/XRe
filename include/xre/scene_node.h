@@ -61,8 +61,8 @@ public:
   void setActive(bool is_active);
   bool isActive();
 
-//   // Check whether a node intersects with a bounding box
-//   bool intersects(DirectX::BoundingOrientedBox other);
+  // Check whether a node intersects with the model contained in another one
+  bool intersects(SceneNode other);
 
 //   // Check whether a node intersects with a line (and optionally put the
 //   // distance of the intersection point as an out parameter)

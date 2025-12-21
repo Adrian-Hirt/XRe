@@ -189,6 +189,10 @@ void Model::setWorldMatrix(glm::mat4 world_matrix) {
 //   return all_corners;
 // }
 
+// TODO: Build "outer" bounding box containing all meshes such that we first only
+// need to check the outer bounding box and then only if we have a hit there
+// we check the inner meshes. Currently, as most models only have one mesh,
+// this should be enough.
 bool Model::intersects(Model other) {
   for (auto mesh : m_meshes) {
     auto this_OOBB = mesh.getObjectOrientedBoundingBox().transformed(m_world_matrix);

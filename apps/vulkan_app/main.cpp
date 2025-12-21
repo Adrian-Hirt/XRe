@@ -85,7 +85,7 @@ public:
     // std::cout << "Draw" << std::endl;
     root_node.render(ctx);
 
-    if (cube1.intersects(cube2)) {
+    if (cube1_node.intersects(cube2_node)) {
       cube1.setColor({1.0f, 0.0f, 0.0f});
     } else {
       cube1.resetColor();

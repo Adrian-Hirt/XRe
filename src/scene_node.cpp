@@ -264,9 +264,9 @@ std::unordered_set<SceneNode*> SceneNode::getTerrainInstances() {
   return result;
 }
 
-// bool SceneNode::intersects(DirectX::BoundingOrientedBox other) {
-//   return getTransformedBoundingBox().Intersects(other);
-// }
+bool SceneNode::intersects(SceneNode other) {
+  return m_model->intersects(*other.m_model);
+}
 
 // bool SceneNode::intersects(DirectX::XMVECTOR line_start, DirectX::XMVECTOR line_direction, float *out_distance) {
 //   return getTransformedBoundingBox().Intersects(line_start, line_direction, *out_distance);
