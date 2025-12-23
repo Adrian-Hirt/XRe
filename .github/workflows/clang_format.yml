@@ -1,17 +1,15 @@
 name: Clang-Format Check
 
-# Define a reusable anchor for the paths
-paths_to_watch: &paths
-  - 'src/**'
-  - 'include/**'
-  - 'apps/**'
-  - '.clang-format'
-
 on:
   pull_request:
-    paths: *paths
+    # define anchor here
+    paths: &paths
+      - 'src/**'
+      - 'include/**'
+      - 'apps/**'
+      - '.clang-format'
   push:
-    paths: *paths
+    paths: *paths # reuse the same anchor
 
 jobs:
   format-check:
