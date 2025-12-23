@@ -123,30 +123,30 @@ void Hand::computeSceneInteractions() {
     return;
   }
 
-//   // Check if the hand is intersecting a grabbable node. To make it simpler for the moment, we only
-//   // check intersection with the palm and the tip of the thumb (as for "grab", both the thumb and the
-//   // center of the palm should intersect, and for "pinch", the tip of the thumb needs to intersect).
-//   DirectX::BoundingOrientedBox thumb_bounding_box = m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT]->getTransformedBoundingBox();
-//   DirectX::BoundingOrientedBox palm_bounding_box = m_joint_nodes[XR_HAND_JOINT_PALM_EXT]->getTransformedBoundingBox();
+  // Check if the hand is intersecting a grabbable node. To make it simpler for the moment, we only
+  // check intersection with the palm and the tip of the thumb (as for "grab", both the thumb and the
+  // center of the palm should intersect, and for "pinch", the tip of the thumb needs to intersect).
+  SceneNode* thumb_scene_node = m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT];
+  SceneNode* palm_scene_node = m_joint_nodes[XR_HAND_JOINT_PALM_EXT];
 
-//   for(SceneNode *current_node : SceneNode::getGrabbableInstances()) {
-//     // Skip this if we already are grabbing this node with another controller or a hand
-//     if (current_node->m_grabbed) {
-//       continue;
-//     }
+  for(SceneNode *current_node : SceneNode::getGrabbableInstances()) {
+    // Skip this if we already are grabbing this node with another controller or a hand
+    if (current_node->m_grabbed) {
+      continue;
+    }
 
-//     if(current_node->intersects(thumb_bounding_box) || current_node->intersects(palm_bounding_box)) {
-//       // Keep track that we're intersecting with this model
-//       current_node->m_intersected_in_current_frame = true;
+    if(current_node->intersects(*thumb_scene_node) || current_node->intersects(*palm_scene_node)) {
+      // Keep track that we're intersecting with this model
+      current_node->m_intersected_in_current_frame = true;
 
-//       // Also, if the hand is pinching, set the position and rotation of the model to that of the thumb
-//       if (m_pinching) {
-//         current_node->m_grabbed = true;
-//         current_node->setPosition(m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT]->getPosition());
-//         current_node->setRotation(m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT]->getRotation());
-//       }
-//     }
-//   }
+      // Also, if the hand is pinching, set the position and rotation of the model to that of the thumb
+      if (m_pinching) {
+        current_node->m_grabbed = true;
+        current_node->setPosition(m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT]->getPosition());
+        current_node->setRotation(m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT]->getRotation());
+      }
+    }
+  }
 
   // TODO: If the hand is closed, we need to check for intersection with the central
   // palm joint position, to determine whether the hand is grabbing something.

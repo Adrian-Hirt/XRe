@@ -10,6 +10,7 @@
 #include <xre/structs.h>
 #include <xre/mesh.h>
 #include <xre/geometry.h>
+#include <xre/color_utils.h>
 // #include <xre/bounding_box_mesh.h>
 
 class Model {
@@ -28,6 +29,18 @@ public:
   void setColor(glm::vec3 color);
   void resetColor();
   glm::vec3 getColor();
+
+  // Intersection check
+  bool intersects(Model other);
+  bool intersects(const glm::vec3& line_start, const glm::vec3& line_direction, float *out_distance);
+
+  // Debug methods
+  void toggleRenderBoundingBoxes();
+  void printBouindingBoxes();
+
+  // Toggling the state if a model is intersected and therefore
+  // should have a slightly different color applied
+  void setInteractedState(bool interacted);
 
   // std::vector<DirectX::XMFLOAT3> getMeshBoundingBoxCorners();
 
@@ -52,6 +65,10 @@ private:
 
   void loadObj(const char *model_path);
   void render(RenderContext& ctx);
+
+  bool m_render_bounding_boxes = false;
+
+  bool m_interacted = false;
 
   // Scene Node can call render() directly
   friend class SceneNode;

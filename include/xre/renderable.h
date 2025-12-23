@@ -17,6 +17,7 @@
 #include <xre/utils.h>
 #include <xre/structs.h>
 #include <xre/buffer.h>
+#include <xre/object_oriented_bounding_box.h>
 // #include <xre/shader.h>
 
 // Base class which is subclassed by other classes that are "renderable", i.e.
@@ -26,6 +27,7 @@ public:
   // DirectX::BoundingOrientedBox getBoundingBox();
 
   static void registerDeviceAndPhysicalDevice(VkDevice device, VkPhysicalDevice physical_device);
+  OOBB getObjectOrientedBoundingBox();
 
 protected:
   inline static VkDevice s_device = VK_NULL_HANDLE;
@@ -38,6 +40,7 @@ protected:
 
   // Protected as only subclasses may use it
   virtual void render(RenderContext& ctx);
+  void renderBoundingBox(RenderContext& ctx);
 
   // vertex and index buffers
   Buffer *m_vertex_buffer = nullptr;
@@ -54,9 +57,10 @@ protected:
   // Number of vertices and indices
   size_t m_vertex_count;
   size_t m_index_count;
+  size_t m_bbox_index_count;
 
-  // // The bounding box of this mesh
-  // DirectX::BoundingOrientedBox m_bounding_box;
+  // The bounding box of this renderable
+  OOBB m_bounding_box;
 
   // Shader m_shader;
 

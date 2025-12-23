@@ -7,14 +7,14 @@ Controller::Controller() {
   m_model_node = SceneNode(&m_model);
   m_model_node.scale(0.03f, 0.03f, 0.075f);
 
-//   // Create the model for visualizing intersections of the aim line
-//   m_aim_indicator_sphere = ModelFactory::createSphere();
-//   m_aim_indicator_sphere.setColor({0.0f, 0.75f, 1.0f, 1.0f});
-//   m_intersection_sphere_node = SceneNode(&m_aim_indicator_sphere);
-//   m_intersection_sphere_node.scale(0.1f, 0.1f, 0.1f);
+  // Create the model for visualizing intersections of the aim line
+  m_aim_indicator_sphere =  ModelFactory::createCube({0.0f, 0.75f, 1.0f}); //ModelFactory::createSphere();
+  // m_aim_indicator_sphere.setColor({0.0f, 0.75f, 1.0f, 1.0f});
+  m_intersection_sphere_node = SceneNode(&m_aim_indicator_sphere);
+  m_intersection_sphere_node.scale(0.02f, 0.02f, 0.02f);
 
   m_root_node.addChildNode(&m_model_node);
-//   m_root_node.addChildNode(m_intersection_sphere_node);
+  m_root_node.addChildNode(&m_intersection_sphere_node);
 
   // Create the line for the aim direction
   m_aim_line = Line(0.003f, 2.0f, {1.0f, 0.0f, 0.0f});
@@ -70,28 +70,26 @@ void Controller::computeSceneInteractions() {
 
   m_root_node.updateTransformation();
 
-//   DirectX::BoundingOrientedBox controller_bounding_box = m_model_node.getTransformedBoundingBox();
+  // Check if any of our controllers is grabbing a grabbable node
+  for(SceneNode *current_node : SceneNode::getGrabbableInstances()) {
+    // Skip this if we already are grabbing this node with another controller or a hand
+    if (current_node->m_grabbed) {
+      continue;
+    }
 
-//   // Check if any of our controllers is grabbing a grabbable node
-//   for(SceneNode *current_node : SceneNode::getGrabbableInstances()) {
-//     // Skip this if we already are grabbing this node with another controller or a hand
-//     if (current_node->m_grabbed) {
-//       continue;
-//     }
+    if(current_node->intersects(m_model_node)) {
+      // Keep track that we're intersecting with this model
+      current_node->m_intersected_in_current_frame = true;
 
-//     if(current_node->intersects(controller_bounding_box)) {
-//       // Keep track that we're intersecting with this model
-//       current_node->m_intersected_in_current_frame = true;
-
-//       // Also, if the controller is grabbing, set the position and the rotation of the
-//       // model to those of the controller
-//       if (m_grabbing) {
-//         current_node->m_grabbed = true;
-//         current_node->setPosition(m_model_node.getPosition());
-//         current_node->setRotation(m_model_node.getRotation());
-//       }
-//     }
-//   }
+      // Also, if the controller is grabbing, set the position and the rotation of the
+      // model to those of the controller
+      if (m_grabbing) {
+        current_node->m_grabbed = true;
+        current_node->setPosition(m_model_node.getPosition());
+        current_node->setRotation(m_model_node.getRotation());
+      }
+    }
+  }
 }
 
 std::optional<glm::vec3> Controller::updateIntersectionSphereAndComputePossibleTeleport() {
@@ -99,58 +97,61 @@ std::optional<glm::vec3> Controller::updateIntersectionSphereAndComputePossibleT
     return std::nullopt;
   }
 
-//   // Next, check if we need to render the aim intersection sphere
-//   m_intersection_sphere_node.setActive(false);
+  // Next, check if we need to render the aim intersection sphere
+  m_intersection_sphere_node.setActive(false);
 
-//   float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(SceneNode::getGrabbableInstances());
-//   float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(SceneNode::getTerrainInstances());
+  float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(SceneNode::getGrabbableInstances());
+  float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(SceneNode::getTerrainInstances());
 
-//   if (m_intersection_sphere_node.isActive()) {
-//     // The direction vector has unit length, i.e. to stretch it to the required length, we
-//     // simple multiply the vector with the length, which gives us a new vector.
-//     DirectX::XMVECTOR stretched_direction = m_aim_line.getLineDirection() * std::min(closest_grabbable_aim_intersection, closest_terrain_aim_intersection);
+  if (m_intersection_sphere_node.isActive()) {
+    // The direction vector has unit length, i.e. to stretch it to the required length, we
+    // simple multiply the vector with the length, which gives us a new vector.
+    glm::vec3 stretched_direction = m_aim_line.getLineDirection() * std::min(closest_grabbable_aim_intersection, closest_terrain_aim_intersection);
 
-//     DirectX::XMVECTOR sphere_position = m_aim_line.getLineStart();
-//     sphere_position = DirectX::XMVectorAdd(sphere_position, stretched_direction);
-//     m_intersection_sphere_node.setPosition(sphere_position);
-//     m_aim_indicator_sphere.setColor({0.0f, 0.75f, 1.0f, 1.0f});
+    glm::vec3 sphere_position = m_aim_line.getLineStart();
+    sphere_position = sphere_position + stretched_direction;
+    m_intersection_sphere_node.setPosition(sphere_position);
+    m_aim_indicator_sphere.setColor({0.0f, 0.75f, 1.0f});
 
-//     if (closest_terrain_aim_intersection < closest_grabbable_aim_intersection) {
-//       // Paint the indicator spheres yellow if we can teleport to their location
-//       m_aim_indicator_sphere.setColor({1.0f, 1.0f, 0.0f, 1.0f});
+    if (closest_terrain_aim_intersection < closest_grabbable_aim_intersection) {
+      // Paint the indicator spheres yellow if we can teleport to their location
+      m_aim_indicator_sphere.setColor({1.0f, 1.0f, 0.0f});
 
-//       // If a teleporting is requested and there is an intersection sphere rendered, we can
-//       // check whether the target is a terrain, and if yes, teleport to that location.
-//       if (m_teleporting_requested) {
-//         return sphere_position;
-//       }
-//     }
-//   }
+      // If a teleporting is requested and there is an intersection sphere rendered, we can
+      // check whether the target is a terrain, and if yes, teleport to that location.
+      if (m_teleporting_requested) {
+        return sphere_position;
+      }
+    }
+  }
 
   return std::nullopt;
 }
 
-// float Controller::computeAimIndicatorSpherePosition(std::unordered_set<SceneNode *> nodes) {
-//   // As we only want to highlight the intersection with the closest model,
-//   // we need to keep track of the smallest threshold. We probably should replace
-//   // this later with sorting the elements by distance from the camera and then check in
-//   // ascending distance, but for now this will have to do.
-//   float closest_intersection_distance = Controller::s_line_intersection_threshold + 1;
+float Controller::computeAimIndicatorSpherePosition(std::unordered_set<SceneNode *> nodes) {
+  // As we only want to highlight the intersection with the closest model,
+  // we need to keep track of the smallest threshold. We probably should replace
+  // this later with sorting the elements by distance from the camera and then check in
+  // ascending distance, but for now this will have to do.
+  float closest_intersection_distance = Controller::s_line_intersection_threshold + 1;
 
-//   for(SceneNode *current_node : nodes) {
-//     // Check if the node intersects the line of the controller
-//     float intersection_distance;
+  for(SceneNode *current_node : nodes) {
+    // Check if the node intersects the line of the controller
+    float intersection_distance;
+    glm::vec3 start = m_aim_line.getLineStart();
+    glm::vec3 dir = m_aim_line.getLineDirection();
 
-//     if(current_node->intersects(m_aim_line.getLineStart(), m_aim_line.getLineDirection(), &intersection_distance)) {
-//       if (intersection_distance > 0 && intersection_distance <= Controller::s_line_intersection_threshold) {
-//         m_intersection_sphere_node.setActive(true);
+    // if(current_node->intersects(m_aim_line.getLineStart(), m_aim_line.getLineDirection(), &intersection_distance)) {
+    if (current_node->intersects(start, dir, &intersection_distance)) {
+      if (intersection_distance > 0 && intersection_distance <= Controller::s_line_intersection_threshold) {
+        m_intersection_sphere_node.setActive(true);
 
-//         if (closest_intersection_distance > intersection_distance) {
-//           closest_intersection_distance = intersection_distance;
-//         }
-//       }
-//     }
-//   }
+        if (closest_intersection_distance > intersection_distance) {
+          closest_intersection_distance = intersection_distance;
+        }
+      }
+    }
+  }
 
-//   return closest_intersection_distance;
-// }
+  return closest_intersection_distance;
+}

@@ -28,6 +28,6 @@ private:
   SceneNode m_scene_node;
   
   glm::vec3 m_line_color;
-  glm::vec3 m_line_start = glm::zero<glm::vec3>();;
+  glm::vec3 m_line_start = glm::zero<glm::vec3>();
   glm::vec3 m_line_direction = { 0.0f, 0.0f, -1.0f };
 };

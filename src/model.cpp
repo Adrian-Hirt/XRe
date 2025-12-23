@@ -37,6 +37,11 @@ void Model::render(RenderContext& ctx) {
   uniform_buffer_object.world = m_world_matrix;
   uniform_buffer_object.color = m_model_color;
 
+  // Render a different color if the model is interacted with.
+  if (m_interacted) {
+    uniform_buffer_object.color = ColorUtils::lighten(m_model_color, 0.5f);
+  }
+
   // Update uniform buffer
   const uint32_t offset = m_model_index * ctx.aligned_size;
   ctx.model_uniform_buffer->loadData(uniform_buffer_object, offset);
@@ -56,7 +61,15 @@ void Model::render(RenderContext& ctx) {
   // Render meshes of this model
   for (Mesh mesh : m_meshes) {
     mesh.render(ctx);
+
+    if (m_render_bounding_boxes) {
+      mesh.renderBoundingBox(ctx);
+    }
   }
+}
+
+void Model::toggleRenderBoundingBoxes() {
+  m_render_bounding_boxes = !m_render_bounding_boxes;
 }
 
 // void Model::renderWithTransparency() {
@@ -180,3 +193,42 @@ void Model::setWorldMatrix(glm::mat4 world_matrix) {
 
 //   return all_corners;
 // }
+
+// TODO: Build "outer" bounding box containing all meshes such that we first only
+// need to check the outer bounding box and then only if we have a hit there
+// we check the inner meshes. Currently, as most models only have one mesh,
+// this should be enough.
+bool Model::intersects(Model other) {
+  for (auto mesh : m_meshes) {
+    auto this_OOBB = mesh.getObjectOrientedBoundingBox().transformed(m_world_matrix);
+    for (auto other_mesh : other.m_meshes) {
+      auto other_OOBB = other_mesh.getObjectOrientedBoundingBox().transformed(other.m_world_matrix);
+      if (this_OOBB.intersects(other_OOBB)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+bool Model::intersects(const glm::vec3& line_start, const glm::vec3& line_direction, float *out_distance) {
+  for (auto mesh : m_meshes) {
+    auto this_OOBB = mesh.getObjectOrientedBoundingBox().transformed(m_world_matrix);
+    if (this_OOBB.intersects(line_start, line_direction, out_distance)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+void Model::printBouindingBoxes() {
+  for (auto mesh : m_meshes) {
+    mesh.getObjectOrientedBoundingBox().print();
+  }
+}
+
+void Model::setInteractedState(bool interacted) {
+  m_interacted = interacted;
+}

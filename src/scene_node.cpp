@@ -71,24 +71,15 @@ void SceneNode::render(RenderContext& ctx) {
 //     // Update the shader with the transform
 //     m_model->m_shader.setModelMatrix(m_world_transform);
 //     m_model->m_shader.setNormalRotationMatrix(m_world_rotation_matrix);
-//     if (m_intersected_in_current_frame) {
-//       m_model->m_shader.setModelColor({1.0f, 0.0f, 0.0f, 1.0f});
-//     }
-//     else {
-//       m_model->m_shader.setModelColor(m_model->getColor());
-//     }
-//     m_model->m_shader.updatePerModelConstantBuffer();
+
+    // Keep track if there is an interaction with the model
+    m_model->setInteractedState(m_intersected_in_current_frame);
 
     // Update the render context with the transform
     m_model->setWorldMatrix(m_world_transform);
 
     // And render the model
     m_model->render(ctx);
-
-//     // Set shader variables to identities, as the bounding box is already updated
-//     // with the correct position (as we need the correct position to be able to
-//     // compute intersections).
-//     m_model_bounding_box_mesh.render();
   }
   else if (m_renderable) {
     m_renderable->render(ctx);
@@ -126,10 +117,6 @@ void SceneNode::updateTransformation() {
       m_world_transform = m_local_transform;
       m_world_rotation_matrix = glm::toMat4(m_rotation);
     }
-
-    // if (m_model) {
-    //   m_model_bounding_box_mesh.updateVerticesFromBoundingBox(getTransformedBoundingBox());
-    // }
   }
 
   // Update the transforms of all the children.
@@ -264,13 +251,13 @@ std::unordered_set<SceneNode*> SceneNode::getTerrainInstances() {
   return result;
 }
 
-// bool SceneNode::intersects(DirectX::BoundingOrientedBox other) {
-//   return getTransformedBoundingBox().Intersects(other);
-// }
+bool SceneNode::intersects(SceneNode other) {
+  return m_model->intersects(*other.m_model);
+}
 
-// bool SceneNode::intersects(DirectX::XMVECTOR line_start, DirectX::XMVECTOR line_direction, float *out_distance) {
-//   return getTransformedBoundingBox().Intersects(line_start, line_direction, *out_distance);
-// }
+bool SceneNode::intersects(const glm::vec3& line_start, const glm::vec3& line_direction, float *out_distance) {
+  return m_model->intersects(line_start, line_direction, out_distance);
+}
 
 void SceneNode::resetInteractionStates() {
   for (SceneNode* current_node : s_grabbable_instances) {
