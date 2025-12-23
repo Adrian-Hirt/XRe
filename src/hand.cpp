@@ -9,7 +9,7 @@ Hand::Hand(XrHandEXT hand_identifier) {
   for (int i = 0; i < XR_HAND_JOINT_COUNT_EXT; i++) {
     // TODO: use a more sensible approach for lifetime handling
     Model *joint_model = ModelFactory::createCubePtr({0.67f, 0.84f, 0.9});
-    SceneNode* joint_node = new SceneNode(joint_model);
+    SceneNode *joint_node = new SceneNode(joint_model);
     joint_node->setScale(0.005f, 0.005f, 0.005f);
     m_hand_root_node->addChildNode(joint_node);
     m_joint_nodes.push_back(joint_node);
@@ -126,16 +126,16 @@ void Hand::computeSceneInteractions() {
   // Check if the hand is intersecting a grabbable node. To make it simpler for the moment, we only
   // check intersection with the palm and the tip of the thumb (as for "grab", both the thumb and the
   // center of the palm should intersect, and for "pinch", the tip of the thumb needs to intersect).
-  SceneNode* thumb_scene_node = m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT];
-  SceneNode* palm_scene_node = m_joint_nodes[XR_HAND_JOINT_PALM_EXT];
+  SceneNode *thumb_scene_node = m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT];
+  SceneNode *palm_scene_node = m_joint_nodes[XR_HAND_JOINT_PALM_EXT];
 
-  for(SceneNode *current_node : SceneNode::getGrabbableInstances()) {
+  for (SceneNode *current_node : SceneNode::getGrabbableInstances()) {
     // Skip this if we already are grabbing this node with another controller or a hand
     if (current_node->m_grabbed) {
       continue;
     }
 
-    if(current_node->intersects(*thumb_scene_node) || current_node->intersects(*palm_scene_node)) {
+    if (current_node->intersects(*thumb_scene_node) || current_node->intersects(*palm_scene_node)) {
       // Keep track that we're intersecting with this model
       current_node->m_intersected_in_current_frame = true;
 
@@ -151,4 +151,3 @@ void Hand::computeSceneInteractions() {
   // TODO: If the hand is closed, we need to check for intersection with the central
   // palm joint position, to determine whether the hand is grabbing something.
 }
-

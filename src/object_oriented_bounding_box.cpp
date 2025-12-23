@@ -3,7 +3,7 @@
 // ------------------------------------
 // Power iteration eigenvector solver
 // ------------------------------------
-glm::vec3 OOBB::powerIteration(const glm::mat3& matrix, int max_iterations = 50) {
+glm::vec3 OOBB::powerIteration(const glm::mat3 &matrix, int max_iterations = 50) {
   // Use a vector with all ones as the "starting" vector
   glm::vec3 b = glm::one<glm::vec3>();
 
@@ -20,7 +20,7 @@ glm::vec3 OOBB::powerIteration(const glm::mat3& matrix, int max_iterations = 50)
 
 OOBB::OOBB() {}
 
-OOBB::OOBB(const std::vector<glm::vec3>& points) {
+OOBB::OOBB(const std::vector<glm::vec3> &points) {
   if (points.empty()) {
     m_center = glm::zero<glm::vec3>();
     m_extents = glm::zero<glm::vec3>();
@@ -34,7 +34,7 @@ OOBB::OOBB(const std::vector<glm::vec3>& points) {
   // Sum up all points and then divide by the number of points
   // to find the center of mass of the points.
   glm::vec3 centroid = glm::zero<glm::vec3>();
-  for (auto& p : points) {
+  for (auto &p : points) {
     centroid += p;
   }
   centroid /= (float)points.size();
@@ -45,7 +45,7 @@ OOBB::OOBB(const std::vector<glm::vec3>& points) {
   // Build the covariance matrix of the points
   glm::mat3 covariance = glm::zero<glm::mat3>();
 
-  for (auto& p : points) {
+  for (auto &p : points) {
     glm::vec3 d = p - centroid;
     covariance[0][0] += d.x * d.x;
     covariance[0][1] += d.x * d.y;
@@ -58,7 +58,7 @@ OOBB::OOBB(const std::vector<glm::vec3>& points) {
     covariance[2][2] += d.z * d.z;
   }
 
-  covariance /= (float) points.size();
+  covariance /= (float)points.size();
 
   // -------------------------------
   // 3. Compute eigenvectors (principal axes)
@@ -80,13 +80,12 @@ OOBB::OOBB(const std::vector<glm::vec3>& points) {
 
   // Check if e1 and e2 are too parallel, which might happen e.g. with cubes,
   // which means computing the principal components will fail.
-  if(glm::length2(glm::cross(e1,e2)) < 1e-6f) {
+  if (glm::length2(glm::cross(e1, e2)) < 1e-6f) {
     // Pick any vector orthogonal to e1
-    if(fabs(e1.x) < 0.9f) {
-      e2 = glm::normalize(glm::cross(e1, glm::vec3(1,0,0)));
-    }
-    else {
-      e2 = glm::normalize(glm::cross(e1, glm::vec3(0,1,0)));
+    if (fabs(e1.x) < 0.9f) {
+      e2 = glm::normalize(glm::cross(e1, glm::vec3(1, 0, 0)));
+    } else {
+      e2 = glm::normalize(glm::cross(e1, glm::vec3(0, 1, 0)));
     }
   }
   float lambda2 = glm::dot(e2, covariance * e2);
@@ -107,8 +106,7 @@ OOBB::OOBB(const std::vector<glm::vec3>& points) {
   if (fabs(lambda1 - lambda2) < eps && fabs(lambda2 - lambda3) < eps) {
     // fallback to world axes
     axes = glm::identity<glm::mat3>();
-  }
-  else {
+  } else {
     axes[0] = e1;
     axes[1] = e2;
     axes[2] = e3;
@@ -127,10 +125,10 @@ OOBB::OOBB(const std::vector<glm::vec3>& points) {
   glm::mat3 rotation = axes;
   glm::mat3 rotation_transposed = glm::transpose(rotation);
 
-  glm::vec3 minv( std::numeric_limits<float>::max());
+  glm::vec3 minv(std::numeric_limits<float>::max());
   glm::vec3 maxv(-std::numeric_limits<float>::max());
 
-  for (auto& p : points) {
+  for (auto &p : points) {
     glm::vec3 d = p - centroid;
     glm::vec3 q = rotation_transposed * d;
 
@@ -150,28 +148,16 @@ OOBB::OOBB(const std::vector<glm::vec3>& points) {
   m_axes = axes;
 }
 
-glm::vec3 OOBB::getCenter() {
-  return m_center;
-};
+glm::vec3 OOBB::getCenter() { return m_center; };
 
-glm::vec3 OOBB::getExtents() {
-  return m_extents;
-};
+glm::vec3 OOBB::getExtents() { return m_extents; };
 
-glm::mat3 OOBB::getAxes() {
-  return m_axes;
-};
+glm::mat3 OOBB::getAxes() { return m_axes; };
 
 void OOBB::print() {
-  std::cout << "Center: " 
-            << m_center.x << ", " 
-            << m_center.y << ", " 
-            << m_center.z << "\n";
+  std::cout << "Center: " << m_center.x << ", " << m_center.y << ", " << m_center.z << "\n";
 
-  std::cout << "Extents: "
-            << m_extents.x << ", "
-            << m_extents.y << ", "
-            << m_extents.z << "\n";
+  std::cout << "Extents: " << m_extents.x << ", " << m_extents.y << ", " << m_extents.z << "\n";
 
   std::cout << "Axes: (columns)\n";
 
@@ -185,7 +171,7 @@ void OOBB::print() {
   std::cout << "--------------" << std::endl;
 }
 
-OOBB OOBB::transformed(const glm::mat4& model) const {
+OOBB OOBB::transformed(const glm::mat4 &model) const {
   OOBB transformed_bounding_box;
 
   // 1. Transform center (full transform)
@@ -200,11 +186,7 @@ OOBB OOBB::transformed(const glm::mat4& model) const {
   }
 
   // 4. Extract scale factors (length of basis vectors)
-  glm::vec3 scale(
-    glm::length(rotation_scale_matrix[0]),
-    glm::length(rotation_scale_matrix[1]),
-    glm::length(rotation_scale_matrix[2])
-  );
+  glm::vec3 scale(glm::length(rotation_scale_matrix[0]), glm::length(rotation_scale_matrix[1]), glm::length(rotation_scale_matrix[2]));
 
   // 5. Scale extents
   transformed_bounding_box.m_extents = m_extents * scale;
@@ -233,43 +215,35 @@ std::vector<glm::vec3> OOBB::getCorners() const {
 }
 
 std::vector<uint16_t> OOBB::getLineIndices() const {
-  return {
-    // +X face
-    0, 2, 3,
-    3, 1, 0,
-    // -X face
-    4, 5, 7,
-    7, 6, 4,
-    // +Y face
-    0, 1, 5,
-    5, 4, 0,
-    // -Y face
-    2, 6, 7,
-    7, 3, 2,
-    // +Z face
-    0, 4, 6,
-    6, 2, 0,
-    // -Z face
-    1, 3, 7,
-    7, 5, 1
-  };
+  return {// +X face
+          0, 2, 3, 3, 1, 0,
+          // -X face
+          4, 5, 7, 7, 6, 4,
+          // +Y face
+          0, 1, 5, 5, 4, 0,
+          // -Y face
+          2, 6, 7, 7, 3, 2,
+          // +Z face
+          0, 4, 6, 6, 2, 0,
+          // -Z face
+          1, 3, 7, 7, 5, 1};
 }
 
-bool OOBB::intersects(OOBB& other) {
+bool OOBB::intersects(OOBB &other) {
   constexpr float EPS = 1e-8f;
 
   // Center-to-center vector
   glm::vec3 center_to_center_vector = other.getCenter() - m_center;
 
   // Convenience access
-  const glm::mat3& other_axes = other.getAxes();
+  const glm::mat3 &other_axes = other.getAxes();
 
   // Lambda used to test whether a given axis is a separating axis
   // between two oriented bounding boxes (SAT test).
   //
   // If the projections of the two OOBBs onto this axis do NOT overlap,
   // then this axis separates the boxes and they do not intersect.
-  auto isSeparatingAxis = [](glm::vec3& axis, OOBB& self, OOBB& other, glm::vec3 center_to_center) {
+  auto isSeparatingAxis = [](glm::vec3 &axis, OOBB &self, OOBB &other, glm::vec3 center_to_center) {
     // Helper lambda that computes the projection "radius" of an OOBB
     // onto the given axis.
     //
@@ -280,10 +254,9 @@ bool OOBB::intersects(OOBB& other) {
     //
     // The radius is the sum of each local axis contribution,
     // weighted by the box's half-extents.
-    auto projectedRadius = [](OOBB& box, glm::vec3& axis) {
-        return box.getExtents().x * fabs(glm::dot(axis, box.getAxes()[0])) +
-              box.getExtents().y * fabs(glm::dot(axis, box.getAxes()[1])) +
-              box.getExtents().z * fabs(glm::dot(axis, box.getAxes()[2]));
+    auto projectedRadius = [](OOBB &box, glm::vec3 &axis) {
+      return box.getExtents().x * fabs(glm::dot(axis, box.getAxes()[0])) + box.getExtents().y * fabs(glm::dot(axis, box.getAxes()[1])) +
+             box.getExtents().z * fabs(glm::dot(axis, box.getAxes()[2]));
     };
 
     // Project both boxes onto the axis and compute their radii
@@ -340,7 +313,7 @@ bool OOBB::intersects(OOBB& other) {
   return true;
 }
 
-bool OOBB::intersects(const glm::vec3& line_start, const glm::vec3& line_direction, float *out_distance) {
+bool OOBB::intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance) {
   constexpr float EPS = 1e-8f;
 
   // Transform ray into OOBB local space
@@ -363,17 +336,16 @@ bool OOBB::intersects(const glm::vec3& line_start, const glm::vec3& line_directi
     if (fabs(local_direction[i]) < EPS) {
       // Ray parallel to slab. If the origin is outside the slab => no intersection, can
       // return false directly.
-      if (local_origin[i] < -m_extents[i] || local_origin[i] >  m_extents[i]) {
+      if (local_origin[i] < -m_extents[i] || local_origin[i] > m_extents[i]) {
         return false;
       }
-    }
-    else {
+    } else {
 
       float inverse_direction = 1.0f / local_direction[i];
 
       // t_near is the intersection with the near plane, t_far is the intersection with the far plane.
       float t_near = (-m_extents[i] - local_origin[i]) * inverse_direction;
-      float t_far = ( m_extents[i] - local_origin[i]) * inverse_direction;
+      float t_far = (m_extents[i] - local_origin[i]) * inverse_direction;
 
       // Might need to swap depending on the ray direction
       if (t_near > t_far) {

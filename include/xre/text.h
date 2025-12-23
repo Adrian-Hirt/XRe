@@ -14,7 +14,7 @@
 
 class Text : public Renderable {
 public:
-  Text(const char* sentence);
+  Text(const char *sentence);
 
   void render();
 
@@ -29,6 +29,6 @@ private:
   // Text does not have a bounding box
   inline bool hasBoundingBox() override { return false; };
 
-  void buildMeshesFromSentence(const char* sentence);
+  void buildMeshesFromSentence(const char *sentence);
   inline text_char_t computeTextureOffsets(int letter);
 };

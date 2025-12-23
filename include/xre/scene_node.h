@@ -16,18 +16,18 @@
 class SceneNode {
 public:
   SceneNode();
-  SceneNode(Model* model);
-  SceneNode(Model* model, SceneNode &parent);
-  SceneNode(Renderable* model);
-  SceneNode(Renderable* model, SceneNode &parent);
+  SceneNode(Model *model);
+  SceneNode(Model *model, SceneNode &parent);
+  SceneNode(Renderable *model);
+  SceneNode(Renderable *model, SceneNode &parent);
   ~SceneNode();
 
-//   void addChildNode(SceneNode &child);
+  //   void addChildNode(SceneNode &child);
   void addChildNode(SceneNode *child);
-  void render(RenderContext& ctx);
+  void render(RenderContext &ctx);
   void updateTransformation();
   void buildBoundingBox();
-//   DirectX::BoundingOrientedBox getTransformedBoundingBox();
+  //   DirectX::BoundingOrientedBox getTransformedBoundingBox();
 
   // These methods apply the rotation / translation / scaling
   // to the values we already have, e.g. to simply double the
@@ -53,9 +53,9 @@ public:
   glm::vec3 getScale();
   glm::vec3 getPosition();
 
-  static std::unordered_set<SceneNode*> getGrabbableInstances();
+  static std::unordered_set<SceneNode *> getGrabbableInstances();
   void setGrabbable(bool grabbable);
-  static std::unordered_set<SceneNode*> getTerrainInstances();
+  static std::unordered_set<SceneNode *> getTerrainInstances();
   void setIsTerrain(bool is_terrain);
 
   void setActive(bool is_active);
@@ -66,23 +66,24 @@ public:
 
   // Check whether a node intersects with a line (and optionally put the
   // distance of the intersection point as an out parameter)
-  bool intersects(const glm::vec3& line_start, const glm::vec3& line_direction, float *out_distance);
+  bool intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance);
 
   bool m_grabbed = false;
   bool m_intersected_in_current_frame = false;
 
   static void resetInteractionStates();
+
 private:
   // Parent node (which might be null for the root node)
-  SceneNode* m_parent;
+  SceneNode *m_parent;
 
   // Children of this node
   std::vector<SceneNode *> m_children;
 
   // Model or Renderable contained in this node (which might be null, e.g. for a node only containing some
   // transformation)
-  Model* m_model = nullptr;
-  Renderable* m_renderable = nullptr;
+  Model *m_model = nullptr;
+  Renderable *m_renderable = nullptr;
 
   // Position, scale and rotation of the SceneNode. These are all LOCAL,
   // i.e. in relation to the transform of the parent node!
@@ -102,13 +103,13 @@ private:
   // Rotation relative to world
   glm::mat4 m_world_rotation_matrix;
 
-//   DirectX::BoundingOrientedBox m_model_bounding_box;
-//   BoundingBoxMesh m_model_bounding_box_mesh;
+  //   DirectX::BoundingOrientedBox m_model_bounding_box;
+  //   BoundingBoxMesh m_model_bounding_box_mesh;
 
   // Set of all instances we marked as grabbable
-  inline static std::unordered_set<SceneNode*> s_grabbable_instances;
+  inline static std::unordered_set<SceneNode *> s_grabbable_instances;
 
-  inline static std::unordered_set<SceneNode*> s_terrain_instances;
+  inline static std::unordered_set<SceneNode *> s_terrain_instances;
 
   bool m_transform_needs_update = true;
 

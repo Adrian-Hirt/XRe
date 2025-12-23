@@ -1,0 +1,9 @@
+BasedOnStyle: LLVM
+IndentWidth: 2
+ColumnLimit: 140
+AllowShortIfStatementsOnASingleLine: false
+BreakBeforeBraces: Attach
+SortIncludes: false
+AllowShortFunctionsOnASingleLine: true
+BraceWrapping:
+  BeforeElse: true

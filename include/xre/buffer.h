@@ -25,6 +25,6 @@ private:
   VkDeviceMemory m_device_memory = nullptr;
   VkDeviceSize m_size = 0u;
 
-  void* map();
+  void *map();
   void unmap();
 };

@@ -14,11 +14,11 @@
 class OOBB {
 public:
   OOBB();
-  OOBB(const std::vector<glm::vec3>& points);
+  OOBB(const std::vector<glm::vec3> &points);
 
-  bool intersects(OOBB& other);
-  bool intersects(const glm::vec3& line_start, const glm::vec3& line_direction, float *out_distance);
-  OOBB transformed(const glm::mat4& model) const;
+  bool intersects(OOBB &other);
+  bool intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance);
+  OOBB transformed(const glm::mat4 &model) const;
   std::vector<glm::vec3> getCorners() const;
   std::vector<uint16_t> getLineIndices() const;
 
@@ -33,5 +33,5 @@ private:
   glm::vec3 m_extents;
   glm::mat3 m_axes;
 
-  glm::vec3 powerIteration(const glm::mat3& A, int maxIterations);
+  glm::vec3 powerIteration(const glm::mat3 &A, int maxIterations);
 };

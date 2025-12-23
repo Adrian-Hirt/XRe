@@ -39,12 +39,12 @@ protected:
   virtual inline bool hasBoundingBox() { return true; };
 
   // Protected as only subclasses may use it
-  virtual void render(RenderContext& ctx);
-  void renderBoundingBox(RenderContext& ctx);
+  virtual void render(RenderContext &ctx);
+  void renderBoundingBox(RenderContext &ctx);
 
   // vertex and index buffers
   Buffer *m_vertex_buffer = nullptr;
-  Buffer *m_index_buffer = nullptr; 
+  Buffer *m_index_buffer = nullptr;
 
   // Vertex and index buffer for bounding volumes, which mainly are used
   // for debugging purposes.

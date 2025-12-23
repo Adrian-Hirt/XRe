@@ -74,9 +74,7 @@ struct Vertex {
     return attribute_descriptions;
   }
 
-  bool operator==(const Vertex& other) const {
-    return position == other.position && texture_coord == other.texture_coord;
-  }
+  bool operator==(const Vertex &other) const { return position == other.position && texture_coord == other.texture_coord; }
 };
 
 // typedef struct text_char_t {

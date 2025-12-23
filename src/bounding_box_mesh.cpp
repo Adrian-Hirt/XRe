@@ -3,11 +3,7 @@
 BoundingBoxMesh::BoundingBoxMesh() {}
 
 BoundingBoxMesh::BoundingBoxMesh(std::vector<vertex_t> vertices) {
-  std::vector<unsigned int> bounding_box_indices = {
-      0, 1, 2, 3, 0, 3, 1, 2,
-      4, 5, 6, 7, 4, 7, 5, 6,
-      0, 4, 1, 5, 2, 6, 3, 7
-    };
+  std::vector<unsigned int> bounding_box_indices = {0, 1, 2, 3, 0, 3, 1, 2, 4, 5, 6, 7, 4, 7, 5, 6, 0, 4, 1, 5, 2, 6, 3, 7};
 
   // Store number of vertices and indices
   m_vertex_count = vertices.size();
@@ -43,7 +39,7 @@ void BoundingBoxMesh::updateVerticesFromBoundingBox(DirectX::BoundingOrientedBox
 
   // Create vertices from the corners of the bounding box
   for (int i = 0; i < bounding_box.CORNER_COUNT; i++) {
-    bounding_box_vertices.push_back({ corners[i], { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
+    bounding_box_vertices.push_back({corners[i], {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}});
   }
 
   // Update the vertex buffer

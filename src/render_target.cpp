@@ -1,16 +1,12 @@
 #include <xre/render_target.h>
 
-RenderTarget::RenderTarget(VkDevice device,
-                           VkPhysicalDevice physical_device,
-                           VkImage color_image,
-                           VkExtent2D size,
-                           VkFormat color_format,
-                           VkRenderPass render_pass) 
+RenderTarget::RenderTarget(VkDevice device, VkPhysicalDevice physical_device, VkImage color_image, VkExtent2D size, VkFormat color_format,
+                           VkRenderPass render_pass)
     : m_device(device), m_color_image(color_image) {
   VkResult result;
-  
+
   // Create color image view
-  VkImageViewCreateInfo image_view_create_info{ VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
+  VkImageViewCreateInfo image_view_create_info{VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO};
   image_view_create_info.image = color_image;
   image_view_create_info.format = color_format;
   image_view_create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
@@ -28,9 +24,9 @@ RenderTarget::RenderTarget(VkDevice device,
 
   // Create depth image
   VkFormat depth_format = VK_FORMAT_D32_SFLOAT;
-  VkImageCreateInfo depth_image_create_info{ VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
+  VkImageCreateInfo depth_image_create_info{VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
   depth_image_create_info.imageType = VK_IMAGE_TYPE_2D;
-  depth_image_create_info.extent = { size.width, size.height, 1 };
+  depth_image_create_info.extent = {size.width, size.height, 1};
   depth_image_create_info.mipLevels = 1;
   depth_image_create_info.arrayLayers = 1;
   depth_image_create_info.format = depth_format;
@@ -42,14 +38,14 @@ RenderTarget::RenderTarget(VkDevice device,
   // Allocate and bind memory
   VkMemoryRequirements memReq;
   vkGetImageMemoryRequirements(device, m_depth_image, &memReq);
-  VkMemoryAllocateInfo allocInfo{ VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO };
+  VkMemoryAllocateInfo allocInfo{VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
   allocInfo.allocationSize = memReq.size;
   allocInfo.memoryTypeIndex = VulkanUtils::findMemoryType(physical_device, memReq.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
   vkAllocateMemory(device, &allocInfo, nullptr, &m_depth_memory);
   vkBindImageMemory(device, m_depth_image, m_depth_memory, 0);
 
   // Create the depth view
-  VkImageViewCreateInfo depthViewInfo{ VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
+  VkImageViewCreateInfo depthViewInfo{VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO};
   depthViewInfo.image = m_depth_image;
   depthViewInfo.format = depth_format;
   depthViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
@@ -59,10 +55,11 @@ RenderTarget::RenderTarget(VkDevice device,
   vkCreateImageView(device, &depthViewInfo, nullptr, &m_depth_image_view);
 
   // Create framebuffer
-  std::array<VkImageView, 2> attachments = { m_color_image_view, m_depth_image_view };
-  VkFramebufferCreateInfo framebuffer_create_info{ VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO };
+  std::array<VkImageView, 2> attachments = {m_color_image_view, m_depth_image_view};
+  VkFramebufferCreateInfo framebuffer_create_info{VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO};
   framebuffer_create_info.renderPass = render_pass;
-  framebuffer_create_info.attachmentCount = static_cast<uint32_t>(attachments.size());;
+  framebuffer_create_info.attachmentCount = static_cast<uint32_t>(attachments.size());
+  ;
   framebuffer_create_info.pAttachments = attachments.data();
   framebuffer_create_info.width = size.width;
   framebuffer_create_info.height = size.height;
@@ -76,10 +73,6 @@ void RenderTarget::destroy() {
   // vkDestroyImageView(m_device, m_image_view, nullptr);
 }
 
-VkImage RenderTarget::getImage() {
-  return m_color_image;
-}
+VkImage RenderTarget::getImage() { return m_color_image; }
 
-VkFramebuffer RenderTarget::getFramebuffer() {
-  return m_framebuffer;
-}
+VkFramebuffer RenderTarget::getFramebuffer() { return m_framebuffer; }

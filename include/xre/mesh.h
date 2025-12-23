@@ -20,7 +20,7 @@ public:
   // Mesh(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, const char *texture_path);
 
 private:
-  void render(RenderContext& ctx);
+  void render(RenderContext &ctx);
 
   // Only Model can call Mesh::render()
   friend class Model;

@@ -15,7 +15,7 @@ Model::Model() {}
 //  2) Color of the model
 //------------------------------------------------------------------------------------------------------
 Model::Model(std::vector<Mesh> meshes) : Model::Model(meshes, glm::vec3(0.8f, 0.8f, 0.8f)) {}
-Model::Model(std::vector<Mesh> meshes, glm::vec3 color)  {
+Model::Model(std::vector<Mesh> meshes, glm::vec3 color) {
   m_meshes = meshes;
   m_original_model_color = color;
   m_model_color = color;
@@ -31,7 +31,7 @@ Model::Model(const char *model_path, glm::vec3 color) {
   m_model_index = s_model_index++;
 }
 
-void Model::render(RenderContext& ctx) {
+void Model::render(RenderContext &ctx) {
   // Prepare model uniform buffer
   ModelUniformBufferObject uniform_buffer_object{};
   uniform_buffer_object.world = m_world_matrix;
@@ -47,16 +47,8 @@ void Model::render(RenderContext& ctx) {
   ctx.model_uniform_buffer->loadData(uniform_buffer_object, offset);
 
   // Bind descriptor set
-  vkCmdBindDescriptorSets(
-    ctx.command_buffer,
-    VK_PIPELINE_BIND_POINT_GRAPHICS,
-    ctx.pipeline_layout,
-    1u,
-    1u,
-    &ctx.descriptor_set,
-    1,
-    &offset
-  );
+  vkCmdBindDescriptorSets(ctx.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ctx.pipeline_layout, 1u, 1u, &ctx.descriptor_set, 1,
+                          &offset);
 
   // Render meshes of this model
   for (Mesh mesh : m_meshes) {
@@ -68,9 +60,7 @@ void Model::render(RenderContext& ctx) {
   }
 }
 
-void Model::toggleRenderBoundingBoxes() {
-  m_render_bounding_boxes = !m_render_bounding_boxes;
-}
+void Model::toggleRenderBoundingBoxes() { m_render_bounding_boxes = !m_render_bounding_boxes; }
 
 // void Model::renderWithTransparency() {
 //   // Render the model twice, once with Counterclockwise
@@ -82,17 +72,11 @@ void Model::toggleRenderBoundingBoxes() {
 //   renderMeshes();
 // }
 
-void Model::setColor(glm::vec3 color) {
-  m_model_color = color;
-}
+void Model::setColor(glm::vec3 color) { m_model_color = color; }
 
-void Model::resetColor() {
-  m_model_color = m_original_model_color;
-}
+void Model::resetColor() { m_model_color = m_original_model_color; }
 
-glm::vec3 Model::getColor() {
-  return m_model_color;
-}
+glm::vec3 Model::getColor() { return m_model_color; }
 
 void Model::loadObj(const char *model_path) {
   tinyobj::attrib_t attrib;
@@ -133,8 +117,7 @@ void Model::loadObj(const char *model_path) {
           tinyobj::real_t normal_y = attrib.normals[3 * index.normal_index + 1];
           tinyobj::real_t normal_z = attrib.normals[3 * index.normal_index + 2];
           current_vertex.normal = glm::vec3(normal_x, normal_y, normal_z);
-        }
-        else {
+        } else {
           current_vertex.normal = glm::vec3(1.0f, 0.0f, 0.0f);
         }
 
@@ -144,8 +127,7 @@ void Model::loadObj(const char *model_path) {
           tinyobj::real_t texture_x = attrib.texcoords[2 * index.texcoord_index + 0];
           tinyobj::real_t texture_y = attrib.texcoords[2 * index.texcoord_index + 1];
           current_vertex.texture_coord = glm::vec2(texture_x, texture_y);
-        }
-        else {
+        } else {
           current_vertex.texture_coord = glm::vec2(0.0f, 0.0f);
         }
 
@@ -172,9 +154,7 @@ void Model::loadObj(const char *model_path) {
   };
 }
 
-void Model::setWorldMatrix(glm::mat4 world_matrix) {
-  m_world_matrix = world_matrix;
-}
+void Model::setWorldMatrix(glm::mat4 world_matrix) { m_world_matrix = world_matrix; }
 
 // std::vector<DirectX::XMFLOAT3> Model::getMeshBoundingBoxCorners() {
 //   size_t points_count = m_meshes.size() * 8;
@@ -212,7 +192,7 @@ bool Model::intersects(Model other) {
   return false;
 }
 
-bool Model::intersects(const glm::vec3& line_start, const glm::vec3& line_direction, float *out_distance) {
+bool Model::intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance) {
   for (auto mesh : m_meshes) {
     auto this_OOBB = mesh.getObjectOrientedBoundingBox().transformed(m_world_matrix);
     if (this_OOBB.intersects(line_start, line_direction, out_distance)) {
@@ -229,6 +209,4 @@ void Model::printBouindingBoxes() {
   }
 }
 
-void Model::setInteractedState(bool interacted) {
-  m_interacted = interacted;
-}
+void Model::setInteractedState(bool interacted) { m_interacted = interacted; }

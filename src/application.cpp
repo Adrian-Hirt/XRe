@@ -19,16 +19,14 @@ void Application::run() {
   setup();
 
   // Main render loop
-  while(loop_running) {
+  while (loop_running) {
     // Poll the OpenXR events, and if OpenXR reports to still be running, keep going on
     m_open_xr_handler.pollOpenxrEvents(loop_running, xr_running);
 
     if (xr_running) {
       // Render frame
-      m_open_xr_handler.renderFrame(
-        std::bind(&Application::draw, this, std::placeholders::_1), 
-        std::bind(&Application::updateSimulation, this, std::placeholders::_1)
-      );
+      m_open_xr_handler.renderFrame(std::bind(&Application::draw, this, std::placeholders::_1),
+                                    std::bind(&Application::updateSimulation, this, std::placeholders::_1));
     }
   }
 }
@@ -37,7 +35,7 @@ void Application::setup() {
   // Override this method to setup your scene etc.
 }
 
-void Application::draw(RenderContext& ctx) {
+void Application::draw(RenderContext &ctx) {
   // Override this method to draw some stuff
 }
 

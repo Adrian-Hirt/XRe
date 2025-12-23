@@ -25,8 +25,9 @@ public:
 
   void run();
   virtual void setup();
-  virtual void draw(RenderContext& ctx);
+  virtual void draw(RenderContext &ctx);
   virtual void updateSimulation(XrTime predicted_time);
+
 private:
   // Handlers
   OpenXrHandler m_open_xr_handler;

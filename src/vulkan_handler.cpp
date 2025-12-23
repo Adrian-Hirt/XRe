@@ -16,7 +16,8 @@ VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
   // Retrieve the needed extensions
   //------------------------------------------------------------------------------------------------------
   PFN_xrGetVulkanInstanceExtensionsKHR getVulkanInstanceExtensionsKHR = nullptr;
-  xr_result = xrGetInstanceProcAddr(xr_instance, "xrGetVulkanInstanceExtensionsKHR", reinterpret_cast<PFN_xrVoidFunction*>(&getVulkanInstanceExtensionsKHR));
+  xr_result = xrGetInstanceProcAddr(xr_instance, "xrGetVulkanInstanceExtensionsKHR",
+                                    reinterpret_cast<PFN_xrVoidFunction *>(&getVulkanInstanceExtensionsKHR));
   Utils::checkXrResult(xr_result, "Failed to retrieve xrGetVulkanInstanceExtensionsKHR function");
 
   // Get all supported Vulkan instance extensions
@@ -40,16 +41,17 @@ VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
 
   std::string instance_extension_buffer;
   instance_extension_buffer.resize(instance_extension_count);
-  xr_result = getVulkanInstanceExtensionsKHR(xr_instance, xr_system_id, instance_extension_count, &instance_extension_count, instance_extension_buffer.data());
+  xr_result = getVulkanInstanceExtensionsKHR(xr_instance, xr_system_id, instance_extension_count, &instance_extension_count,
+                                             instance_extension_buffer.data());
   Utils::checkXrResult(xr_result, "Failed to get required Vulkan instance extensions");
 
-  std::vector<const char*> vulkan_instance_extensions = Utils::splitString(instance_extension_buffer, ' ');
+  std::vector<const char *> vulkan_instance_extensions = Utils::splitString(instance_extension_buffer, ' ');
 
   // Check that all Vulkan instance extensions are supported
-  for (const char* extension : vulkan_instance_extensions) {
+  for (const char *extension : vulkan_instance_extensions) {
     bool extensionSupported = false;
 
-    for (const VkExtensionProperties& supportedExtension : supportedVulkanInstanceExtensions) {
+    for (const VkExtensionProperties &supportedExtension : supportedVulkanInstanceExtensions) {
       if (strcmp(extension, supportedExtension.extensionName) == 0) {
         extensionSupported = true;
         break;
@@ -89,7 +91,8 @@ VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
   // Physical device
   //------------------------------------------------------------------------------------------------------
   PFN_xrGetVulkanGraphicsDeviceKHR getVulkanGraphicsDeviceKHR = nullptr;
-  xr_result = xrGetInstanceProcAddr(xr_instance, "xrGetVulkanGraphicsDeviceKHR", reinterpret_cast<PFN_xrVoidFunction*>(&getVulkanGraphicsDeviceKHR));
+  xr_result = xrGetInstanceProcAddr(xr_instance, "xrGetVulkanGraphicsDeviceKHR",
+                                    reinterpret_cast<PFN_xrVoidFunction *>(&getVulkanGraphicsDeviceKHR));
   Utils::checkXrResult(xr_result, "Failed to retrieve xrGetVulkanGraphicsDeviceKHR function");
 
   // Retrieve physical device from OpenXR
@@ -112,12 +115,11 @@ VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
   std::vector<VkQueueFamilyProperties> queue_families(physical_device_queue_family_count);
   vkGetPhysicalDeviceQueueFamilyProperties(m_physical_device, &physical_device_queue_family_count, queue_families.data());
 
-
   // Loop over all queue families and keep track of the queue families we are interested in.
   // We simply assume that the graphics queue family and the present graphics family are the same for now.
   bool queue_family_index_found = false;
   for (uint32_t i = 0; i < queue_families.size(); i++) {
-    VkQueueFamilyProperties& candidate = queue_families[i];
+    VkQueueFamilyProperties &candidate = queue_families[i];
 
     if (candidate.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
       m_queue_family_index = i;
@@ -129,7 +131,8 @@ VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
   Utils::checkBoolResult(queue_family_index_found, "Failed to find graphics queue for physical device!");
 
   PFN_xrGetVulkanDeviceExtensionsKHR ext_xrGetVulkanDeviceExtensionsKHR;
-	xr_result = xrGetInstanceProcAddr(xr_instance, "xrGetVulkanDeviceExtensionsKHR", (PFN_xrVoidFunction*)(&ext_xrGetVulkanDeviceExtensionsKHR));
+  xr_result =
+      xrGetInstanceProcAddr(xr_instance, "xrGetVulkanDeviceExtensionsKHR", (PFN_xrVoidFunction *)(&ext_xrGetVulkanDeviceExtensionsKHR));
   Utils::checkXrResult(xr_result, "Failed to retrieve the `xrGetVulkanDeviceExtensionsKHR` function");
 
   // Get all supported Vulkan device extensions
@@ -153,16 +156,16 @@ VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
 
   std::string buffer;
   buffer.resize(vk_device_extensions_count);
-  xr_result = ext_xrGetVulkanDeviceExtensionsKHR(xr_instance, xr_system_id, vk_device_extensions_count, &vk_device_extensions_count, buffer.data());
+  xr_result =
+      ext_xrGetVulkanDeviceExtensionsKHR(xr_instance, xr_system_id, vk_device_extensions_count, &vk_device_extensions_count, buffer.data());
   Utils::checkXrResult(xr_result, "Failed to retrieve required Vulkan device extensions");
 
-  std::vector<const char*> vulkanDeviceExtensions = Utils::splitString(buffer, ' ');
-
+  std::vector<const char *> vulkanDeviceExtensions = Utils::splitString(buffer, ' ');
 
   // Check that all Vulkan device extensions are supported
-  for (const char* extension : vulkanDeviceExtensions) {
+  for (const char *extension : vulkanDeviceExtensions) {
     bool extensionSupported = false;
-    for (const VkExtensionProperties& supportedExtension : supportedVulkanDeviceExtensions) {
+    for (const VkExtensionProperties &supportedExtension : supportedVulkanDeviceExtensions) {
       if (strcmp(extension, supportedExtension.extensionName) == 0) {
         extensionSupported = true;
         break;
@@ -195,7 +198,7 @@ VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
     Utils::exitWithMessage("Required Vulkan physical device feature \"Shader Storage Image Multisample\" not supported");
   }
 
-  if(!features.samplerAnisotropy) {
+  if (!features.samplerAnisotropy) {
     Utils::exitWithMessage("Required Vulkan physical device feature \"samplerAnisotropy\" not supported");
   }
 
@@ -217,13 +220,14 @@ VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
   // create the device
   result = vkCreateDevice(m_physical_device, &device_create_info, nullptr, &m_device);
   Utils::checkVkResult(result, "failed to create logical device!");
-  
+
   // Check graphics requirements for Vulkan
   PFN_xrGetVulkanGraphicsRequirementsKHR getVulkanGraphicsRequirementsKHR = nullptr;
-  xr_result = xrGetInstanceProcAddr(xr_instance, "xrGetVulkanGraphicsRequirementsKHR", reinterpret_cast<PFN_xrVoidFunction*>(&getVulkanGraphicsRequirementsKHR));
+  xr_result = xrGetInstanceProcAddr(xr_instance, "xrGetVulkanGraphicsRequirementsKHR",
+                                    reinterpret_cast<PFN_xrVoidFunction *>(&getVulkanGraphicsRequirementsKHR));
   Utils::checkXrResult(xr_result, "Failed to retrieve xrGetVulkanGraphicsRequirementsKHR function");
 
-  XrGraphicsRequirementsVulkanKHR graphicsRequirements{ XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN_KHR };
+  XrGraphicsRequirementsVulkanKHR graphicsRequirements{XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN_KHR};
   xr_result = getVulkanGraphicsRequirementsKHR(xr_instance, xr_system_id, &graphicsRequirements);
   Utils::checkXrResult(xr_result, "Failed to retrieve Vulkan graphics requirements");
 
@@ -283,7 +287,7 @@ VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
   dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
   // Create the render pass
-  std::array<VkAttachmentDescription, 2> attachments = { color_attachment, depth_attachment };
+  std::array<VkAttachmentDescription, 2> attachments = {color_attachment, depth_attachment};
   VkRenderPassCreateInfo renderPassInfo{};
   renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
   renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
@@ -311,20 +315,10 @@ void VulkanHandler::setupRenderer() {
   // Uniform buffer
   //------------------------------------------------------------------------------------------------------
   // Create uniform buffer
-  m_uniform_buffer = new Buffer(
-    m_device,
-    m_physical_device,
-    m_aligned_size * s_max_models_in_scene,
-    VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
-  );
+  m_uniform_buffer = new Buffer(m_device, m_physical_device, m_aligned_size * s_max_models_in_scene, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 
   // Create global uniform buffer
-  m_global_uniform_buffer = new Buffer(
-    m_device,
-    m_physical_device,
-    sizeof(GlobalUniformBufferObject),
-    VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
-  );
+  m_global_uniform_buffer = new Buffer(m_device, m_physical_device, sizeof(GlobalUniformBufferObject), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 
   //------------------------------------------------------------------------------------------------------
   // Descriptor set layouts
@@ -343,7 +337,7 @@ void VulkanHandler::setupRenderer() {
 
   result = vkCreateDescriptorSetLayout(m_device, &global_layout_create_info, nullptr, &m_global_descriptor_set_layout);
   Utils::checkVkResult(result, "Failed to create global descriptor set layout");
-  
+
   // Model uniform buffer object (set = 1)
   VkDescriptorSetLayoutBinding ubo_layout_binding{};
   ubo_layout_binding.binding = 0;
@@ -376,7 +370,7 @@ void VulkanHandler::setupRenderer() {
   global_descriptor_pool_size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
   global_descriptor_pool_size.descriptorCount = 1;
 
-  VkDescriptorPoolCreateInfo global_descriptor_pool_create_info{ VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO };
+  VkDescriptorPoolCreateInfo global_descriptor_pool_create_info{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
   global_descriptor_pool_create_info.poolSizeCount = 1;
   global_descriptor_pool_create_info.pPoolSizes = &global_descriptor_pool_size;
   global_descriptor_pool_create_info.maxSets = 1;
@@ -390,7 +384,7 @@ void VulkanHandler::setupRenderer() {
   descriptor_pool_size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
   descriptor_pool_size.descriptorCount = 1u;
 
-  VkDescriptorPoolCreateInfo descriptor_pool_create_info{ VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO };
+  VkDescriptorPoolCreateInfo descriptor_pool_create_info{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
   descriptor_pool_create_info.poolSizeCount = 1u;
   descriptor_pool_create_info.pPoolSizes = &descriptor_pool_size;
   descriptor_pool_create_info.maxSets = 1u;
@@ -403,7 +397,7 @@ void VulkanHandler::setupRenderer() {
   // Descriptor set
   //------------------------------------------------------------------------------------------------------
   // Allocate global descriptor set
-  VkDescriptorSetAllocateInfo global_descriptor_set_allocate_info{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
+  VkDescriptorSetAllocateInfo global_descriptor_set_allocate_info{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
   global_descriptor_set_allocate_info.descriptorPool = global_descriptor_pool;
   global_descriptor_set_allocate_info.descriptorSetCount = 1;
   global_descriptor_set_allocate_info.pSetLayouts = &m_global_descriptor_set_layout;
@@ -416,7 +410,7 @@ void VulkanHandler::setupRenderer() {
   global_descriptor_buffer_info.offset = 0;
   global_descriptor_buffer_info.range = VK_WHOLE_SIZE;
 
-  VkWriteDescriptorSet global_write_descriptor_set{ VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
+  VkWriteDescriptorSet global_write_descriptor_set{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
   global_write_descriptor_set.dstSet = m_global_descriptor_set;
   global_write_descriptor_set.pBufferInfo = &global_descriptor_buffer_info;
   global_write_descriptor_set.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -427,7 +421,7 @@ void VulkanHandler::setupRenderer() {
   vkUpdateDescriptorSets(m_device, 1, &global_write_descriptor_set, 0, nullptr);
 
   // Allocate local descriptor set
-  VkDescriptorSetAllocateInfo descriptor_set_allocate_info{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
+  VkDescriptorSetAllocateInfo descriptor_set_allocate_info{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
   descriptor_set_allocate_info.descriptorPool = descriptor_pool;
   descriptor_set_allocate_info.descriptorSetCount = 1u;
   descriptor_set_allocate_info.pSetLayouts = &m_descriptor_set_layout;
@@ -440,7 +434,7 @@ void VulkanHandler::setupRenderer() {
   descriptor_buffer_info.offset = 0u;
   descriptor_buffer_info.range = VK_WHOLE_SIZE;
 
-  VkWriteDescriptorSet write_descriptor_set{ VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
+  VkWriteDescriptorSet write_descriptor_set{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
   write_descriptor_set.dstSet = m_descriptor_set;
   write_descriptor_set.pBufferInfo = &descriptor_buffer_info;
   write_descriptor_set.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
@@ -454,8 +448,8 @@ void VulkanHandler::setupRenderer() {
   // Pipeline layout
   //------------------------------------------------------------------------------------------------------
   std::array<VkDescriptorSetLayout, 2> set_layouts = {
-    m_global_descriptor_set_layout,  // set = 0
-    m_descriptor_set_layout          // set = 1 (local UBO)
+      m_global_descriptor_set_layout, // set = 0
+      m_descriptor_set_layout         // set = 1 (local UBO)
   };
 
   VkPipelineLayoutCreateInfo pipeline_layout_info{};
@@ -491,12 +485,12 @@ void VulkanHandler::setupRenderer() {
   fragment_shader_stage_create_info.module = fragment_shader_module;
   fragment_shader_stage_create_info.pName = "main";
 
-  std::vector<VkPipelineShaderStageCreateInfo> shader_stages = { vertex_shader_stage_create_info, fragment_shader_stage_create_info };
+  std::vector<VkPipelineShaderStageCreateInfo> shader_stages = {vertex_shader_stage_create_info, fragment_shader_stage_create_info};
 
   //------------------------------------------------------------------------------------------------------
   // Dynamic state
   //------------------------------------------------------------------------------------------------------
-  const std::array dynamic_states = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+  const std::array dynamic_states = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
 
   VkPipelineDynamicStateCreateInfo dynamic_state_create_info{};
   dynamic_state_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
@@ -571,7 +565,8 @@ void VulkanHandler::setupRenderer() {
   // Color blending
   //------------------------------------------------------------------------------------------------------
   VkPipelineColorBlendAttachmentState color_blend_attachment_state{};
-  color_blend_attachment_state.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+  color_blend_attachment_state.colorWriteMask =
+      VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
   color_blend_attachment_state.blendEnable = VK_TRUE;
   color_blend_attachment_state.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
   color_blend_attachment_state.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
@@ -594,7 +589,8 @@ void VulkanHandler::setupRenderer() {
   pipeline_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
   pipeline_create_info.layout = m_pipeline_layout;
   pipeline_create_info.stageCount = static_cast<uint32_t>(shader_stages.size());
-  pipeline_create_info.pStages = shader_stages.data();;
+  pipeline_create_info.pStages = shader_stages.data();
+  ;
   pipeline_create_info.pVertexInputState = &vertex_input_info;
   pipeline_create_info.pInputAssemblyState = &input_assembly_info;
   pipeline_create_info.pViewportState = &viewport_state_info;
@@ -650,12 +646,12 @@ void VulkanHandler::setupRenderer() {
   Utils::checkVkResult(result, "Failed to create fence");
 }
 
-VkShaderModule VulkanHandler::createShaderModule(const std::vector<char>& code) {
+VkShaderModule VulkanHandler::createShaderModule(const std::vector<char> &code) {
   // Setup the create info for the shader module
   VkShaderModuleCreateInfo shader_module_create_info{};
   shader_module_create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
   shader_module_create_info.codeSize = code.size();
-  shader_module_create_info.pCode = reinterpret_cast<const uint32_t*>(code.data());
+  shader_module_create_info.pCode = reinterpret_cast<const uint32_t *>(code.data());
 
   // And create the shader module itself
   VkShaderModule shader_module;
@@ -665,9 +661,9 @@ VkShaderModule VulkanHandler::createShaderModule(const std::vector<char>& code) 
   return shader_module;
 }
 
-void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf,
-                                VkExtent2D resolution, std::function<void(RenderContext&)> draw_callback,
-                                std::function<void(RenderContext&)> draw_interactions_callback) {
+void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf, VkExtent2D resolution,
+                                std::function<void(RenderContext &)> draw_callback,
+                                std::function<void(RenderContext &)> draw_interactions_callback) {
   VkResult result;
 
   //------------------------------------------------------------------------------------------------------
@@ -686,7 +682,7 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   Utils::checkVkResult(result, "Failed to reset fence to unsignalled state!");
 
   // Reset the command buffer such that we can record into it
-  result = vkResetCommandBuffer(m_command_buffer,  0);
+  result = vkResetCommandBuffer(m_command_buffer, 0);
   Utils::checkVkResult(result, "failed to reset command buffer!");
 
   //------------------------------------------------------------------------------------------------------
@@ -711,7 +707,7 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
   render_pass_info.renderPass = m_render_pass;
   render_pass_info.framebuffer = framebuf;
-  render_pass_info.renderArea.offset = { 0, 0 };
+  render_pass_info.renderArea.offset = {0, 0};
   render_pass_info.renderArea.extent = resolution;
   render_pass_info.clearValueCount = static_cast<uint32_t>(clear_values.size());
   render_pass_info.pClearValues = clear_values.data();
@@ -741,7 +737,7 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   scissor.offset = render_pass_info.renderArea.offset;
   scissor.extent = render_pass_info.renderArea.extent;
   vkCmdSetScissor(m_command_buffer, 0u, 1u, &scissor);
-  
+
   //------------------------------------------------------------------------------------------------------
   // Draw the scene
   //------------------------------------------------------------------------------------------------------
@@ -763,13 +759,8 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   m_global_uniform_buffer->loadData(global_uniform_buffer_object);
 
   // Bind global descriptor set (camera)
-  vkCmdBindDescriptorSets(
-    m_command_buffer,
-    VK_PIPELINE_BIND_POINT_GRAPHICS,
-    m_pipeline_layout,
-    0, 1, &m_global_descriptor_set, // set = 0
-    0, nullptr
-  );
+  vkCmdBindDescriptorSets(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0, 1, &m_global_descriptor_set, // set = 0
+                          0, nullptr);
 
   // Draw scene
   draw_callback(ctx);
@@ -805,22 +796,12 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   Utils::checkVkResult(result, "failed to submit draw command buffer!");
 }
 
-VkInstance VulkanHandler::getInstance() {
-  return m_vk_instance;
-}
+VkInstance VulkanHandler::getInstance() { return m_vk_instance; }
 
-VkPhysicalDevice VulkanHandler::getPhysicalDevice() {
-  return m_physical_device;
-}
+VkPhysicalDevice VulkanHandler::getPhysicalDevice() { return m_physical_device; }
 
-VkDevice VulkanHandler::getLogicalDevice() {
-  return m_device;
-}
+VkDevice VulkanHandler::getLogicalDevice() { return m_device; }
 
-uint32_t VulkanHandler::getQueueFamilyIndex() {
-  return m_queue_family_index;
-}
+uint32_t VulkanHandler::getQueueFamilyIndex() { return m_queue_family_index; }
 
-VkRenderPass VulkanHandler::getRenderPass() {
-  return m_render_pass;
-}
+VkRenderPass VulkanHandler::getRenderPass() { return m_render_pass; }

@@ -31,9 +31,8 @@ public:
   VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id);
 
   void setupRenderer();
-  void renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf,
-                   VkExtent2D resolution, std::function<void(RenderContext&)> draw_callback,
-                   std::function<void(RenderContext&)> draw_interactions_callback);
+  void renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf, VkExtent2D resolution,
+                   std::function<void(RenderContext &)> draw_callback, std::function<void(RenderContext &)> draw_interactions_callback);
   // void renderFrame(XrCompositionLayerProjectionView& view, std::function<void()> draw_callback,
   //                  glm::vec3 current_origin, Swapchain swapchain, uint32_t swapchain_image_id, uint32_t image_index);
 
@@ -45,11 +44,12 @@ public:
 
   static constexpr VkFormat s_color_format = VK_FORMAT_R8G8B8A8_SRGB;
   static constexpr uint32_t s_max_models_in_scene = 256;
+
 private:
   // -------------------------------------------
   // Methods
   // -------------------------------------------
-  VkShaderModule createShaderModule(const std::vector<char>& code);
+  VkShaderModule createShaderModule(const std::vector<char> &code);
 
   // -------------------------------------------
   // Attributes

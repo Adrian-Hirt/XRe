@@ -32,7 +32,7 @@ public:
 
   // Intersection check
   bool intersects(Model other);
-  bool intersects(const glm::vec3& line_start, const glm::vec3& line_direction, float *out_distance);
+  bool intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance);
 
   // Debug methods
   void toggleRenderBoundingBoxes();
@@ -64,7 +64,7 @@ private:
   glm::mat4 m_world_matrix;
 
   void loadObj(const char *model_path);
-  void render(RenderContext& ctx);
+  void render(RenderContext &ctx);
 
   bool m_render_bounding_boxes = false;
 

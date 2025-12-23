@@ -8,7 +8,7 @@ Controller::Controller() {
   m_model_node.scale(0.03f, 0.03f, 0.075f);
 
   // Create the model for visualizing intersections of the aim line
-  m_aim_indicator_sphere =  ModelFactory::createCube({0.0f, 0.75f, 1.0f}); //ModelFactory::createSphere();
+  m_aim_indicator_sphere = ModelFactory::createCube({0.0f, 0.75f, 1.0f}); // ModelFactory::createSphere();
   // m_aim_indicator_sphere.setColor({0.0f, 0.75f, 1.0f, 1.0f});
   m_intersection_sphere_node = SceneNode(&m_aim_indicator_sphere);
   m_intersection_sphere_node.scale(0.02f, 0.02f, 0.02f);
@@ -20,7 +20,7 @@ Controller::Controller() {
   m_aim_line = Line(0.003f, 2.0f, {1.0f, 0.0f, 0.0f});
 }
 
-void Controller::render(RenderContext& ctx) {
+void Controller::render(RenderContext &ctx) {
   // Return early if the controller is not active
   if (!m_active) {
     return;
@@ -30,8 +30,7 @@ void Controller::render(RenderContext& ctx) {
   // state of the controller
   if (m_grabbing) {
     m_model.setColor({1.0f, 0.0f, 0.0f});
-  }
-  else {
+  } else {
     m_model.resetColor();
   }
 
@@ -56,28 +55,26 @@ void Controller::updatePosition(glm::vec3 current_origin) {
   m_model_node.setRotation(controller_orientation);
 
   // Update the aim line
-  m_aim_line.updateAimLineFromControllerPose(controller_position,
-                                             Utils::toQuat(m_aim.orientation),
-                                             current_origin,
+  m_aim_line.updateAimLineFromControllerPose(controller_position, Utils::toQuat(m_aim.orientation), current_origin,
                                              Controller::s_line_intersection_threshold);
 }
 
 void Controller::computeSceneInteractions() {
   // Nothing to do if the controller is not active
-  if(!m_active) {
+  if (!m_active) {
     return;
   }
 
   m_root_node.updateTransformation();
 
   // Check if any of our controllers is grabbing a grabbable node
-  for(SceneNode *current_node : SceneNode::getGrabbableInstances()) {
+  for (SceneNode *current_node : SceneNode::getGrabbableInstances()) {
     // Skip this if we already are grabbing this node with another controller or a hand
     if (current_node->m_grabbed) {
       continue;
     }
 
-    if(current_node->intersects(m_model_node)) {
+    if (current_node->intersects(m_model_node)) {
       // Keep track that we're intersecting with this model
       current_node->m_intersected_in_current_frame = true;
 
@@ -93,7 +90,7 @@ void Controller::computeSceneInteractions() {
 }
 
 std::optional<glm::vec3> Controller::updateIntersectionSphereAndComputePossibleTeleport() {
-  if(!m_active) {
+  if (!m_active) {
     return std::nullopt;
   }
 
@@ -106,7 +103,8 @@ std::optional<glm::vec3> Controller::updateIntersectionSphereAndComputePossibleT
   if (m_intersection_sphere_node.isActive()) {
     // The direction vector has unit length, i.e. to stretch it to the required length, we
     // simple multiply the vector with the length, which gives us a new vector.
-    glm::vec3 stretched_direction = m_aim_line.getLineDirection() * std::min(closest_grabbable_aim_intersection, closest_terrain_aim_intersection);
+    glm::vec3 stretched_direction =
+        m_aim_line.getLineDirection() * std::min(closest_grabbable_aim_intersection, closest_terrain_aim_intersection);
 
     glm::vec3 sphere_position = m_aim_line.getLineStart();
     sphere_position = sphere_position + stretched_direction;
@@ -135,7 +133,7 @@ float Controller::computeAimIndicatorSpherePosition(std::unordered_set<SceneNode
   // ascending distance, but for now this will have to do.
   float closest_intersection_distance = Controller::s_line_intersection_threshold + 1;
 
-  for(SceneNode *current_node : nodes) {
+  for (SceneNode *current_node : nodes) {
     // Check if the node intersects the line of the controller
     float intersection_distance;
     glm::vec3 start = m_aim_line.getLineStart();

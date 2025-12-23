@@ -22,7 +22,7 @@ public:
   Controller();
 
   // Render the controller
-  void render(RenderContext& ctx);
+  void render(RenderContext &ctx);
 
   // Check whether we want to teleport
   std::optional<glm::vec3> updateIntersectionSphereAndComputePossibleTeleport();
