@@ -64,9 +64,9 @@ public:
   // Check whether a node intersects with the model contained in another one
   bool intersects(SceneNode other);
 
-//   // Check whether a node intersects with a line (and optionally put the
-//   // distance of the intersection point as an out parameter)
-//   bool intersects(DirectX::XMVECTOR line_start, DirectX::XMVECTOR line_direction, float *out_distance);
+  // Check whether a node intersects with a line (and optionally put the
+  // distance of the intersection point as an out parameter)
+  bool intersects(const glm::vec3& line_start, const glm::vec3& line_direction, float *out_distance);
 
   bool m_grabbed = false;
   bool m_intersected_in_current_frame = false;

@@ -67,15 +67,15 @@ private:
   // Line for visualizing the aim direction
   Line m_aim_line;
 
-  // // Model to visualize intersections of the aim line
-  // // and models marked as interactable
-  // Model m_aim_indicator_sphere;
+  // Model to visualize intersections of the aim line
+  // and models marked as interactable
+  Model m_aim_indicator_sphere;
 
   // Scene nodes
   SceneNode m_root_node;
   SceneNode m_model_node;
-  // SceneNode m_intersection_sphere_node;
-  // SceneNode m_aim_line_node;
+  SceneNode m_intersection_sphere_node;
+  SceneNode m_aim_line_node;
 
-  // float computeAimIndicatorSpherePosition(std::unordered_set<SceneNode *> models);
+  float computeAimIndicatorSpherePosition(std::unordered_set<SceneNode *> models);
 };

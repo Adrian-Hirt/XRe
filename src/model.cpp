@@ -212,6 +212,23 @@ bool Model::intersects(Model other) {
   return false;
 }
 
+bool Model::intersects(const glm::vec3& line_start, const glm::vec3& line_direction, float *out_distance) {
+  for (auto mesh : m_meshes) {
+    auto this_OOBB = mesh.getObjectOrientedBoundingBox().transformed(m_world_matrix);
+    if (this_OOBB.intersects(line_start, line_direction, out_distance)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+void Model::printBouindingBoxes() {
+  for (auto mesh : m_meshes) {
+    mesh.getObjectOrientedBoundingBox().print();
+  }
+}
+
 void Model::setInteractedState(bool interacted) {
   m_interacted = interacted;
 }

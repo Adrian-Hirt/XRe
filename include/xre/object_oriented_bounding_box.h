@@ -17,6 +17,7 @@ public:
   OOBB(const std::vector<glm::vec3>& points);
 
   bool intersects(OOBB& other);
+  bool intersects(const glm::vec3& line_start, const glm::vec3& line_direction, float *out_distance);
   OOBB transformed(const glm::mat4& model) const;
   std::vector<glm::vec3> getCorners() const;
   std::vector<uint16_t> getLineIndices() const;

@@ -32,9 +32,11 @@ public:
 
   // Intersection check
   bool intersects(Model other);
+  bool intersects(const glm::vec3& line_start, const glm::vec3& line_direction, float *out_distance);
 
-  // Debug method
+  // Debug methods
   void toggleRenderBoundingBoxes();
+  void printBouindingBoxes();
 
   // Toggling the state if a model is intersected and therefore
   // should have a slightly different color applied

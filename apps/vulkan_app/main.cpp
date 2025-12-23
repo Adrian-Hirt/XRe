@@ -44,7 +44,10 @@ public:
     cube2.toggleRenderBoundingBoxes();
 
     cube1_node.setGrabbable(true);
-    cube2_node.setGrabbable(true);
+    // cube2_node.setGrabbable(true);
+    floor_node.setIsTerrain(true);
+
+    // cube1.printBouindingBoxes();
   };
 
   void updateSimulation(XrTime predicted_time) override {

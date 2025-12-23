@@ -33,7 +33,7 @@ void Line::updateAimLineFromControllerPose(glm::vec3 controller_position,
   m_scene_node.setPosition(cube_center);
 
   // Update fields
-  m_line_start = cube_center;
+  m_line_start = controller_position;
   m_line_direction = normalized_direction;
 
   // Update Z scale for the length

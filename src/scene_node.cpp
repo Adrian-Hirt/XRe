@@ -255,9 +255,9 @@ bool SceneNode::intersects(SceneNode other) {
   return m_model->intersects(*other.m_model);
 }
 
-// bool SceneNode::intersects(DirectX::XMVECTOR line_start, DirectX::XMVECTOR line_direction, float *out_distance) {
-//   return getTransformedBoundingBox().Intersects(line_start, line_direction, *out_distance);
-// }
+bool SceneNode::intersects(const glm::vec3& line_start, const glm::vec3& line_direction, float *out_distance) {
+  return m_model->intersects(line_start, line_direction, out_distance);
+}
 
 void SceneNode::resetInteractionStates() {
   for (SceneNode* current_node : s_grabbable_instances) {

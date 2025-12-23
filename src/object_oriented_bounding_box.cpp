@@ -339,3 +339,60 @@ bool OOBB::intersects(OOBB& other) {
   // No separating axis found
   return true;
 }
+
+bool OOBB::intersects(const glm::vec3& line_start, const glm::vec3& line_direction, float *out_distance) {
+  constexpr float EPS = 1e-8f;
+
+  // Transform ray into OOBB local space
+  // OOBB local space:
+  //  - box center at (0,0,0)
+  //  - axes aligned with XYZ
+  //  - extents = m_extents
+  glm::mat3 rotation_transposed = glm::transpose(m_axes);
+  glm::vec3 local_origin = rotation_transposed * (line_start - m_center);
+  glm::vec3 local_direction = rotation_transposed * line_direction;
+
+  // Ray vs AABB (slab test)
+  //
+  // A ray can be written as P(t) = local_origin + t * local_direction
+  // For each axis i ∈ (X, Y, Z), the AABB defines a slab -m_extents[i] ≤ P_i(t) ≤ +m_extents[i]
+  float intersection_min = 0.0f;
+  float intersection_max = std::numeric_limits<float>::max();
+
+  for (int i = 0; i < 3; ++i) {
+    if (fabs(local_direction[i]) < EPS) {
+      // Ray parallel to slab. If the origin is outside the slab => no intersection, can
+      // return false directly.
+      if (local_origin[i] < -m_extents[i] || local_origin[i] >  m_extents[i]) {
+        return false;
+      }
+    }
+    else {
+
+      float inverse_direction = 1.0f / local_direction[i];
+
+      // t_near is the intersection with the near plane, t_far is the intersection with the far plane.
+      float t_near = (-m_extents[i] - local_origin[i]) * inverse_direction;
+      float t_far = ( m_extents[i] - local_origin[i]) * inverse_direction;
+
+      // Might need to swap depending on the ray direction
+      if (t_near > t_far) {
+        std::swap(t_near, t_far);
+      }
+
+      // Merge with global computed interval
+      intersection_min = std::max(intersection_min, t_near);
+      intersection_max = std::min(intersection_max, t_far);
+
+      // If the min value is larger than the max value, the intervals do not
+      // overlap and we can directly return false
+      if (intersection_min > intersection_max) {
+        return false;
+      }
+    }
+  }
+
+  // Output intersection distance
+  *out_distance = intersection_min;
+  return true;
+}
