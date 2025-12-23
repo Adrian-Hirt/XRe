@@ -33,8 +33,6 @@ public:
   void setupRenderer();
   void renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf, VkExtent2D resolution,
                    std::function<void(RenderContext &)> draw_callback, std::function<void(RenderContext &)> draw_interactions_callback);
-  // void renderFrame(XrCompositionLayerProjectionView& view, std::function<void()> draw_callback,
-  //                  glm::vec3 current_origin, Swapchain swapchain, uint32_t swapchain_image_id, uint32_t image_index);
 
   VkInstance getInstance();
   VkPhysicalDevice getPhysicalDevice();

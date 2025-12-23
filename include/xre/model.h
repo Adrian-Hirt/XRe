@@ -3,7 +3,6 @@
 // Include other headers
 #include <vector>
 #include <glm/glm/vec3.hpp>
-// #include <unordered_set>
 
 // XRe includes
 #include <xre/utils.h>
@@ -11,7 +10,6 @@
 #include <xre/mesh.h>
 #include <xre/geometry.h>
 #include <xre/color_utils.h>
-// #include <xre/bounding_box_mesh.h>
 
 class Model {
 public:
@@ -41,8 +39,6 @@ public:
   // Toggling the state if a model is intersected and therefore
   // should have a slightly different color applied
   void setInteractedState(bool interacted);
-
-  // std::vector<DirectX::XMFLOAT3> getMeshBoundingBoxCorners();
 
 private:
   // Keep track of the global index of the model

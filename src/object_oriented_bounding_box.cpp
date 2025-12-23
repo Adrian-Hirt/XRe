@@ -28,9 +28,7 @@ OOBB::OOBB(const std::vector<glm::vec3> &points) {
     return;
   }
 
-  // -------------------------------
-  // 1. Compute centroid
-  // -------------------------------
+  // Compute centroid
   // Sum up all points and then divide by the number of points
   // to find the center of mass of the points.
   glm::vec3 centroid = glm::zero<glm::vec3>();
@@ -39,9 +37,6 @@ OOBB::OOBB(const std::vector<glm::vec3> &points) {
   }
   centroid /= (float)points.size();
 
-  // -------------------------------
-  // 2. Compute covariance matrix
-  // -------------------------------
   // Build the covariance matrix of the points
   glm::mat3 covariance = glm::zero<glm::mat3>();
 
@@ -60,9 +55,7 @@ OOBB::OOBB(const std::vector<glm::vec3> &points) {
 
   covariance /= (float)points.size();
 
-  // -------------------------------
-  // 3. Compute eigenvectors (principal axes)
-  // -------------------------------
+  // Compute eigenvectors (principal axes)
   // First eigenvector, directly computed from the power iteration
   // method.
   glm::vec3 e1 = powerIteration(covariance);
@@ -100,7 +93,7 @@ OOBB::OOBB(const std::vector<glm::vec3> &points) {
   // Store the eigenvectors in a matrix for later usage
   glm::mat3 axes;
 
-  // 4. Check for degenerate case (cube or sphere), where otherwise
+  // Check for degenerate case (cube or sphere), where otherwise
   // the bounding boxes would be rotated by 45 degrees.
   float eps = 1e-5f;
   if (fabs(lambda1 - lambda2) < eps && fabs(lambda2 - lambda3) < eps) {
@@ -112,9 +105,7 @@ OOBB::OOBB(const std::vector<glm::vec3> &points) {
     axes[2] = e3;
   }
 
-  // -------------------------------
-  // 4. Transform all points to local space
-  // -------------------------------
+  // Transform all points to local space
   // local = R^T (p - centroid). The part (p - centroid) moves the pointcloud
   // such that the centroid is at the origin, and R^T rotates the pointcloud
   // such that the principal components now align with the XYZ axies of the
@@ -136,9 +127,7 @@ OOBB::OOBB(const std::vector<glm::vec3> &points) {
     maxv = glm::max(maxv, q);
   }
 
-  // -------------------------------
-  // 5. Compute extents and center
-  // -------------------------------
+  // Compute extents and center
   glm::vec3 extents = 0.5f * (maxv - minv);
   glm::vec3 local_center = 0.5f * (maxv + minv);
   glm::vec3 world_center = rotation * local_center + centroid;
@@ -174,21 +163,21 @@ void OOBB::print() {
 OOBB OOBB::transformed(const glm::mat4 &model) const {
   OOBB transformed_bounding_box;
 
-  // 1. Transform center (full transform)
+  // Transform center (full transform)
   transformed_bounding_box.m_center = glm::vec3(model * glm::vec4(m_center, 1.0f));
 
-  // 2. Extract rotation + scale (upper-left 3x3)
+  // Extract rotation + scale (upper-left 3x3)
   glm::mat3 rotation_scale_matrix = glm::mat3(model);
 
-  // 3. Transform axes (rotation only, normalize!)
+  // Transform axes (rotation only, normalize!)
   for (int i = 0; i < 3; ++i) {
     transformed_bounding_box.m_axes[i] = glm::normalize(rotation_scale_matrix * m_axes[i]);
   }
 
-  // 4. Extract scale factors (length of basis vectors)
+  // Extract scale factors (length of basis vectors)
   glm::vec3 scale(glm::length(rotation_scale_matrix[0]), glm::length(rotation_scale_matrix[1]), glm::length(rotation_scale_matrix[2]));
 
-  // 5. Scale extents
+  // Scale extents
   transformed_bounding_box.m_extents = m_extents * scale;
 
   return transformed_bounding_box;

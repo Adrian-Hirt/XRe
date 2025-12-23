@@ -1,8 +1,5 @@
 #pragma once
 
-// // DirectX includes
-// #include <DirectXMath/DirectXMath.h>
-
 // XRe includes
 #include <xre/model.h>
 #include <xre/renderable.h>
@@ -22,12 +19,9 @@ public:
   SceneNode(Renderable *model, SceneNode &parent);
   ~SceneNode();
 
-  //   void addChildNode(SceneNode &child);
   void addChildNode(SceneNode *child);
   void render(RenderContext &ctx);
   void updateTransformation();
-  void buildBoundingBox();
-  //   DirectX::BoundingOrientedBox getTransformedBoundingBox();
 
   // These methods apply the rotation / translation / scaling
   // to the values we already have, e.g. to simply double the
@@ -102,9 +96,6 @@ private:
 
   // Rotation relative to world
   glm::mat4 m_world_rotation_matrix;
-
-  //   DirectX::BoundingOrientedBox m_model_bounding_box;
-  //   BoundingBoxMesh m_model_bounding_box_mesh;
 
   // Set of all instances we marked as grabbable
   inline static std::unordered_set<SceneNode *> s_grabbable_instances;

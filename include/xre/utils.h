@@ -84,38 +84,4 @@ inline std::vector<const char *> splitString(const std::string &string, char del
 inline glm::vec3 toVec3(const XrVector3f &vec) { return glm::vec3(vec.x, vec.y, vec.z); }
 
 inline glm::quat toQuat(const XrQuaternionf &quat) { return glm::quat(quat.w, quat.x, quat.y, quat.z); }
-
-// inline std::string getFileLocation(const std::string &path) {
-//   std::string result;
-// #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-//   result = path;
-// #else
-//   std::wstring package_install_location = Windows::ApplicationModel::Package::Current->InstalledLocation->Path->Data();
-//   std::filesystem::path filesys_path(path);
-
-//   result = wStringToString(package_install_location);
-//   result += "\\" + filesys_path.filename().string();
-// #endif
-//   return result;
-// };
-
-// inline std::string wStringToString(std::wstring w_string) {
-//   if (w_string.empty()) {
-//     return std::string();
-//   }
-//   size_t string_size_needed = WideCharToMultiByte(CP_UTF8, 0, w_string.c_str(), w_string.length(), NULL, 0, NULL, NULL);
-//   std::string result(string_size_needed, 0);
-//   WideCharToMultiByte(CP_UTF8, 0, w_string.c_str(), -1, &result[0], string_size_needed, NULL, NULL);
-//   return result;
-// };
-
-// inline std::wstring stringToWString(std::string string) {
-//   if (string.empty()) {
-//     return std::wstring();
-//   }
-//   size_t string_size_needed = MultiByteToWideChar(CP_UTF8, 0, string.c_str(), string.length(), NULL, 0);
-//   std::wstring result(string_size_needed, 0);
-//   MultiByteToWideChar(CP_UTF8, 0, string.c_str(), -1, &result[0], string_size_needed);
-//   return result;
-// }
 } // namespace Utils

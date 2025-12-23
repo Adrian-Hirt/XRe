@@ -22,11 +22,6 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
   // Setup the vulkan renderer
   m_vulkan_handler.setupRenderer();
 
-  // 	// // Initialize the global buffers for the shaders
-  //   // Shader::createGlobalBuffers(getDevice(), getDeviceContext());
-
-  // Register the device & device_context with the classes that need them
-  //   // Shader::registerDx11DeviceAndDeviceContext(getDevice(), getDeviceContext());
   Renderable::registerDeviceAndPhysicalDevice(m_vulkan_handler.getLogicalDevice(), m_vulkan_handler.getPhysicalDevice());
 
   // Instruct the handler to initialize the xr actions

@@ -1,11 +1,5 @@
 #include <xre/vulkan_handler.h>
 
-// // TODO: why can't i put this in a class?
-// // Validation layers we wish to use
-// const std::vector<const char*> s_validation_layers = {
-//   "VK_LAYER_KHRONOS_validation"
-// };
-
 VulkanHandler::VulkanHandler() {};
 
 VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
@@ -590,7 +584,6 @@ void VulkanHandler::setupRenderer() {
   pipeline_create_info.layout = m_pipeline_layout;
   pipeline_create_info.stageCount = static_cast<uint32_t>(shader_stages.size());
   pipeline_create_info.pStages = shader_stages.data();
-  ;
   pipeline_create_info.pVertexInputState = &vertex_input_info;
   pipeline_create_info.pInputAssemblyState = &input_assembly_info;
   pipeline_create_info.pViewportState = &viewport_state_info;

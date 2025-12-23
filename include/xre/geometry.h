@@ -20,21 +20,21 @@ inline glm::mat4 poseToMatrix(const XrPosef &pose, const glm::vec3 &current_orig
   return glm::inverse(translation * rotation);
 }
 
-inline glm::mat4 createProjectionMatrix(XrFovf fov, float nearClip, float farClip) {
-  const float l = glm::tan(fov.angleLeft);
-  const float r = glm::tan(fov.angleRight);
-  const float d = glm::tan(fov.angleDown);
-  const float u = glm::tan(fov.angleUp);
+inline glm::mat4 createProjectionMatrix(XrFovf fov, float near_clip, float far_clip) {
+  const float left = glm::tan(fov.angleLeft);
+  const float right = glm::tan(fov.angleRight);
+  const float down = glm::tan(fov.angleDown);
+  const float up = glm::tan(fov.angleUp);
 
-  const float w = r - l;
-  const float h = d - u;
+  const float width = right - left;
+  const float height = down - up;
 
-  glm::mat4 projectionMatrix;
-  projectionMatrix[0] = {2.0f / w, 0.0f, 0.0f, 0.0f};
-  projectionMatrix[1] = {0.0f, 2.0f / h, 0.0f, 0.0f};
-  projectionMatrix[2] = {(r + l) / w, (u + d) / h, -(farClip + nearClip) / (farClip - nearClip), -1.0f};
-  projectionMatrix[3] = {0.0f, 0.0f, -(farClip * (nearClip + nearClip)) / (farClip - nearClip), 0.0f};
-  return projectionMatrix;
+  glm::mat4 projection_matrix;
+  projection_matrix[0] = {2.0f / width, 0.0f, 0.0f, 0.0f};
+  projection_matrix[1] = {0.0f, 2.0f / height, 0.0f, 0.0f};
+  projection_matrix[2] = {(right + left) / width, (up + down) / height, -(far_clip + near_clip) / (far_clip - near_clip), -1.0f};
+  projection_matrix[3] = {0.0f, 0.0f, -(far_clip * (near_clip + near_clip)) / (far_clip - near_clip), 0.0f};
+  return projection_matrix;
 }
 
 inline glm::mat4 composeWorldMatrix(const glm::vec3 &translation, const glm::quat &rotation, const glm::vec3 &scale) {

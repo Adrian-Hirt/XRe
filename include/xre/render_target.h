@@ -12,7 +12,8 @@
 
 class RenderTarget final {
 public:
-  RenderTarget(VkDevice device, VkPhysicalDevice physicalDevice, VkImage image, VkExtent2D size, VkFormat format, VkRenderPass renderPass);
+  RenderTarget(VkDevice device, VkPhysicalDevice physical_device, VkImage image, VkExtent2D size, VkFormat format,
+               VkRenderPass render_pass);
 
   void destroy();
 

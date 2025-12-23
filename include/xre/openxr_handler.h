@@ -71,15 +71,7 @@ private:
   std::vector<glm::mat4> m_view_matrices;
   std::vector<glm::mat4> m_projection_matrices;
 
-  // // Swapchains
-  // std::vector<Swapchain> m_swapchains;
-
   // // Pointers to ext functions we need to use
-  // PFN_xrGetVulkanInstanceExtensionsKHR m_ext_getVulkanInstanceExtensionsKHR = nullptr;
-  // PFN_xrGetVulkanDeviceExtensionsKHR m_ext_getVulkanDeviceExtensionsKHR = nullptr;
-  // PFN_xrGetVulkanGraphicsDeviceKHR m_ext_getVulkanGraphicsDeviceKHR = nullptr;
-  // PFN_xrGetVulkanGraphicsRequirementsKHR m_ext_getVulkanGraphicsRequirementsKHR = nullptr;
-
   PFN_xrCreateHandTrackerEXT m_ext_xrCreateHandTrackerEXT;
   PFN_xrDestroyHandTrackerEXT m_ext_xrDestroyHandTrackerEXT;
   PFN_xrLocateHandJointsEXT m_ext_xrLocateHandJointsEXT;

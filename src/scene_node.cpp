@@ -7,13 +7,11 @@ SceneNode::SceneNode() {
 
 SceneNode::SceneNode(Model *model) {
   m_model = model;
-  buildBoundingBox();
   m_parent = NULL;
 }
 
 SceneNode::SceneNode(Model *model, SceneNode &parent) {
   m_model = model;
-  buildBoundingBox();
   m_parent = &parent;
   parent.addChildNode(this);
 }
@@ -26,33 +24,7 @@ SceneNode::SceneNode(Renderable *renderable, SceneNode &parent) {
   parent.addChildNode(this);
 }
 
-void SceneNode::buildBoundingBox() {
-  //   std::vector<DirectX::XMFLOAT3> bounding_box_corners = m_model->getMeshBoundingBoxCorners();
-  //   size_t points_count = bounding_box_corners.size();
-
-  //   // Build the bounding box
-  //   DirectX::BoundingOrientedBox::CreateFromPoints(m_model_bounding_box, points_count, bounding_box_corners.data(),
-  //   sizeof(DirectX::XMFLOAT3));
-
-  //   // Create the bounding box mesh, such that we can render it
-  //   DirectX::XMFLOAT3 corners[m_model_bounding_box.CORNER_COUNT];
-  //   m_model_bounding_box.GetCorners(corners);
-  //   std::vector<vertex_t> bounding_box_vertices;
-
-  //   // Create vertices from the corners of the bounding box
-  //   for (int i = 0; i < m_model_bounding_box.CORNER_COUNT; i++) {
-  //     bounding_box_vertices.push_back({ corners[i], { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } });
-  //   }
-
-  //   m_model_bounding_box_mesh = BoundingBoxMesh(bounding_box_vertices);
-}
-
 SceneNode::~SceneNode() { m_children.clear(); }
-
-// void SceneNode::addChildNode(SceneNode &child) {
-//   m_children.push_back(&child);
-//   child.m_parent = this;
-// }
 
 void SceneNode::addChildNode(SceneNode *child) {
   m_children.push_back(child);
@@ -65,10 +37,6 @@ void SceneNode::render(RenderContext &ctx) {
   }
 
   if (m_model) {
-    //     // Update the shader with the transform
-    //     m_model->m_shader.setModelMatrix(m_world_transform);
-    //     m_model->m_shader.setNormalRotationMatrix(m_world_rotation_matrix);
-
     // Keep track if there is an interaction with the model
     m_model->setInteractedState(m_intersected_in_current_frame);
 
@@ -118,12 +86,6 @@ void SceneNode::updateTransformation() {
   // And then reset the `m_transform_needs_update` flag
   m_transform_needs_update = false;
 }
-
-// DirectX::BoundingOrientedBox SceneNode::getTransformedBoundingBox() {
-//   DirectX::BoundingOrientedBox transformed;
-//   m_model_bounding_box.Transform(transformed, DirectX::XMMatrixTranspose(m_world_transform));
-//   return transformed;
-// }
 
 void SceneNode::rotate(float roll, float pitch, float yaw) {
   auto rotation = glm::quat(glm::vec3(pitch, yaw, roll));

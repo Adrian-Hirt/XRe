@@ -1,11 +1,5 @@
 #pragma once
 
-// DirectX includes
-// #include <d3d11.h>
-// #include <DirectXMath/DirectXMath.h>
-// #include <DirectXTex/WICTextureLoader11.h>
-// #include <DirectXMath/DirectXCollision.h>
-
 // Include vector header
 #include <vector>
 
@@ -24,15 +18,12 @@
 // can be rendered to display some output in the program.
 class Renderable {
 public:
-  // DirectX::BoundingOrientedBox getBoundingBox();
-
   static void registerDeviceAndPhysicalDevice(VkDevice device, VkPhysicalDevice physical_device);
   OOBB getObjectOrientedBoundingBox();
 
 protected:
   inline static VkDevice s_device = VK_NULL_HANDLE;
   inline static VkPhysicalDevice s_physical_device = VK_NULL_HANDLE;
-  // inline static ID3D11ShaderResourceView *s_nulltexture = NULL;
 
   // Any renderable has a bounding box by default. Subclasses which do not
   // can override this method to disable bounding boxes.
@@ -50,9 +41,6 @@ protected:
   // for debugging purposes.
   Buffer *m_bounding_box_vertex_buffer = nullptr;
   Buffer *m_bounding_box_index_buffer = nullptr;
-
-  // // The applied texture
-  // ID3D11ShaderResourceView *m_texture_view = NULL;
 
   // Number of vertices and indices
   size_t m_vertex_count;

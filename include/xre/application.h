@@ -14,10 +14,6 @@
 // #include <xre/text.h>
 #include <xre/scene_node.h>
 
-// // Other includes
-// #include <iostream>
-// #include <functional>
-
 class Application {
 public:
   Application(const char *application_name);

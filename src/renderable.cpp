@@ -62,10 +62,6 @@ void Renderable::registerDeviceAndPhysicalDevice(VkDevice device, VkPhysicalDevi
   Renderable::s_physical_device = physical_device;
 }
 
-// DirectX::BoundingOrientedBox Renderable::getBoundingBox() {
-//   return m_bounding_box;
-// }
-
 void Renderable::render(RenderContext &ctx) {
   //------------------------------------------------------------------------------------------------------
   // Bind buffers

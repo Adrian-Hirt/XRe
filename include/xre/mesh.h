@@ -1,9 +1,5 @@
 #pragma once
 
-// DirectX includes
-// #include <DirectXTex/WICTextureLoader11.h>
-// #include <DirectXMath/DirectXCollision.h>
-
 // Include vector header
 #include <vector>
 

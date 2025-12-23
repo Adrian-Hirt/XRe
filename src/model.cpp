@@ -151,24 +151,6 @@ void Model::loadObj(const char *model_path) {
 
 void Model::setWorldMatrix(glm::mat4 world_matrix) { m_world_matrix = world_matrix; }
 
-// std::vector<DirectX::XMFLOAT3> Model::getMeshBoundingBoxCorners() {
-//   size_t points_count = m_meshes.size() * 8;
-//   std::vector<DirectX::XMFLOAT3> all_corners;
-
-//   // Get all bounding boxes of all meshes, and put the
-//   // corners into the previously defined array
-//   for(Mesh mesh : m_meshes) {
-//     DirectX::XMFLOAT3 corners[8];
-//     mesh.getBoundingBox().GetCorners(corners);
-
-//     for (size_t j = 0; j < 8; j++) {
-//      all_corners.push_back(corners[j]);
-//     }
-//   }
-
-//   return all_corners;
-// }
-
 // TODO: Build "outer" bounding box containing all meshes such that we first only
 // need to check the outer bounding box and then only if we have a hit there
 // we check the inner meshes. Currently, as most models only have one mesh,

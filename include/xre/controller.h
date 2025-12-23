@@ -1,8 +1,5 @@
 #pragma once
 
-// // DirectX includes
-// #include <DirectXMath/DirectXMath.h>
-
 // Other includes
 #include <optional>
 
