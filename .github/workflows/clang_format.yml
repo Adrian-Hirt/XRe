@@ -19,11 +19,11 @@ jobs:
       # Checkout repository
       - uses: actions/checkout@v3
 
-      # Install dependencies (CMake + clang-format)
+      # Install dependencies (CMake + clang-format + vulkan)
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake clang-format
+          sudo apt-get install -y cmake clang-format libvulkan-dev vulkan-utils
 
       # Configure CMake
       - name: Configure CMake
