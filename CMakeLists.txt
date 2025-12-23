@@ -39,6 +39,18 @@ SET(SRCFILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/object_oriented_bounding_box.cpp
 )
 
+find_program(CLANG_FORMAT_EXE NAMES clang-format)
+
+if(CLANG_FORMAT_EXE)
+  add_custom_target(
+    clang_format
+    COMMAND ${CLANG_FORMAT_EXE} -i ${CMAKE_CURRENT_SOURCE_DIR}/include/xre/*.h ${SRCFILES}
+    COMMENT "Running clang-format on all source files"
+  )
+else()
+  message(WARNING "clang-format not found! Skipping formatting target.")
+endif()
+
 # Needed to access the include folders from the individual apps
 SET(XRE_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/ext)
 
