@@ -59,7 +59,8 @@ public:
 
 private:
   // Threshold for showing the line intersection point
-  static constexpr float s_line_intersection_threshold = 6.0f;
+  static constexpr float s_line_intersection_far_threshold = 6.0f;
+  static constexpr float s_line_intersection_near_threshold = 0.1f;
 
   // Model for the controller
   Model m_model;

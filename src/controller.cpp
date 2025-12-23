@@ -8,10 +8,10 @@ Controller::Controller() {
   m_model_node.scale(0.03f, 0.03f, 0.075f);
 
   // Create the model for visualizing intersections of the aim line
-  m_aim_indicator_sphere = ModelFactory::createCube({0.0f, 0.75f, 1.0f}); // ModelFactory::createSphere();
-  // m_aim_indicator_sphere.setColor({0.0f, 0.75f, 1.0f, 1.0f});
+  m_aim_indicator_sphere = ModelFactory::createSphere();
+  m_aim_indicator_sphere.setColor({0.0f, 0.75f, 1.0f});
   m_intersection_sphere_node = SceneNode(&m_aim_indicator_sphere);
-  m_intersection_sphere_node.scale(0.02f, 0.02f, 0.02f);
+  m_intersection_sphere_node.scale(0.05f, 0.05f, 0.05f);
 
   m_root_node.addChildNode(&m_model_node);
   m_root_node.addChildNode(&m_intersection_sphere_node);
@@ -56,7 +56,7 @@ void Controller::updatePosition(glm::vec3 current_origin) {
 
   // Update the aim line
   m_aim_line.updateAimLineFromControllerPose(controller_position, Utils::toQuat(m_aim.orientation), current_origin,
-                                             Controller::s_line_intersection_threshold);
+                                             Controller::s_line_intersection_far_threshold);
 }
 
 void Controller::computeSceneInteractions() {
@@ -131,7 +131,7 @@ float Controller::computeAimIndicatorSpherePosition(std::unordered_set<SceneNode
   // we need to keep track of the smallest threshold. We probably should replace
   // this later with sorting the elements by distance from the camera and then check in
   // ascending distance, but for now this will have to do.
-  float closest_intersection_distance = Controller::s_line_intersection_threshold + 1;
+  float closest_intersection_distance = Controller::s_line_intersection_far_threshold + 1;
 
   for (SceneNode *current_node : nodes) {
     // Check if the node intersects the line of the controller
@@ -141,7 +141,8 @@ float Controller::computeAimIndicatorSpherePosition(std::unordered_set<SceneNode
 
     // if(current_node->intersects(m_aim_line.getLineStart(), m_aim_line.getLineDirection(), &intersection_distance)) {
     if (current_node->intersects(start, dir, &intersection_distance)) {
-      if (intersection_distance > 0 && intersection_distance <= Controller::s_line_intersection_threshold) {
+      if (intersection_distance > 0 && intersection_distance <= Controller::s_line_intersection_far_threshold &&
+          intersection_distance >= Controller::s_line_intersection_near_threshold) {
         m_intersection_sphere_node.setActive(true);
 
         if (closest_intersection_distance > intersection_distance) {

@@ -133,21 +133,16 @@ void Model::loadObj(const char *model_path) {
 
         // Add the newly created vertex to the vector of vertices
         mesh_vertices.push_back(current_vertex);
+      }
 
-        // It's nessecary to "reverse" the order of the indices, as otherwise
-        // the models will be rendered inside out
-        mesh_indices.push_back(index.vertex_index);
+      // It's nessecary to "reverse" the order of the indices, as otherwise
+      // the models will be rendered inside out
+      for (int i = face_vertices_count - 1; i >= 0; i--) {
+        mesh_indices.push_back(static_cast<uint16_t>(index_offset + i));
       }
 
       index_offset += face_vertices_count;
     }
-
-    for (auto i : mesh_indices) {
-      std::cout << i << ", ";
-    }
-    std::cout << std::endl;
-
-    exit(0);
 
     Mesh mesh = Mesh(mesh_vertices, mesh_indices);
     m_meshes.push_back(mesh);
