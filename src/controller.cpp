@@ -55,7 +55,7 @@ void Controller::updatePosition(glm::vec3 current_origin) {
   m_model_node.setRotation(controller_orientation);
 
   // Update the aim line
-  m_aim_line.updateAimLineFromControllerPose(controller_position, Utils::toQuat(m_aim.orientation), current_origin,
+  m_aim_line.updateAimLineFromControllerPose(controller_position, Utils::toQuat(m_aim.orientation),
                                              Controller::s_line_intersection_far_threshold);
 }
 

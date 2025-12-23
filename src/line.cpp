@@ -15,8 +15,7 @@ void Line::render(RenderContext &ctx) {
   m_scene_node.render(ctx);
 }
 
-void Line::updateAimLineFromControllerPose(glm::vec3 controller_position, glm::quat controller_orientation, glm::vec3 current_origin,
-                                           float length) {
+void Line::updateAimLineFromControllerPose(glm::vec3 controller_position, glm::quat controller_orientation, float length) {
   // Compute direction from OpenXR quaternion
   glm::vec3 forward = {0.0f, 0.0f, -1.0f};
   glm::vec3 normalized_direction = glm::normalize(controller_orientation * forward);

@@ -12,9 +12,9 @@
 namespace Geometry {
 inline XrPosef XrPoseIdentity() { return {{0, 0, 0, 1}, {0, 0, 0}}; };
 
-inline glm::mat4 poseToMatrix(const XrPosef &pose) {
-  const glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(pose.position.x, pose.position.y, pose.position.z));
-
+inline glm::mat4 poseToMatrix(const XrPosef &pose, const glm::vec3 &current_origin) {
+  const glm::vec3 location = glm::vec3(pose.position.x, pose.position.y, pose.position.z) + current_origin;
+  const glm::mat4 translation = glm::translate(glm::mat4(1.0f), location);
   const glm::mat4 rotation = glm::toMat4(glm::quat(pose.orientation.w, pose.orientation.x, pose.orientation.y, pose.orientation.z));
 
   return glm::inverse(translation * rotation);

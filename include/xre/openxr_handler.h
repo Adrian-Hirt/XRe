@@ -102,8 +102,8 @@ private:
   // For checking if the pose of a controller is valid
   const static XrSpaceLocationFlags s_pose_valid_flags = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
 
-  // DirectX::XMVECTOR m_headset_position = { 0.0f, 0.0f, 0.0f };
-  glm::vec3 m_current_origin = {0.0f, 0.0f, 0.0f};
+  glm::vec3 m_headset_position = glm::zero<glm::vec3>();
+  glm::vec3 m_current_origin = glm::zero<glm::vec3>();
 
   // Methods
   bool initializeOpenxr();
@@ -115,6 +115,6 @@ private:
   void updateControllerStates(Controller *controller, XrTime predicted_time);
   void renderInteractions(RenderContext &ctx);
   void updateHandTrackingStates(Hand *hand, XrTime predicted_time);
-  // void updateCurrentOriginForTeleport(DirectX::XMVECTOR teleport_location);
+  void updateCurrentOriginForTeleport(glm::vec3 teleport_location);
   XrPath getXrPathFromString(std::string string);
 };

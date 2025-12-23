@@ -7,7 +7,8 @@ public:
 
   Model cube1 = ModelFactory::createCube({0.0f, 1.0f, 0.0f});
   Model cube2 = ModelFactory::createCube({0.0f, 1.0f, 0.0f});
-  Model sphere = ModelFactory::createSphere();
+  Model sphere1 = ModelFactory::createSphere();
+  Model sphere2 = ModelFactory::createSphere();
 
   Model floor = ModelFactory::createGroundPlane(10);
   Model cube = ModelFactory::createCube({0.0f, 1.0f, 0.0f});
@@ -18,28 +19,32 @@ public:
   SceneNode floor_node = SceneNode(&floor);
   SceneNode cube1_node = SceneNode(&cube1);
   SceneNode cube2_node = SceneNode(&cube2);
-  SceneNode sphere_node = SceneNode(&sphere);
+  SceneNode sphere1_node = SceneNode(&sphere1);
+  SceneNode sphere2_node = SceneNode(&sphere2);
 
   bool forward = true;
 
   void setup() override {
     std::cout << "Setup" << std::endl;
 
-    sphere.setColor({1.0f, 0.0f, 0.0f});
+    sphere1.setColor({1.0f, 0.0f, 0.0f});
+    sphere2.setColor({1.0f, 0.0f, 0.0f});
 
     // Setup scene graph
     root_node.addChildNode(&cube1_node);
     root_node.addChildNode(&cube2_node);
     root_node.addChildNode(&floor_node);
-    root_node.addChildNode(&sphere_node);
+    root_node.addChildNode(&sphere1_node);
+    root_node.addChildNode(&sphere2_node);
 
     // Update initial transforms
     cube1_node.setScale(0.1f, 0.1f, 0.1f);
     cube2_node.setScale(0.1f, 0.1f, 0.1f);
     cube1_node.setPosition(0.0f, 1.5f, -2.0f);
     cube2_node.setPosition(0.0f, 1.5f, 0.0f);
-    sphere_node.scale(0.1f, 0.1f, 0.1f);
-    sphere_node.setPosition(0.0f, 1.5f, 0.0f);
+    sphere1_node.scale(0.1f, 0.1f, 0.1f);
+    sphere2_node.scale(0.1f, 0.1f, 0.1f);
+    sphere2_node.setPosition(5.0f, 0.0f, -4.0f);
     root_node.updateTransformation();
 
     cube1.toggleRenderBoundingBoxes();

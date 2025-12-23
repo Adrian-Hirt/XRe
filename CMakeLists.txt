@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 # Enable Action bindings other than khr/simple_controller. Comment this out to only use
 # khr/simple_controller for the Mixed Reality-Portal debugging.
-# add_compile_definitions(ENABLE_OCULUS_TOUCH_BINDINGS)
+add_compile_definitions(ENABLE_OCULUS_TOUCH_BINDINGS)
 
 message(STATUS "CMake Build type: ${CMAKE_BUILD_TYPE}")
 

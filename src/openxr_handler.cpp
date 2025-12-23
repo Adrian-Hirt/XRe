@@ -651,16 +651,16 @@ void OpenXrHandler::pollOpenxrActions(XrTime predicted_time) {
   updateHandTrackingStates(m_left_hand, predicted_time);
   updateHandTrackingStates(m_right_hand, predicted_time);
 
-  //   // Update the location of the headset
-  //   XrSpaceLocation space_location = {};
-  //   space_location.type = XR_TYPE_SPACE_LOCATION;
-  //   space_location.pose = Geometry::XrPoseIdentity();
-  //   result = xrLocateSpace(m_openxr_view_space, m_openxr_stage_space, predicted_time, &space_location);
-  //   Utils::checkXrResult(result, "Can't get the view pose of the HMD in the stage space");
+  // Update the location of the headset
+  XrSpaceLocation space_location = {};
+  space_location.type = XR_TYPE_SPACE_LOCATION;
+  space_location.pose = Geometry::XrPoseIdentity();
+  result = xrLocateSpace(m_openxr_view_space, m_openxr_stage_space, predicted_time, &space_location);
+  Utils::checkXrResult(result, "Can't get the view pose of the HMD in the stage space");
 
-  //   // if ((space_location.locationFlags & s_pose_valid_flags) == s_pose_valid_flags) {
-  //   //   m_headset_position = DirectX::XMLoadFloat3((DirectX::XMFLOAT3 *)&space_location.pose.position);
-  //   // }
+  if ((space_location.locationFlags & s_pose_valid_flags) == s_pose_valid_flags) {
+    m_headset_position = glm::vec3(space_location.pose.position.x, space_location.pose.position.y, space_location.pose.position.z);
+  }
 }
 
 void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predicted_time) {
@@ -811,10 +811,10 @@ void OpenXrHandler::renderFrame(std::function<void(RenderContext &)> draw_callba
   // precedende. Later, we might map the teleport action to a single controller anyway,
   // so maybe this will not be needed anymore.
   if (teleport_location_right.has_value()) {
-    // updateCurrentOriginForTeleport(teleport_location_right.value());
+    updateCurrentOriginForTeleport(teleport_location_right.value());
     // TODO: update position of grabbed model if we're currently grabbing something with either hand
   } else if (teleport_location_left.has_value()) {
-    // updateCurrentOriginForTeleport(teleport_location_left.value());
+    updateCurrentOriginForTeleport(teleport_location_left.value());
     // TODO: update position of grabbed model if we're currently grabbing something with either hand
   } else {
     // If not teleporting, we can update the position of the controller, as well as their interactions
@@ -915,7 +915,7 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, XrCompositionLayerProject
     m_projection_views[i].fov = m_openxr_views[i].fov;
 
     // Update view matrix
-    m_view_matrices[i] = Geometry::poseToMatrix(m_projection_views[i].pose);
+    m_view_matrices[i] = Geometry::poseToMatrix(m_projection_views[i].pose, m_current_origin);
 
     // Update projection matrix
     m_projection_matrices[i] = Geometry::createProjectionMatrix(m_projection_views[i].fov, 0.1f, 250.0f);
@@ -982,15 +982,15 @@ void OpenXrHandler::renderInteractions(RenderContext &ctx) {
   }
 }
 
-// void OpenXrHandler::updateCurrentOriginForTeleport(DirectX::XMVECTOR teleport_location) {
-//   DirectX::XMVECTOR difference_vector = teleport_location- m_headset_position;
-//   m_current_origin = difference_vector;
+void OpenXrHandler::updateCurrentOriginForTeleport(glm::vec3 teleport_location) {
+  glm::vec3 difference_vector = teleport_location - m_headset_position;
 
-//   // FIXME: Set the Y value to 0, such that we don't teleport "down" into the floor.
-//   // We'll need to have some reliable method to determine the current y value of the floor
-//   // (i.e. mesh with terrain flag) under the HMD position to fix this.
-//   m_current_origin = DirectX::XMVectorSetY(m_current_origin, 0.0f);
-// }
+  // FIXME: Set the Y value to 0, such that we don't teleport "down" into the floor.
+  // We'll need to have some reliable method to determine the current y value of the floor
+  // (i.e. mesh with terrain flag) under the HMD position to fix this.
+  difference_vector.y = 0;
+  m_current_origin = difference_vector;
+}
 
 XrPath OpenXrHandler::getXrPathFromString(std::string string) {
   XrPath path;
