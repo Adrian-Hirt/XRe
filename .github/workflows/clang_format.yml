@@ -25,6 +25,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake clang-format libvulkan-dev
 
+      - name: Download OpenXR Loader (Linux)
+        run: |
+          wget https://github.com/KhronosGroup/OpenXR-SDK/releases/download/1.0.27.0/OpenXR-SDK-Linux-x64-1.0.27.0.tar.gz
+          tar -xzf OpenXR-SDK-Linux-x64-1.0.27.0.tar.gz -C $HOME/OpenXR
+
+      - name: Set OpenXR environment
+        run: echo "OPENXR_ROOT=$HOME/OpenXR/lib" >> $GITHUB_ENV
+
       # Configure CMake
       - name: Configure CMake
         run: cmake -S . -B build
