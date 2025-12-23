@@ -39,8 +39,8 @@ SET(SRCFILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/object_oriented_bounding_box.cpp
 )
 
+# Setup clang format
 find_program(CLANG_FORMAT_EXE NAMES clang-format)
-
 if(CLANG_FORMAT_EXE)
   add_custom_target(
     clang_format
@@ -60,5 +60,9 @@ SET(XRE_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}
 
 set(SHADERS_FOLDER "\"${CMAKE_CURRENT_SOURCE_DIR}/shaders/\"" STRING "")
 set(DATA_FOLDER "\"${CMAKE_CURRENT_SOURCE_DIR}/data/\"" STRING "")
+
+# Allow using the functions defined in the utils file
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(utils)
 
 add_subdirectory(apps)
