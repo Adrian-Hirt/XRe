@@ -14,13 +14,23 @@ set(CMAKE_CXX_STANDARD 20)
 # khr/simple_controller for the Mixed Reality-Portal debugging.
 # add_compile_definitions(ENABLE_OCULUS_TOUCH_BINDINGS)
 
-find_library(OPENXR NAMES openxr_loader PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib/open_xr/${TARGET_ARCHITECTURE}/${CMAKE_BUILD_TYPE})
-message(STATUS "***** find_library returned ${OPENXR} *****")
-message(STATUS "***** CMake Build type: ${CMAKE_BUILD_TYPE} *****")
+message(STATUS "CMake Build type: ${CMAKE_BUILD_TYPE}")
 
-# TODO: This should probably work without having to specify the path
-set(ENV{VULKAN_SDK} "C:/VulkanSDK/1.3.290.0")
-find_package(Vulkan)
+# Find OpenXR
+find_library(OPENXR NAMES openxr_loader PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib/open_xr/${TARGET_ARCHITECTURE}/${CMAKE_BUILD_TYPE})
+if(OPENXR)
+  message(STATUS "OpenXR library found: ${OPENXR}")
+else()
+  message(FATAL_ERROR "OpenXR library not found")
+endif()
+
+# Find Vulkan
+find_package(Vulkan REQUIRED)
+if(Vulkan_FOUND)
+  message(STATUS "Vulkan found: ${Vulkan_INCLUDE_DIR} / ${Vulkan_LIBRARY}")
+else()
+  message(FATAL_ERROR "Vulkan not found")
+endif()
 
 # FILE(GLOB SRCFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 SET(SRCFILES
