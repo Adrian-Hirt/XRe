@@ -1,6 +1,7 @@
 name: Clang-Format Check
 
 on:
+  workflow_dispatch:
   pull_request:
     # define anchor here
     paths: &paths
