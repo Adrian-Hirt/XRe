@@ -47,6 +47,12 @@ if(CLANG_FORMAT_EXE)
     COMMAND ${CLANG_FORMAT_EXE} -i ${CMAKE_CURRENT_SOURCE_DIR}/include/xre/*.h ${SRCFILES}
     COMMENT "Running clang-format on all source files"
   )
+
+  add_custom_target(
+    clang_format_check
+    COMMAND ${CLANG_FORMAT_EXE} --dry-run --Werror ${CMAKE_CURRENT_SOURCE_DIR}/include/xre/*.h ${SRCFILES}
+    COMMENT "Checking clang-format style"
+  )
 else()
   message(WARNING "clang-format not found! Skipping formatting target.")
 endif()

@@ -1,0 +1,35 @@
+name: Clang-Format Check
+
+# Define a reusable anchor for the paths
+paths_to_watch: &paths
+  - 'src/**'
+  - 'include/**'
+  - 'apps/**'
+  - '.clang-format'
+
+on:
+  pull_request:
+    paths: *paths
+  push:
+    paths: *paths
+
+jobs:
+  format-check:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout repository
+      - uses: actions/checkout@v3
+
+      # Install dependencies (CMake + clang-format)
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake clang-format
+
+      # Configure CMake
+      - name: Configure CMake
+        run: cmake -S . -B build
+
+      # Build the clang_format_check target
+      - name: Run clang-format check
+        run: cmake --build build --target clang_format_check
