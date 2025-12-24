@@ -1,9 +1,14 @@
 #include <xre/buffer.h>
 
-Buffer::Buffer(VkDevice device, VkPhysicalDevice physical_device, VkDeviceSize size, VkBufferUsageFlags buffer_usage_flags)
-    : m_device(device), m_size(size) {
+Buffer::Buffer(VkDevice device, VkPhysicalDevice physical_device, VkDeviceSize size, VkBufferUsageFlags buffer_usage_flags) {
   VkResult result;
 
+  // Store inputs on object
+  m_device = device;
+  m_size = size;
+
+  // Setup the create info struct to create the buffer, passing in the needed
+  // details we got when the method was called
   VkBufferCreateInfo buffer_create_info{VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO};
   buffer_create_info.size = size;
   buffer_create_info.usage = buffer_usage_flags;
@@ -11,26 +16,31 @@ Buffer::Buffer(VkDevice device, VkPhysicalDevice physical_device, VkDeviceSize s
   result = vkCreateBuffer(device, &buffer_create_info, nullptr, &m_buffer);
   Utils::checkVkResult(result, "Failed to create buffer");
 
+  // Get the memory requirements and the memory proportions from the Vulkan runtime
   VkMemoryRequirements memory_requirements;
   vkGetBufferMemoryRequirements(device, m_buffer, &memory_requirements);
 
   VkPhysicalDeviceMemoryProperties memory_properties;
   vkGetPhysicalDeviceMemoryProperties(physical_device, &memory_properties);
 
+  // Find the index of the memory type we requestes
   const uint32_t properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
   const VkMemoryPropertyFlags type_filter = memory_requirements.memoryTypeBits;
   uint32_t memory_type_index = VulkanUtils::findMemoryType(physical_device, type_filter, properties);
 
+  // Allocate memory
   VkMemoryAllocateInfo memory_allocate_info{VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
   memory_allocate_info.allocationSize = memory_requirements.size;
   memory_allocate_info.memoryTypeIndex = memory_type_index;
   result = vkAllocateMemory(device, &memory_allocate_info, nullptr, &m_device_memory);
   Utils::checkVkResult(result, "Failed to allocate memory for buffer");
 
+  // And bind the buffer memory
   result = vkBindBufferMemory(device, m_buffer, m_device_memory, 0u);
   Utils::checkVkResult(result, "Failed to allocate bind memory for buffer");
 }
 
+// Method to load vertices into a buffer
 void Buffer::loadData(std::vector<Vertex> input) {
   void *data = map();
   uint32_t size = sizeof(Vertex) * input.size();
@@ -38,6 +48,7 @@ void Buffer::loadData(std::vector<Vertex> input) {
   unmap();
 }
 
+// Method to load indices into a buffer
 void Buffer::loadData(std::vector<uint16_t> input) {
   void *data = map();
   uint32_t size = sizeof(uint16_t) * input.size();
@@ -45,6 +56,7 @@ void Buffer::loadData(std::vector<uint16_t> input) {
   unmap();
 }
 
+// Method to load data from a UBO for a Model into a buffer
 void Buffer::loadData(ModelUniformBufferObject input, VkDeviceSize offset) {
   void *data = map();
   // Copy at given offset
@@ -52,6 +64,7 @@ void Buffer::loadData(ModelUniformBufferObject input, VkDeviceSize offset) {
   unmap();
 }
 
+// Method to load data for the global UBO into a buffer
 void Buffer::loadData(GlobalUniformBufferObject input) {
   void *data = map();
   memcpy(data, &input, sizeof(input));
