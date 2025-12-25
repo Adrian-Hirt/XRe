@@ -7,11 +7,12 @@
 #include <xre/model.h>
 #include <xre/model_factory.h>
 #include <xre/scene_node.h>
+#include <xre/material.h>
 
 class Hand {
 public:
   // Constructor
-  Hand(XrHandEXT hand_identifier);
+  Hand(XrHandEXT hand_identifier, Material material);
 
   // Render the hand
   void render(RenderContext &ctx);

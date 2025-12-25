@@ -43,6 +43,10 @@ public:
   static constexpr VkFormat s_color_format = VK_FORMAT_R8G8B8A8_SRGB;
   static constexpr uint32_t s_max_models_in_scene = 256;
 
+  VkPipelineLayout createPipelineLayout();
+  VkPipeline createGraphicsPipeline(const std::string& vert_path, const std::string& frag_path);
+  void bindGraphicsPipeline(VkPipeline pipeline);
+
 private:
   // -------------------------------------------
   // Methods
@@ -87,7 +91,6 @@ private:
 
   // Layout of the graphics pipeline (holds `uniform` values in shaders)
   VkPipelineLayout m_pipeline_layout = nullptr;
-  VkPipeline m_graphics_pipeline = nullptr;
 
   // Command pool for our application (manage the memory that is used to store
   // command buffers).

@@ -5,14 +5,17 @@ class VulkanApp : public Application {
 public:
   VulkanApp(const char *application_name) : Application(application_name) {};
 
-  Model cube1 = ModelFactory::createCube({0.0f, 1.0f, 0.0f});
-  Model cube2 = ModelFactory::createCube({0.0f, 1.0f, 0.0f});
-  Model sphere1 = ModelFactory::createSphere();
-  Model sphere2 = ModelFactory::createSphere();
+  Material material = Material(SHADERS_FOLDER "vk/ambient.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
+  Material basic_material = Material(SHADERS_FOLDER "vk/basic.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
 
-  Model floor = ModelFactory::createGroundPlane(10);
-  Model cube = ModelFactory::createCube({0.0f, 1.0f, 0.0f});
-  Line line = Line(0.003f, 2.0f, {1.0f, 0.0f, 0.0f});
+  Model cube1 = ModelFactory::createCube({0.0f, 1.0f, 0.0f}, basic_material);
+  Model cube2 = ModelFactory::createCube({0.0f, 1.0f, 0.0f}, material);
+  Model sphere1 = ModelFactory::createSphere(material);
+  Model sphere2 = ModelFactory::createSphere(material);
+
+  Model floor = ModelFactory::createGroundPlane(10, basic_material);
+  Model cube = ModelFactory::createCube({0.0f, 1.0f, 0.0f}, material);
+  Line line = Line(0.003f, 2.0f, {1.0f, 0.0f, 0.0f}, material);
   XrTime last_time = 0;
 
   SceneNode root_node = SceneNode();
@@ -29,6 +32,7 @@ public:
 
     sphere1.setColor({1.0f, 0.0f, 0.0f});
     sphere2.setColor({1.0f, 0.0f, 0.0f});
+    floor.setColor({0.7f, 0.7f, 0.7f});
 
     // Setup scene graph
     root_node.addChildNode(&cube1_node);

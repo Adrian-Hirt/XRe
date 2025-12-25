@@ -1,14 +1,14 @@
 #include <xre/controller.h>
 
-Controller::Controller() {
+Controller::Controller(Material material) {
   // Create the model for visualizing the controllers
-  m_model = ModelFactory::createCube({0.67f, 0.84f, 0.9f});
+  m_model = ModelFactory::createCube({0.67f, 0.84f, 0.9f}, material);
   m_root_node = SceneNode();
   m_model_node = SceneNode(&m_model);
   m_model_node.scale(0.03f, 0.03f, 0.075f);
 
   // Create the model for visualizing intersections of the aim line
-  m_aim_indicator_sphere = ModelFactory::createSphere();
+  m_aim_indicator_sphere = ModelFactory::createSphere(material);
   m_aim_indicator_sphere.setColor({0.0f, 0.75f, 1.0f});
   m_intersection_sphere_node = SceneNode(&m_aim_indicator_sphere);
   m_intersection_sphere_node.scale(0.05f, 0.05f, 0.05f);
@@ -17,7 +17,7 @@ Controller::Controller() {
   m_root_node.addChildNode(&m_intersection_sphere_node);
 
   // Create the line for the aim direction
-  m_aim_line = Line(0.003f, 2.0f, {1.0f, 0.0f, 0.0f});
+  m_aim_line = Line(0.003f, 2.0f, {1.0f, 0.0f, 0.0f}, material);
 }
 
 void Controller::render(RenderContext &ctx) {

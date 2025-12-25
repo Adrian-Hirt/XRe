@@ -12,7 +12,6 @@
 #include <xre/structs.h>
 #include <xre/buffer.h>
 #include <xre/object_oriented_bounding_box.h>
-// #include <xre/shader.h>
 
 // Base class which is subclassed by other classes that are "renderable", i.e.
 // can be rendered to display some output in the program.
@@ -49,8 +48,6 @@ protected:
 
   // The bounding box of this renderable
   OOBB m_bounding_box;
-
-  // Shader m_shader;
 
   void initialize(std::vector<Vertex> vertices, std::vector<uint16_t> indices);
 

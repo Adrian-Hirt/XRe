@@ -12,11 +12,12 @@
 #include <xre/line.h>
 #include <xre/scene_node.h>
 #include <xre/structs.h>
+#include <xre/material.h>
 
 class Controller {
 public:
   // Constructor
-  Controller();
+  Controller(Material material);
 
   // Render the controller
   void render(RenderContext &ctx);

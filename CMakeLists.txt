@@ -47,6 +47,7 @@ SET(SRCFILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/hand.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/line.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/object_oriented_bounding_box.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/material.cpp
 )
 
 # Setup clang format

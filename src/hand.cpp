@@ -1,6 +1,6 @@
 #include <xre/hand.h>
 
-Hand::Hand(XrHandEXT hand_identifier) {
+Hand::Hand(XrHandEXT hand_identifier, Material material) {
   m_hand_identifier = hand_identifier;
   m_hand_root_node = new SceneNode();
 
@@ -8,7 +8,7 @@ Hand::Hand(XrHandEXT hand_identifier) {
   // times. For the first version we'll keep this approach though.
   for (int i = 0; i < XR_HAND_JOINT_COUNT_EXT; i++) {
     // TODO: use a more sensible approach for lifetime handling
-    Model *joint_model = ModelFactory::createCubePtr({0.67f, 0.84f, 0.9});
+    Model *joint_model = ModelFactory::createCubePtr({0.67f, 0.84f, 0.9}, material);
     SceneNode *joint_node = new SceneNode(joint_model);
     joint_node->setScale(0.005f, 0.005f, 0.005f);
     m_hand_root_node->addChildNode(joint_node);
