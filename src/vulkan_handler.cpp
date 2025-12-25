@@ -441,25 +441,56 @@ void VulkanHandler::setupRenderer() {
   //------------------------------------------------------------------------------------------------------
   // Pipeline layout
   //------------------------------------------------------------------------------------------------------
-  std::array<VkDescriptorSetLayout, 2> set_layouts = {
-      m_global_descriptor_set_layout, // set = 0
-      m_descriptor_set_layout         // set = 1 (local UBO)
-  };
+  m_pipeline_layout = createPipelineLayout(m_global_descriptor_set_layout, m_descriptor_set_layout);
 
-  VkPipelineLayoutCreateInfo pipeline_layout_info{};
-  pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-  pipeline_layout_info.setLayoutCount = static_cast<uint32_t>(set_layouts.size());
-  pipeline_layout_info.pSetLayouts = set_layouts.data();
+  //------------------------------------------------------------------------------------------------------
+  // Graphics pipeline
+  //------------------------------------------------------------------------------------------------------
+  m_graphics_pipeline = createGraphicsPipeline(m_render_pass, m_pipeline_layout, SHADERS_FOLDER "vk/basic.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
 
-  result = vkCreatePipelineLayout(m_device, &pipeline_layout_info, nullptr, &m_pipeline_layout);
-  Utils::checkVkResult(result, "Failed to create pipeline layout");
+  //------------------------------------------------------------------------------------------------------
+  // Command pool
+  //------------------------------------------------------------------------------------------------------
+  VkCommandPoolCreateInfo pool_create_info{};
+  pool_create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+  pool_create_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+  pool_create_info.queueFamilyIndex = m_queue_family_index;
 
+  result = vkCreateCommandPool(m_device, &pool_create_info, nullptr, &m_command_pool);
+  Utils::checkVkResult(result, "Failed to create the command pool");
+
+  //------------------------------------------------------------------------------------------------------
+  // Command buffer
+  //------------------------------------------------------------------------------------------------------
+  VkCommandBufferAllocateInfo buffer_allocate_info{};
+  buffer_allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  buffer_allocate_info.commandPool = m_command_pool;
+  buffer_allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  buffer_allocate_info.commandBufferCount = 1u;
+
+  result = vkAllocateCommandBuffers(m_device, &buffer_allocate_info, &m_command_buffer);
+  Utils::checkVkResult(result, "Failed to allocate command buffers");
+
+  //------------------------------------------------------------------------------------------------------
+  // Sync objects
+  //------------------------------------------------------------------------------------------------------
+  // Create memory fence
+  VkFenceCreateInfo fence_create_info{};
+  fence_create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+  // Create the fence in the signalled state such that the first `vkWaitForFences` call
+  // does not block indefinitely.
+  fence_create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+  result = vkCreateFence(m_device, &fence_create_info, nullptr, &m_fence);
+  Utils::checkVkResult(result, "Failed to create fence");
+}
+
+VkPipeline VulkanHandler::createGraphicsPipeline(VkRenderPass render_pass, VkPipelineLayout pipeline_layout, const std::string& vert_path, const std::string& frag_path) {
   //------------------------------------------------------------------------------------------------------
   // Shader modules
   //------------------------------------------------------------------------------------------------------
   // Load shader bytecodes
-  static std::vector<char> vertex_shader_code = Utils::readFile(SHADERS_FOLDER "vk/basic.vert.spv");
-  static std::vector<char> fragment_shader_code = Utils::readFile(SHADERS_FOLDER "vk/basic.frag.spv");
+  static std::vector<char> vertex_shader_code = Utils::readFile(vert_path);
+  static std::vector<char> fragment_shader_code = Utils::readFile(frag_path);
 
   // Create shader modules for both of the shaders
   VkShaderModule vertex_shader_module = createShaderModule(vertex_shader_code);
@@ -581,7 +612,7 @@ void VulkanHandler::setupRenderer() {
   // Setup the pipeline create info
   VkGraphicsPipelineCreateInfo pipeline_create_info{};
   pipeline_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-  pipeline_create_info.layout = m_pipeline_layout;
+  pipeline_create_info.layout = pipeline_layout;
   pipeline_create_info.stageCount = static_cast<uint32_t>(shader_stages.size());
   pipeline_create_info.pStages = shader_stages.data();
   pipeline_create_info.pVertexInputState = &vertex_input_info;
@@ -593,50 +624,37 @@ void VulkanHandler::setupRenderer() {
   pipeline_create_info.pColorBlendState = &color_blend_info;
   pipeline_create_info.pDynamicState = &dynamic_state_create_info;
   pipeline_create_info.pDepthStencilState = &depth_stencil_info;
-  pipeline_create_info.renderPass = m_render_pass;
+  pipeline_create_info.renderPass = render_pass;
   pipeline_create_info.subpass = 0;
 
-  result = vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &pipeline_create_info, nullptr, &m_graphics_pipeline);
+  VkPipeline graphics_pipeline;
+  VkResult result = vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &pipeline_create_info, nullptr, &graphics_pipeline);
   Utils::checkVkResult(result, "Failed to create the graphics pipeline");
 
   // Make sure to cleanup the shader modules
   vkDestroyShaderModule(m_device, fragment_shader_module, nullptr);
   vkDestroyShaderModule(m_device, vertex_shader_module, nullptr);
 
-  //------------------------------------------------------------------------------------------------------
-  // Command pool
-  //------------------------------------------------------------------------------------------------------
-  VkCommandPoolCreateInfo pool_create_info{};
-  pool_create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-  pool_create_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-  pool_create_info.queueFamilyIndex = m_queue_family_index;
+  return graphics_pipeline;
+}
 
-  result = vkCreateCommandPool(m_device, &pool_create_info, nullptr, &m_command_pool);
-  Utils::checkVkResult(result, "Failed to create the command pool");
+VkPipelineLayout VulkanHandler::createPipelineLayout(VkDescriptorSetLayout global_layout, VkDescriptorSetLayout model_layout) {
+  std::array<VkDescriptorSetLayout, 2> set_layouts = {
+    global_layout, // set = 0
+    model_layout   // set = 1 (local UBO)
+};
 
-  //------------------------------------------------------------------------------------------------------
-  // Command buffer
-  //------------------------------------------------------------------------------------------------------
-  VkCommandBufferAllocateInfo buffer_allocate_info{};
-  buffer_allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-  buffer_allocate_info.commandPool = m_command_pool;
-  buffer_allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-  buffer_allocate_info.commandBufferCount = 1u;
+  VkPipelineLayoutCreateInfo pipeline_layout_info{};
+  pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+  pipeline_layout_info.setLayoutCount = static_cast<uint32_t>(set_layouts.size());
+  pipeline_layout_info.pSetLayouts = set_layouts.data();
 
-  result = vkAllocateCommandBuffers(m_device, &buffer_allocate_info, &m_command_buffer);
-  Utils::checkVkResult(result, "Failed to allocate command buffers");
+  VkPipelineLayout pipeline_layout;
 
-  //------------------------------------------------------------------------------------------------------
-  // Sync objects
-  //------------------------------------------------------------------------------------------------------
-  // Create memory fence
-  VkFenceCreateInfo fence_create_info{};
-  fence_create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-  // Create the fence in the signalled state such that the first `vkWaitForFences` call
-  // does not block indefinitely.
-  fence_create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-  result = vkCreateFence(m_device, &fence_create_info, nullptr, &m_fence);
-  Utils::checkVkResult(result, "Failed to create fence");
+  VkResult result = vkCreatePipelineLayout(m_device, &pipeline_layout_info, nullptr, &pipeline_layout);
+  Utils::checkVkResult(result, "Failed to create pipeline layout");
+
+  return pipeline_layout;
 }
 
 VkShaderModule VulkanHandler::createShaderModule(const std::vector<char> &code) {
