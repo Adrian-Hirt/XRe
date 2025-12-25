@@ -9,8 +9,8 @@
 class Line {
 public:
   Line();
-  Line(float thickness, float length);
-  Line(float thickness, float length, glm::vec3 color);
+  Line(float thickness, float length, Material material);
+  Line(float thickness, float length, glm::vec3 color, Material material);
 
   void render(RenderContext &ctx);
   void updateAimLineFromControllerPose(glm::vec3 controller_position, glm::quat controller_orientation, float length);

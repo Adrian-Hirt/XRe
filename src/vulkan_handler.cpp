@@ -444,11 +444,6 @@ void VulkanHandler::setupRenderer() {
   m_pipeline_layout = createPipelineLayout();
 
   //------------------------------------------------------------------------------------------------------
-  // Graphics pipeline
-  //------------------------------------------------------------------------------------------------------
-  m_graphics_pipeline = createGraphicsPipeline(m_pipeline_layout, SHADERS_FOLDER "vk/basic.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
-
-  //------------------------------------------------------------------------------------------------------
   // Command pool
   //------------------------------------------------------------------------------------------------------
   VkCommandPoolCreateInfo pool_create_info{};
@@ -484,13 +479,13 @@ void VulkanHandler::setupRenderer() {
   Utils::checkVkResult(result, "Failed to create fence");
 }
 
-VkPipeline VulkanHandler::createGraphicsPipeline(VkPipelineLayout pipeline_layout, const std::string& vert_path, const std::string& frag_path) {
+VkPipeline VulkanHandler::createGraphicsPipeline(const std::string& vert_path, const std::string& frag_path) {
   //------------------------------------------------------------------------------------------------------
   // Shader modules
   //------------------------------------------------------------------------------------------------------
   // Load shader bytecodes
-  static std::vector<char> vertex_shader_code = Utils::readFile(vert_path);
-  static std::vector<char> fragment_shader_code = Utils::readFile(frag_path);
+  std::vector<char> vertex_shader_code = Utils::readFile(vert_path);
+  std::vector<char> fragment_shader_code = Utils::readFile(frag_path);
 
   // Create shader modules for both of the shaders
   VkShaderModule vertex_shader_module = createShaderModule(vertex_shader_code);
@@ -612,7 +607,7 @@ VkPipeline VulkanHandler::createGraphicsPipeline(VkPipelineLayout pipeline_layou
   // Setup the pipeline create info
   VkGraphicsPipelineCreateInfo pipeline_create_info{};
   pipeline_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-  pipeline_create_info.layout = pipeline_layout;
+  pipeline_create_info.layout = m_pipeline_layout;
   pipeline_create_info.stageCount = static_cast<uint32_t>(shader_stages.size());
   pipeline_create_info.pStages = shader_stages.data();
   pipeline_create_info.pVertexInputState = &vertex_input_info;
@@ -768,11 +763,6 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   vkCmdBindDescriptorSets(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0, 1, &m_global_descriptor_set, // set = 0
                           0, nullptr);
 
-  //------------------------------------------------------------------------------------------------------
-  // Bind the graphics pipeline
-  //------------------------------------------------------------------------------------------------------
-  vkCmdBindPipeline(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphics_pipeline);
-
   // Draw scene
   draw_callback(ctx);
 
@@ -805,6 +795,10 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   // completion.
   result = vkQueueSubmit(m_graphics_queue, 1, &submit_info, m_fence);
   Utils::checkVkResult(result, "failed to submit draw command buffer!");
+}
+
+void VulkanHandler::bindGraphicsPipeline(VkPipeline pipeline) {
+  vkCmdBindPipeline(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 }
 
 VkInstance VulkanHandler::getInstance() { return m_vk_instance; }

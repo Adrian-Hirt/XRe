@@ -10,15 +10,16 @@
 #include <xre/mesh.h>
 #include <xre/geometry.h>
 #include <xre/color_utils.h>
+#include <xre/material.h>
 
 class Model {
 public:
   Model();
-  Model(std::vector<Mesh> meshes);
-  Model(std::vector<Mesh> meshes, glm::vec3 color);
+  Model(std::vector<Mesh> meshes, Material material);
+  Model(std::vector<Mesh> meshes, glm::vec3 color, Material material);
 
-  Model(const char *model_path);
-  Model(const char *model_path, glm::vec3 color);
+  Model(const char *model_path, Material material);
+  Model(const char *model_path, glm::vec3 color, Material material);
 
   // Set the world transform
   void setWorldMatrix(glm::mat4 world_matrix);
@@ -65,6 +66,8 @@ private:
   bool m_render_bounding_boxes = false;
 
   bool m_interacted = false;
+  
+  Material m_material;
 
   // Scene Node can call render() directly
   friend class SceneNode;

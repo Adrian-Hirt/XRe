@@ -14,21 +14,23 @@ Model::Model() {}
 //  1) Vector of meshes for this model
 //  2) Color of the model
 //------------------------------------------------------------------------------------------------------
-Model::Model(std::vector<Mesh> meshes) : Model::Model(meshes, glm::vec3(0.8f, 0.8f, 0.8f)) {}
-Model::Model(std::vector<Mesh> meshes, glm::vec3 color) {
+Model::Model(std::vector<Mesh> meshes, Material material) : Model::Model(meshes, glm::vec3(0.8f, 0.8f, 0.8f), material) {}
+Model::Model(std::vector<Mesh> meshes, glm::vec3 color, Material material) {
   m_meshes = meshes;
   m_original_model_color = color;
   m_model_color = color;
   // TODO: check that we haven't reached the max number of models
   m_model_index = s_model_index++;
+  m_material = material;
 }
 
-Model::Model(const char *model_path) : Model::Model(model_path, glm::vec3(0.8f, 0.8f, 0.8f)) {}
-Model::Model(const char *model_path, glm::vec3 color) {
+Model::Model(const char *model_path, Material material) : Model::Model(model_path, glm::vec3(0.8f, 0.8f, 0.8f), material) {}
+Model::Model(const char *model_path, glm::vec3 color, Material material) {
   loadObj(model_path);
   m_model_color = color;
   m_original_model_color = color;
   m_model_index = s_model_index++;
+  m_material = material;
 }
 
 void Model::render(RenderContext &ctx) {
@@ -50,6 +52,9 @@ void Model::render(RenderContext &ctx) {
   vkCmdBindDescriptorSets(ctx.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ctx.pipeline_layout, 1u, 1u, &ctx.descriptor_set, 1,
                           &offset);
 
+  // Bind the graphics pipeline of the material
+  m_material.bind();
+                  
   // Render meshes of this model
   for (Mesh mesh : m_meshes) {
     mesh.render(ctx);

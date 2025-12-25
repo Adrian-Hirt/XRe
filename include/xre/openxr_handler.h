@@ -95,8 +95,12 @@ private:
   // For checking if the pose of a controller is valid
   const static XrSpaceLocationFlags s_pose_valid_flags = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
 
+  // Tracking positions of headset
   glm::vec3 m_headset_position = glm::zero<glm::vec3>();
   glm::vec3 m_current_origin = glm::zero<glm::vec3>();
+
+  // Material for controllers and hands
+  Material m_interactions_material;
 
   // Methods
   bool initializeOpenxr();

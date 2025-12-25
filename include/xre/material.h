@@ -8,8 +8,10 @@
 
 class Material {
 public:
+  Material();
   Material(const std::string& vert_path, const std::string& frag_path);
   static void registerVulkanHandler(VulkanHandler handler);
+  void bind();
 
 private:
   inline static VulkanHandler s_vulkan_handler;
