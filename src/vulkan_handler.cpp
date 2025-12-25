@@ -707,11 +707,6 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   vkCmdBeginRenderPass(m_command_buffer, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
 
   //------------------------------------------------------------------------------------------------------
-  // Bind the graphics pipeline
-  //------------------------------------------------------------------------------------------------------
-  vkCmdBindPipeline(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphics_pipeline);
-
-  //------------------------------------------------------------------------------------------------------
   // Set viewport
   //------------------------------------------------------------------------------------------------------
   VkViewport viewport;
@@ -754,6 +749,11 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   // Bind global descriptor set (camera)
   vkCmdBindDescriptorSets(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0, 1, &m_global_descriptor_set, // set = 0
                           0, nullptr);
+
+  //------------------------------------------------------------------------------------------------------
+  // Bind the graphics pipeline
+  //------------------------------------------------------------------------------------------------------
+  vkCmdBindPipeline(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphics_pipeline);
 
   // Draw scene
   draw_callback(ctx);
