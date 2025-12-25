@@ -5,6 +5,7 @@
 
 // XRe includes
 #include <xre/vulkan_handler.h>
+#include <xre/buffer.h>
 
 class Material {
 public:
@@ -13,9 +14,17 @@ public:
   static void registerVulkanHandler(VulkanHandler handler);
   void bind();
 
+  Buffer* getUniformBuffer();
+  VkDescriptorSet getDescriptorset();
+
 private:
   inline static VulkanHandler s_vulkan_handler;
 
   VkPipeline m_graphics_pipeline;
-  VkPipelineLayout m_pipeline_layout;
+
+  // Uniform buffer
+  Buffer *m_uniform_buffer = nullptr;
+
+  // Descriptor set
+  VkDescriptorSet m_descriptor_set = nullptr;
 };

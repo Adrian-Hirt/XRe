@@ -44,6 +44,10 @@ void Model::render(RenderContext &ctx) {
     uniform_buffer_object.color = ColorUtils::lighten(m_model_color, 0.5f);
   }
 
+  // Update context
+  ctx.descriptor_set = m_material.getDescriptorset();
+  ctx.model_uniform_buffer = m_material.getUniformBuffer();
+
   // Update uniform buffer
   const uint32_t offset = m_model_index * ctx.aligned_size;
   ctx.model_uniform_buffer->loadData(uniform_buffer_object, offset);

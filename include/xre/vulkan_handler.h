@@ -42,10 +42,13 @@ public:
 
   static constexpr VkFormat s_color_format = VK_FORMAT_R8G8B8A8_SRGB;
   static constexpr uint32_t s_max_models_in_scene = 256;
+  static constexpr uint32_t s_max_descriptors = 20;
 
   VkPipelineLayout createPipelineLayout();
   VkPipeline createGraphicsPipeline(const std::string& vert_path, const std::string& frag_path);
   void bindGraphicsPipeline(VkPipeline pipeline);
+  Buffer* createUniformBuffer();
+  VkDescriptorSet allocateDescriptorSet(Buffer* material_uniform_buffer);
 
 private:
   // -------------------------------------------
@@ -84,7 +87,7 @@ private:
 
   // Specifies the types of resources that are going to be accessed by the pipeline
   VkDescriptorSetLayout m_descriptor_set_layout = nullptr;
-  VkDescriptorSet m_descriptor_set = nullptr;
+  VkDescriptorPool m_local_descriptor_pool;
 
   VkDescriptorSetLayout m_global_descriptor_set_layout = nullptr;
   VkDescriptorSet m_global_descriptor_set = nullptr;
