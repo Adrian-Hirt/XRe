@@ -3,7 +3,6 @@
 // XRe includes
 #include <xre/model.h>
 #include <xre/renderable.h>
-// #include <xre/shader.h>
 
 // Other includes
 #include <vector>
