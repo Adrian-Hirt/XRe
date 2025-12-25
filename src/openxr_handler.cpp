@@ -23,6 +23,7 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
   m_vulkan_handler.setupRenderer();
 
   Renderable::registerDeviceAndPhysicalDevice(m_vulkan_handler.getLogicalDevice(), m_vulkan_handler.getPhysicalDevice());
+  Material::registerVulkanHandler(m_vulkan_handler);
 
   // Instruct the handler to initialize the xr actions
   initializeOpenxrActions();

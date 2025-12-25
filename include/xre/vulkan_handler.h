@@ -43,13 +43,14 @@ public:
   static constexpr VkFormat s_color_format = VK_FORMAT_R8G8B8A8_SRGB;
   static constexpr uint32_t s_max_models_in_scene = 256;
 
+  VkPipelineLayout createPipelineLayout();
+  VkPipeline createGraphicsPipeline(VkPipelineLayout pipeline_layout, const std::string& vert_path, const std::string& frag_path);
+
 private:
   // -------------------------------------------
   // Methods
   // -------------------------------------------
   VkShaderModule createShaderModule(const std::vector<char> &code);
-  VkPipelineLayout createPipelineLayout(VkDescriptorSetLayout global_layout, VkDescriptorSetLayout model_layout);
-  VkPipeline createGraphicsPipeline(VkRenderPass render_pass, VkPipelineLayout pipeline_layout, const std::string& vert_path, const std::string& frag_path);
 
   // -------------------------------------------
   // Attributes

@@ -21,6 +21,7 @@
 #include <xre/render_target.h>
 #include <xre/controller.h>
 #include <xre/hand.h>
+#include <xre/material.h>
 
 // Other includes
 #include <iostream>

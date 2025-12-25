@@ -441,12 +441,12 @@ void VulkanHandler::setupRenderer() {
   //------------------------------------------------------------------------------------------------------
   // Pipeline layout
   //------------------------------------------------------------------------------------------------------
-  m_pipeline_layout = createPipelineLayout(m_global_descriptor_set_layout, m_descriptor_set_layout);
+  m_pipeline_layout = createPipelineLayout();
 
   //------------------------------------------------------------------------------------------------------
   // Graphics pipeline
   //------------------------------------------------------------------------------------------------------
-  m_graphics_pipeline = createGraphicsPipeline(m_render_pass, m_pipeline_layout, SHADERS_FOLDER "vk/basic.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
+  m_graphics_pipeline = createGraphicsPipeline(m_pipeline_layout, SHADERS_FOLDER "vk/basic.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
 
   //------------------------------------------------------------------------------------------------------
   // Command pool
@@ -484,7 +484,7 @@ void VulkanHandler::setupRenderer() {
   Utils::checkVkResult(result, "Failed to create fence");
 }
 
-VkPipeline VulkanHandler::createGraphicsPipeline(VkRenderPass render_pass, VkPipelineLayout pipeline_layout, const std::string& vert_path, const std::string& frag_path) {
+VkPipeline VulkanHandler::createGraphicsPipeline(VkPipelineLayout pipeline_layout, const std::string& vert_path, const std::string& frag_path) {
   //------------------------------------------------------------------------------------------------------
   // Shader modules
   //------------------------------------------------------------------------------------------------------
@@ -624,7 +624,7 @@ VkPipeline VulkanHandler::createGraphicsPipeline(VkRenderPass render_pass, VkPip
   pipeline_create_info.pColorBlendState = &color_blend_info;
   pipeline_create_info.pDynamicState = &dynamic_state_create_info;
   pipeline_create_info.pDepthStencilState = &depth_stencil_info;
-  pipeline_create_info.renderPass = render_pass;
+  pipeline_create_info.renderPass = m_render_pass;
   pipeline_create_info.subpass = 0;
 
   VkPipeline graphics_pipeline;
@@ -638,11 +638,11 @@ VkPipeline VulkanHandler::createGraphicsPipeline(VkRenderPass render_pass, VkPip
   return graphics_pipeline;
 }
 
-VkPipelineLayout VulkanHandler::createPipelineLayout(VkDescriptorSetLayout global_layout, VkDescriptorSetLayout model_layout) {
+VkPipelineLayout VulkanHandler::createPipelineLayout() {
   std::array<VkDescriptorSetLayout, 2> set_layouts = {
-    global_layout, // set = 0
-    model_layout   // set = 1 (local UBO)
-};
+    m_global_descriptor_set_layout, // set = 0
+    m_descriptor_set_layout // set = 1 (local UBO)
+  };
 
   VkPipelineLayoutCreateInfo pipeline_layout_info{};
   pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
