@@ -1,5 +1,4 @@
 #include <xre/application.h>
-#include <xre/object_oriented_bounding_box.h>
 
 class VulkanApp : public Application {
 public:
