@@ -14,17 +14,12 @@
 
 class Texture {
 public:
-  Texture(const std::string& path);
-
-  // TODO: replace this by a more sensible architecture
-  static void registerVulkanHandler(VulkanHandler handler);
+  Texture(const std::string& path, VulkanHandler& vulkan_handler);
 
   VkImageView getTextureImageView();
   VkSampler getTextureSampler();
 
 private:
-  inline static VulkanHandler s_vulkan_handler;
-
   VkImage createTextureImage(const std::string& path);
   void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout);
   void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
@@ -33,4 +28,5 @@ private:
 
   VkImageView m_texture_image_view;
   VkSampler m_texture_sampler;
+  VulkanHandler& m_vulkan_handler;
 };

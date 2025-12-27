@@ -3,6 +3,9 @@
 Application::Application(const char *application_name) {
   // create the XR handler
   m_open_xr_handler = OpenXrHandler(application_name);
+
+  // Create the resource manager
+  m_resource_manager = new ResourceManager(m_open_xr_handler.m_vulkan_handler);
 }
 
 Application::~Application() {};
@@ -39,3 +42,7 @@ void Application::updateSimulation(XrTime predicted_time) {
   // Override this method to update the simulation based
   // on the predicted time the frame will be rendered
 }
+
+ResourceManager* Application::resourceManager() {
+  return m_resource_manager;
+};

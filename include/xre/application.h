@@ -12,6 +12,7 @@
 #include <xre/scene_node.h>
 #include <xre/material.h>
 #include <xre/texture.h>
+#include <xre/resource_manager.h>
 
 class Application {
 public:
@@ -23,7 +24,12 @@ public:
   virtual void draw(RenderContext &ctx);
   virtual void updateSimulation(XrTime predicted_time);
 
+  ResourceManager* resourceManager();
+
 private:
   // Handlers
   OpenXrHandler m_open_xr_handler;
+
+  // Resource manager
+  ResourceManager* m_resource_manager;
 };
