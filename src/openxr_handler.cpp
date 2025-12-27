@@ -22,8 +22,10 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
   // Setup the vulkan renderer
   m_vulkan_handler.setupRenderer();
 
+  // TODO: Replace this by a more sensible architecture
   Renderable::registerDeviceAndPhysicalDevice(m_vulkan_handler.getLogicalDevice(), m_vulkan_handler.getPhysicalDevice());
   Material::registerVulkanHandler(m_vulkan_handler);
+  Texture::registerVulkanHandler(m_vulkan_handler);
 
   // Create the material for the controllers and hands
   m_interactions_material = Material(SHADERS_FOLDER "vk/ambient.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");

@@ -11,6 +11,7 @@
 // #include <xre/text.h>
 #include <xre/scene_node.h>
 #include <xre/material.h>
+#include <xre/texture.h>
 
 class Application {
 public:

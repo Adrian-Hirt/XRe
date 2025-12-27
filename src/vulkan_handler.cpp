@@ -339,19 +339,19 @@ void VulkanHandler::setupRenderer() {
   ubo_layout_binding.descriptorCount = 1;
   ubo_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-  // Combined image sampler
-  // VkDescriptorSetLayoutBinding sampler_layout_binding{};
-  // sampler_layout_binding.binding = 1;
-  // sampler_layout_binding.descriptorCount = 1;
-  // sampler_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-  // sampler_layout_binding.pImmutableSamplers = nullptr;
-  // sampler_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+  // Combined image sampler (set = 1)
+  VkDescriptorSetLayoutBinding sampler_layout_binding{};
+  sampler_layout_binding.binding = 1;
+  sampler_layout_binding.descriptorCount = 1;
+  sampler_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+  sampler_layout_binding.pImmutableSamplers = nullptr;
+  sampler_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-  // std::array<VkDescriptorSetLayoutBinding, 2> bindings = { ubo_layout_binding, sampler_layout_binding };
+  std::array<VkDescriptorSetLayoutBinding, 2> bindings = { ubo_layout_binding, sampler_layout_binding };
   VkDescriptorSetLayoutCreateInfo layout_create_info{};
   layout_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-  layout_create_info.bindingCount = 1;
-  layout_create_info.pBindings = &ubo_layout_binding;
+  layout_create_info.bindingCount = static_cast<uint32_t>(bindings.size());
+  layout_create_info.pBindings = bindings.data();
 
   result = vkCreateDescriptorSetLayout(m_device, &layout_create_info, nullptr, &m_descriptor_set_layout);
   Utils::checkVkResult(result, "Failed to create the descriptor set layout");
@@ -374,13 +374,18 @@ void VulkanHandler::setupRenderer() {
   Utils::checkVkResult(result, "Failed to create global descriptor pool");
 
   // Create local descriptor pool
-  VkDescriptorPoolSize descriptor_pool_size;
-  descriptor_pool_size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-  descriptor_pool_size.descriptorCount = s_max_descriptors;
+  std::array<VkDescriptorPoolSize, 2> poolSizes{};
+  // VkDescriptorPoolSize descriptor_pool_size;
+  // descriptor_pool_size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+  // descriptor_pool_size.descriptorCount = s_max_descriptors;
+  poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+  poolSizes[0].descriptorCount = s_max_descriptors;
+  poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+  poolSizes[1].descriptorCount = s_max_descriptors;
 
   VkDescriptorPoolCreateInfo descriptor_pool_create_info{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
-  descriptor_pool_create_info.poolSizeCount = 1u;
-  descriptor_pool_create_info.pPoolSizes = &descriptor_pool_size;
+  descriptor_pool_create_info.poolSizeCount = static_cast<uint32_t>(poolSizes.size());;
+  descriptor_pool_create_info.pPoolSizes = poolSizes.data();
   descriptor_pool_create_info.maxSets = s_max_descriptors;
 
   result = vkCreateDescriptorPool(m_device, &descriptor_pool_create_info, nullptr, &m_local_descriptor_pool);
@@ -459,7 +464,7 @@ Buffer* VulkanHandler::createUniformBuffer() {
   return new Buffer(m_device, m_physical_device, m_aligned_size * s_max_models_in_scene, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 }
 
-VkDescriptorSet VulkanHandler::allocateDescriptorSet(Buffer* material_uniform_buffer) {
+VkDescriptorSet VulkanHandler::allocateDescriptorSet(Buffer* material_uniform_buffer, VkImageView texture_image_view, VkSampler texture_sampler) {
   VkDescriptorSetAllocateInfo descriptor_set_allocate_info{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
   descriptor_set_allocate_info.descriptorPool = m_local_descriptor_pool;
   descriptor_set_allocate_info.descriptorSetCount = 1u;
@@ -474,6 +479,11 @@ VkDescriptorSet VulkanHandler::allocateDescriptorSet(Buffer* material_uniform_bu
   descriptor_buffer_info.offset = 0u;
   descriptor_buffer_info.range = VK_WHOLE_SIZE;
 
+  VkDescriptorImageInfo imageInfo{};
+  imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+  imageInfo.imageView = texture_image_view;
+  imageInfo.sampler = texture_sampler;
+
   VkWriteDescriptorSet write_descriptor_set{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
   write_descriptor_set.dstSet = descriptor_set;
   write_descriptor_set.pBufferInfo = &descriptor_buffer_info;
@@ -482,8 +492,26 @@ VkDescriptorSet VulkanHandler::allocateDescriptorSet(Buffer* material_uniform_bu
   write_descriptor_set.dstBinding = 0u;
   write_descriptor_set.dstArrayElement = 0u;
 
-  vkUpdateDescriptorSets(m_device, 1u, &write_descriptor_set, 0u, nullptr);
+  if (texture_image_view == NULL) {
+    vkUpdateDescriptorSets(m_device, 1u, &write_descriptor_set, 0u, nullptr);
+  }
+  else {
+    assert(texture_sampler != VK_NULL_HANDLE);
+    assert(texture_image_view != VK_NULL_HANDLE);
+    std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+    descriptorWrites[0] = write_descriptor_set;
 
+    descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    descriptorWrites[1].dstSet = descriptor_set;
+    descriptorWrites[1].dstBinding = 1;
+    descriptorWrites[1].dstArrayElement = 0;
+    descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    descriptorWrites[1].descriptorCount = 1;
+    descriptorWrites[1].pImageInfo = &imageInfo;
+
+    vkUpdateDescriptorSets(m_device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+  }
+  
   return descriptor_set;
 }
 
@@ -816,3 +844,37 @@ VkDevice VulkanHandler::getLogicalDevice() { return m_device; }
 uint32_t VulkanHandler::getQueueFamilyIndex() { return m_queue_family_index; }
 
 VkRenderPass VulkanHandler::getRenderPass() { return m_render_pass; }
+
+VkCommandBuffer VulkanHandler::beginSingleTimeCommands() {
+  VkCommandBufferAllocateInfo allocInfo{};
+  allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  allocInfo.commandPool = m_command_pool;
+  allocInfo.commandBufferCount = 1;
+
+  VkCommandBuffer commandBuffer;
+  vkAllocateCommandBuffers(m_device, &allocInfo, &commandBuffer);
+
+  VkCommandBufferBeginInfo beginInfo{};
+  beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+  beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+  vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+  return commandBuffer;
+}
+
+void VulkanHandler::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
+  vkEndCommandBuffer(commandBuffer);
+
+  VkSubmitInfo submitInfo{};
+  submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+  submitInfo.commandBufferCount = 1;
+  submitInfo.pCommandBuffers = &commandBuffer;
+
+  vkQueueSubmit(m_graphics_queue, 1, &submitInfo, VK_NULL_HANDLE);
+  vkQueueWaitIdle(m_graphics_queue);
+
+  vkFreeCommandBuffers(m_device, m_command_pool, 1, &commandBuffer);
+}
+

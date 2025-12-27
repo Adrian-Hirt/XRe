@@ -22,6 +22,7 @@
 #include <xre/controller.h>
 #include <xre/hand.h>
 #include <xre/material.h>
+#include <xre/texture.h>
 
 // Other includes
 #include <iostream>

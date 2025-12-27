@@ -17,6 +17,7 @@
 // can be rendered to display some output in the program.
 class Renderable {
 public:
+  // TODO: Replace this by a more sensible architecture
   static void registerDeviceAndPhysicalDevice(VkDevice device, VkPhysicalDevice physical_device);
   OOBB getObjectOrientedBoundingBox();
 
