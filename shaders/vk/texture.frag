@@ -10,5 +10,4 @@ layout(location = 0) out vec4 outColor;
 
 void main() {
   outColor = vec4(texture(texSampler, fragmentCoordinate).rgb, 1.0f);
-  // outColor = vec4(fragmentCoordinate, 0.0, 1.0);
 }
