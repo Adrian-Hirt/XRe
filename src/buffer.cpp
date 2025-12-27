@@ -71,9 +71,15 @@ void Buffer::loadData(GlobalUniformBufferObject input) {
   unmap();
 }
 
+void Buffer::loadData(stbi_uc* input) {
+  void *data = map();
+  memcpy(data, input, m_size);
+  unmap();
+}
+
 void Buffer::destroy() {
-  vkFreeMemory(m_device, m_device_memory, nullptr);
   vkDestroyBuffer(m_device, m_buffer, nullptr);
+  vkFreeMemory(m_device, m_device_memory, nullptr);
 }
 
 void *Buffer::map() {

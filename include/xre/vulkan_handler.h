@@ -48,7 +48,10 @@ public:
   VkPipeline createGraphicsPipeline(const std::string& vert_path, const std::string& frag_path);
   void bindGraphicsPipeline(VkPipeline pipeline);
   Buffer* createUniformBuffer();
-  VkDescriptorSet allocateDescriptorSet(Buffer* material_uniform_buffer);
+  VkDescriptorSet allocateDescriptorSet(Buffer* material_uniform_buffer, VkImageView texture_image_view, VkSampler texture_sampler);
+
+  VkCommandBuffer beginSingleTimeCommands();
+  void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
 private:
   // -------------------------------------------

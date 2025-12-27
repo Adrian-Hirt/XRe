@@ -18,6 +18,7 @@ layout(location = 2) in vec2 inTexCoord;
 
 layout(location = 0) out vec3 color;
 layout(location = 1) out vec3 position; // In world space
+layout(location = 2) out vec2 fragTexCoord;
 
 void main() {
   // Transform vertex position to world space
@@ -28,5 +29,8 @@ void main() {
   gl_Position = globalUBO.view_projection * pos;
 
   // Set color to color of the model
-  color = modelUBO.color;
+  color = vec3(inTexCoord, 0.0);
+
+  // Set fragment texture coordinates
+  fragTexCoord = inTexCoord;
 }

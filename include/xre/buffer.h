@@ -8,6 +8,9 @@
 #include <xre/structs.h>
 #include <xre/vulkan_utils.h>
 
+// Other includes
+#include <stb_image.h>
+
 class Buffer {
 public:
   Buffer(VkDevice device, VkPhysicalDevice physical_device, VkDeviceSize size, VkBufferUsageFlags buffer_usage_flags);
@@ -18,6 +21,7 @@ public:
   void loadData(std::vector<uint16_t> input);
   void loadData(ModelUniformBufferObject input, VkDeviceSize offset);
   void loadData(GlobalUniformBufferObject input);
+  void loadData(stbi_uc* input);
 
 private:
   VkDevice m_device = nullptr;

@@ -53,8 +53,16 @@ void Model::render(RenderContext &ctx) {
   ctx.model_uniform_buffer->loadData(uniform_buffer_object, offset);
 
   // Bind descriptor set
-  vkCmdBindDescriptorSets(ctx.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ctx.pipeline_layout, 1u, 1u, &ctx.descriptor_set, 1,
-                          &offset);
+  vkCmdBindDescriptorSets(
+    ctx.command_buffer,
+    VK_PIPELINE_BIND_POINT_GRAPHICS,
+    ctx.pipeline_layout,
+    1u,
+    1u,
+    &ctx.descriptor_set,
+    1,
+    &offset
+  );
 
   // Bind the graphics pipeline of the material
   m_material.bind();

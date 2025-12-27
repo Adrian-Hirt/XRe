@@ -8,10 +8,10 @@ namespace ModelFactory {
 // "Private" method using an anonymous namespace
 namespace {
 inline std::tuple<std::vector<Vertex>, std::vector<uint16_t>> getGroundVerticesAndIndices(float extent) {
-  std::vector<Vertex> vertices = {{glm::vec3(-extent, 0.0f, -extent), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)},
-                                  {glm::vec3(-extent, 0.0f, extent), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)},
-                                  {glm::vec3(extent, 0.0f, extent), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)},
-                                  {glm::vec3(extent, 0.0f, -extent), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)}};
+  std::vector<Vertex> vertices = {{glm::vec3(-extent, 0.0f, -extent), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)},
+                                  {glm::vec3(-extent, 0.0f, extent), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
+                                  {glm::vec3(extent, 0.0f, extent), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+                                  {glm::vec3(extent, 0.0f, -extent), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)}};
 
   std::vector<uint16_t> indices = {0, 2, 1, 0, 3, 2};
 
