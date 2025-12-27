@@ -7,6 +7,7 @@
 #include <xre/vulkan_handler.h>
 #include <xre/buffer.h>
 #include <xre/vulkan_utils.h>
+#include <xre/utils.h>
 
 // Other includes
 #include <string>
@@ -24,14 +25,12 @@ public:
 private:
   inline static VulkanHandler s_vulkan_handler;
 
-  void createTextureImage(const std::string& path);
-  void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+  VkImage createTextureImage(const std::string& path);
+  void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout);
   void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
-  void createTextureImageView();
+  void createTextureImageView(VkImage image);
   void createTextureSampler();
 
-  VkImage textureImage;
-  VkDeviceMemory textureImageMemory;
-  VkImageView textureImageView;
-  VkSampler textureSampler;
+  VkImageView m_texture_image_view;
+  VkSampler m_texture_sampler;
 };

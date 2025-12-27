@@ -31,5 +31,6 @@ private:
   // Descriptor set
   VkDescriptorSet m_descriptor_set = nullptr;
 
+  // Optional texture
   Texture *m_texture = nullptr;
 };
