@@ -6,9 +6,11 @@
 #include <xre/material.h>
 #include <xre/model_factory.h>
 #include <xre/line.h>
+#include <xre/text.h>
 
 // Other includes
 #include <memory>
+#include <string>
 
 class ResourceManager {
 public:
@@ -36,6 +38,9 @@ public:
   // Methods to create lines
   std::shared_ptr<Line> line(float thickness, float length, std::shared_ptr<Material> material);
   std::shared_ptr<Line> line(float thickness, float length, std::shared_ptr<Material> material, glm::vec3 color);
+
+  // Methods to create text
+  std::shared_ptr<Text> text(std::string sentence);
 
 private:
   std::shared_ptr<VulkanHandler> m_vulkan_handler;

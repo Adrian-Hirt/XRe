@@ -1,6 +1,11 @@
 #include <xre/text.h>
 
-text_char_t Text::computeTextureOffsets(int letter) {
+Text::Text(const std::string sentence, std::shared_ptr<VulkanHandler> vulkan_handler) {
+  m_vulkan_handler = vulkan_handler;
+  buildMeshesFromSentence(sentence);
+}
+
+TextChar Text::computeTextureOffsets(int letter) {
   int row = letter / 32;
   int column = letter % 32;
 
@@ -9,7 +14,7 @@ text_char_t Text::computeTextureOffsets(int letter) {
   float top = row * Y_STEP;
   float bottom = top + Y_STEP;
 
-  text_char_t character;
+  TextChar character;
   character.left = left;
   character.right = right;
   character.top = top;
@@ -18,21 +23,17 @@ text_char_t Text::computeTextureOffsets(int letter) {
   return character;
 }
 
-Text::Text(const char *sentence) { buildMeshesFromSentence(sentence); }
-
-void Text::buildMeshesFromSentence(const char *sentence) {
-  int lenght = strlen(sentence);
-
+void Text::buildMeshesFromSentence(const std::string sentence) {
+  int lenght = sentence.length();
   float x_offset = -0.95f;
   float char_height = 0.1;
   float char_width = 0.05f;
 
-  DirectX::XMFLOAT3 normal = {0.0f, 0.0f, 1.0f};
+  glm::vec3 normal = { 0.0f, 0.0f, 1.0f };
 
-  std::vector<vertex_t> vertices;
-  std::vector<unsigned int> indices;
-
-  unsigned int current_index = 0;
+  std::vector<Vertex> vertices;
+  std::vector<uint16_t> indices;
+  uint16_t current_index = 0;
 
   for (int i = 0; i < lenght; i++) {
     int letter = ((int)sentence[i]) - 32;
@@ -46,43 +47,40 @@ void Text::buildMeshesFromSentence(const char *sentence) {
       // Space, just create a space between the meshes
       x_offset += char_width;
     } else {
-      text_char_t text_character = computeTextureOffsets(letter);
+      TextChar text_character = computeTextureOffsets(letter);
 
+      // clang-format off
       // Build vertices, for now with a "default" size and position
-      vertices.push_back({DirectX::XMFLOAT3(x_offset, 0.95f, 0.0f), normal, DirectX::XMFLOAT2(text_character.left, text_character.top)});
-      vertices.push_back(
-          {DirectX::XMFLOAT3(x_offset + char_width, 0.95f, 0.0f), normal, DirectX::XMFLOAT2(text_character.right, text_character.top)});
-      vertices.push_back({DirectX::XMFLOAT3(x_offset + char_width, 0.95f - char_height, 0.0f), normal,
-                          DirectX::XMFLOAT2(text_character.right, text_character.bottom)});
-      vertices.push_back(
-          {DirectX::XMFLOAT3(x_offset, 0.95f - char_height, 0.0f), normal, DirectX::XMFLOAT2(text_character.left, text_character.bottom)});
+      vertices.push_back({glm::vec3(x_offset,              0.0f, 0.0f),               normal, glm::vec2(text_character.left, text_character.top)});
+      vertices.push_back({glm::vec3(x_offset + char_width, 0.0f, 0.0f),               normal, glm::vec2(text_character.right, text_character.top)});
+      vertices.push_back({glm::vec3(x_offset + char_width, 0.0f - char_height, 0.0f), normal, glm::vec2(text_character.right, text_character.bottom)});
+      vertices.push_back({glm::vec3(x_offset,              0.0f - char_height, 0.0f), normal, glm::vec2(text_character.left, text_character.bottom)});
+      // clang-format on
 
       x_offset += char_width;
 
       // Add indices
-      indices.insert(indices.end(),
-                     {current_index, current_index + 1, current_index + 2, current_index + 3, current_index, current_index + 2});
+      for (uint16_t offset : {0,1,2,3,0,2}) {
+        indices.push_back(current_index + offset);
+      }
 
       // Increase index counter
       current_index += 4;
     }
   }
 
-  // Call general initialize method
-  initialize(vertices, indices);
+  // Create the mesh
+  Mesh mesh = Mesh(vertices, indices, m_vulkan_handler);
+  std::vector<Mesh> meshes = { mesh };
 
-  // Load the texture
-  std::wstring filepath = Utils::stringToWString(DATA_FOLDER "/fonts/DejaVuSansMono128NoAA.png");
-  ID3D11Resource *texture; // Throwaway variable
-  HRESULT result = DirectX::CreateWICTextureFromFile(s_device, s_device_context, filepath.c_str(), &texture, &m_texture_view);
-  Utils::checkHresult(result, "Failed to load the texture");
+  // Create the texture and the material
+  std::shared_ptr<Texture> texture = std::make_shared<Texture>(DATA_FOLDER "fonts/DejaVuSansMono128NoAA.png", m_vulkan_handler);
+  std::shared_ptr<Material> material = std::make_shared<Material>(SHADERS_FOLDER "vk/texture.vert.spv", SHADERS_FOLDER "vk/texture.frag.spv", texture, m_vulkan_handler);
 
-  m_shader = Shader::loadOrCreate(SHADERS_FOLDER "/bitmap.hlsl");
+  // Create the model
+  m_model = std::make_shared<Model>(meshes, glm::vec3(1.0f, 0.0f, 0.0f), material);
 }
 
-void Text::render() {
-  m_shader.activate();
-  m_shader.updatePerModelConstantBuffer();
-
-  Renderable::render();
+std::shared_ptr<Model> Text::getModel() {
+  return m_model;
 }

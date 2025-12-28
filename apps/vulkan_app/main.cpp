@@ -24,6 +24,9 @@ public:
   std::shared_ptr<Line> line = res.line(0.003f, 2.0f, material, {1.0f, 0.0f, 0.0f});
   XrTime last_time = 0;
 
+  // Create some text with some valid and some invalid characters
+  std::shared_ptr<Text> text = res.text("This is a sample text :) カタカナ");
+
   std::shared_ptr<SceneNode> root_node = std::make_shared<SceneNode>();
   std::shared_ptr<SceneNode> floor_node = std::make_shared<SceneNode>(floor);
   std::shared_ptr<SceneNode> cube1_node = std::make_shared<SceneNode>(cube1);
@@ -31,6 +34,7 @@ public:
   std::shared_ptr<SceneNode> sphere1_node = std::make_shared<SceneNode>(sphere1);
   std::shared_ptr<SceneNode> sphere2_node = std::make_shared<SceneNode>(sphere2);
   std::shared_ptr<SceneNode> cube_node = std::make_shared<SceneNode>(cube);
+  std::shared_ptr<SceneNode> text_node = std::make_shared<SceneNode>(text->getModel());
 
   bool forward = true;
 
@@ -48,6 +52,7 @@ public:
     root_node->addChildNode(sphere1_node);
     root_node->addChildNode(sphere2_node);
     root_node->addChildNode(cube_node);
+    root_node->addChildNode(text_node);
 
     // Update initial transforms
     cube1_node->setScale(0.1f, 0.1f, 0.1f);
@@ -59,6 +64,9 @@ public:
     sphere2_node->setPosition(5.0f, 0.0f, -4.0f);
     cube_node->scale(2.0f, 0.5f, 2.0f);
     cube_node->setPosition(4.0f, 0.5f, 4.0f);
+
+    text_node->setPosition(0.0f, 1.5f, -1.0f);
+    text_node->updateTransformation();
 
     root_node->updateTransformation();
 

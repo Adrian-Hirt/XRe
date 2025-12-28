@@ -48,3 +48,7 @@ std::shared_ptr<Model> ResourceManager::model(const char *model_path, std::share
 std::shared_ptr<Model> ResourceManager::model(const char *model_path, std::shared_ptr<Material> material, glm::vec3 color) {
   return std::make_shared<Model>(model_path, color, material, m_vulkan_handler);
 }
+
+std::shared_ptr<Text> ResourceManager::text(std::string sentence) {
+  return std::make_shared<Text>(sentence, m_vulkan_handler);
+}

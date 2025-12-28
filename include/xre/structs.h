@@ -77,9 +77,9 @@ struct Vertex {
   bool operator==(const Vertex &other) const { return position == other.position && texture_coord == other.texture_coord; }
 };
 
-// typedef struct text_char_t {
-//   float left;
-//   float right;
-//   float top;
-//   float bottom;
-// } text_char_t;
+struct TextChar {
+  float left;
+  float right;
+  float top;
+  float bottom;
+};

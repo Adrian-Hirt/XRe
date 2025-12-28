@@ -1,23 +1,23 @@
 #pragma once
 
-// DirectX includes
-#include <DirectXTex/WICTextureLoader11.h>
-
 // XRe includes
+#include <xre/model.h>
 #include <xre/structs.h>
-#include <xre/utils.h>
-#include <xre/renderable.h>
+#include <xre/model.h>
+#include <xre/vulkan_handler.h>
+#include <xre/scene_node.h>
+// #include <xre/utils.h>
+// #include <xre/renderable.h>
 
 // Other includes
 #include <fstream>
-#include <vector>
+#include <memory>
+#include <string>
 
-// TODO: move to an approach using a model with multiple meshes making up the text
-class Text : public Renderable {
+class Text {
 public:
-  Text(const char *sentence);
-
-  void render();
+  Text(const std::string sentence, std::shared_ptr<VulkanHandler> vulkan_handler);
+  std::shared_ptr<Model> getModel();
 
 private:
   // Using the extendes ASCII charset for now, which has 224 characters (skipping control character)
@@ -27,9 +27,9 @@ private:
   const float X_STEP = 1.0f / 32.0f;
   const float Y_STEP = 1.0f / 7.0f;
 
-  // Text does not have a bounding box
-  inline bool hasBoundingBox() override { return false; };
+  void buildMeshesFromSentence(const std::string sentence);
+  inline TextChar computeTextureOffsets(int letter);
 
-  void buildMeshesFromSentence(const char *sentence);
-  inline text_char_t computeTextureOffsets(int letter);
+  std::shared_ptr<VulkanHandler> m_vulkan_handler;
+  std::shared_ptr<Model> m_model;
 };
