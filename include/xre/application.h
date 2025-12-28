@@ -7,7 +7,6 @@
 #include <xre/renderable.h>
 #include <xre/mesh.h>
 #include <xre/model.h>
-#include <xre/model_factory.h>
 // #include <xre/text.h>
 #include <xre/scene_node.h>
 #include <xre/material.h>
