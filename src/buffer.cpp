@@ -71,7 +71,7 @@ void Buffer::loadData(GlobalUniformBufferObject input) {
   unmap();
 }
 
-void Buffer::loadData(stbi_uc* input) {
+void Buffer::loadData(stbi_uc *input) {
   void *data = map();
   memcpy(data, input, m_size);
   unmap();

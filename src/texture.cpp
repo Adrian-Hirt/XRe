@@ -4,18 +4,18 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-Texture::Texture(const std::string& path, std::shared_ptr<VulkanHandler> vulkan_handler) : m_vulkan_handler(vulkan_handler) {
+Texture::Texture(const std::string &path, std::shared_ptr<VulkanHandler> vulkan_handler) : m_vulkan_handler(vulkan_handler) {
   VkImage texture_image = createTextureImage(path);
   createTextureImageView(texture_image);
   createTextureSampler();
 }
 
-VkImage Texture::createTextureImage(const std::string& path) {
+VkImage Texture::createTextureImage(const std::string &path) {
   VkResult result;
 
   // Load the image with the STB image library
   int texture_width, texture_height, texture_channels;
-  stbi_uc* pixels = stbi_load(path.c_str(), &texture_width, &texture_height, &texture_channels, STBI_rgb_alpha);
+  stbi_uc *pixels = stbi_load(path.c_str(), &texture_width, &texture_height, &texture_channels, STBI_rgb_alpha);
   VkDeviceSize image_size = texture_width * texture_height * 4;
 
   if (!pixels) {
@@ -23,12 +23,8 @@ VkImage Texture::createTextureImage(const std::string& path) {
   }
 
   // Create our staging buffer
-  Buffer staging_buffer = Buffer(
-    m_vulkan_handler->getLogicalDevice(),
-    m_vulkan_handler->getPhysicalDevice(),
-    image_size,
-    VK_BUFFER_USAGE_TRANSFER_SRC_BIT
-  );
+  Buffer staging_buffer =
+      Buffer(m_vulkan_handler->getLogicalDevice(), m_vulkan_handler->getPhysicalDevice(), image_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
 
   // Load pixels into buffer
   staging_buffer.loadData(pixels);
@@ -66,25 +62,23 @@ VkImage Texture::createTextureImage(const std::string& path) {
   VkMemoryAllocateInfo allocate_info{};
   allocate_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
   allocate_info.allocationSize = memory_requirements.size;
-  allocate_info.memoryTypeIndex =  VulkanUtils::findMemoryType(
-    m_vulkan_handler->getPhysicalDevice(),
-    memory_requirements.memoryTypeBits,
-    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-  );
+  allocate_info.memoryTypeIndex = VulkanUtils::findMemoryType(m_vulkan_handler->getPhysicalDevice(), memory_requirements.memoryTypeBits,
+                                                              VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
   // Allocate and bind the image memory
   VkDeviceMemory texture_image_memory;
   result = vkAllocateMemory(m_vulkan_handler->getLogicalDevice(), &allocate_info, nullptr, &texture_image_memory);
   Utils::checkVkResult(result, "failed to allocate image memory!");
 
-  result = vkBindImageMemory(m_vulkan_handler->getLogicalDevice(), texture_image, texture_image_memory, 0) ;
+  result = vkBindImageMemory(m_vulkan_handler->getLogicalDevice(), texture_image, texture_image_memory, 0);
   Utils::checkVkResult(result, "failed to bing image memory!");
 
   // Transition the image layout to the correct layout VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, then copy
   // the buffer to the image, and then transition the image to the final layout VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL.
   transitionImageLayout(texture_image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
   copyBufferToImage(staging_buffer.getBuffer(), texture_image, static_cast<uint32_t>(texture_width), static_cast<uint32_t>(texture_height));
-  transitionImageLayout(texture_image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+  transitionImageLayout(texture_image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
   // Cleanup
   staging_buffer.destroy();
@@ -128,14 +122,7 @@ void Texture::transitionImageLayout(VkImage image, VkFormat format, VkImageLayou
     Utils::exitWithMessage("unsupported layout transition!");
   }
 
-  vkCmdPipelineBarrier(
-    command_buffer,
-    source_stage, destination_stage,
-    0,
-    0, nullptr,
-    0, nullptr,
-    1, &barrier
-  );
+  vkCmdPipelineBarrier(command_buffer, source_stage, destination_stage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 
   m_vulkan_handler->endSingleTimeCommands(command_buffer);
 }
@@ -152,20 +139,9 @@ void Texture::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, 
   region.imageSubresource.baseArrayLayer = 0;
   region.imageSubresource.layerCount = 1;
   region.imageOffset = {0, 0, 0};
-  region.imageExtent = {
-    width,
-    height,
-    1
-  };
+  region.imageExtent = {width, height, 1};
 
-  vkCmdCopyBufferToImage(
-    command_buffer,
-    buffer,
-    image,
-    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-    1,
-    &region
-  );
+  vkCmdCopyBufferToImage(command_buffer, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
   m_vulkan_handler->endSingleTimeCommands(command_buffer);
 }
@@ -217,10 +193,6 @@ void Texture::createTextureSampler() {
   Utils::checkVkResult(result, "failed to create texture sampler!");
 }
 
-VkImageView Texture::getTextureImageView() {
-  return m_texture_image_view;
-}
+VkImageView Texture::getTextureImageView() { return m_texture_image_view; }
 
-VkSampler Texture::getTextureSampler() {
-  return m_texture_sampler;
-}
+VkSampler Texture::getTextureSampler() { return m_texture_sampler; }

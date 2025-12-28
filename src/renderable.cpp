@@ -46,8 +46,7 @@ void Renderable::initialize(std::vector<Vertex> vertices, std::vector<uint16_t> 
 
     // Create vertex buffer for object oriented bounding boxes.
     size_t size = sizeof(Vertex) * bbox_vertices.size();
-    m_bounding_box_vertex_buffer =
-        new Buffer(device, physical_device, static_cast<VkDeviceSize>(size), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+    m_bounding_box_vertex_buffer = new Buffer(device, physical_device, static_cast<VkDeviceSize>(size), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
     m_bounding_box_vertex_buffer->loadData(bbox_vertices);
     m_bbox_index_count = m_bounding_box.getLineIndices().size();
 

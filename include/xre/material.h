@@ -13,11 +13,12 @@
 
 class Material {
 public:
-  Material(const std::string& vert_path, const std::string& frag_path, std::shared_ptr<VulkanHandler> vulkan_handler);
-  Material(const std::string& vert_path, const std::string& frag_path, std::shared_ptr<Texture> texture, std::shared_ptr<VulkanHandler> vulkan_handler);
+  Material(const std::string &vert_path, const std::string &frag_path, std::shared_ptr<VulkanHandler> vulkan_handler);
+  Material(const std::string &vert_path, const std::string &frag_path, std::shared_ptr<Texture> texture,
+           std::shared_ptr<VulkanHandler> vulkan_handler);
 
   void bind();
-  Buffer* getUniformBuffer();
+  Buffer *getUniformBuffer();
   VkDescriptorSet getDescriptorset();
 
 private:

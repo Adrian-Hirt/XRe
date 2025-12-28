@@ -26,7 +26,7 @@ public:
   virtual void draw(RenderContext &ctx);
   virtual void updateSimulation(XrTime predicted_time);
 
-  ResourceManager& resourceManager();
+  ResourceManager &resourceManager();
 
 private:
   // Handlers

@@ -26,7 +26,7 @@
 
 class VulkanHandler {
 public:
-  VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id, const char* application_name);
+  VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id, const char *application_name);
 
   void setupRenderer();
   void renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf, VkExtent2D resolution,
@@ -43,10 +43,10 @@ public:
   static constexpr uint32_t s_max_descriptors = 20;
 
   VkPipelineLayout createPipelineLayout();
-  VkPipeline createGraphicsPipeline(const std::string& vert_path, const std::string& frag_path);
+  VkPipeline createGraphicsPipeline(const std::string &vert_path, const std::string &frag_path);
   void bindGraphicsPipeline(VkPipeline pipeline);
-  Buffer* createUniformBuffer();
-  VkDescriptorSet allocateDescriptorSet(Buffer* material_uniform_buffer, VkImageView texture_image_view, VkSampler texture_sampler);
+  Buffer *createUniformBuffer();
+  VkDescriptorSet allocateDescriptorSet(Buffer *material_uniform_buffer, VkImageView texture_image_view, VkSampler texture_sampler);
 
   VkCommandBuffer beginSingleTimeCommands();
   void endSingleTimeCommands(VkCommandBuffer commandBuffer);

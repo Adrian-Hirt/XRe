@@ -21,7 +21,7 @@ public:
   void loadData(std::vector<uint16_t> input);
   void loadData(ModelUniformBufferObject input, VkDeviceSize offset);
   void loadData(GlobalUniformBufferObject input);
-  void loadData(stbi_uc* input);
+  void loadData(stbi_uc *input);
 
 private:
   VkDevice m_device = nullptr;

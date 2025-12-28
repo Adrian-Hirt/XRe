@@ -1,6 +1,6 @@
 #include <xre/vulkan_handler.h>
 
-VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id, const char* application_name) {
+VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id, const char *application_name) {
   VkResult result;
   XrResult xr_result;
 
@@ -345,7 +345,7 @@ void VulkanHandler::setupRenderer() {
   sampler_layout_binding.pImmutableSamplers = nullptr;
   sampler_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-  std::array<VkDescriptorSetLayoutBinding, 2> bindings = { ubo_layout_binding, sampler_layout_binding };
+  std::array<VkDescriptorSetLayoutBinding, 2> bindings = {ubo_layout_binding, sampler_layout_binding};
   VkDescriptorSetLayoutCreateInfo layout_create_info{};
   layout_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
   layout_create_info.bindingCount = static_cast<uint32_t>(bindings.size());
@@ -382,7 +382,8 @@ void VulkanHandler::setupRenderer() {
   poolSizes[1].descriptorCount = s_max_descriptors;
 
   VkDescriptorPoolCreateInfo descriptor_pool_create_info{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
-  descriptor_pool_create_info.poolSizeCount = static_cast<uint32_t>(poolSizes.size());;
+  descriptor_pool_create_info.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+  ;
   descriptor_pool_create_info.pPoolSizes = poolSizes.data();
   descriptor_pool_create_info.maxSets = s_max_descriptors;
 
@@ -457,12 +458,13 @@ void VulkanHandler::setupRenderer() {
   Utils::checkVkResult(result, "Failed to create fence");
 }
 
-Buffer* VulkanHandler::createUniformBuffer() {
+Buffer *VulkanHandler::createUniformBuffer() {
   // Create uniform buffer
   return new Buffer(m_device, m_physical_device, m_aligned_size * s_max_models_in_scene, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 }
 
-VkDescriptorSet VulkanHandler::allocateDescriptorSet(Buffer* material_uniform_buffer, VkImageView texture_image_view, VkSampler texture_sampler) {
+VkDescriptorSet VulkanHandler::allocateDescriptorSet(Buffer *material_uniform_buffer, VkImageView texture_image_view,
+                                                     VkSampler texture_sampler) {
   VkDescriptorSetAllocateInfo descriptor_set_allocate_info{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
   descriptor_set_allocate_info.descriptorPool = m_local_descriptor_pool;
   descriptor_set_allocate_info.descriptorSetCount = 1u;
@@ -492,8 +494,7 @@ VkDescriptorSet VulkanHandler::allocateDescriptorSet(Buffer* material_uniform_bu
 
   if (texture_image_view == NULL) {
     vkUpdateDescriptorSets(m_device, 1u, &write_descriptor_set, 0u, nullptr);
-  }
-  else {
+  } else {
     assert(texture_sampler != VK_NULL_HANDLE);
     assert(texture_image_view != VK_NULL_HANDLE);
     std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
@@ -509,11 +510,11 @@ VkDescriptorSet VulkanHandler::allocateDescriptorSet(Buffer* material_uniform_bu
 
     vkUpdateDescriptorSets(m_device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
   }
-  
+
   return descriptor_set;
 }
 
-VkPipeline VulkanHandler::createGraphicsPipeline(const std::string& vert_path, const std::string& frag_path) {
+VkPipeline VulkanHandler::createGraphicsPipeline(const std::string &vert_path, const std::string &frag_path) {
   //------------------------------------------------------------------------------------------------------
   // Shader modules
   //------------------------------------------------------------------------------------------------------
@@ -669,8 +670,8 @@ VkPipeline VulkanHandler::createGraphicsPipeline(const std::string& vert_path, c
 
 VkPipelineLayout VulkanHandler::createPipelineLayout() {
   std::array<VkDescriptorSetLayout, 2> set_layouts = {
-    m_global_descriptor_set_layout, // set = 0
-    m_descriptor_set_layout // set = 1 (local UBO)
+      m_global_descriptor_set_layout, // set = 0
+      m_descriptor_set_layout         // set = 1 (local UBO)
   };
 
   VkPipelineLayoutCreateInfo pipeline_layout_info{};
@@ -875,4 +876,3 @@ void VulkanHandler::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
 
   vkFreeCommandBuffers(m_device, m_command_pool, 1, &commandBuffer);
 }
-

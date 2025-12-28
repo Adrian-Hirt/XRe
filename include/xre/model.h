@@ -63,7 +63,7 @@ private:
   bool m_render_bounding_boxes = false;
 
   bool m_interacted = false;
-  
+
   std::shared_ptr<Material> m_material;
 
   // Scene Node can call render() directly

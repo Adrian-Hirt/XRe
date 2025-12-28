@@ -176,9 +176,7 @@ std::unordered_set<SceneNode *> SceneNode::getTerrainInstances() {
   return result;
 }
 
-bool SceneNode::intersects(std::shared_ptr<SceneNode> other) {
-  return m_model->intersects(other->m_model);
-}
+bool SceneNode::intersects(std::shared_ptr<SceneNode> other) { return m_model->intersects(other->m_model); }
 
 bool SceneNode::intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance) {
   return m_model->intersects(line_start, line_direction, out_distance);

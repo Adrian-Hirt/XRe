@@ -18,7 +18,8 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
   m_vulkan_handler->setupRenderer();
 
   // Create the material for the controllers and hands
-  m_interactions_material = std::make_shared<Material>(SHADERS_FOLDER "vk/ambient.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv", m_vulkan_handler);
+  m_interactions_material =
+      std::make_shared<Material>(SHADERS_FOLDER "vk/ambient.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv", m_vulkan_handler);
 
   // Instruct the handler to initialize the xr actions
   initializeOpenxrActions();
@@ -938,8 +939,8 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, XrCompositionLayerProject
 
     // Render the content to the swapchain, which is done by the Vulkan handler
     m_vulkan_handler->renderFrame(m_view_matrices[i], m_projection_matrices[i], m_render_targets[i][swapchain_image_id]->getFramebuffer(),
-                                 getEyeResolution(i), draw_callback,
-                                 std::bind(&OpenXrHandler::renderInteractions, this, std::placeholders::_1));
+                                  getEyeResolution(i), draw_callback,
+                                  std::bind(&OpenXrHandler::renderInteractions, this, std::placeholders::_1));
 
     // We're done rendering for the current view, so we can release the swapchain image (i.e. tell
     // the OpenXR runtime that we're done with this swapchain image).

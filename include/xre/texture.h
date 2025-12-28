@@ -15,13 +15,13 @@
 
 class Texture {
 public:
-  Texture(const std::string& path, std::shared_ptr<VulkanHandler> vulkan_handler);
+  Texture(const std::string &path, std::shared_ptr<VulkanHandler> vulkan_handler);
 
   VkImageView getTextureImageView();
   VkSampler getTextureSampler();
 
 private:
-  VkImage createTextureImage(const std::string& path);
+  VkImage createTextureImage(const std::string &path);
   void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout);
   void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
   void createTextureImageView(VkImage image);
