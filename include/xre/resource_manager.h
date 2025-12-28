@@ -4,12 +4,15 @@
 #include <xre/vulkan_handler.h>
 #include <xre/texture.h>
 
+// Other includes
+#include <memory>
+
 class ResourceManager {
 public:
-  ResourceManager(VulkanHandler &vulkan_handler);
+  ResourceManager(std::shared_ptr<VulkanHandler> vulkan_handler);
 
   Texture texture(const std::string& path);
 
 private:
-  VulkanHandler& m_vulkan_handler;
+  std::shared_ptr<VulkanHandler> m_vulkan_handler;
 };

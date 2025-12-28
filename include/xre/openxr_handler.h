@@ -28,6 +28,7 @@
 #include <iostream>
 #include <vector>
 #include <functional>
+#include <memory>
 
 class OpenXrHandler {
 public:
@@ -40,7 +41,7 @@ public:
                    std::function<void(RenderContext &)> draw_callback);
 
   // Handlers
-  VulkanHandler m_vulkan_handler;
+  std::shared_ptr<VulkanHandler> m_vulkan_handler;
 
 private:
   // Configs

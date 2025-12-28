@@ -14,14 +14,14 @@ public:
   Material(const std::string& vert_path, const std::string& frag_path);
   Material(const std::string& vert_path, const std::string& frag_path, Texture texture);
   // TODO: replace this by a more sensible architecture
-  static void registerVulkanHandler(VulkanHandler handler);
+  static void registerVulkanHandler(VulkanHandler *handler);
   void bind();
 
   Buffer* getUniformBuffer();
   VkDescriptorSet getDescriptorset();
 
 private:
-  inline static VulkanHandler s_vulkan_handler;
+  inline static VulkanHandler* s_vulkan_handler;
 
   VkPipeline m_graphics_pipeline;
 

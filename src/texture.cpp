@@ -4,7 +4,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-Texture::Texture(const std::string& path, VulkanHandler& vulkan_handler) : m_vulkan_handler(vulkan_handler) {
+Texture::Texture(const std::string& path, std::shared_ptr<VulkanHandler> vulkan_handler) : m_vulkan_handler(vulkan_handler) {
   VkImage texture_image = createTextureImage(path);
   createTextureImageView(texture_image);
   createTextureSampler();
@@ -24,8 +24,8 @@ VkImage Texture::createTextureImage(const std::string& path) {
 
   // Create our staging buffer
   Buffer staging_buffer = Buffer(
-    m_vulkan_handler.getLogicalDevice(),
-    m_vulkan_handler.getPhysicalDevice(),
+    m_vulkan_handler->getLogicalDevice(),
+    m_vulkan_handler->getPhysicalDevice(),
     image_size,
     VK_BUFFER_USAGE_TRANSFER_SRC_BIT
   );
@@ -55,29 +55,29 @@ VkImage Texture::createTextureImage(const std::string& path) {
 
   // Create the image
   VkImage texture_image;
-  result = vkCreateImage(m_vulkan_handler.getLogicalDevice(), &image_create_info, nullptr, &texture_image);
+  result = vkCreateImage(m_vulkan_handler->getLogicalDevice(), &image_create_info, nullptr, &texture_image);
   Utils::checkVkResult(result, "failed to create image!");
 
   // Get the memory requirements from the runtime
   VkMemoryRequirements memory_requirements;
-  vkGetImageMemoryRequirements(m_vulkan_handler.getLogicalDevice(), texture_image, &memory_requirements);
+  vkGetImageMemoryRequirements(m_vulkan_handler->getLogicalDevice(), texture_image, &memory_requirements);
 
   // Setup the info struct to allocate memory
   VkMemoryAllocateInfo allocate_info{};
   allocate_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
   allocate_info.allocationSize = memory_requirements.size;
   allocate_info.memoryTypeIndex =  VulkanUtils::findMemoryType(
-    m_vulkan_handler.getPhysicalDevice(),
+    m_vulkan_handler->getPhysicalDevice(),
     memory_requirements.memoryTypeBits,
     VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
   );
 
   // Allocate and bind the image memory
   VkDeviceMemory texture_image_memory;
-  result = vkAllocateMemory(m_vulkan_handler.getLogicalDevice(), &allocate_info, nullptr, &texture_image_memory);
+  result = vkAllocateMemory(m_vulkan_handler->getLogicalDevice(), &allocate_info, nullptr, &texture_image_memory);
   Utils::checkVkResult(result, "failed to allocate image memory!");
 
-  result = vkBindImageMemory(m_vulkan_handler.getLogicalDevice(), texture_image, texture_image_memory, 0) ;
+  result = vkBindImageMemory(m_vulkan_handler->getLogicalDevice(), texture_image, texture_image_memory, 0) ;
   Utils::checkVkResult(result, "failed to bing image memory!");
 
   // Transition the image layout to the correct layout VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, then copy
@@ -93,7 +93,7 @@ VkImage Texture::createTextureImage(const std::string& path) {
 }
 
 void Texture::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout) {
-  VkCommandBuffer command_buffer = m_vulkan_handler.beginSingleTimeCommands();
+  VkCommandBuffer command_buffer = m_vulkan_handler->beginSingleTimeCommands();
 
   VkPipelineStageFlags source_stage;
   VkPipelineStageFlags destination_stage;
@@ -137,11 +137,11 @@ void Texture::transitionImageLayout(VkImage image, VkFormat format, VkImageLayou
     1, &barrier
   );
 
-  m_vulkan_handler.endSingleTimeCommands(command_buffer);
+  m_vulkan_handler->endSingleTimeCommands(command_buffer);
 }
 
 void Texture::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
-  VkCommandBuffer command_buffer = m_vulkan_handler.beginSingleTimeCommands();
+  VkCommandBuffer command_buffer = m_vulkan_handler->beginSingleTimeCommands();
 
   VkBufferImageCopy region{};
   region.bufferOffset = 0;
@@ -167,7 +167,7 @@ void Texture::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, 
     &region
   );
 
-  m_vulkan_handler.endSingleTimeCommands(command_buffer);
+  m_vulkan_handler->endSingleTimeCommands(command_buffer);
 }
 
 void Texture::createTextureImageView(VkImage image) {
@@ -184,7 +184,7 @@ void Texture::createTextureImageView(VkImage image) {
   image_view_create_info.subresourceRange.baseArrayLayer = 0;
   image_view_create_info.subresourceRange.layerCount = 1;
 
-  result = vkCreateImageView(m_vulkan_handler.getLogicalDevice(), &image_view_create_info, nullptr, &m_texture_image_view);
+  result = vkCreateImageView(m_vulkan_handler->getLogicalDevice(), &image_view_create_info, nullptr, &m_texture_image_view);
   Utils::checkVkResult(result, "failed to create texture image view!");
 }
 
@@ -210,10 +210,10 @@ void Texture::createTextureSampler() {
 
   // Check the max level of anisotropic filtering that the physical device supports
   VkPhysicalDeviceProperties properties{};
-  vkGetPhysicalDeviceProperties(m_vulkan_handler.getPhysicalDevice(), &properties);
+  vkGetPhysicalDeviceProperties(m_vulkan_handler->getPhysicalDevice(), &properties);
   sampler_create_info.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
 
-  result = vkCreateSampler(m_vulkan_handler.getLogicalDevice(), &sampler_create_info, nullptr, &m_texture_sampler);
+  result = vkCreateSampler(m_vulkan_handler->getLogicalDevice(), &sampler_create_info, nullptr, &m_texture_sampler);
   Utils::checkVkResult(result, "failed to create texture sampler!");
 }
 

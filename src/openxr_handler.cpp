@@ -15,11 +15,11 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
   Utils::checkBoolResult(result, "Initializing OpenXR failed!");
 
   // Setup the vulkan renderer
-  m_vulkan_handler.setupRenderer();
+  m_vulkan_handler->setupRenderer();
 
   // TODO: Replace this by a more sensible architecture
-  Renderable::registerDeviceAndPhysicalDevice(m_vulkan_handler.getLogicalDevice(), m_vulkan_handler.getPhysicalDevice());
-  Material::registerVulkanHandler(m_vulkan_handler);
+  Renderable::registerDeviceAndPhysicalDevice(m_vulkan_handler->getLogicalDevice(), m_vulkan_handler->getPhysicalDevice());
+  Material::registerVulkanHandler(m_vulkan_handler.get());
   // Texture::registerVulkanHandler(m_vulkan_handler);
 
   // Create the material for the controllers and hands
@@ -135,17 +135,17 @@ bool OpenXrHandler::initializeOpenxr() {
   //------------------------------------------------------------------------------------------------------
   // Vulkan handler
   //------------------------------------------------------------------------------------------------------
-  m_vulkan_handler = VulkanHandler(m_openxr_instance, m_openxr_system_id);
+  m_vulkan_handler = std::make_shared<VulkanHandler>(m_openxr_instance, m_openxr_system_id);
 
   //------------------------------------------------------------------------------------------------------
   // OpenXR Session
   //------------------------------------------------------------------------------------------------------
   // Create session with Vulkan graphics binding
   XrGraphicsBindingVulkanKHR graphics_binding{XR_TYPE_GRAPHICS_BINDING_VULKAN_KHR};
-  graphics_binding.device = m_vulkan_handler.getLogicalDevice();
-  graphics_binding.instance = m_vulkan_handler.getInstance();
-  graphics_binding.physicalDevice = m_vulkan_handler.getPhysicalDevice();
-  graphics_binding.queueFamilyIndex = m_vulkan_handler.getQueueFamilyIndex();
+  graphics_binding.device = m_vulkan_handler->getLogicalDevice();
+  graphics_binding.instance = m_vulkan_handler->getInstance();
+  graphics_binding.physicalDevice = m_vulkan_handler->getPhysicalDevice();
+  graphics_binding.queueFamilyIndex = m_vulkan_handler->getQueueFamilyIndex();
   graphics_binding.queueIndex = 0u;
 
   // Only load the handtracking extensions if we actually can use them
@@ -322,8 +322,8 @@ bool OpenXrHandler::initializeOpenxr() {
       RenderTarget *&render_target = swapchain_render_targets[j];
 
       VkImage image = swapchain_images[j].image;
-      render_target = new RenderTarget(m_vulkan_handler.getLogicalDevice(), m_vulkan_handler.getPhysicalDevice(), image,
-                                       getEyeResolution(i), VulkanHandler::s_color_format, m_vulkan_handler.getRenderPass());
+      render_target = new RenderTarget(m_vulkan_handler->getLogicalDevice(), m_vulkan_handler->getPhysicalDevice(), image,
+                                       getEyeResolution(i), VulkanHandler::s_color_format, m_vulkan_handler->getRenderPass());
     }
   }
 
@@ -942,7 +942,7 @@ void OpenXrHandler::renderLayer(XrTime predicted_time, XrCompositionLayerProject
     Utils::checkXrResult(result, "Could not wait for the swapchain image");
 
     // Render the content to the swapchain, which is done by the Vulkan handler
-    m_vulkan_handler.renderFrame(m_view_matrices[i], m_projection_matrices[i], m_render_targets[i][swapchain_image_id]->getFramebuffer(),
+    m_vulkan_handler->renderFrame(m_view_matrices[i], m_projection_matrices[i], m_render_targets[i][swapchain_image_id]->getFramebuffer(),
                                  getEyeResolution(i), draw_callback,
                                  std::bind(&OpenXrHandler::renderInteractions, this, std::placeholders::_1));
 

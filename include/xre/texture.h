@@ -11,10 +11,11 @@
 
 // Other includes
 #include <string>
+#include <memory>
 
 class Texture {
 public:
-  Texture(const std::string& path, VulkanHandler& vulkan_handler);
+  Texture(const std::string& path, std::shared_ptr<VulkanHandler> vulkan_handler);
 
   VkImageView getTextureImageView();
   VkSampler getTextureSampler();
@@ -28,5 +29,5 @@ private:
 
   VkImageView m_texture_image_view;
   VkSampler m_texture_sampler;
-  VulkanHandler& m_vulkan_handler;
+  std::shared_ptr<VulkanHandler> m_vulkan_handler;
 };
