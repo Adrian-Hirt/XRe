@@ -14,6 +14,9 @@
 #include <xre/texture.h>
 #include <xre/resource_manager.h>
 
+// Other includes
+#include <memory>
+
 class Application {
 public:
   Application(const char *application_name);
@@ -24,12 +27,12 @@ public:
   virtual void draw(RenderContext &ctx);
   virtual void updateSimulation(XrTime predicted_time);
 
-  ResourceManager* resourceManager();
+  ResourceManager& resourceManager();
 
 private:
   // Handlers
-  OpenXrHandler m_open_xr_handler;
+  std::unique_ptr<OpenXrHandler> m_open_xr_handler;
 
   // Resource manager
-  ResourceManager* m_resource_manager;
+  std::shared_ptr<ResourceManager> m_resource_manager;
 };

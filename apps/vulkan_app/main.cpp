@@ -4,7 +4,9 @@ class VulkanApp : public Application {
 public:
   VulkanApp(const char *application_name) : Application(application_name) {};
 
-  Texture texture = resourceManager()->texture(DATA_FOLDER "textures/Wood048_2K-JPG_Color.jpg");
+  ResourceManager& res = resourceManager();
+
+  Texture texture = res.texture(DATA_FOLDER "textures/Wood048_2K-JPG_Color.jpg");
 
   Material material = Material(SHADERS_FOLDER "vk/ambient.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
   Material basic_material = Material(SHADERS_FOLDER "vk/basic.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");

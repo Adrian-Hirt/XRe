@@ -31,7 +31,6 @@
 
 class OpenXrHandler {
 public:
-  OpenXrHandler();
   OpenXrHandler(const char *application_name);
   ~OpenXrHandler();
   VkExtent2D getEyeResolution(size_t eyeIndex) const;
