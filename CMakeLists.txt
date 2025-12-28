@@ -51,6 +51,7 @@ SET(SRCFILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/texture.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/resource_manager.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/text.cpp
+
 )
 
 # Setup clang format

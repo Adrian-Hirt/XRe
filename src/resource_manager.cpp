@@ -33,6 +33,10 @@ std::shared_ptr<Model> ResourceManager::plane(float extent, std::shared_ptr<Mate
   return ModelFactory::createPlane(extent, material, color, m_vulkan_handler);
 }
 
+std::shared_ptr<Model> ResourceManager::quad(std::shared_ptr<Material> material) {
+  return ModelFactory::createQuad(material, DEFAULT_MODEL_COLOR, m_vulkan_handler);
+}
+
 std::shared_ptr<Line> ResourceManager::line(float thickness, float length, std::shared_ptr<Material> material) {
   return line(thickness, length, material, DEFAULT_MODEL_COLOR);
 }

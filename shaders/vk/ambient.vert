@@ -17,12 +17,10 @@ layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inTexCoord;
 
 layout(location = 0) out vec3 color;
-layout(location = 1) out vec3 position; // In world space
 
 void main() {
   // Transform vertex position to world space
   vec4 pos = modelUBO.world * vec4(inPosition, 1.0);
-  position = pos.xyz;
 
   // Transform to clip space
   gl_Position = globalUBO.view_projection * pos;

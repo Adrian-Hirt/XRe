@@ -8,17 +8,19 @@ public:
 
   std::shared_ptr<Texture> texture = res.texture(DATA_FOLDER "textures/Wood048_2K-JPG_Color.jpg");
   std::shared_ptr<Texture> texture2 = res.texture(DATA_FOLDER "textures/Tiles012_2K-JPG_Color.jpg");
+  std::shared_ptr<Texture> texture3 = res.texture(DATA_FOLDER "textures/Bricks090_2K-JPG_Color.jpg");
 
   std::shared_ptr<Material> material = res.material(SHADERS_FOLDER "vk/ambient.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
   std::shared_ptr<Material> basic_material = res.material(SHADERS_FOLDER "vk/basic.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
   std::shared_ptr<Material> texture_material = res.material(SHADERS_FOLDER "vk/texture.vert.spv", SHADERS_FOLDER "vk/texture.frag.spv", texture);
   std::shared_ptr<Material> texture2_material = res.material(SHADERS_FOLDER "vk/texture.vert.spv", SHADERS_FOLDER "vk/texture.frag.spv", texture2);
+  std::shared_ptr<Material> static_image_material = res.material(SHADERS_FOLDER "vk/bitmap.vert.spv", SHADERS_FOLDER "vk/texture.frag.spv", texture3);
 
   std::shared_ptr<Model> cube1 = res.cube(basic_material, {0.0f, 1.0f, 0.0f});
   std::shared_ptr<Model> cube2 = res.cube(material, {0.0f, 1.0f, 0.0f});
   std::shared_ptr<Model> sphere1 = res.sphere(material);
   std::shared_ptr<Model> sphere2 = res.sphere(material);
-
+  std::shared_ptr<Model> quad = res.quad(static_image_material);
   std::shared_ptr<Model> floor = res.plane(10, texture_material);
   std::shared_ptr<Model> cube = res.cube(texture2_material);
   std::shared_ptr<Line> line = res.line(0.003f, 2.0f, material, {1.0f, 0.0f, 0.0f});
@@ -35,6 +37,7 @@ public:
   std::shared_ptr<SceneNode> sphere2_node = std::make_shared<SceneNode>(sphere2);
   std::shared_ptr<SceneNode> cube_node = std::make_shared<SceneNode>(cube);
   std::shared_ptr<SceneNode> text_node = std::make_shared<SceneNode>(text->getModel());
+  std::shared_ptr<SceneNode> quad_node = std::make_shared<SceneNode>(quad);
 
   bool forward = true;
 
@@ -53,6 +56,7 @@ public:
     root_node->addChildNode(sphere2_node);
     root_node->addChildNode(cube_node);
     root_node->addChildNode(text_node);
+    root_node->addChildNode(quad_node);
 
     // Update initial transforms
     cube1_node->setScale(0.1f, 0.1f, 0.1f);
@@ -64,9 +68,10 @@ public:
     sphere2_node->setPosition(5.0f, 0.0f, -4.0f);
     cube_node->scale(2.0f, 0.5f, 2.0f);
     cube_node->setPosition(4.0f, 0.5f, 4.0f);
-
     text_node->setPosition(0.0f, 1.5f, -1.0f);
-    text_node->updateTransformation();
+
+    quad_node->translate(0.8f, 0.8f, 0.0f);
+    quad_node->scale(0.2f, 0.2f, 0.2f);
 
     root_node->updateTransformation();
 

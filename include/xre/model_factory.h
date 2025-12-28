@@ -23,6 +23,17 @@ inline std::tuple<std::vector<Vertex>, std::vector<uint16_t>> getPlaneVerticesAn
   return {vertices, indices};
 }
 
+inline std::tuple<std::vector<Vertex>, std::vector<uint16_t>> getQuadVerticesAndIndices() {
+  std::vector<Vertex> vertices = {{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)},
+                                  {glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
+                                  {glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+                                  {glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)}};
+
+  std::vector<uint16_t> indices = {0, 2, 1, 0, 3, 2};
+
+  return {vertices, indices};
+}
+
 inline std::tuple<std::vector<Vertex>, std::vector<uint16_t>> getCubeVerticesAndIndices() {
   std::vector<Vertex> vertices{
       // front face
@@ -81,6 +92,13 @@ inline std::shared_ptr<Model> createCube(glm::vec3 color, std::shared_ptr<Materi
 inline std::shared_ptr<Model> createPlane(float extent, std::shared_ptr<Material> material, glm::vec3 color,
                                           std::shared_ptr<VulkanHandler> vulkan_handler) {
   auto [vertices, indices] = getPlaneVerticesAndIndices(extent);
+
+  Mesh plane_mesh = Mesh(vertices, indices, vulkan_handler);
+  return std::make_shared<Model>(std::vector<Mesh>{plane_mesh}, color, material);
+}
+
+inline std::shared_ptr<Model> createQuad(std::shared_ptr<Material> material, glm::vec3 color, std::shared_ptr<VulkanHandler> vulkan_handler) {
+  auto [vertices, indices] = getQuadVerticesAndIndices();
 
   Mesh plane_mesh = Mesh(vertices, indices, vulkan_handler);
   return std::make_shared<Model>(std::vector<Mesh>{plane_mesh}, color, material);

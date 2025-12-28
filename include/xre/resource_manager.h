@@ -30,6 +30,7 @@ public:
   std::shared_ptr<Model> sphere(std::shared_ptr<Material> material, glm::vec3 color);
   std::shared_ptr<Model> plane(float extent, std::shared_ptr<Material> material);
   std::shared_ptr<Model> plane(float extent, std::shared_ptr<Material> material, glm::vec3 color);
+  std::shared_ptr<Model> quad(std::shared_ptr<Material> material);
 
   // Method to create a model from loading the geometry from a .obj file
   std::shared_ptr<Model> model(const char *model_path, std::shared_ptr<Material> material);

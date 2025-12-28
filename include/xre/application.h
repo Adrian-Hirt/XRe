@@ -1,8 +1,6 @@
 #pragma once
 
 // XRe includes
-#include <xre/line.h>
-// #include <xre/bitmap.h>
 #include <xre/openxr_handler.h>
 #include <xre/renderable.h>
 #include <xre/mesh.h>

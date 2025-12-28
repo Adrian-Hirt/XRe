@@ -72,7 +72,7 @@ void SceneNode::updateTransformation() {
 }
 
 void SceneNode::rotate(float roll, float pitch, float yaw) {
-  auto rotation = glm::quat(glm::vec3(pitch, yaw, roll));
+  auto rotation = glm::quat(glm::vec3(roll, pitch, yaw));
   rotate(rotation);
 }
 

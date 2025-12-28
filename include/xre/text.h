@@ -5,12 +5,8 @@
 #include <xre/structs.h>
 #include <xre/model.h>
 #include <xre/vulkan_handler.h>
-#include <xre/scene_node.h>
-// #include <xre/utils.h>
-// #include <xre/renderable.h>
 
 // Other includes
-#include <fstream>
 #include <memory>
 #include <string>
 
