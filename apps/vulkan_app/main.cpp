@@ -19,7 +19,7 @@ public:
 
   std::shared_ptr<Model> floor = res.plane(10, texture_material);
   std::shared_ptr<Model> cube = res.cube({0.0f, 1.0f, 0.0f}, material);
-  // Line line = Line(0.003f, 2.0f, {1.0f, 0.0f, 0.0f}, material);
+  std::shared_ptr<Line> line = res.line(0.003f, 2.0f, {1.0f, 0.0f, 0.0f}, material);
   XrTime last_time = 0;
 
   std::shared_ptr<SceneNode> root_node = std::make_shared<SceneNode>();
@@ -118,7 +118,7 @@ public:
       cube1->resetColor();
     }
 
-    // line.render(ctx);
+    line->render(ctx);
   };
 };
 

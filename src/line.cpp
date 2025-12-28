@@ -1,6 +1,5 @@
 #include <xre/line.h>
 
-Line::Line(float thickness, float length, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler) : Line::Line(thickness, length, {0.0f, 0.0f, 0.0f}, material, vulkan_handler) {}
 Line::Line(float thickness, float length, glm::vec3 color, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler) {
   m_line_color = color;
   m_model = ModelFactory::createCube(m_line_color, material, vulkan_handler);

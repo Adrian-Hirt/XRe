@@ -5,6 +5,7 @@
 #include <xre/texture.h>
 #include <xre/material.h>
 #include <xre/model_factory.h>
+#include <xre/line.h>
 
 // Other includes
 #include <memory>
@@ -24,6 +25,10 @@ public:
   std::shared_ptr<Model> cube(glm::vec3 color, std::shared_ptr<Material> material);
   std::shared_ptr<Model> sphere(std::shared_ptr<Material> material);
   std::shared_ptr<Model> plane(float extent, std::shared_ptr<Material> material);
+
+  // Methods to create lines
+  std::shared_ptr<Line> line(float thickness, float length, std::shared_ptr<Material> material);
+  std::shared_ptr<Line> line(float thickness, float length, glm::vec3 color, std::shared_ptr<Material> material);
 
 private:
   std::shared_ptr<VulkanHandler> m_vulkan_handler;

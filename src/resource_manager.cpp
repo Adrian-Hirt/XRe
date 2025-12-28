@@ -25,3 +25,12 @@ std::shared_ptr<Model> ResourceManager::sphere(std::shared_ptr<Material> materia
 std::shared_ptr<Model> ResourceManager::plane(float extent, std::shared_ptr<Material> material) {
   return ModelFactory::createPlane(extent, material, m_vulkan_handler);
 }
+
+std::shared_ptr<Line> ResourceManager::line(float thickness, float length, glm::vec3 color, std::shared_ptr<Material> material) {
+  return std::make_shared<Line>(thickness, length, color, material, m_vulkan_handler);
+}
+
+std::shared_ptr<Line> ResourceManager::line(float thickness, float length, std::shared_ptr<Material> material) {
+  glm::vec3 default_color = {1.0f, 1.0f, 1.0f};
+  return std::make_shared<Line>(thickness, length, default_color, material, m_vulkan_handler);
+}

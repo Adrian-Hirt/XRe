@@ -12,7 +12,6 @@
 
 class Line {
 public:
-  Line(float thickness, float length, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler);
   Line(float thickness, float length, glm::vec3 color, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler);
 
   void render(RenderContext &ctx);
