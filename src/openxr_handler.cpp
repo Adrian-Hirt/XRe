@@ -130,7 +130,7 @@ bool OpenXrHandler::initializeOpenxr() {
   //------------------------------------------------------------------------------------------------------
   // Vulkan handler
   //------------------------------------------------------------------------------------------------------
-  m_vulkan_handler = std::make_shared<VulkanHandler>(m_openxr_instance, m_openxr_system_id);
+  m_vulkan_handler = std::make_shared<VulkanHandler>(m_openxr_instance, m_openxr_system_id, m_application_name);
 
   //------------------------------------------------------------------------------------------------------
   // OpenXR Session
@@ -975,10 +975,6 @@ void OpenXrHandler::renderInteractions(RenderContext &ctx) {
 
 void OpenXrHandler::updateCurrentOriginForTeleport(glm::vec3 teleport_location) {
   glm::vec3 difference_vector = teleport_location - m_headset_position;
-
-  // FIXME: Set the Y value to 0, such that we don't teleport "down" into the floor.
-  // We'll need to have some reliable method to determine the current y value of the floor
-  // (i.e. mesh with terrain flag) under the HMD position to fix this.
   difference_vector.y += m_headset_position.y;
   m_current_origin = difference_vector;
 }

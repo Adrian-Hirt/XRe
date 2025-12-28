@@ -1,8 +1,6 @@
 #include <xre/vulkan_handler.h>
 
-VulkanHandler::VulkanHandler() {};
-
-VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
+VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id, const char* application_name) {
   VkResult result;
   XrResult xr_result;
 
@@ -63,7 +61,7 @@ VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id) {
   // Create Vulkan instance
   VkApplicationInfo vulkan_app_info{};
   vulkan_app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-  vulkan_app_info.pApplicationName = "XRe Application"; // TODO
+  vulkan_app_info.pApplicationName = application_name;
   vulkan_app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
   vulkan_app_info.pEngineName = "XRe";
   vulkan_app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);

@@ -26,8 +26,7 @@
 
 class VulkanHandler {
 public:
-  VulkanHandler();
-  VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id);
+  VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id, const char* application_name);
 
   void setupRenderer();
   void renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf, VkExtent2D resolution,
