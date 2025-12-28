@@ -14,7 +14,7 @@ Material::Material(const std::string& vert_path, const std::string& frag_path, s
   m_descriptor_set = m_vulkan_handler->allocateDescriptorSet(m_uniform_buffer, NULL, NULL);
 }
 
-Material::Material(const std::string& vert_path, const std::string& frag_path, Texture texture, std::shared_ptr<VulkanHandler> vulkan_handler) {
+Material::Material(const std::string& vert_path, const std::string& frag_path, std::shared_ptr<Texture> texture, std::shared_ptr<VulkanHandler> vulkan_handler) {
   // Bind the vulkan handler
   m_vulkan_handler = vulkan_handler;
 
@@ -27,8 +27,8 @@ Material::Material(const std::string& vert_path, const std::string& frag_path, T
   // Create descriptor set
   m_descriptor_set = m_vulkan_handler->allocateDescriptorSet(
     m_uniform_buffer,
-    texture.getTextureImageView(),
-    texture.getTextureSampler()
+    texture->getTextureImageView(),
+    texture->getTextureSampler()
   );
 }
 

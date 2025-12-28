@@ -13,11 +13,11 @@ class ResourceManager {
 public:
   ResourceManager(std::shared_ptr<VulkanHandler> vulkan_handler);
 
-  Texture texture(const std::string& path);
+  std::shared_ptr<Texture> texture(const std::string& path);
 
   // Methods to create materials
   std::shared_ptr<Material> material(const std::string& vert_path, const std::string& frag_path);
-  std::shared_ptr<Material> material(const std::string& vert_path, const std::string& frag_path, Texture texture);
+  std::shared_ptr<Material> material(const std::string& vert_path, const std::string& frag_path, std::shared_ptr<Texture> texture);
 
   // Methods to create models that we have predefined
   // TODO: return unique ptrs and handle ownership correctly

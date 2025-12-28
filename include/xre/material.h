@@ -8,10 +8,13 @@
 #include <xre/buffer.h>
 #include <xre/texture.h>
 
+// Other includes
+#include <memory>
+
 class Material {
 public:
   Material(const std::string& vert_path, const std::string& frag_path, std::shared_ptr<VulkanHandler> vulkan_handler);
-  Material(const std::string& vert_path, const std::string& frag_path, Texture texture, std::shared_ptr<VulkanHandler> vulkan_handler);
+  Material(const std::string& vert_path, const std::string& frag_path, std::shared_ptr<Texture> texture, std::shared_ptr<VulkanHandler> vulkan_handler);
 
   void bind();
   Buffer* getUniformBuffer();
@@ -29,5 +32,5 @@ private:
   VkDescriptorSet m_descriptor_set = nullptr;
 
   // Optional texture
-  Texture *m_texture = nullptr;
+  std::shared_ptr<Texture> m_texture = nullptr;
 };
