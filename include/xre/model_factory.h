@@ -63,11 +63,11 @@ inline Model createCube(glm::vec3 color, std::shared_ptr<Material> material) {
   return Model({cube_mesh}, color, material);
 }
 
-inline Model createCube(glm::vec3 color, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler) {
+inline std::shared_ptr<Model> createCube(glm::vec3 color, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler) {
   auto [vertices, indices] = getCubeVerticesAndIndices();
 
   Mesh cube_mesh = Mesh(vertices, indices, vulkan_handler);
-  return Model({cube_mesh}, color, material);
+  return std::make_shared<Model>(std::vector<Mesh>{cube_mesh}, color, material);
 }
 
 inline Model *createCubePtr(glm::vec3 color, std::shared_ptr<Material> material) {

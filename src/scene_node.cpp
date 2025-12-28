@@ -16,6 +16,11 @@ SceneNode::SceneNode(Model *model, SceneNode &parent) {
   parent.addChildNode(this);
 }
 
+SceneNode::SceneNode(std::shared_ptr<Model> model) {
+  m_model = model.get();
+  m_parent = NULL;
+}
+
 SceneNode::SceneNode(Renderable *renderable) { m_renderable = renderable; }
 
 SceneNode::SceneNode(Renderable *renderable, SceneNode &parent) {

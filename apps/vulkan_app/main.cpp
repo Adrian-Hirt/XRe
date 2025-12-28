@@ -12,20 +12,20 @@ public:
   std::shared_ptr<Material> basic_material = res.material(SHADERS_FOLDER "vk/basic.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
   std::shared_ptr<Material> texture_material = res.material(SHADERS_FOLDER "vk/texture.vert.spv", SHADERS_FOLDER "vk/texture.frag.spv", texture);
 
-  Model cube1 = res.cube({0.0f, 1.0f, 0.0f}, basic_material);
-  Model cube2 = res.cube({0.0f, 1.0f, 0.0f}, material);
+  std::shared_ptr<Model> cube1 = res.cube({0.0f, 1.0f, 0.0f}, basic_material);
+  std::shared_ptr<Model> cube2 = res.cube({0.0f, 1.0f, 0.0f}, material);
   Model sphere1 = ModelFactory::createSphere(material);
   Model sphere2 = ModelFactory::createSphere(material);
 
   Model floor = ModelFactory::createGroundPlane(10, texture_material);
-  Model cube = res.cube({0.0f, 1.0f, 0.0f}, material);
+  std::shared_ptr<Model> cube = res.cube({0.0f, 1.0f, 0.0f}, material);
   Line line = Line(0.003f, 2.0f, {1.0f, 0.0f, 0.0f}, material);
   XrTime last_time = 0;
 
   SceneNode root_node = SceneNode();
   SceneNode floor_node = SceneNode(&floor);
-  SceneNode cube1_node = SceneNode(&cube1);
-  SceneNode cube2_node = SceneNode(&cube2);
+  SceneNode cube1_node = SceneNode(cube1);
+  SceneNode cube2_node = SceneNode(cube2);
   SceneNode sphere1_node = SceneNode(&sphere1);
   SceneNode sphere2_node = SceneNode(&sphere2);
 
@@ -55,8 +55,8 @@ public:
     sphere2_node.setPosition(5.0f, 0.0f, -4.0f);
     root_node.updateTransformation();
 
-    cube1.toggleRenderBoundingBoxes();
-    cube2.toggleRenderBoundingBoxes();
+    cube1->toggleRenderBoundingBoxes();
+    cube2->toggleRenderBoundingBoxes();
     // sphere.toggleRenderBoundingBoxes();
 
     cube1_node.setGrabbable(true);
@@ -113,9 +113,9 @@ public:
     root_node.render(ctx);
 
     if (cube1_node.intersects(cube2_node)) {
-      cube1.setColor({1.0f, 0.0f, 0.0f});
+      cube1->setColor({1.0f, 0.0f, 0.0f});
     } else {
-      cube1.resetColor();
+      cube1->resetColor();
     }
 
     line.render(ctx);

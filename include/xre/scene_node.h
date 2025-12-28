@@ -4,16 +4,22 @@
 #include <xre/model.h>
 #include <xre/renderable.h>
 
+// GLM includes
+#include <glm/glm/vec3.hpp>
+
 // Other includes
 #include <vector>
-#include <glm/glm/vec3.hpp>
 #include <unordered_set>
+#include <memory>
 
 class SceneNode {
 public:
   SceneNode();
   SceneNode(Model *model);
   SceneNode(Model *model, SceneNode &parent);
+
+  SceneNode(std::shared_ptr<Model> model);
+
   SceneNode(Renderable *model);
   SceneNode(Renderable *model, SceneNode &parent);
   ~SceneNode();
