@@ -17,7 +17,7 @@
 class Controller {
 public:
   // Constructor
-  Controller(Material* material);
+  Controller(std::shared_ptr<Material> material);
 
   // Render the controller
   void render(RenderContext &ctx);

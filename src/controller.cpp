@@ -1,6 +1,6 @@
 #include <xre/controller.h>
 
-Controller::Controller(Material* material) {
+Controller::Controller(std::shared_ptr<Material> material) {
   // Create the model for visualizing the controllers
   m_model = ModelFactory::createCube({0.67f, 0.84f, 0.9f}, material);
   m_root_node = SceneNode();

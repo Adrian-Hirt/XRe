@@ -368,9 +368,8 @@ void OpenXrHandler::initializeOpenxrActions() {
   XrResult result;
 
   // Create controllers for left and right hands
-  // TODO: Fix passing of the material
-  m_left_controller = new Controller(m_interactions_material.get());
-  m_right_controller = new Controller(m_interactions_material.get());
+  m_left_controller = new Controller(m_interactions_material);
+  m_right_controller = new Controller(m_interactions_material);
 
   // Create the action set for the application. Currently, we're only using
   // a single action set for the whole application, later on we might add
@@ -1008,9 +1007,8 @@ void OpenXrHandler::initializeHandTracking() {
     return;
   }
 
-  // TODO: Fix passing of the material
-  m_left_hand = new Hand(XR_HAND_LEFT_EXT, m_interactions_material.get());
-  m_right_hand = new Hand(XR_HAND_RIGHT_EXT, m_interactions_material.get());
+  m_left_hand = new Hand(XR_HAND_LEFT_EXT, m_interactions_material);
+  m_right_hand = new Hand(XR_HAND_RIGHT_EXT, m_interactions_material);
 
   for (Hand *hand : {m_left_hand, m_right_hand}) {
     XrHandTrackerCreateInfoEXT hand_tracker_create_info = {};

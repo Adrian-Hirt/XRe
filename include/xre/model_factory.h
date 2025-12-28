@@ -51,28 +51,28 @@ inline std::tuple<std::vector<Vertex>, std::vector<uint16_t>> getCubeVerticesAnd
 }
 } // namespace
 
-inline Model createCube(glm::vec3 color, Material* material) {
+inline Model createCube(glm::vec3 color, std::shared_ptr<Material> material) {
   auto [vertices, indices] = getCubeVerticesAndIndices();
 
   Mesh cube_mesh = Mesh(vertices, indices);
   return Model({cube_mesh}, color, material);
 }
 
-inline Model *createCubePtr(glm::vec3 color, Material* material) {
+inline Model *createCubePtr(glm::vec3 color, std::shared_ptr<Material> material) {
   auto [vertices, indices] = getCubeVerticesAndIndices();
 
   Mesh cube_mesh = Mesh(vertices, indices);
   return new Model({cube_mesh}, color, material);
 }
 
-inline Model createGroundPlane(float extent, Material* material) {
+inline Model createGroundPlane(float extent,std::shared_ptr<Material> material) {
   auto [vertices, indices] = getGroundVerticesAndIndices(extent);
 
   Mesh ground_mesh = Mesh(vertices, indices);
   return Model({ground_mesh}, material);
 }
 
-inline Model createSphere(Material* material) {
+inline Model createSphere(std::shared_ptr<Material> material) {
   Model sphere = Model(DATA_FOLDER "/models/sphere.obj", material);
 
   return sphere;

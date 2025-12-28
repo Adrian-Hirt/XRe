@@ -14,8 +14,8 @@ Model::Model() {}
 //  1) Vector of meshes for this model
 //  2) Color of the model
 //------------------------------------------------------------------------------------------------------
-Model::Model(std::vector<Mesh> meshes, Material* material) : Model::Model(meshes, glm::vec3(0.8f, 0.8f, 0.8f), material) {}
-Model::Model(std::vector<Mesh> meshes, glm::vec3 color, Material* material) {
+Model::Model(std::vector<Mesh> meshes, std::shared_ptr<Material> material) : Model::Model(meshes, glm::vec3(0.8f, 0.8f, 0.8f), material) {}
+Model::Model(std::vector<Mesh> meshes, glm::vec3 color, std::shared_ptr<Material> material) {
   m_meshes = meshes;
   m_original_model_color = color;
   m_model_color = color;
@@ -24,8 +24,8 @@ Model::Model(std::vector<Mesh> meshes, glm::vec3 color, Material* material) {
   m_material = material;
 }
 
-Model::Model(const char *model_path, Material* material) : Model::Model(model_path, glm::vec3(0.8f, 0.8f, 0.8f), material) {}
-Model::Model(const char *model_path, glm::vec3 color, Material* material) {
+Model::Model(const char *model_path, std::shared_ptr<Material> material) : Model::Model(model_path, glm::vec3(0.8f, 0.8f, 0.8f), material) {}
+Model::Model(const char *model_path, glm::vec3 color, std::shared_ptr<Material> material) {
   loadObj(model_path);
   m_model_color = color;
   m_original_model_color = color;

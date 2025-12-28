@@ -9,10 +9,13 @@
 #include <xre/scene_node.h>
 #include <xre/material.h>
 
+// Other includes
+#include <memory>
+
 class Hand {
 public:
   // Constructor
-  Hand(XrHandEXT hand_identifier, Material* material);
+  Hand(XrHandEXT hand_identifier, std::shared_ptr<Material> material);
 
   // Render the hand
   void render(RenderContext &ctx);
