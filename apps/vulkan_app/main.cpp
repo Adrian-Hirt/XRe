@@ -62,41 +62,29 @@ public:
 
     root_node->updateTransformation();
 
-    cube1->toggleRenderBoundingBoxes();
-    cube2->toggleRenderBoundingBoxes();
-    // sphere.toggleRenderBoundingBoxes();
-
     cube1_node->setGrabbable(true);
-    // cube2_node.setGrabbable(true);
     floor_node->setIsTerrain(true);
     cube_node->setIsTerrain(true);
-
-    // cube1.printBouindingBoxes();
   };
 
   void updateSimulation(XrTime predicted_time) override {
-  //   // compute delta time in seconds
-  //   float dt = 0.0f;
+    // compute delta time in seconds
+    float dt = 0.0f;
 
-  //   // skip first frame
-  //   if (last_time != 0) {
-  //     dt = static_cast<float>(predicted_time - last_time) * 1e-9f; // assuming XrTime is in ns
-  //   }
-  //   last_time = predicted_time;
+    // skip first frame
+    if (last_time != 0) {
+      dt = static_cast<float>(predicted_time - last_time) * 1e-9f; // assuming XrTime is in ns
+    }
+    last_time = predicted_time;
 
-  //   // rotation speed in degrees per second
-  //   constexpr float rotation_speed = 45.0f;
-  //   float angle = rotation_speed * dt;
-
-  //   // apply rotation around Y axis
-  //   glm::quat delta = glm::angleAxis(glm::radians(angle), glm::vec3(0,1,0));
-  //   auto rotation = glm::normalize(delta * cube_node.getRotation());
-  //   cube_node.setRotation(rotation);
+    // movement speed in units per second
+    constexpr float rotation_speed = 1.0f;
+    float translation = rotation_speed * dt;
 
     if (forward) {
-      cube2_node->translate(0.0f, 0.0f, -0.01f);
+      cube2_node->translate(0.0f, 0.0f, -translation);
     } else {
-      cube2_node->translate(0.0f, 0.0f, 0.01f);
+      cube2_node->translate(0.0f, 0.0f, translation);
     }
 
     float z = cube2_node->getPosition()[2];
@@ -117,7 +105,6 @@ public:
   };
 
   void draw(RenderContext& ctx) override {
-    // std::cout << "Draw" << std::endl;
     root_node->render(ctx);
 
     if (cube1_node->intersects(cube2_node)) {
