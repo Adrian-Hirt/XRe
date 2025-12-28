@@ -9,7 +9,6 @@
 //  1) Vector of meshes for this model
 //  2) Color of the model
 //------------------------------------------------------------------------------------------------------
-Model::Model(std::vector<Mesh> meshes, std::shared_ptr<Material> material) : Model::Model(meshes, glm::vec3(0.8f, 0.8f, 0.8f), material) {}
 Model::Model(std::vector<Mesh> meshes, glm::vec3 color, std::shared_ptr<Material> material) {
   m_meshes = meshes;
   m_original_model_color = color;
@@ -19,7 +18,6 @@ Model::Model(std::vector<Mesh> meshes, glm::vec3 color, std::shared_ptr<Material
   m_material = material;
 }
 
-Model::Model(const char *model_path, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler) : Model::Model(model_path, glm::vec3(0.8f, 0.8f, 0.8f), material, vulkan_handler) {}
 Model::Model(const char *model_path, glm::vec3 color, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler) {
   loadObj(model_path, vulkan_handler);
   m_model_color = color;

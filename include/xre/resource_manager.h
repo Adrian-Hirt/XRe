@@ -22,14 +22,23 @@ public:
 
   // Methods to create models that we have predefined
   // TODO: return unique ptrs and handle ownership correctly
-  std::shared_ptr<Model> cube(glm::vec3 color, std::shared_ptr<Material> material);
+  std::shared_ptr<Model> cube(std::shared_ptr<Material> material);
+  std::shared_ptr<Model> cube(std::shared_ptr<Material> material, glm::vec3 color);
   std::shared_ptr<Model> sphere(std::shared_ptr<Material> material);
+  std::shared_ptr<Model> sphere(std::shared_ptr<Material> material, glm::vec3 color);
   std::shared_ptr<Model> plane(float extent, std::shared_ptr<Material> material);
+  std::shared_ptr<Model> plane(float extent, std::shared_ptr<Material> material, glm::vec3 color);
+
+  // Method to create a model from loading the geometry from a .obj file
+  std::shared_ptr<Model> model(const char *model_path, std::shared_ptr<Material> material);
+  std::shared_ptr<Model> model(const char *model_path, std::shared_ptr<Material> material, glm::vec3 color);
 
   // Methods to create lines
   std::shared_ptr<Line> line(float thickness, float length, std::shared_ptr<Material> material);
-  std::shared_ptr<Line> line(float thickness, float length, glm::vec3 color, std::shared_ptr<Material> material);
+  std::shared_ptr<Line> line(float thickness, float length, std::shared_ptr<Material> material, glm::vec3 color);
 
 private:
   std::shared_ptr<VulkanHandler> m_vulkan_handler;
+
+  inline static const glm::vec3 DEFAULT_MODEL_COLOR = {0.8f, 0.8f, 0.8f};
 };

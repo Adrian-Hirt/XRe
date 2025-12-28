@@ -63,14 +63,14 @@ inline std::shared_ptr<Model> createCube(glm::vec3 color, std::shared_ptr<Materi
   return std::make_shared<Model>(std::vector<Mesh>{cube_mesh}, color, material);
 }
 
-inline std::shared_ptr<Model> createPlane(float extent, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler) {
+inline std::shared_ptr<Model> createPlane(float extent, std::shared_ptr<Material> material, glm::vec3 color, std::shared_ptr<VulkanHandler> vulkan_handler) {
   auto [vertices, indices] = getPlaneVerticesAndIndices(extent);
 
   Mesh plane_mesh = Mesh(vertices, indices, vulkan_handler);
-  return std::make_shared<Model>(std::vector<Mesh>{plane_mesh}, material);
+  return std::make_shared<Model>(std::vector<Mesh>{plane_mesh}, color, material);
 }
 
-inline std::shared_ptr<Model> createSphere(std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler) {
-  return std::make_shared<Model>(DATA_FOLDER "/models/sphere.obj", material, vulkan_handler);
+inline std::shared_ptr<Model> createSphere(std::shared_ptr<Material> material, glm::vec3 color, std::shared_ptr<VulkanHandler> vulkan_handler) {
+  return std::make_shared<Model>(DATA_FOLDER "/models/sphere.obj", color, material, vulkan_handler);
 }
 }; // namespace ModelFactory

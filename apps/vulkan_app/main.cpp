@@ -12,14 +12,14 @@ public:
   std::shared_ptr<Material> basic_material = res.material(SHADERS_FOLDER "vk/basic.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
   std::shared_ptr<Material> texture_material = res.material(SHADERS_FOLDER "vk/texture.vert.spv", SHADERS_FOLDER "vk/texture.frag.spv", texture);
 
-  std::shared_ptr<Model> cube1 = res.cube({0.0f, 1.0f, 0.0f}, basic_material);
-  std::shared_ptr<Model> cube2 = res.cube({0.0f, 1.0f, 0.0f}, material);
+  std::shared_ptr<Model> cube1 = res.cube(basic_material, {0.0f, 1.0f, 0.0f});
+  std::shared_ptr<Model> cube2 = res.cube(material, {0.0f, 1.0f, 0.0f});
   std::shared_ptr<Model> sphere1 = res.sphere(material);
   std::shared_ptr<Model> sphere2 = res.sphere(material);
 
   std::shared_ptr<Model> floor = res.plane(10, texture_material);
-  std::shared_ptr<Model> cube = res.cube({0.0f, 1.0f, 0.0f}, material);
-  std::shared_ptr<Line> line = res.line(0.003f, 2.0f, {1.0f, 0.0f, 0.0f}, material);
+  std::shared_ptr<Model> cube = res.cube(material, {0.0f, 1.0f, 0.0f});
+  std::shared_ptr<Line> line = res.line(0.003f, 2.0f, material, {1.0f, 0.0f, 0.0f});
   XrTime last_time = 0;
 
   std::shared_ptr<SceneNode> root_node = std::make_shared<SceneNode>();

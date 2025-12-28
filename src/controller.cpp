@@ -8,8 +8,7 @@ Controller::Controller(std::shared_ptr<Material> material, std::shared_ptr<Vulka
   m_model_node->scale(0.03f, 0.03f, 0.075f);
 
   // Create the model for visualizing intersections of the aim line
-  m_aim_indicator_sphere = ModelFactory::createSphere(material, vulkan_handler);
-  m_aim_indicator_sphere->setColor({0.0f, 0.75f, 1.0f});
+  m_aim_indicator_sphere = ModelFactory::createSphere(material, {0.0f, 0.75f, 1.0f}, vulkan_handler);
   m_intersection_sphere_node = std::make_shared<SceneNode>(m_aim_indicator_sphere);
   m_intersection_sphere_node->scale(0.05f, 0.05f, 0.05f);
 
