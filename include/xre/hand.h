@@ -15,7 +15,7 @@
 class Hand {
 public:
   // Constructor
-  Hand(XrHandEXT hand_identifier, std::shared_ptr<Material> material);
+  Hand(XrHandEXT hand_identifier, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler);
 
   // Render the hand
   void render(RenderContext &ctx);
@@ -35,8 +35,8 @@ public:
   bool m_active = false;
 
 private:
-  SceneNode *m_hand_root_node;
-  std::vector<SceneNode *> m_joint_nodes;
+  std::shared_ptr<SceneNode> m_hand_root_node;
+  std::vector<std::shared_ptr<SceneNode>> m_joint_nodes;
 
   bool m_pinching = false;
 

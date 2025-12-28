@@ -2,6 +2,7 @@
 
 // Other includes
 #include <optional>
+#include <memory>
 
 // OpenXR includes
 #include <open_xr/openxr.h>
@@ -13,11 +14,12 @@
 #include <xre/scene_node.h>
 #include <xre/structs.h>
 #include <xre/material.h>
+#include <xre/vulkan_handler.h>
 
 class Controller {
 public:
   // Constructor
-  Controller(std::shared_ptr<Material> material);
+  Controller(std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler);
 
   // Render the controller
   void render(RenderContext &ctx);
@@ -61,20 +63,20 @@ private:
   static constexpr float s_line_intersection_near_threshold = 0.1f;
 
   // Model for the controller
-  Model m_model;
+  std::shared_ptr<Model> m_model;
 
   // Line for visualizing the aim direction
-  Line m_aim_line;
+  std::shared_ptr<Line> m_aim_line;
 
   // Model to visualize intersections of the aim line
   // and models marked as interactable
-  Model m_aim_indicator_sphere;
+  std::shared_ptr<Model> m_aim_indicator_sphere;
 
   // Scene nodes
   SceneNode m_root_node;
-  SceneNode m_model_node;
-  SceneNode m_intersection_sphere_node;
-  SceneNode m_aim_line_node;
+  std::shared_ptr<SceneNode> m_model_node;
+  std::shared_ptr<SceneNode> m_intersection_sphere_node;
+  std::shared_ptr<SceneNode> m_aim_line_node;
 
   float computeAimIndicatorSpherePosition(std::unordered_set<SceneNode *> models);
 };

@@ -19,9 +19,11 @@ public:
   std::shared_ptr<Material> material(const std::string& vert_path, const std::string& frag_path);
   std::shared_ptr<Material> material(const std::string& vert_path, const std::string& frag_path, Texture texture);
 
-  // Methods to create models
+  // Methods to create models that we have predefined
   // TODO: return unique ptrs and handle ownership correctly
   std::shared_ptr<Model> cube(glm::vec3 color, std::shared_ptr<Material> material);
+  std::shared_ptr<Model> sphere(std::shared_ptr<Material> material);
+  std::shared_ptr<Model> plane(float extent, std::shared_ptr<Material> material);
 
 private:
   std::shared_ptr<VulkanHandler> m_vulkan_handler;

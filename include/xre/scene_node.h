@@ -15,16 +15,11 @@
 class SceneNode {
 public:
   SceneNode();
-  SceneNode(Model *model);
-  SceneNode(Model *model, SceneNode &parent);
-
   SceneNode(std::shared_ptr<Model> model);
-
-  SceneNode(Renderable *model);
-  SceneNode(Renderable *model, SceneNode &parent);
+  SceneNode(std::shared_ptr<Model> model, std::shared_ptr<SceneNode> parent);
   ~SceneNode();
 
-  void addChildNode(SceneNode *child);
+  void addChildNode(std::shared_ptr<SceneNode> child);
   void render(RenderContext &ctx);
   void updateTransformation();
 
@@ -61,7 +56,7 @@ public:
   bool isActive();
 
   // Check whether a node intersects with the model contained in another one
-  bool intersects(SceneNode other);
+  bool intersects(std::shared_ptr<SceneNode> other);
 
   // Check whether a node intersects with a line (and optionally put the
   // distance of the intersection point as an out parameter)
@@ -77,12 +72,11 @@ private:
   SceneNode *m_parent;
 
   // Children of this node
-  std::vector<SceneNode *> m_children;
+  std::vector<std::shared_ptr<SceneNode>> m_children;
 
-  // Model or Renderable contained in this node (which might be null, e.g. for a node only containing some
+  // Model contained in this node (which might be null, e.g. for a node only containing some
   // transformation)
-  Model *m_model = nullptr;
-  Renderable *m_renderable = nullptr;
+  std::shared_ptr<Model> m_model = nullptr;
 
   // Position, scale and rotation of the SceneNode. These are all LOCAL,
   // i.e. in relation to the transform of the parent node!

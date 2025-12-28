@@ -6,6 +6,13 @@ void Renderable::initialize(std::vector<Vertex> vertices, std::vector<uint16_t> 
   Utils::checkBoolResult(getDevice() != nullptr, "Device has not been set!");
   Utils::checkBoolResult(getPhysicalDevice() != nullptr, "Physical device has not been set");
 
+  if (!m_vulkan_handler) {
+    std::cout << "Using static member" << std::endl;
+  }
+  else {
+    std::cout << "Using handler" << std::endl;
+  }
+
   // Store number of vertices and indices
   m_vertex_count = vertices.size();
   m_index_count = indices.size();

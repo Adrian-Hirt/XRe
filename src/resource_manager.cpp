@@ -17,3 +17,11 @@ std::shared_ptr<Material> ResourceManager::material(const std::string& vert_path
 std::shared_ptr<Model> ResourceManager::cube(glm::vec3 color, std::shared_ptr<Material> material) {
   return ModelFactory::createCube(color, material, m_vulkan_handler);
 }
+
+std::shared_ptr<Model> ResourceManager::sphere(std::shared_ptr<Material> material) {
+  return ModelFactory::createSphere(material, m_vulkan_handler);
+}
+
+std::shared_ptr<Model> ResourceManager::plane(float extent, std::shared_ptr<Material> material) {
+  return ModelFactory::createPlane(extent, material, m_vulkan_handler);
+}

@@ -15,12 +15,11 @@
 
 class Model {
 public:
-  Model();
   Model(std::vector<Mesh> meshes, std::shared_ptr<Material> material);
   Model(std::vector<Mesh> meshes, glm::vec3 color, std::shared_ptr<Material> material);
 
-  Model(const char *model_path, std::shared_ptr<Material> material);
-  Model(const char *model_path, glm::vec3 color, std::shared_ptr<Material> material);
+  Model(const char *model_path, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler);
+  Model(const char *model_path, glm::vec3 color, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler);
 
   // Set the world transform
   void setWorldMatrix(glm::mat4 world_matrix);
@@ -31,7 +30,7 @@ public:
   glm::vec3 getColor();
 
   // Intersection check
-  bool intersects(Model other);
+  bool intersects(std::shared_ptr<Model> other);
   bool intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance);
 
   // Debug methods
@@ -61,7 +60,7 @@ private:
   // Store the world transform
   glm::mat4 m_world_matrix;
 
-  void loadObj(const char *model_path);
+  void loadObj(const char *model_path, std::shared_ptr<VulkanHandler> vulkan_handler);
   void render(RenderContext &ctx);
 
   bool m_render_bounding_boxes = false;

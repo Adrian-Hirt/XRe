@@ -366,8 +366,8 @@ void OpenXrHandler::initializeOpenxrActions() {
   XrResult result;
 
   // Create controllers for left and right hands
-  m_left_controller = new Controller(m_interactions_material);
-  m_right_controller = new Controller(m_interactions_material);
+  m_left_controller = new Controller(m_interactions_material, m_vulkan_handler);
+  m_right_controller = new Controller(m_interactions_material, m_vulkan_handler);
 
   // Create the action set for the application. Currently, we're only using
   // a single action set for the whole application, later on we might add
@@ -1005,8 +1005,8 @@ void OpenXrHandler::initializeHandTracking() {
     return;
   }
 
-  m_left_hand = new Hand(XR_HAND_LEFT_EXT, m_interactions_material);
-  m_right_hand = new Hand(XR_HAND_RIGHT_EXT, m_interactions_material);
+  m_left_hand = new Hand(XR_HAND_LEFT_EXT, m_interactions_material, m_vulkan_handler);
+  m_right_hand = new Hand(XR_HAND_RIGHT_EXT, m_interactions_material, m_vulkan_handler);
 
   for (Hand *hand : {m_left_hand, m_right_hand}) {
     XrHandTrackerCreateInfoEXT hand_tracker_create_info = {};

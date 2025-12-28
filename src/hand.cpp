@@ -1,15 +1,14 @@
 #include <xre/hand.h>
 
-Hand::Hand(XrHandEXT hand_identifier, std::shared_ptr<Material> material) {
+Hand::Hand(XrHandEXT hand_identifier, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler) {
   m_hand_identifier = hand_identifier;
-  m_hand_root_node = new SceneNode();
+  m_hand_root_node = std::make_shared<SceneNode>();
 
   // This could probably be replaced by instancing, where we only have one cube but draw it multiple
   // times. For the first version we'll keep this approach though.
   for (int i = 0; i < XR_HAND_JOINT_COUNT_EXT; i++) {
-    // TODO: use a more sensible approach for lifetime handling
-    Model *joint_model = ModelFactory::createCubePtr({0.67f, 0.84f, 0.9}, material);
-    SceneNode *joint_node = new SceneNode(joint_model);
+    std::shared_ptr<Model> joint_model = ModelFactory::createCube({0.67f, 0.84f, 0.9}, material, vulkan_handler);
+    std::shared_ptr<SceneNode> joint_node = std::make_unique<SceneNode>(joint_model);
     joint_node->setScale(0.005f, 0.005f, 0.005f);
     m_hand_root_node->addChildNode(joint_node);
     m_joint_nodes.push_back(joint_node);
@@ -90,7 +89,7 @@ void Hand::updatePosition(glm::vec3 current_origin) {
       continue;
     }
 
-    SceneNode *current_node = m_joint_nodes[i];
+    std::shared_ptr<SceneNode> current_node = m_joint_nodes[i];
     XrPosef pose = m_joint_locations[i].pose;
 
     glm::vec3 joint_position = Utils::toVec3(pose.position);
@@ -126,8 +125,8 @@ void Hand::computeSceneInteractions() {
   // Check if the hand is intersecting a grabbable node. To make it simpler for the moment, we only
   // check intersection with the palm and the tip of the thumb (as for "grab", both the thumb and the
   // center of the palm should intersect, and for "pinch", the tip of the thumb needs to intersect).
-  SceneNode *thumb_scene_node = m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT];
-  SceneNode *palm_scene_node = m_joint_nodes[XR_HAND_JOINT_PALM_EXT];
+  std::shared_ptr<SceneNode> thumb_scene_node = m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT];
+  std::shared_ptr<SceneNode> palm_scene_node = m_joint_nodes[XR_HAND_JOINT_PALM_EXT];
 
   for (SceneNode *current_node : SceneNode::getGrabbableInstances()) {
     // Skip this if we already are grabbing this node with another controller or a hand
@@ -135,7 +134,7 @@ void Hand::computeSceneInteractions() {
       continue;
     }
 
-    if (current_node->intersects(*thumb_scene_node) || current_node->intersects(*palm_scene_node)) {
+    if (current_node->intersects(thumb_scene_node) || current_node->intersects(palm_scene_node)) {
       // Keep track that we're intersecting with this model
       current_node->m_intersected_in_current_frame = true;
 

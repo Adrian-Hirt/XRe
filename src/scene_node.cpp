@@ -5,33 +5,20 @@ SceneNode::SceneNode() {
   m_model = NULL;
 }
 
-SceneNode::SceneNode(Model *model) {
-  m_model = model;
-  m_parent = NULL;
-}
-
-SceneNode::SceneNode(Model *model, SceneNode &parent) {
-  m_model = model;
-  m_parent = &parent;
-  parent.addChildNode(this);
-}
-
 SceneNode::SceneNode(std::shared_ptr<Model> model) {
-  m_model = model.get();
+  m_model = model;
   m_parent = NULL;
 }
 
-SceneNode::SceneNode(Renderable *renderable) { m_renderable = renderable; }
-
-SceneNode::SceneNode(Renderable *renderable, SceneNode &parent) {
-  m_renderable = renderable;
-  m_parent = &parent;
-  parent.addChildNode(this);
-}
+// SceneNode::SceneNode(std::shared_ptr<Model> model,std::shared_ptr<SceneNode> parent) {
+//   m_model = model;
+//   m_parent = parent;
+//   parent.addChildNode(this);
+// }
 
 SceneNode::~SceneNode() { m_children.clear(); }
 
-void SceneNode::addChildNode(SceneNode *child) {
+void SceneNode::addChildNode(std::shared_ptr<SceneNode> child) {
   m_children.push_back(child);
   child->m_parent = this;
 }
@@ -50,11 +37,9 @@ void SceneNode::render(RenderContext &ctx) {
 
     // And render the model
     m_model->render(ctx);
-  } else if (m_renderable) {
-    m_renderable->render(ctx);
   }
 
-  for (SceneNode *child : m_children) {
+  for (std::shared_ptr<SceneNode> child : m_children) {
     child->render(ctx);
   }
 }
@@ -84,7 +69,7 @@ void SceneNode::updateTransformation() {
   }
 
   // Update the transforms of all the children.
-  for (SceneNode *child : m_children) {
+  for (std::shared_ptr<SceneNode> child : m_children) {
     child->updateTransformation();
   }
 
@@ -197,7 +182,9 @@ std::unordered_set<SceneNode *> SceneNode::getTerrainInstances() {
   return result;
 }
 
-bool SceneNode::intersects(SceneNode other) { return m_model->intersects(*other.m_model); }
+bool SceneNode::intersects(std::shared_ptr<SceneNode> other) {
+  return m_model->intersects(other->m_model);
+}
 
 bool SceneNode::intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance) {
   return m_model->intersects(line_start, line_direction, out_distance);

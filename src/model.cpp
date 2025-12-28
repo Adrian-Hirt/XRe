@@ -4,11 +4,6 @@
 #include <tiny_obj_loader.h>
 
 //------------------------------------------------------------------------------------------------------
-// Empty default constructor
-//------------------------------------------------------------------------------------------------------
-Model::Model() {}
-
-//------------------------------------------------------------------------------------------------------
 // Initialize the model.
 // Arguments:
 //  1) Vector of meshes for this model
@@ -24,9 +19,9 @@ Model::Model(std::vector<Mesh> meshes, glm::vec3 color, std::shared_ptr<Material
   m_material = material;
 }
 
-Model::Model(const char *model_path, std::shared_ptr<Material> material) : Model::Model(model_path, glm::vec3(0.8f, 0.8f, 0.8f), material) {}
-Model::Model(const char *model_path, glm::vec3 color, std::shared_ptr<Material> material) {
-  loadObj(model_path);
+Model::Model(const char *model_path, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler) : Model::Model(model_path, glm::vec3(0.8f, 0.8f, 0.8f), material, vulkan_handler) {}
+Model::Model(const char *model_path, glm::vec3 color, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler) {
+  loadObj(model_path, vulkan_handler);
   m_model_color = color;
   m_original_model_color = color;
   m_model_index = s_model_index++;
@@ -95,7 +90,7 @@ void Model::resetColor() { m_model_color = m_original_model_color; }
 
 glm::vec3 Model::getColor() { return m_model_color; }
 
-void Model::loadObj(const char *model_path) {
+void Model::loadObj(const char *model_path, std::shared_ptr<VulkanHandler> vulkan_handler) {
   tinyobj::attrib_t attrib;
   std::vector<tinyobj::shape_t> shapes;
   std::vector<tinyobj::material_t> materials;
@@ -161,8 +156,14 @@ void Model::loadObj(const char *model_path) {
       index_offset += face_vertices_count;
     }
 
-    Mesh mesh = Mesh(mesh_vertices, mesh_indices);
-    m_meshes.push_back(mesh);
+    if (vulkan_handler) {
+      Mesh mesh = Mesh(mesh_vertices, mesh_indices, vulkan_handler);
+      m_meshes.push_back(mesh);
+    }
+    else {
+      Mesh mesh = Mesh(mesh_vertices, mesh_indices);
+      m_meshes.push_back(mesh);
+    }
   };
 }
 
@@ -172,11 +173,11 @@ void Model::setWorldMatrix(glm::mat4 world_matrix) { m_world_matrix = world_matr
 // need to check the outer bounding box and then only if we have a hit there
 // we check the inner meshes. Currently, as most models only have one mesh,
 // this should be enough.
-bool Model::intersects(Model other) {
+bool Model::intersects(std::shared_ptr<Model> other) {
   for (auto mesh : m_meshes) {
     auto this_OOBB = mesh.getObjectOrientedBoundingBox().transformed(m_world_matrix);
-    for (auto other_mesh : other.m_meshes) {
-      auto other_OOBB = other_mesh.getObjectOrientedBoundingBox().transformed(other.m_world_matrix);
+    for (auto other_mesh : other->m_meshes) {
+      auto other_OOBB = other_mesh.getObjectOrientedBoundingBox().transformed(other->m_world_matrix);
       if (this_OOBB.intersects(other_OOBB)) {
         return true;
       }

@@ -5,12 +5,15 @@
 #include <xre/scene_node.h>
 #include <xre/model_factory.h>
 #include <xre/structs.h>
+#include <xre/vulkan_handler.h>
+
+// Other includes
+#include <memory>
 
 class Line {
 public:
-  Line();
-  Line(float thickness, float length, std::shared_ptr<Material> material);
-  Line(float thickness, float length, glm::vec3 color, std::shared_ptr<Material> material);
+  Line(float thickness, float length, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler);
+  Line(float thickness, float length, glm::vec3 color, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler);
 
   void render(RenderContext &ctx);
   void updateAimLineFromControllerPose(glm::vec3 controller_position, glm::quat controller_orientation, float length);
@@ -19,7 +22,7 @@ public:
 
 private:
   // Model for the line
-  Model *m_model;
+  std::shared_ptr<Model> m_model;
 
   // Scene node for the line
   SceneNode m_scene_node;
