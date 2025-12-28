@@ -8,9 +8,9 @@ public:
 
   Texture texture = res.texture(DATA_FOLDER "textures/Wood048_2K-JPG_Color.jpg");
 
-  std::shared_ptr<Material> material = std::make_shared<Material>(SHADERS_FOLDER "vk/ambient.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
-  std::shared_ptr<Material> basic_material = std::make_shared<Material>(SHADERS_FOLDER "vk/basic.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
-  std::shared_ptr<Material> texture_material = std::make_shared<Material>(SHADERS_FOLDER "vk/texture.vert.spv", SHADERS_FOLDER "vk/texture.frag.spv", texture);
+  std::shared_ptr<Material> material = res.material(SHADERS_FOLDER "vk/ambient.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
+  std::shared_ptr<Material> basic_material = res.material(SHADERS_FOLDER "vk/basic.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
+  std::shared_ptr<Material> texture_material = res.material(SHADERS_FOLDER "vk/texture.vert.spv", SHADERS_FOLDER "vk/texture.frag.spv", texture);
 
   Model cube1 = ModelFactory::createCube({0.0f, 1.0f, 0.0f}, basic_material);
   Model cube2 = ModelFactory::createCube({0.0f, 1.0f, 0.0f}, material);

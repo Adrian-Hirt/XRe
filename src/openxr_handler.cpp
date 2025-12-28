@@ -19,11 +19,9 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
 
   // TODO: Replace this by a more sensible architecture
   Renderable::registerDeviceAndPhysicalDevice(m_vulkan_handler->getLogicalDevice(), m_vulkan_handler->getPhysicalDevice());
-  Material::registerVulkanHandler(m_vulkan_handler.get());
-  // Texture::registerVulkanHandler(m_vulkan_handler);
 
   // Create the material for the controllers and hands
-  m_interactions_material = std::make_shared<Material>(SHADERS_FOLDER "vk/ambient.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
+  m_interactions_material = std::make_shared<Material>(SHADERS_FOLDER "vk/ambient.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv", m_vulkan_handler);
 
   // Instruct the handler to initialize the xr actions
   initializeOpenxrActions();

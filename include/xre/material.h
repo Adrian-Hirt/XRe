@@ -10,17 +10,15 @@
 
 class Material {
 public:
-  Material(const std::string& vert_path, const std::string& frag_path);
-  Material(const std::string& vert_path, const std::string& frag_path, Texture texture);
-  // TODO: replace this by a more sensible architecture
-  static void registerVulkanHandler(VulkanHandler *handler);
-  void bind();
+  Material(const std::string& vert_path, const std::string& frag_path, std::shared_ptr<VulkanHandler> vulkan_handler);
+  Material(const std::string& vert_path, const std::string& frag_path, Texture texture, std::shared_ptr<VulkanHandler> vulkan_handler);
 
+  void bind();
   Buffer* getUniformBuffer();
   VkDescriptorSet getDescriptorset();
 
 private:
-  inline static VulkanHandler* s_vulkan_handler;
+  std::shared_ptr<VulkanHandler> m_vulkan_handler;
 
   VkPipeline m_graphics_pipeline;
 
