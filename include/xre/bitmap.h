@@ -7,6 +7,7 @@
 // Other includes
 #include <vector>
 
+// TODO: move to an approach using a model with a fixed-position shader
 class Bitmap : public Renderable {
 public:
   Bitmap();

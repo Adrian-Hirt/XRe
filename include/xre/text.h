@@ -12,6 +12,7 @@
 #include <fstream>
 #include <vector>
 
+// TODO: move to an approach using a model with multiple meshes making up the text
 class Text : public Renderable {
 public:
   Text(const char *sentence);

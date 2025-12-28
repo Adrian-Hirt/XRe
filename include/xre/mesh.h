@@ -1,17 +1,19 @@
 #pragma once
 
-// Include vector header
+// Other includes
 #include <vector>
+#include <memory>
 
 // XRe includes
 #include <xre/utils.h>
 #include <xre/structs.h>
 #include <xre/renderable.h>
+#include <xre/vulkan_handler.h>
 
 class Mesh : public Renderable {
 public:
-  Mesh();
   Mesh(std::vector<Vertex> vertices, std::vector<uint16_t> indices);
+  Mesh(std::vector<Vertex> vertices, std::vector<uint16_t> indices, std::shared_ptr<VulkanHandler> vulkan_handler);
 
 private:
   void render(RenderContext &ctx);

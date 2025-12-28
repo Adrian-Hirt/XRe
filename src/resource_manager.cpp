@@ -13,3 +13,7 @@ std::shared_ptr<Material> ResourceManager::material(const std::string& vert_path
 std::shared_ptr<Material> ResourceManager::material(const std::string& vert_path, const std::string& frag_path, Texture texture) {
   return std::make_shared<Material>(vert_path, frag_path, texture, m_vulkan_handler);
 }
+
+Model ResourceManager::cube(glm::vec3 color, std::shared_ptr<Material> material) {
+  return ModelFactory::createCube(color, material, m_vulkan_handler);
+}

@@ -1,7 +1,8 @@
 #pragma once
 
-// Include vector header
+// Other includes
 #include <vector>
+#include <memory>
 
 // GLM includes
 #include <glm/glm/vec3.hpp>
@@ -12,6 +13,7 @@
 #include <xre/structs.h>
 #include <xre/buffer.h>
 #include <xre/object_oriented_bounding_box.h>
+#include <xre/vulkan_handler.h>
 
 // Base class which is subclassed by other classes that are "renderable", i.e.
 // can be rendered to display some output in the program.
@@ -22,6 +24,7 @@ public:
   OOBB getObjectOrientedBoundingBox();
 
 protected:
+  std::shared_ptr<VulkanHandler> m_vulkan_handler;
   inline static VkDevice s_device = VK_NULL_HANDLE;
   inline static VkPhysicalDevice s_physical_device = VK_NULL_HANDLE;
 
@@ -51,6 +54,10 @@ protected:
   OOBB m_bounding_box;
 
   void initialize(std::vector<Vertex> vertices, std::vector<uint16_t> indices);
+  void initialize(std::vector<Vertex> vertices, std::vector<uint16_t> indices, std::shared_ptr<VulkanHandler> vulkan_handler);
+
+  VkDevice getDevice();
+  VkPhysicalDevice getPhysicalDevice();
 
   // Scene Node can call render() directly
   friend class SceneNode;

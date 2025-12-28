@@ -1,8 +1,13 @@
 #pragma once
 
+// XRe includes
 #include <xre/mesh.h>
 #include <xre/model.h>
+#include <xre/vulkan_handler.h>
+
+// Other includes
 #include <tuple>
+#include <memory>
 
 namespace ModelFactory {
 // "Private" method using an anonymous namespace
@@ -55,6 +60,13 @@ inline Model createCube(glm::vec3 color, std::shared_ptr<Material> material) {
   auto [vertices, indices] = getCubeVerticesAndIndices();
 
   Mesh cube_mesh = Mesh(vertices, indices);
+  return Model({cube_mesh}, color, material);
+}
+
+inline Model createCube(glm::vec3 color, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler) {
+  auto [vertices, indices] = getCubeVerticesAndIndices();
+
+  Mesh cube_mesh = Mesh(vertices, indices, vulkan_handler);
   return Model({cube_mesh}, color, material);
 }
 
