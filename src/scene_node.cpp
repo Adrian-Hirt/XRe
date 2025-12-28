@@ -10,12 +10,6 @@ SceneNode::SceneNode(std::shared_ptr<Model> model) {
   m_parent = NULL;
 }
 
-// SceneNode::SceneNode(std::shared_ptr<Model> model,std::shared_ptr<SceneNode> parent) {
-//   m_model = model;
-//   m_parent = parent;
-//   parent.addChildNode(this);
-// }
-
 SceneNode::~SceneNode() { m_children.clear(); }
 
 void SceneNode::addChildNode(std::shared_ptr<SceneNode> child) {

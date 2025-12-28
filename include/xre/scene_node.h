@@ -16,7 +16,6 @@ class SceneNode {
 public:
   SceneNode();
   SceneNode(std::shared_ptr<Model> model);
-  SceneNode(std::shared_ptr<Model> model, std::shared_ptr<SceneNode> parent);
   ~SceneNode();
 
   void addChildNode(std::shared_ptr<SceneNode> child);
