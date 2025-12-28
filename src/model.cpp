@@ -156,14 +156,8 @@ void Model::loadObj(const char *model_path, std::shared_ptr<VulkanHandler> vulka
       index_offset += face_vertices_count;
     }
 
-    if (vulkan_handler) {
-      Mesh mesh = Mesh(mesh_vertices, mesh_indices, vulkan_handler);
-      m_meshes.push_back(mesh);
-    }
-    else {
-      Mesh mesh = Mesh(mesh_vertices, mesh_indices);
-      m_meshes.push_back(mesh);
-    }
+    Mesh mesh = Mesh(mesh_vertices, mesh_indices, vulkan_handler);
+    m_meshes.push_back(mesh);
   };
 }
 

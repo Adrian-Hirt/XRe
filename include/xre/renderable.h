@@ -19,14 +19,10 @@
 // can be rendered to display some output in the program.
 class Renderable {
 public:
-  // TODO: Replace this by a more sensible architecture
-  static void registerDeviceAndPhysicalDevice(VkDevice device, VkPhysicalDevice physical_device);
   OOBB getObjectOrientedBoundingBox();
 
 protected:
   std::shared_ptr<VulkanHandler> m_vulkan_handler;
-  inline static VkDevice s_device = VK_NULL_HANDLE;
-  inline static VkPhysicalDevice s_physical_device = VK_NULL_HANDLE;
 
   // Any renderable has a bounding box by default. Subclasses which do not
   // can override this method to disable bounding boxes.
@@ -53,11 +49,7 @@ protected:
   // The bounding box of this renderable
   OOBB m_bounding_box;
 
-  void initialize(std::vector<Vertex> vertices, std::vector<uint16_t> indices);
   void initialize(std::vector<Vertex> vertices, std::vector<uint16_t> indices, std::shared_ptr<VulkanHandler> vulkan_handler);
-
-  VkDevice getDevice();
-  VkPhysicalDevice getPhysicalDevice();
 
   // Scene Node can call render() directly
   friend class SceneNode;

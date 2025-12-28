@@ -1,17 +1,12 @@
 #include <xre/renderable.h>
 
 // Function to initialize the "common" data of a mesh, to avoid code-duplication
-void Renderable::initialize(std::vector<Vertex> vertices, std::vector<uint16_t> indices) {
-  // Check that the device and physical device have been set
-  Utils::checkBoolResult(getDevice() != nullptr, "Device has not been set!");
-  Utils::checkBoolResult(getPhysicalDevice() != nullptr, "Physical device has not been set");
+void Renderable::initialize(std::vector<Vertex> vertices, std::vector<uint16_t> indices, std::shared_ptr<VulkanHandler> vulkan_handler) {
+  // Store vulkan handler
+  m_vulkan_handler = vulkan_handler;
 
-  if (!m_vulkan_handler) {
-    std::cout << "Using static member" << std::endl;
-  }
-  else {
-    std::cout << "Using handler" << std::endl;
-  }
+  auto device = m_vulkan_handler->getLogicalDevice();
+  auto physical_device = m_vulkan_handler->getPhysicalDevice();
 
   // Store number of vertices and indices
   m_vertex_count = vertices.size();
@@ -19,12 +14,12 @@ void Renderable::initialize(std::vector<Vertex> vertices, std::vector<uint16_t> 
 
   // Create vertex buffer
   size_t size = sizeof(Vertex) * vertices.size();
-  m_vertex_buffer = new Buffer(getDevice(), getPhysicalDevice(), static_cast<VkDeviceSize>(size), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+  m_vertex_buffer = new Buffer(device, physical_device, static_cast<VkDeviceSize>(size), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
   m_vertex_buffer->loadData(vertices);
 
   // Create index buffer
   size_t index_size = sizeof(uint16_t) * indices.size();
-  m_index_buffer = new Buffer(getDevice(), getPhysicalDevice(), static_cast<VkDeviceSize>(index_size), VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
+  m_index_buffer = new Buffer(device, physical_device, static_cast<VkDeviceSize>(index_size), VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
   m_index_buffer->loadData(indices);
 
   if (hasBoundingBox()) {
@@ -52,44 +47,15 @@ void Renderable::initialize(std::vector<Vertex> vertices, std::vector<uint16_t> 
     // Create vertex buffer for object oriented bounding boxes.
     size_t size = sizeof(Vertex) * bbox_vertices.size();
     m_bounding_box_vertex_buffer =
-        new Buffer(getDevice(), getPhysicalDevice(), static_cast<VkDeviceSize>(size), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+        new Buffer(device, physical_device, static_cast<VkDeviceSize>(size), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
     m_bounding_box_vertex_buffer->loadData(bbox_vertices);
     m_bbox_index_count = m_bounding_box.getLineIndices().size();
 
     // Create index buffer for object oriented bounding boxes.
     size_t index_size = sizeof(uint16_t) * m_bbox_index_count;
     m_bounding_box_index_buffer =
-        new Buffer(getDevice(), getPhysicalDevice(), static_cast<VkDeviceSize>(index_size), VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
+        new Buffer(device, physical_device, static_cast<VkDeviceSize>(index_size), VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
     m_bounding_box_index_buffer->loadData(m_bounding_box.getLineIndices());
-  }
-}
-
-void Renderable::initialize(std::vector<Vertex> vertices, std::vector<uint16_t> indices, std::shared_ptr<VulkanHandler> vulkan_handler) {
-  m_vulkan_handler = vulkan_handler;
-
-  initialize(vertices, indices);
-}
-
-void Renderable::registerDeviceAndPhysicalDevice(VkDevice device, VkPhysicalDevice physical_device) {
-  Renderable::s_device = device;
-  Renderable::s_physical_device = physical_device;
-}
-
-VkDevice Renderable::getDevice() {
-  if (!m_vulkan_handler) {
-    return s_device;
-  }
-  else {
-    return m_vulkan_handler->getLogicalDevice();
-  }
-}
-
-VkPhysicalDevice Renderable::getPhysicalDevice() {
-  if (!m_vulkan_handler) {
-    return s_physical_device;
-  }
-  else {
-    return m_vulkan_handler->getPhysicalDevice();
   }
 }
 
