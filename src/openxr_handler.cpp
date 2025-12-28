@@ -979,7 +979,7 @@ void OpenXrHandler::updateCurrentOriginForTeleport(glm::vec3 teleport_location) 
   // FIXME: Set the Y value to 0, such that we don't teleport "down" into the floor.
   // We'll need to have some reliable method to determine the current y value of the floor
   // (i.e. mesh with terrain flag) under the HMD position to fix this.
-  difference_vector.y = 0;
+  difference_vector.y += m_headset_position.y;
   m_current_origin = difference_vector;
 }
 

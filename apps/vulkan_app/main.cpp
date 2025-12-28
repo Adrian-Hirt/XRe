@@ -7,10 +7,12 @@ public:
   ResourceManager& res = resourceManager();
 
   std::shared_ptr<Texture> texture = res.texture(DATA_FOLDER "textures/Wood048_2K-JPG_Color.jpg");
+  std::shared_ptr<Texture> texture2 = res.texture(DATA_FOLDER "textures/Tiles012_2K-JPG_Color.jpg");
 
   std::shared_ptr<Material> material = res.material(SHADERS_FOLDER "vk/ambient.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
   std::shared_ptr<Material> basic_material = res.material(SHADERS_FOLDER "vk/basic.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
   std::shared_ptr<Material> texture_material = res.material(SHADERS_FOLDER "vk/texture.vert.spv", SHADERS_FOLDER "vk/texture.frag.spv", texture);
+  std::shared_ptr<Material> texture2_material = res.material(SHADERS_FOLDER "vk/texture.vert.spv", SHADERS_FOLDER "vk/texture.frag.spv", texture2);
 
   std::shared_ptr<Model> cube1 = res.cube(basic_material, {0.0f, 1.0f, 0.0f});
   std::shared_ptr<Model> cube2 = res.cube(material, {0.0f, 1.0f, 0.0f});
@@ -18,7 +20,7 @@ public:
   std::shared_ptr<Model> sphere2 = res.sphere(material);
 
   std::shared_ptr<Model> floor = res.plane(10, texture_material);
-  std::shared_ptr<Model> cube = res.cube(material, {0.0f, 1.0f, 0.0f});
+  std::shared_ptr<Model> cube = res.cube(texture2_material);
   std::shared_ptr<Line> line = res.line(0.003f, 2.0f, material, {1.0f, 0.0f, 0.0f});
   XrTime last_time = 0;
 
@@ -28,6 +30,7 @@ public:
   std::shared_ptr<SceneNode> cube2_node = std::make_shared<SceneNode>(cube2);
   std::shared_ptr<SceneNode> sphere1_node = std::make_shared<SceneNode>(sphere1);
   std::shared_ptr<SceneNode> sphere2_node = std::make_shared<SceneNode>(sphere2);
+  std::shared_ptr<SceneNode> cube_node = std::make_shared<SceneNode>(cube);
 
   bool forward = true;
 
@@ -44,6 +47,7 @@ public:
     root_node->addChildNode(floor_node);
     root_node->addChildNode(sphere1_node);
     root_node->addChildNode(sphere2_node);
+    root_node->addChildNode(cube_node);
 
     // Update initial transforms
     cube1_node->setScale(0.1f, 0.1f, 0.1f);
@@ -53,6 +57,9 @@ public:
     sphere1_node->scale(0.1f, 0.1f, 0.1f);
     sphere2_node->scale(0.1f, 0.1f, 0.1f);
     sphere2_node->setPosition(5.0f, 0.0f, -4.0f);
+    cube_node->scale(2.0f, 0.5f, 2.0f);
+    cube_node->setPosition(4.0f, 0.5f, 4.0f);
+
     root_node->updateTransformation();
 
     cube1->toggleRenderBoundingBoxes();
@@ -62,6 +69,7 @@ public:
     cube1_node->setGrabbable(true);
     // cube2_node.setGrabbable(true);
     floor_node->setIsTerrain(true);
+    cube_node->setIsTerrain(true);
 
     // cube1.printBouindingBoxes();
   };
