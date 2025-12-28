@@ -14,8 +14,8 @@ Model::Model() {}
 //  1) Vector of meshes for this model
 //  2) Color of the model
 //------------------------------------------------------------------------------------------------------
-Model::Model(std::vector<Mesh> meshes, Material material) : Model::Model(meshes, glm::vec3(0.8f, 0.8f, 0.8f), material) {}
-Model::Model(std::vector<Mesh> meshes, glm::vec3 color, Material material) {
+Model::Model(std::vector<Mesh> meshes, Material* material) : Model::Model(meshes, glm::vec3(0.8f, 0.8f, 0.8f), material) {}
+Model::Model(std::vector<Mesh> meshes, glm::vec3 color, Material* material) {
   m_meshes = meshes;
   m_original_model_color = color;
   m_model_color = color;
@@ -24,8 +24,8 @@ Model::Model(std::vector<Mesh> meshes, glm::vec3 color, Material material) {
   m_material = material;
 }
 
-Model::Model(const char *model_path, Material material) : Model::Model(model_path, glm::vec3(0.8f, 0.8f, 0.8f), material) {}
-Model::Model(const char *model_path, glm::vec3 color, Material material) {
+Model::Model(const char *model_path, Material* material) : Model::Model(model_path, glm::vec3(0.8f, 0.8f, 0.8f), material) {}
+Model::Model(const char *model_path, glm::vec3 color, Material* material) {
   loadObj(model_path);
   m_model_color = color;
   m_original_model_color = color;
@@ -45,8 +45,8 @@ void Model::render(RenderContext &ctx) {
   }
 
   // Update context
-  ctx.descriptor_set = m_material.getDescriptorset();
-  ctx.model_uniform_buffer = m_material.getUniformBuffer();
+  ctx.descriptor_set = m_material->getDescriptorset();
+  ctx.model_uniform_buffer = m_material->getUniformBuffer();
 
   // Update uniform buffer
   const uint32_t offset = m_model_index * ctx.aligned_size;
@@ -65,7 +65,7 @@ void Model::render(RenderContext &ctx) {
   );
 
   // Bind the graphics pipeline of the material
-  m_material.bind();
+  m_material->bind();
                   
   // Render meshes of this model
   for (Mesh mesh : m_meshes) {

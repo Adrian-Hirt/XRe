@@ -12,7 +12,7 @@
 class Hand {
 public:
   // Constructor
-  Hand(XrHandEXT hand_identifier, Material material);
+  Hand(XrHandEXT hand_identifier, Material* material);
 
   // Render the hand
   void render(RenderContext &ctx);

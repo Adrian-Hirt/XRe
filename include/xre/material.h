@@ -10,7 +10,6 @@
 
 class Material {
 public:
-  Material();
   Material(const std::string& vert_path, const std::string& frag_path);
   Material(const std::string& vert_path, const std::string& frag_path, Texture texture);
   // TODO: replace this by a more sensible architecture

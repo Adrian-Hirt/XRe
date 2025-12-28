@@ -101,7 +101,7 @@ private:
   glm::vec3 m_current_origin = glm::zero<glm::vec3>();
 
   // Material for controllers and hands
-  Material m_interactions_material;
+  std::shared_ptr<Material> m_interactions_material;
 
   // Methods
   bool initializeOpenxr();

@@ -12,14 +12,14 @@ public:
   Material basic_material = Material(SHADERS_FOLDER "vk/basic.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
   Material texture_material = Material(SHADERS_FOLDER "vk/texture.vert.spv", SHADERS_FOLDER "vk/texture.frag.spv", texture);
 
-  Model cube1 = ModelFactory::createCube({0.0f, 1.0f, 0.0f}, basic_material);
-  Model cube2 = ModelFactory::createCube({0.0f, 1.0f, 0.0f}, material);
-  Model sphere1 = ModelFactory::createSphere(material);
-  Model sphere2 = ModelFactory::createSphere(material);
+  Model cube1 = ModelFactory::createCube({0.0f, 1.0f, 0.0f}, &basic_material);
+  Model cube2 = ModelFactory::createCube({0.0f, 1.0f, 0.0f}, &material);
+  Model sphere1 = ModelFactory::createSphere(&material);
+  Model sphere2 = ModelFactory::createSphere(&material);
 
-  Model floor = ModelFactory::createGroundPlane(10, texture_material);
-  Model cube = ModelFactory::createCube({0.0f, 1.0f, 0.0f}, material);
-  Line line = Line(0.003f, 2.0f, {1.0f, 0.0f, 0.0f}, material);
+  Model floor = ModelFactory::createGroundPlane(10, &texture_material);
+  Model cube = ModelFactory::createCube({0.0f, 1.0f, 0.0f}, &material);
+  Line line = Line(0.003f, 2.0f, {1.0f, 0.0f, 0.0f}, &material);
   XrTime last_time = 0;
 
   SceneNode root_node = SceneNode();

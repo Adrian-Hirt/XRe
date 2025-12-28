@@ -1,8 +1,8 @@
 #include <xre/line.h>
 
 Line::Line() {}
-Line::Line(float thickness, float length, Material material) : Line::Line(thickness, length, {0.0f, 0.0f, 0.0f}, material) {}
-Line::Line(float thickness, float length, glm::vec3 color, Material material) {
+Line::Line(float thickness, float length, Material* material) : Line::Line(thickness, length, {0.0f, 0.0f, 0.0f}, material) {}
+Line::Line(float thickness, float length, glm::vec3 color, Material* material) {
   m_line_color = color;
   m_model = ModelFactory::createCubePtr(m_line_color, material);
   m_scene_node = SceneNode(m_model);

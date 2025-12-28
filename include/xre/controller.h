@@ -17,7 +17,7 @@
 class Controller {
 public:
   // Constructor
-  Controller(Material material);
+  Controller(Material* material);
 
   // Render the controller
   void render(RenderContext &ctx);

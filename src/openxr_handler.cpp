@@ -23,7 +23,7 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
   // Texture::registerVulkanHandler(m_vulkan_handler);
 
   // Create the material for the controllers and hands
-  m_interactions_material = Material(SHADERS_FOLDER "vk/ambient.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
+  m_interactions_material = std::make_shared<Material>(SHADERS_FOLDER "vk/ambient.vert.spv", SHADERS_FOLDER "vk/basic.frag.spv");
 
   // Instruct the handler to initialize the xr actions
   initializeOpenxrActions();
@@ -368,8 +368,9 @@ void OpenXrHandler::initializeOpenxrActions() {
   XrResult result;
 
   // Create controllers for left and right hands
-  m_left_controller = new Controller(m_interactions_material);
-  m_right_controller = new Controller(m_interactions_material);
+  // TODO: Fix passing of the material
+  m_left_controller = new Controller(m_interactions_material.get());
+  m_right_controller = new Controller(m_interactions_material.get());
 
   // Create the action set for the application. Currently, we're only using
   // a single action set for the whole application, later on we might add
@@ -1007,8 +1008,9 @@ void OpenXrHandler::initializeHandTracking() {
     return;
   }
 
-  m_left_hand = new Hand(XR_HAND_LEFT_EXT, m_interactions_material);
-  m_right_hand = new Hand(XR_HAND_RIGHT_EXT, m_interactions_material);
+  // TODO: Fix passing of the material
+  m_left_hand = new Hand(XR_HAND_LEFT_EXT, m_interactions_material.get());
+  m_right_hand = new Hand(XR_HAND_RIGHT_EXT, m_interactions_material.get());
 
   for (Hand *hand : {m_left_hand, m_right_hand}) {
     XrHandTrackerCreateInfoEXT hand_tracker_create_info = {};

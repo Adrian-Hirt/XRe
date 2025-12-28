@@ -15,11 +15,11 @@
 class Model {
 public:
   Model();
-  Model(std::vector<Mesh> meshes, Material material);
-  Model(std::vector<Mesh> meshes, glm::vec3 color, Material material);
+  Model(std::vector<Mesh> meshes, Material* material);
+  Model(std::vector<Mesh> meshes, glm::vec3 color, Material* material);
 
-  Model(const char *model_path, Material material);
-  Model(const char *model_path, glm::vec3 color, Material material);
+  Model(const char *model_path, Material* material);
+  Model(const char *model_path, glm::vec3 color, Material* material);
 
   // Set the world transform
   void setWorldMatrix(glm::mat4 world_matrix);
@@ -67,7 +67,7 @@ private:
 
   bool m_interacted = false;
   
-  Material m_material;
+  Material* m_material;
 
   // Scene Node can call render() directly
   friend class SceneNode;

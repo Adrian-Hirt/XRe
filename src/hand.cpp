@@ -1,6 +1,6 @@
 #include <xre/hand.h>
 
-Hand::Hand(XrHandEXT hand_identifier, Material material) {
+Hand::Hand(XrHandEXT hand_identifier, Material* material) {
   m_hand_identifier = hand_identifier;
   m_hand_root_node = new SceneNode();
 
