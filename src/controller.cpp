@@ -55,7 +55,7 @@ void Controller::updatePosition(glm::vec3 current_origin) {
 
   // Update the aim line
   m_aim_line->updateAimLineFromControllerPose(controller_position, Utils::toQuat(m_aim.orientation),
-                                              Controller::s_line_intersection_far_threshold);
+                                              m_aim_line_render_length);
 }
 
 void Controller::computeSceneInteractions() {
@@ -93,17 +93,25 @@ std::optional<glm::vec3> Controller::updateIntersectionSphereAndComputePossibleT
     return std::nullopt;
   }
 
-  // Next, check if we need to render the aim intersection sphere
+  // Reset state of the intersection sphere
   m_intersection_sphere_node->setActive(false);
+
+  // Reset line length
+  m_aim_line_render_length = s_line_intersection_far_threshold;
 
   float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(SceneNode::getGrabbableInstances());
   float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(SceneNode::getTerrainInstances());
 
   if (m_intersection_sphere_node->isActive()) {
+    float closest_intersection = std::min(closest_grabbable_aim_intersection, closest_terrain_aim_intersection);
+
+    // Set length of line to render, which needs to be the half of the closest intersection (due to how
+    // we render the line).
+    m_aim_line_render_length = closest_intersection / 2.0f;
+
     // The direction vector has unit length, i.e. to stretch it to the required length, we
     // simple multiply the vector with the length, which gives us a new vector.
-    glm::vec3 stretched_direction =
-        m_aim_line->getLineDirection() * std::min(closest_grabbable_aim_intersection, closest_terrain_aim_intersection);
+    glm::vec3 stretched_direction = m_aim_line->getLineDirection() * closest_intersection;
 
     glm::vec3 sphere_position = m_aim_line->getLineStart();
     sphere_position = sphere_position + stretched_direction;

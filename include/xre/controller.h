@@ -68,6 +68,9 @@ private:
   // Line for visualizing the aim direction
   std::shared_ptr<Line> m_aim_line;
 
+  // Lenght of the line to render
+  float m_aim_line_render_length;
+
   // Model to visualize intersections of the aim line
   // and models marked as interactable
   std::shared_ptr<Model> m_aim_indicator_sphere;

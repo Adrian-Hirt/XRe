@@ -15,6 +15,7 @@ public:
   Line(float thickness, float length, glm::vec3 color, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler);
 
   void render(RenderContext &ctx);
+  void render(RenderContext &ctx, float length_to_render);
   void updateAimLineFromControllerPose(glm::vec3 controller_position, glm::quat controller_orientation, float length);
   glm::vec3 getLineStart();
   glm::vec3 getLineDirection();
