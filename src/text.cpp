@@ -82,7 +82,7 @@ void Text::buildMeshesFromSentence(const std::string sentence) {
     vertex_shader = SHADERS_FOLDER "bitmap.vert.spv";
   }
   else {
-    vertex_shader = SHADERS_FOLDER "texture.vert.spv";
+    vertex_shader = SHADERS_FOLDER "basic.vert.spv";
   }
 
   std::shared_ptr<Material> material = std::make_shared<Material>(vertex_shader, SHADERS_FOLDER "texture.frag.spv", texture, m_vulkan_handler);

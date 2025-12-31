@@ -12,8 +12,8 @@ public:
 
   std::shared_ptr<Material> material = res.material(SHADERS_FOLDER "ambient.vert.spv", SHADERS_FOLDER "basic.frag.spv");
   std::shared_ptr<Material> basic_material = res.material(SHADERS_FOLDER "basic.vert.spv", SHADERS_FOLDER "basic.frag.spv");
-  std::shared_ptr<Material> texture_material = res.material(SHADERS_FOLDER "texture.vert.spv", SHADERS_FOLDER "texture.frag.spv", texture);
-  std::shared_ptr<Material> texture2_material = res.material(SHADERS_FOLDER "texture.vert.spv", SHADERS_FOLDER "texture.frag.spv", texture2);
+  std::shared_ptr<Material> texture_material = res.material(SHADERS_FOLDER "basic.vert.spv", SHADERS_FOLDER "texture.frag.spv", texture);
+  std::shared_ptr<Material> texture2_material = res.material(SHADERS_FOLDER "basic.vert.spv", SHADERS_FOLDER "texture.frag.spv", texture2);
   std::shared_ptr<Material> static_image_material = res.material(SHADERS_FOLDER "bitmap.vert.spv", SHADERS_FOLDER "texture.frag.spv", texture3);
 
   std::shared_ptr<Model> cube1 = res.cube(basic_material, {0.0f, 1.0f, 0.0f});

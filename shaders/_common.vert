@@ -1,5 +1,3 @@
-#version 450 core
-
 layout(set = 0, binding = 0) uniform GlobalUniformBufferObject {
   mat4 view_projection;
   vec3 light_vector;
@@ -18,17 +16,3 @@ layout(location = 2) in vec2 inTexCoord;
 
 layout(location = 0) out vec3 color;
 layout(location = 1) out vec2 fragTexCoord;
-
-void main() {
-  // Transform vertex position to world space
-  vec4 pos = modelUBO.world * vec4(inPosition, 1.0);
-
-  // Transform to clip space
-  gl_Position = globalUBO.view_projection * pos;
-
-  // Set color to color of the model
-  color = vec3(inTexCoord, 0.0);
-
-  // Set fragment texture coordinates
-  fragTexCoord = inTexCoord;
-}
