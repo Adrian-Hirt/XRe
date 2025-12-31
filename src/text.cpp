@@ -1,7 +1,8 @@
 #include <xre/text.h>
 
-Text::Text(const std::string sentence, std::shared_ptr<VulkanHandler> vulkan_handler) {
+Text::Text(const std::string sentence, std::shared_ptr<VulkanHandler> vulkan_handler, bool stick_to_hud) {
   m_vulkan_handler = vulkan_handler;
+  m_stick_to_hud = stick_to_hud;
   buildMeshesFromSentence(sentence);
 }
 
@@ -25,7 +26,7 @@ TextChar Text::computeTextureOffsets(int letter) {
 
 void Text::buildMeshesFromSentence(const std::string sentence) {
   int lenght = sentence.length();
-  float x_offset = -0.95f;
+  float x_offset = 0.0f;
   float char_height = 0.1;
   float char_width = 0.05f;
 
@@ -75,7 +76,16 @@ void Text::buildMeshesFromSentence(const std::string sentence) {
 
   // Create the texture and the material
   std::shared_ptr<Texture> texture = std::make_shared<Texture>(DATA_FOLDER "fonts/DejaVuSansMono128NoAA.png", m_vulkan_handler);
-  std::shared_ptr<Material> material = std::make_shared<Material>(SHADERS_FOLDER "vk/texture.vert.spv", SHADERS_FOLDER "vk/texture.frag.spv", texture, m_vulkan_handler);
+
+  std::string vertex_shader;
+  if (m_stick_to_hud) {
+    vertex_shader = SHADERS_FOLDER "vk/bitmap.vert.spv";
+  }
+  else {
+    vertex_shader = SHADERS_FOLDER "vk/texture.vert.spv";
+  }
+
+  std::shared_ptr<Material> material = std::make_shared<Material>(vertex_shader, SHADERS_FOLDER "vk/texture.frag.spv", texture, m_vulkan_handler);
 
   // Create the model
   m_model = std::make_shared<Model>(meshes, glm::vec3(1.0f, 0.0f, 0.0f), material);

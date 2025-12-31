@@ -27,7 +27,7 @@ public:
   XrTime last_time = 0;
 
   // Create some text with some valid and some invalid characters
-  std::shared_ptr<Text> text = res.text("This is a sample text :) カタカナ");
+  std::shared_ptr<Text> text = res.text("This is a sample text :) カタカナ", true);
 
   std::shared_ptr<SceneNode> root_node = std::make_shared<SceneNode>();
   std::shared_ptr<SceneNode> floor_node = std::make_shared<SceneNode>(floor);
@@ -68,10 +68,12 @@ public:
     sphere2_node->setPosition(5.0f, 0.0f, -4.0f);
     cube_node->scale(2.0f, 0.5f, 2.0f);
     cube_node->setPosition(4.0f, 0.5f, 4.0f);
-    text_node->setPosition(0.0f, 1.5f, -1.0f);
+
+    text_node->scale(0.2f, 0.2f, 0.2f);
+    text_node->translate(0.0f, 0.2f, 0.0f);
 
     quad_node->translate(0.8f, 0.8f, 0.0f);
-    quad_node->scale(0.2f, 0.2f, 0.2f);
+    quad_node->scale(0.1f, 0.1f, 0.1f);
 
     root_node->updateTransformation();
 

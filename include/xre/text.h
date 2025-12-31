@@ -12,7 +12,7 @@
 
 class Text {
 public:
-  Text(const std::string sentence, std::shared_ptr<VulkanHandler> vulkan_handler);
+  Text(const std::string sentence, std::shared_ptr<VulkanHandler> vulkan_handler, bool stick_to_hud);
   std::shared_ptr<Model> getModel();
 
 private:
@@ -22,6 +22,10 @@ private:
   // Steps for going through the texture
   const float X_STEP = 1.0f / 32.0f;
   const float Y_STEP = 1.0f / 7.0f;
+
+  // Keep track whether the text should be sticking to the HUD or if it
+  // should be displayed in the world
+  bool m_stick_to_hud = false;
 
   void buildMeshesFromSentence(const std::string sentence);
   inline TextChar computeTextureOffsets(int letter);

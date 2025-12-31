@@ -53,6 +53,6 @@ std::shared_ptr<Model> ResourceManager::model(const char *model_path, std::share
   return std::make_shared<Model>(model_path, color, material, m_vulkan_handler);
 }
 
-std::shared_ptr<Text> ResourceManager::text(std::string sentence) {
-  return std::make_shared<Text>(sentence, m_vulkan_handler);
+std::shared_ptr<Text> ResourceManager::text(std::string sentence, bool stick_to_hud) {
+  return std::make_shared<Text>(sentence, m_vulkan_handler, stick_to_hud);
 }
