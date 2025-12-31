@@ -79,13 +79,13 @@ void Text::buildMeshesFromSentence(const std::string sentence) {
 
   std::string vertex_shader;
   if (m_stick_to_hud) {
-    vertex_shader = SHADERS_FOLDER "vk/bitmap.vert.spv";
+    vertex_shader = SHADERS_FOLDER "bitmap.vert.spv";
   }
   else {
-    vertex_shader = SHADERS_FOLDER "vk/texture.vert.spv";
+    vertex_shader = SHADERS_FOLDER "texture.vert.spv";
   }
 
-  std::shared_ptr<Material> material = std::make_shared<Material>(vertex_shader, SHADERS_FOLDER "vk/texture.frag.spv", texture, m_vulkan_handler);
+  std::shared_ptr<Material> material = std::make_shared<Material>(vertex_shader, SHADERS_FOLDER "texture.frag.spv", texture, m_vulkan_handler);
 
   // Create the model
   m_model = std::make_shared<Model>(meshes, glm::vec3(1.0f, 0.0f, 0.0f), material);
