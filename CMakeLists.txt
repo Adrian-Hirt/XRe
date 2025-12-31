@@ -32,27 +32,7 @@ else()
   message(FATAL_ERROR "Vulkan not found")
 endif()
 
-# FILE(GLOB SRCFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
-SET(SRCFILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/application.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/openxr_handler.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan_handler.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/render_target.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/buffer.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/renderable.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/mesh.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/model.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/scene_node.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/controller.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/hand.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/line.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/object_oriented_bounding_box.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/material.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/texture.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/resource_manager.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/text.cpp
-
-)
+FILE(GLOB SRCFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
 # Setup clang format
 find_program(CLANG_FORMAT_EXE NAMES clang-format)
