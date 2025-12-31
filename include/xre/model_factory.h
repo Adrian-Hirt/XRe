@@ -97,7 +97,8 @@ inline std::shared_ptr<Model> createPlane(float extent, std::shared_ptr<Material
   return std::make_shared<Model>(std::vector<Mesh>{plane_mesh}, color, material);
 }
 
-inline std::shared_ptr<Model> createQuad(std::shared_ptr<Material> material, glm::vec3 color, std::shared_ptr<VulkanHandler> vulkan_handler) {
+inline std::shared_ptr<Model> createQuad(std::shared_ptr<Material> material, glm::vec3 color,
+                                         std::shared_ptr<VulkanHandler> vulkan_handler) {
   auto [vertices, indices] = getQuadVerticesAndIndices();
 
   Mesh plane_mesh = Mesh(vertices, indices, vulkan_handler);

@@ -54,8 +54,7 @@ void Controller::updatePosition(glm::vec3 current_origin) {
   m_model_node->setRotation(controller_orientation);
 
   // Update the aim line
-  m_aim_line->updateAimLineFromControllerPose(controller_position, Utils::toQuat(m_aim.orientation),
-                                              m_aim_line_render_length);
+  m_aim_line->updateAimLineFromControllerPose(controller_position, Utils::toQuat(m_aim.orientation), m_aim_line_render_length);
 }
 
 void Controller::computeSceneInteractions() {

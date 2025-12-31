@@ -30,7 +30,7 @@ void Text::buildMeshesFromSentence(const std::string sentence) {
   float char_height = 0.1;
   float char_width = 0.05f;
 
-  glm::vec3 normal = { 0.0f, 0.0f, 1.0f };
+  glm::vec3 normal = {0.0f, 0.0f, 1.0f};
 
   std::vector<Vertex> vertices;
   std::vector<uint16_t> indices;
@@ -61,7 +61,7 @@ void Text::buildMeshesFromSentence(const std::string sentence) {
       x_offset += char_width;
 
       // Add indices
-      for (uint16_t offset : {0,1,2,3,0,2}) {
+      for (uint16_t offset : {0, 1, 2, 3, 0, 2}) {
         indices.push_back(current_index + offset);
       }
 
@@ -72,7 +72,7 @@ void Text::buildMeshesFromSentence(const std::string sentence) {
 
   // Create the mesh
   Mesh mesh = Mesh(vertices, indices, m_vulkan_handler);
-  std::vector<Mesh> meshes = { mesh };
+  std::vector<Mesh> meshes = {mesh};
 
   // Create the texture and the material
   std::shared_ptr<Texture> texture = std::make_shared<Texture>(DATA_FOLDER "fonts/DejaVuSansMono128NoAA.png", m_vulkan_handler);
@@ -80,17 +80,15 @@ void Text::buildMeshesFromSentence(const std::string sentence) {
   std::string vertex_shader;
   if (m_stick_to_hud) {
     vertex_shader = SHADERS_FOLDER "bitmap.vert.spv";
-  }
-  else {
+  } else {
     vertex_shader = SHADERS_FOLDER "basic.vert.spv";
   }
 
-  std::shared_ptr<Material> material = std::make_shared<Material>(vertex_shader, SHADERS_FOLDER "texture.frag.spv", texture, m_vulkan_handler);
+  std::shared_ptr<Material> material =
+      std::make_shared<Material>(vertex_shader, SHADERS_FOLDER "texture.frag.spv", texture, m_vulkan_handler);
 
   // Create the model
   m_model = std::make_shared<Model>(meshes, glm::vec3(1.0f, 0.0f, 0.0f), material);
 }
 
-std::shared_ptr<Model> Text::getModel() {
-  return m_model;
-}
+std::shared_ptr<Model> Text::getModel() { return m_model; }
