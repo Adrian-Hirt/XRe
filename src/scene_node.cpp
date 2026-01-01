@@ -26,9 +26,6 @@ void SceneNode::render(RenderContext &ctx) {
     // Keep track if there is an interaction with the model
     m_model->setInteractedState(m_intersected_in_current_frame);
 
-    // Update the render context with the transform
-    m_model->setWorldMatrix(m_world_transform);
-
     // And render the model
     m_model->render(ctx);
   }
@@ -60,6 +57,11 @@ void SceneNode::updateTransformation() {
       m_world_transform = m_local_transform;
       m_world_rotation_matrix = glm::toMat4(m_rotation);
     }
+  }
+
+  // Update the transform of the model, if there is a model
+  if (m_model) {
+    m_model->setWorldMatrix(m_world_transform);
   }
 
   // Update the transforms of all the children.
