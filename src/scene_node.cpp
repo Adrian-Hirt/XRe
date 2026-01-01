@@ -45,7 +45,7 @@ void SceneNode::updateTransformation() {
   // if its `m_transform_needs_update` flag or the one of its parent is set to `true`
   if (m_transform_needs_update) {
     // Update the local transform
-    m_local_transform = Geometry::composeWorldMatrix(m_translation, m_rotation, m_scaling);
+    glm::mat4 m_local_transform = Geometry::composeWorldMatrix(m_translation, m_rotation, m_scaling);
 
     if (m_parent) {
       m_world_transform = m_parent->m_world_transform * m_local_transform;

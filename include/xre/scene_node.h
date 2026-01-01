@@ -90,9 +90,6 @@ private:
   // Transform relative to world coordinates
   glm::mat4 m_world_transform;
 
-  // Transform relative to parent
-  glm::mat4 m_local_transform;
-
   // Rotation relative to world
   glm::mat4 m_world_rotation_matrix;
 
