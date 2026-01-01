@@ -27,8 +27,8 @@ public:
   glm::vec3 getColor();
 
   // Intersection check
-  bool intersects(std::shared_ptr<Model> other);
-  bool intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance);
+  bool intersects(std::shared_ptr<Model> other, glm::mat4 other_scene_node_transform, glm::mat4 scene_node_transform);
+  bool intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance, glm::mat4 scene_node_transform);
 
   // Debug methods
   void toggleRenderBoundingBoxes();
@@ -54,11 +54,8 @@ private:
   // Store the original color
   glm::vec3 m_original_model_color;
 
-  // Store the world transform
-  glm::mat4 m_world_matrix;
-
   void loadObj(const char *model_path, std::shared_ptr<VulkanHandler> vulkan_handler);
-  void render(RenderContext &ctx);
+  void render(RenderContext &ctx, glm::mat4 scene_node_transform);
 
   bool m_render_bounding_boxes = false;
 

@@ -27,7 +27,7 @@ void SceneNode::render(RenderContext &ctx) {
     m_model->setInteractedState(m_intersected_in_current_frame);
 
     // And render the model
-    m_model->render(ctx);
+    m_model->render(ctx, m_world_transform);
   }
 
   for (std::shared_ptr<SceneNode> child : m_children) {
@@ -57,11 +57,6 @@ void SceneNode::updateTransformation() {
       m_world_transform = m_local_transform;
       m_world_rotation_matrix = glm::toMat4(m_rotation);
     }
-  }
-
-  // Update the transform of the model, if there is a model
-  if (m_model) {
-    m_model->setWorldMatrix(m_world_transform);
   }
 
   // Update the transforms of all the children.
@@ -178,10 +173,12 @@ std::unordered_set<SceneNode *> SceneNode::getTerrainInstances() {
   return result;
 }
 
-bool SceneNode::intersects(std::shared_ptr<SceneNode> other) { return m_model->intersects(other->m_model); }
+bool SceneNode::intersects(std::shared_ptr<SceneNode> other) {
+  return m_model->intersects(other->m_model, other->m_world_transform, m_world_transform);
+}
 
 bool SceneNode::intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance) {
-  return m_model->intersects(line_start, line_direction, out_distance);
+  return m_model->intersects(line_start, line_direction, out_distance, m_world_transform);
 }
 
 void SceneNode::resetInteractionStates() {

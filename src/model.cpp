@@ -26,10 +26,10 @@ Model::Model(const char *model_path, glm::vec3 color, std::shared_ptr<Material> 
   m_material = material;
 }
 
-void Model::render(RenderContext &ctx) {
+void Model::render(RenderContext &ctx, glm::mat4 scene_node_transform) {
   // Prepare model uniform buffer
   ModelUniformBufferObject uniform_buffer_object{};
-  uniform_buffer_object.world = m_world_matrix;
+  uniform_buffer_object.world = scene_node_transform;
   uniform_buffer_object.color = m_model_color;
 
   // Render a different color if the model is interacted with.
@@ -151,17 +151,15 @@ void Model::loadObj(const char *model_path, std::shared_ptr<VulkanHandler> vulka
   };
 }
 
-void Model::setWorldMatrix(glm::mat4 world_matrix) { m_world_matrix = world_matrix; }
-
 // TODO: Build "outer" bounding box containing all meshes such that we first only
 // need to check the outer bounding box and then only if we have a hit there
 // we check the inner meshes. Currently, as most models only have one mesh,
 // this should be enough.
-bool Model::intersects(std::shared_ptr<Model> other) {
+bool Model::intersects(std::shared_ptr<Model> other, glm::mat4 other_scene_node_transform, glm::mat4 scene_node_transform) {
   for (auto mesh : m_meshes) {
-    auto this_OOBB = mesh.getObjectOrientedBoundingBox().transformed(m_world_matrix);
+    auto this_OOBB = mesh.getObjectOrientedBoundingBox().transformed(scene_node_transform);
     for (auto other_mesh : other->m_meshes) {
-      auto other_OOBB = other_mesh.getObjectOrientedBoundingBox().transformed(other->m_world_matrix);
+      auto other_OOBB = other_mesh.getObjectOrientedBoundingBox().transformed(other_scene_node_transform);
       if (this_OOBB.intersects(other_OOBB)) {
         return true;
       }
@@ -171,9 +169,9 @@ bool Model::intersects(std::shared_ptr<Model> other) {
   return false;
 }
 
-bool Model::intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance) {
+bool Model::intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance, glm::mat4 scene_node_transform) {
   for (auto mesh : m_meshes) {
-    auto this_OOBB = mesh.getObjectOrientedBoundingBox().transformed(m_world_matrix);
+    auto this_OOBB = mesh.getObjectOrientedBoundingBox().transformed(scene_node_transform);
     if (this_OOBB.intersects(line_start, line_direction, out_distance)) {
       return true;
     }
