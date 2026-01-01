@@ -2,6 +2,7 @@
 
 // Include scenes
 #include "scenes/main_scene.h"
+#include "scenes/other_scene.h"
 
 class VulkanApp : public Application {
 public:
@@ -13,6 +14,10 @@ public:
   void setup() override {
     scenes->registerScene("main", [this] {
       return std::make_unique<MainScene>(res, scenes);
+    });
+
+    scenes->registerScene("other", [this] {
+      return std::make_unique<OtherScene>(res, scenes);
     });
 
     scenes->setActive("main");

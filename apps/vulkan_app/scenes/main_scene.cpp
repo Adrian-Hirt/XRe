@@ -1,8 +1,7 @@
 #include "main_scene.h"
+#include <xre/scene_manager.h>
 
 void MainScene::onActivate() {
-  std::cout << "Setup" << std::endl;
-
   // --------------------------------------------------------------------
   // Create resources
   // --------------------------------------------------------------------
@@ -40,8 +39,10 @@ void MainScene::onActivate() {
 
   button = m_resource_manager->button(
     basic_material,
+    true,
     [this]() {
-      std::cout << "Press" << std::endl;
+      std::cout << "Switching to other" << std::endl;
+      m_scene_manager->setActive("other");
     }
   );
 
