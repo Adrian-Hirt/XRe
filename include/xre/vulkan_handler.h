@@ -40,7 +40,7 @@ public:
 
   static constexpr VkFormat s_color_format = VK_FORMAT_R8G8B8A8_SRGB;
   static constexpr uint32_t s_max_models_in_scene = 256;
-  static constexpr uint32_t s_max_descriptors = 20;
+  static constexpr uint32_t s_max_descriptors = 20; // TODO: we might need to be able to handle more materials
 
   VkPipelineLayout createPipelineLayout();
   VkPipeline createGraphicsPipeline(const std::string &vert_path, const std::string &frag_path);

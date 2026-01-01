@@ -11,6 +11,8 @@
 #include <xre/texture.h>
 #include <xre/resource_manager.h>
 #include <xre/button.h>
+#include <xre/scene.h>
+#include <xre/scene_manager.h>
 
 // Other includes
 #include <memory>
@@ -26,7 +28,8 @@ public:
   virtual void draw(RenderContext &ctx);
   virtual void updateSimulation(XrTime predicted_time);
 
-  ResourceManager &resourceManager();
+  std::shared_ptr<ResourceManager> resourceManager();
+  std::shared_ptr<SceneManager> sceneManager();
 
 private:
   // Handlers
@@ -34,4 +37,7 @@ private:
 
   // Resource manager
   std::shared_ptr<ResourceManager> m_resource_manager;
+
+  // Scene manager
+  std::shared_ptr<SceneManager> m_scene_manager;
 };

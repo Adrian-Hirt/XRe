@@ -17,12 +17,13 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <string>
 
 // small header-only file which contains some utility functions
 
 namespace Utils {
 // Prints a message and then exits the application
-inline void exitWithMessage(const char *error_string) {
+inline void exitWithMessage(const std::string& error_string) {
   std::cout << error_string << std::endl;
   exit(EXIT_FAILURE);
 };
