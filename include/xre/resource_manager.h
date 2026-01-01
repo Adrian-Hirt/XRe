@@ -7,10 +7,12 @@
 #include <xre/model_factory.h>
 #include <xre/line.h>
 #include <xre/text.h>
+#include <xre/button.h>
 
 // Other includes
 #include <memory>
 #include <string>
+#include <functional>
 
 class ResourceManager {
 public:
@@ -42,6 +44,9 @@ public:
 
   // Methods to create text
   std::shared_ptr<Text> text(std::string sentence, bool stick_to_hud);
+
+  // Methods to create a button
+  std::shared_ptr<Button> button(std::shared_ptr<Material> material, std::function<void()> activated_callback);
 
 private:
   std::shared_ptr<VulkanHandler> m_vulkan_handler;

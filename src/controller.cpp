@@ -85,6 +85,23 @@ void Controller::computeSceneInteractions() {
       }
     }
   }
+
+  // Check if any of the buttons are activated
+  // TODO: this only works for a single controller active
+  for (Button *button : Button::getInstances()) {
+    // Get the scene node of the button
+    auto scene_node = button->getRootNode();
+    
+    // Skip if the other controller already intersects
+    if (scene_node->m_intersected_in_current_frame) {
+      continue;
+    }
+
+    if (scene_node->intersects(m_model_node)) {
+      // Keep track that we're intersecting with this model
+      scene_node->m_intersected_in_current_frame = true;
+    }
+  }
 }
 
 std::optional<glm::vec3> Controller::updateIntersectionSphereAndComputePossibleTeleport() {

@@ -10,9 +10,11 @@
 #include <xre/material.h>
 #include <xre/texture.h>
 #include <xre/resource_manager.h>
+#include <xre/button.h>
 
 // Other includes
 #include <memory>
+#include <functional>
 
 class Application {
 public:

@@ -56,3 +56,7 @@ std::shared_ptr<Model> ResourceManager::model(const char *model_path, std::share
 std::shared_ptr<Text> ResourceManager::text(std::string sentence, bool stick_to_hud) {
   return std::make_shared<Text>(sentence, m_vulkan_handler, stick_to_hud);
 }
+
+std::shared_ptr<Button> ResourceManager::button(std::shared_ptr<Material> material, std::function<void()> activated_callback) {
+  return std::make_shared<Button>(material, std::move(activated_callback), m_vulkan_handler);
+}

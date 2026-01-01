@@ -39,6 +39,19 @@ public:
   std::shared_ptr<SceneNode> text_node = std::make_shared<SceneNode>(text->getModel());
   std::shared_ptr<SceneNode> quad_node = std::make_shared<SceneNode>(quad);
 
+  // Create a button
+  std::shared_ptr<Button> button = resourceManager().button(
+    basic_material,
+    [this]() {
+      onButtonPressed();
+    }
+  );
+  std::shared_ptr<SceneNode> button_node = button->getRootNode();
+
+  void onButtonPressed() {
+    std::cout << "Pressed" << std::endl;
+  }
+
   bool forward = true;
 
   void setup() override {
@@ -57,6 +70,7 @@ public:
     root_node->addChildNode(cube_node);
     root_node->addChildNode(text_node);
     root_node->addChildNode(quad_node);
+    root_node->addChildNode(button_node);
 
     // Update initial transforms
     cube1_node->setScale(0.1f, 0.1f, 0.1f);
@@ -68,6 +82,7 @@ public:
     sphere2_node->setPosition(5.0f, 0.0f, -4.0f);
     cube_node->scale(2.0f, 0.5f, 2.0f);
     cube_node->setPosition(4.0f, 0.5f, 4.0f);
+    button_node->setPosition({1.0f, 1.3f, 0.0f});
 
     text_node->scale(0.2f, 0.2f, 0.2f);
     text_node->translate(0.0f, 0.2f, 0.0f);

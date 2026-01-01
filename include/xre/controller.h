@@ -15,6 +15,7 @@
 #include <xre/structs.h>
 #include <xre/material.h>
 #include <xre/vulkan_handler.h>
+#include <xre/button.h>
 
 class Controller {
 public:
