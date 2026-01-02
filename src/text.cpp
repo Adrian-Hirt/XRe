@@ -85,7 +85,7 @@ void Text::buildMeshesFromSentence(const std::string sentence) {
   }
 
   std::shared_ptr<Material> material =
-      std::make_shared<Material>(vertex_shader, SHADERS_FOLDER "texture.frag.spv", texture, m_vulkan_handler);
+      std::make_shared<Material>(vertex_shader, SHADERS_FOLDER "texture.frag.spv", texture, false, m_vulkan_handler);
 
   // Create the model
   m_model = std::make_shared<Model>(meshes, glm::vec3(1.0f, 0.0f, 0.0f), material);

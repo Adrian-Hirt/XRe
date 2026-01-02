@@ -19,7 +19,7 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
 
   // Create the material for the controllers and hands
   m_interactions_material =
-      std::make_shared<Material>(SHADERS_FOLDER "ambient.vert.spv", SHADERS_FOLDER "basic.frag.spv", m_vulkan_handler);
+      std::make_shared<Material>(SHADERS_FOLDER "ambient.vert.spv", SHADERS_FOLDER "basic.frag.spv", true, m_vulkan_handler);
 
   // Instruct the handler to initialize the xr actions
   initializeOpenxrActions();

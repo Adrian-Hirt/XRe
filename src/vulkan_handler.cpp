@@ -371,7 +371,7 @@ void VulkanHandler::setupRenderer() {
   result = vkCreateDescriptorPool(m_device, &global_descriptor_pool_create_info, nullptr, &global_descriptor_pool);
   Utils::checkVkResult(result, "Failed to create global descriptor pool");
 
-  // Create local descriptor pool
+  // Create scene descriptor pool
   std::array<VkDescriptorPoolSize, 2> poolSizes{};
   poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
   poolSizes[0].descriptorCount = s_max_descriptors;
@@ -383,8 +383,12 @@ void VulkanHandler::setupRenderer() {
   descriptor_pool_create_info.pPoolSizes = poolSizes.data();
   descriptor_pool_create_info.maxSets = s_max_descriptors;
 
-  result = vkCreateDescriptorPool(m_device, &descriptor_pool_create_info, nullptr, &m_local_descriptor_pool);
-  Utils::checkVkResult(result, "Failed to create descriptor pool");
+  result = vkCreateDescriptorPool(m_device, &descriptor_pool_create_info, nullptr, &m_scene_descriptor_pool);
+  Utils::checkVkResult(result, "Failed to create scene descriptor pool");
+
+  // Create persistent descriptor pool
+  result = vkCreateDescriptorPool(m_device, &descriptor_pool_create_info, nullptr, &m_persistent_descriptor_pool);
+  Utils::checkVkResult(result, "Failed to create persistent descriptor pool");
 
   //------------------------------------------------------------------------------------------------------
   // Descriptor set
@@ -460,11 +464,17 @@ Buffer *VulkanHandler::createUniformBuffer() {
 }
 
 VkDescriptorSet VulkanHandler::allocateDescriptorSet(Buffer *material_uniform_buffer, VkImageView texture_image_view,
-                                                     VkSampler texture_sampler) {
+                                                     VkSampler texture_sampler, bool use_persistent_pool) {
   VkDescriptorSetAllocateInfo descriptor_set_allocate_info{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
-  descriptor_set_allocate_info.descriptorPool = m_local_descriptor_pool;
   descriptor_set_allocate_info.descriptorSetCount = 1u;
   descriptor_set_allocate_info.pSetLayouts = &m_descriptor_set_layout;
+
+  if (use_persistent_pool) {
+    descriptor_set_allocate_info.descriptorPool = m_persistent_descriptor_pool;
+  }
+  else {
+    descriptor_set_allocate_info.descriptorPool = m_scene_descriptor_pool;
+  }
 
   VkDescriptorSet descriptor_set;
   VkResult result = vkAllocateDescriptorSets(m_device, &descriptor_set_allocate_info, &descriptor_set);
@@ -712,7 +722,7 @@ void VulkanHandler::resetDescriptorPool() {
   //------------------------------------------------------------------------------------------------------
   // Reset descriptor pool
   //------------------------------------------------------------------------------------------------------
-  result = vkResetDescriptorPool(m_device, m_local_descriptor_pool, 0);
+  result = vkResetDescriptorPool(m_device, m_scene_descriptor_pool, 0);
   Utils::checkVkResult(result, "Failed to reset descriptor pool");
 }
 
