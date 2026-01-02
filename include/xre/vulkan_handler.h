@@ -47,6 +47,7 @@ public:
   void bindGraphicsPipeline(VkPipeline pipeline);
   Buffer *createUniformBuffer();
   VkDescriptorSet allocateDescriptorSet(Buffer *material_uniform_buffer, VkImageView texture_image_view, VkSampler texture_sampler);
+  void resetDescriptorPool();
 
   VkCommandBuffer beginSingleTimeCommands();
   void endSingleTimeCommands(VkCommandBuffer commandBuffer);

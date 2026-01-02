@@ -373,9 +373,6 @@ void VulkanHandler::setupRenderer() {
 
   // Create local descriptor pool
   std::array<VkDescriptorPoolSize, 2> poolSizes{};
-  // VkDescriptorPoolSize descriptor_pool_size;
-  // descriptor_pool_size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-  // descriptor_pool_size.descriptorCount = s_max_descriptors;
   poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
   poolSizes[0].descriptorCount = s_max_descriptors;
   poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -383,7 +380,6 @@ void VulkanHandler::setupRenderer() {
 
   VkDescriptorPoolCreateInfo descriptor_pool_create_info{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
   descriptor_pool_create_info.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-  ;
   descriptor_pool_create_info.pPoolSizes = poolSizes.data();
   descriptor_pool_create_info.maxSets = s_max_descriptors;
 
@@ -700,6 +696,24 @@ VkShaderModule VulkanHandler::createShaderModule(const std::vector<char> &code) 
   Utils::checkVkResult(result, "Failed to create shader module");
 
   return shader_module;
+}
+
+void VulkanHandler::resetDescriptorPool() {
+  VkResult result;
+
+  //------------------------------------------------------------------------------------------------------
+  // Wait for the previous frame
+  //------------------------------------------------------------------------------------------------------
+  // Wait for the previous frame to be finished (by waiting for the fence
+  // to be signalled)
+  result = vkWaitForFences(m_device, 1u, &m_fence, VK_TRUE, UINT64_MAX);
+  Utils::checkVkResult(result, "Failed to wait for memory fence");
+
+  //------------------------------------------------------------------------------------------------------
+  // Reset descriptor pool
+  //------------------------------------------------------------------------------------------------------
+  result = vkResetDescriptorPool(m_device, m_local_descriptor_pool, 0);
+  Utils::checkVkResult(result, "Failed to reset descriptor pool");
 }
 
 void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuffer framebuf, VkExtent2D resolution,

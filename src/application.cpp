@@ -8,7 +8,7 @@ Application::Application(const char *application_name) {
   m_resource_manager = std::make_shared<ResourceManager>(m_open_xr_handler->m_vulkan_handler);
 
   // Create the scene manager
-  m_scene_manager = std::make_shared<SceneManager>();
+  m_scene_manager = std::make_shared<SceneManager>(m_open_xr_handler->m_vulkan_handler);
 }
 
 Application::~Application() {};

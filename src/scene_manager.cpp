@@ -1,5 +1,9 @@
 #include <xre/scene_manager.h>
 
+SceneManager::SceneManager(std::shared_ptr<VulkanHandler> vulkan_handler) {
+  m_vulkan_handler = vulkan_handler;
+}
+
 void SceneManager::registerScene(std::string name, SceneFactory factory) {
   m_scene_factories[std::move(name)] = std::move(factory);
 }
@@ -13,6 +17,7 @@ void SceneManager::setActive(const std::string& name) {
   // Deactivate old scene
   if (m_active_scene) {
     m_active_scene->onDeactivate();
+    m_vulkan_handler->resetDescriptorPool();
   }
 
   // Create fresh instance and activate it
