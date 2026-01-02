@@ -232,7 +232,7 @@ VulkanHandler::VulkanHandler(XrInstance xr_instance, XrSystemId xr_system_id, co
   //------------------------------------------------------------------------------------------------------
   // We only have a single color buffer attachment (represented by one of the images from the swapchain)
   VkAttachmentDescription color_attachment{};
-  color_attachment.format = s_color_format;
+  color_attachment.format = USED_COLOR_FORMAT;
   color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
   color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
   color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -374,14 +374,14 @@ void VulkanHandler::setupRenderer() {
   // Create scene descriptor pool
   std::array<VkDescriptorPoolSize, 2> poolSizes{};
   poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-  poolSizes[0].descriptorCount = s_max_descriptors;
+  poolSizes[0].descriptorCount = MAX_DESCRIPTORS;
   poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-  poolSizes[1].descriptorCount = s_max_descriptors;
+  poolSizes[1].descriptorCount = MAX_DESCRIPTORS;
 
   VkDescriptorPoolCreateInfo descriptor_pool_create_info{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
   descriptor_pool_create_info.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
   descriptor_pool_create_info.pPoolSizes = poolSizes.data();
-  descriptor_pool_create_info.maxSets = s_max_descriptors;
+  descriptor_pool_create_info.maxSets = MAX_DESCRIPTORS;
 
   result = vkCreateDescriptorPool(m_device, &descriptor_pool_create_info, nullptr, &m_scene_descriptor_pool);
   Utils::checkVkResult(result, "Failed to create scene descriptor pool");
@@ -460,7 +460,7 @@ void VulkanHandler::setupRenderer() {
 
 Buffer *VulkanHandler::createUniformBuffer() {
   // Create uniform buffer
-  return new Buffer(m_device, m_physical_device, m_aligned_size * s_max_models_in_scene, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
+  return new Buffer(m_device, m_physical_device, m_aligned_size * MAX_MODELS_IN_SCENE, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 }
 
 VkDescriptorSet VulkanHandler::allocateDescriptorSet(Buffer *material_uniform_buffer, VkImageView texture_image_view,

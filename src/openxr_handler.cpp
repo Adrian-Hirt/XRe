@@ -250,7 +250,7 @@ bool OpenXrHandler::initializeOpenxr() {
   // Search the chosen format
   bool format_found = false;
   for (const auto &available_format : swapchain_formats) {
-    if (available_format == VulkanHandler::s_color_format) {
+    if (available_format == VulkanHandler::USED_COLOR_FORMAT) {
       format_found = true;
       break;
     }
@@ -275,8 +275,7 @@ bool OpenXrHandler::initializeOpenxr() {
     swapchain_create_info.arraySize = 1; // Number of array layers
     swapchain_create_info.mipCount = 1;  // Only use one mipmap level, bigger numbers would only be useful for textures
     swapchain_create_info.faceCount = 1; // Number of faces to render, 1 should be used, other option would be 6 for cubemaps
-    swapchain_create_info.format = VulkanHandler::s_color_format;
-    ;
+    swapchain_create_info.format = VulkanHandler::USED_COLOR_FORMAT;
     swapchain_create_info.width =
         current_view_configuration.recommendedImageRectWidth; // Just use the recommended width that the runtime gave us
     swapchain_create_info.height =
@@ -319,7 +318,7 @@ bool OpenXrHandler::initializeOpenxr() {
 
       VkImage image = swapchain_images[j].image;
       render_target = new RenderTarget(m_vulkan_handler->getLogicalDevice(), m_vulkan_handler->getPhysicalDevice(), image,
-                                       getEyeResolution(i), VulkanHandler::s_color_format, m_vulkan_handler->getRenderPass());
+                                       getEyeResolution(i), VulkanHandler::USED_COLOR_FORMAT, m_vulkan_handler->getRenderPass());
     }
   }
 
