@@ -96,12 +96,6 @@ private:
   // Rotation relative to world
   glm::mat4 m_world_rotation_matrix;
 
-  // Set of all instances we marked as grabbable
-  inline static std::unordered_set<SceneNode *> s_grabbable_instances;
-
-  // Set of all instances we marked as terrain (i.e. can teleport there)
-  inline static std::unordered_set<SceneNode *> s_terrain_instances;
-
   // Track if the transform of the scene node needs an update
   bool m_transform_needs_update = true;
 

@@ -94,7 +94,7 @@ private:
   XrAction m_controller_teleport_action;
 
   // For checking if the pose of a controller is valid
-  const static XrSpaceLocationFlags s_pose_valid_flags = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
+  const static XrSpaceLocationFlags VALID_POSE_FLAGS = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
 
   // Tracking positions of headset
   glm::vec3 m_headset_position = glm::zero<glm::vec3>();

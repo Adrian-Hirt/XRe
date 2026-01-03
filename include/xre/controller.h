@@ -61,8 +61,8 @@ public:
 
 private:
   // Threshold for showing the line intersection point
-  static constexpr float s_line_intersection_far_threshold = 6.0f;
-  static constexpr float s_line_intersection_near_threshold = 0.1f;
+  static constexpr float LINE_INTERSECTION_FAR_THRESHOLD = 6.0f;
+  static constexpr float LINE_INTERSECTION_NEAR_THRESHOLD = 0.1f;
 
   // Model for the controller
   std::shared_ptr<Model> m_model;

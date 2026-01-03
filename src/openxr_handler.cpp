@@ -654,7 +654,7 @@ void OpenXrHandler::pollOpenxrActions(XrTime predicted_time) {
   result = xrLocateSpace(m_openxr_view_space, m_openxr_stage_space, predicted_time, &space_location);
   Utils::checkXrResult(result, "Can't get the view pose of the HMD in the stage space");
 
-  if ((space_location.locationFlags & s_pose_valid_flags) == s_pose_valid_flags) {
+  if ((space_location.locationFlags & VALID_POSE_FLAGS) == VALID_POSE_FLAGS) {
     m_headset_position = glm::vec3(space_location.pose.position.x, space_location.pose.position.y, space_location.pose.position.z);
   }
 }
@@ -671,7 +671,7 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
   Utils::checkXrResult(result, "Can't get the grip pose of the controller");
 
   // Check wether the controller should be rendered or not.
-  controller->m_active = (space_location.locationFlags & s_pose_valid_flags) == s_pose_valid_flags;
+  controller->m_active = (space_location.locationFlags & VALID_POSE_FLAGS) == VALID_POSE_FLAGS;
 
   // If the controller is not active, we can return early
   if (!controller->m_active) {

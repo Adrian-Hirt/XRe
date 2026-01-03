@@ -112,7 +112,7 @@ std::optional<glm::vec3> Controller::updateIntersectionSphereAndComputePossibleT
   m_intersection_sphere_node->setActive(false);
 
   // Reset line length
-  m_aim_line_render_length = s_line_intersection_far_threshold;
+  m_aim_line_render_length = LINE_INTERSECTION_FAR_THRESHOLD;
 
   float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(SceneManager::instance().getGrabbableNodeInstances());
   float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(SceneManager::instance().getTerrainInstances());
@@ -153,7 +153,7 @@ float Controller::computeAimIndicatorSpherePosition(std::unordered_set<SceneNode
   // we need to keep track of the smallest threshold. We probably should replace
   // this later with sorting the elements by distance from the camera and then check in
   // ascending distance, but for now this will have to do.
-  float closest_intersection_distance = Controller::s_line_intersection_far_threshold + 1;
+  float closest_intersection_distance = LINE_INTERSECTION_FAR_THRESHOLD + 1;
 
   for (SceneNode *current_node : nodes) {
     // Check if the node intersects the line of the controller
@@ -163,8 +163,8 @@ float Controller::computeAimIndicatorSpherePosition(std::unordered_set<SceneNode
 
     // if(current_node->intersects(m_aim_line.getLineStart(), m_aim_line.getLineDirection(), &intersection_distance)) {
     if (current_node->intersects(start, dir, &intersection_distance)) {
-      if (intersection_distance > 0 && intersection_distance <= Controller::s_line_intersection_far_threshold &&
-          intersection_distance >= Controller::s_line_intersection_near_threshold) {
+      if (intersection_distance > 0 && intersection_distance <= LINE_INTERSECTION_FAR_THRESHOLD &&
+          intersection_distance >=LINE_INTERSECTION_NEAR_THRESHOLD) {
         m_intersection_sphere_node->setActive(true);
 
         if (closest_intersection_distance > intersection_distance) {

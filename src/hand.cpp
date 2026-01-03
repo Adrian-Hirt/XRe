@@ -49,7 +49,7 @@ void Hand::updateHandGrabAndPinchState() {
   }
 
   // Nothing to do if we can't track the thumb
-  if ((m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].locationFlags & s_pose_valid_flags) != s_pose_valid_flags) {
+  if ((m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].locationFlags & VALID_POSE_FLAGS) != VALID_POSE_FLAGS) {
     return;
   }
 
@@ -62,7 +62,7 @@ void Hand::updateHandGrabAndPinchState() {
 
   const float pinch_threshold = 0.05f; // 5 cm
 
-  for (XrHandJointEXT fingertip : s_fingertips) {
+  for (XrHandJointEXT fingertip : FINGERTIPS) {
     glm::vec3 tip_position = Utils::toVec3(m_joint_locations[fingertip].pose.position);
     float tip_distance = glm::length(thumb_position - tip_position);
 
@@ -85,7 +85,7 @@ void Hand::updatePosition(glm::vec3 current_origin) {
 
   for (int i = 0; i < XR_HAND_JOINT_COUNT_EXT; i++) {
     // Only update the joint position its pose is valid
-    if ((m_joint_locations[i].locationFlags & s_pose_valid_flags) != s_pose_valid_flags) {
+    if ((m_joint_locations[i].locationFlags & VALID_POSE_FLAGS) != VALID_POSE_FLAGS) {
       continue;
     }
 
@@ -115,8 +115,8 @@ void Hand::computeSceneInteractions() {
   }
 
   // Nothing to do if either the thumb or the palm is not valid
-  bool thumb_valid = (m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].locationFlags & s_pose_valid_flags) == s_pose_valid_flags;
-  bool palm_valid = (m_joint_locations[XR_HAND_JOINT_PALM_EXT].locationFlags & s_pose_valid_flags) == s_pose_valid_flags;
+  bool thumb_valid = (m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].locationFlags & VALID_POSE_FLAGS) == VALID_POSE_FLAGS;
+  bool palm_valid = (m_joint_locations[XR_HAND_JOINT_PALM_EXT].locationFlags & VALID_POSE_FLAGS) == VALID_POSE_FLAGS;
 
   if (!thumb_valid || !palm_valid) {
     return;

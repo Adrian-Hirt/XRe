@@ -18,9 +18,6 @@ public:
   Model(std::vector<Mesh> meshes, glm::vec3 color, std::shared_ptr<Material> material);
   Model(const char *model_path, glm::vec3 color, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler);
 
-  // Set the world transform
-  void setWorldMatrix(glm::mat4 world_matrix);
-
   // Set the color of the model
   void setColor(glm::vec3 color);
   void resetColor();

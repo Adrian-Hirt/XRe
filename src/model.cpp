@@ -64,16 +64,6 @@ void Model::render(RenderContext &ctx, glm::mat4 scene_node_transform) {
 
 void Model::toggleRenderBoundingBoxes() { m_render_bounding_boxes = !m_render_bounding_boxes; }
 
-// void Model::renderWithTransparency() {
-//   // Render the model twice, once with Counterclockwise
-//   // cull mode, once with the normal clockwise cull mode, such
-//   // that the transparency works correctly.
-//   s_dx11_handler->useDefaultRasterizer(false);
-//   renderMeshes();
-//   s_dx11_handler->useDefaultRasterizer(true);
-//   renderMeshes();
-// }
-
 void Model::setColor(glm::vec3 color) { m_model_color = color; }
 
 void Model::resetColor() { m_model_color = m_original_model_color; }

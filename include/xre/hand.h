@@ -41,10 +41,10 @@ private:
 
   bool m_pinching = false;
 
-  const static XrSpaceLocationFlags s_pose_valid_flags = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
+  const static XrSpaceLocationFlags VALID_POSE_FLAGS = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
 
   // clang-format off
-  static inline XrHandJointEXT s_fingertips[4] = {
+  static inline XrHandJointEXT FINGERTIPS[4] = {
     XR_HAND_JOINT_INDEX_TIP_EXT,
     XR_HAND_JOINT_MIDDLE_TIP_EXT,
     XR_HAND_JOINT_RING_TIP_EXT,
