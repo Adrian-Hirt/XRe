@@ -7,8 +7,8 @@ Application::Application(const char *application_name) {
   // Create the resource manager
   m_resource_manager = std::make_shared<ResourceManager>(m_open_xr_handler->m_vulkan_handler);
 
-  // Create the scene manager
-  m_scene_manager = std::make_shared<SceneManager>(m_open_xr_handler->m_vulkan_handler);
+  // Initialize the scene manager, which is handled as a singleton
+ SceneManager::init(m_open_xr_handler->m_vulkan_handler);
 }
 
 Application::~Application() {};
@@ -39,14 +39,12 @@ void Application::setup() {
 
 void Application::draw(RenderContext &ctx) {
   // Forward call to scene manager which then forwards it to the active scene
-  m_scene_manager->draw(ctx);
+  SceneManager::instance().draw(ctx);
 }
 
 void Application::updateSimulation(XrTime predicted_time) {
   // Forward call to scene manager which then forwards it to the active scene
-  m_scene_manager->updateSimulation(predicted_time);
+  SceneManager::instance().updateSimulation(predicted_time);
 }
 
 std::shared_ptr<ResourceManager> Application::resourceManager() { return m_resource_manager; };
-
-std::shared_ptr<SceneManager> Application::sceneManager() { return m_scene_manager; }

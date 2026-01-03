@@ -128,7 +128,7 @@ void Hand::computeSceneInteractions() {
   std::shared_ptr<SceneNode> thumb_scene_node = m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT];
   std::shared_ptr<SceneNode> palm_scene_node = m_joint_nodes[XR_HAND_JOINT_PALM_EXT];
 
-  for (SceneNode *current_node : SceneNode::getGrabbableInstances()) {
+  for (SceneNode *current_node : SceneManager::instance().getGrabbableNodeInstances()) {
     // Skip this if we already are grabbing this node with another controller or a hand
     if (current_node->m_grabbed) {
       continue;

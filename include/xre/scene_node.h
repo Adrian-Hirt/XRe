@@ -12,6 +12,9 @@
 #include <unordered_set>
 #include <memory>
 
+// Forward declaration
+class Scene;
+
 class SceneNode {
 public:
   SceneNode();
@@ -21,6 +24,7 @@ public:
   void addChildNode(std::shared_ptr<SceneNode> child);
   void render(RenderContext &ctx);
   void updateTransformation();
+  void setScene(Scene *scene);
 
   // These methods apply the rotation / translation / scaling
   // to the values we already have, e.g. to simply double the
@@ -46,9 +50,7 @@ public:
   glm::vec3 getScale();
   glm::vec3 getPosition();
 
-  static std::unordered_set<SceneNode *> getGrabbableInstances();
   void setGrabbable(bool grabbable);
-  static std::unordered_set<SceneNode *> getTerrainInstances();
   void setIsTerrain(bool is_terrain);
 
   void setActive(bool is_active);
@@ -65,9 +67,10 @@ public:
   bool m_intersected_in_current_frame = false;
   bool m_was_intersected_in_previous_frame = false;
 
-  static void resetInteractionStates();
-
 private:
+  // Scene of the node (which might be null for nodes without a scene, e.g. controllers)
+  Scene *m_scene;
+
   // Parent node (which might be null for the root node)
   SceneNode *m_parent;
 

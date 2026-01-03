@@ -29,7 +29,7 @@ void MainScene::onActivate() {
 
   root_node = std::make_shared<SceneNode>();
   floor_node = std::make_shared<SceneNode>(floor);
-  cube1_node = std::make_shared<SceneNode>(cube1);
+  cube1_node = node(cube1);
   cube2_node = std::make_shared<SceneNode>(cube2);
   sphere1_node = std::make_shared<SceneNode>(sphere1);
   sphere2_node = std::make_shared<SceneNode>(sphere2);
@@ -42,7 +42,7 @@ void MainScene::onActivate() {
     true,
     [this]() {
       std::cout << "Switching to other" << std::endl;
-      m_scene_manager->setActive("other");
+      SceneManager::instance().setActive("other");
     }
   );
 

@@ -20,7 +20,7 @@ void OtherScene::onActivate() {
     true,
     [this]() {
       std::cout << "Switching to main" << std::endl;
-      m_scene_manager->setActive("main");
+      SceneManager::instance().setActive("main");
     }
   );
 

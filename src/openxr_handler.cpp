@@ -801,7 +801,7 @@ void OpenXrHandler::renderFrame(std::function<void(RenderContext &)> draw_callba
   teleport_location_right = m_right_controller->updateIntersectionSphereAndComputePossibleTeleport();
 
   // Reset the interaction tracking booleans on the grabbable SceneNodes
-  SceneNode::resetInteractionStates();
+  SceneManager::instance().resetInteractionStates();
   Button::resetInteractionStates();
 
   // As both might have a value, we arbitrarily decide to give the right controller

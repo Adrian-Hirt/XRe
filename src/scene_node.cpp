@@ -1,13 +1,16 @@
 #include <xre/scene_node.h>
+#include <xre/scene.h>
 
 SceneNode::SceneNode() {
   m_parent = NULL;
   m_model = NULL;
+  m_scene = NULL;
 }
 
 SceneNode::SceneNode(std::shared_ptr<Model> model) {
   m_model = model;
   m_parent = NULL;
+  m_scene = NULL;
 }
 
 SceneNode::~SceneNode() { m_children.clear(); }
@@ -66,6 +69,10 @@ void SceneNode::updateTransformation() {
 
   // And then reset the `m_transform_needs_update` flag
   m_transform_needs_update = false;
+}
+
+void SceneNode::setScene(Scene* scene) {
+  m_scene = scene;
 }
 
 void SceneNode::rotate(float roll, float pitch, float yaw) {
@@ -130,30 +137,14 @@ glm::vec3 SceneNode::getScale() { return m_scaling; }
 glm::vec3 SceneNode::getPosition() { return m_translation; }
 
 void SceneNode::setGrabbable(bool grabbable) {
-  if (grabbable) {
-    SceneNode::s_grabbable_instances.insert(this);
-  } else {
-    SceneNode::s_grabbable_instances.erase(this);
+  if (m_scene) {
+    m_scene->setNodeGrabbable(this, grabbable);
   }
-}
-
-std::unordered_set<SceneNode *> SceneNode::getGrabbableInstances() {
-  std::unordered_set<SceneNode *> result;
-
-  for (SceneNode *current_node : s_grabbable_instances) {
-    if (current_node->isActive()) {
-      result.insert(current_node);
-    }
-  }
-
-  return result;
 }
 
 void SceneNode::setIsTerrain(bool is_terrain) {
-  if (is_terrain) {
-    SceneNode::s_terrain_instances.insert(this);
-  } else {
-    SceneNode::s_terrain_instances.erase(this);
+  if (m_scene) {
+    m_scene->setNodeIsTerrain(this, is_terrain);
   }
 }
 
@@ -161,29 +152,10 @@ void SceneNode::setActive(bool is_active) { m_is_active = is_active; }
 
 bool SceneNode::isActive() { return m_is_active; }
 
-std::unordered_set<SceneNode *> SceneNode::getTerrainInstances() {
-  std::unordered_set<SceneNode *> result;
-
-  for (SceneNode *current_node : s_terrain_instances) {
-    if (current_node->isActive()) {
-      result.insert(current_node);
-    }
-  }
-
-  return result;
-}
-
 bool SceneNode::intersects(std::shared_ptr<SceneNode> other) {
   return m_model->intersects(other->m_model, other->m_world_transform, m_world_transform);
 }
 
 bool SceneNode::intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance) {
   return m_model->intersects(line_start, line_direction, out_distance, m_world_transform);
-}
-
-void SceneNode::resetInteractionStates() {
-  for (SceneNode *current_node : s_grabbable_instances) {
-    current_node->m_intersected_in_current_frame = false;
-    current_node->m_grabbed = false;
-  }
 }

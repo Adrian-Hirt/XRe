@@ -5,7 +5,7 @@
 
 class OtherScene : public Scene {
 public:
-  OtherScene(std::shared_ptr<ResourceManager> resource_manager, std::shared_ptr<SceneManager> scene_manager) : Scene(resource_manager, scene_manager) {};
+  OtherScene(std::shared_ptr<ResourceManager> resource_manager) : Scene(resource_manager) {};
 
   void onActivate();
   void draw(RenderContext &ctx);

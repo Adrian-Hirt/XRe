@@ -16,6 +16,7 @@
 #include <xre/material.h>
 #include <xre/vulkan_handler.h>
 #include <xre/button.h>
+#include <xre/scene_manager.h>
 
 class Controller {
 public:

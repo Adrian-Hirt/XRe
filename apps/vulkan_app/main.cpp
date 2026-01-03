@@ -9,18 +9,17 @@ public:
   VulkanApp(const char *application_name) : Application(application_name) {};
 
   std::shared_ptr<ResourceManager> res = resourceManager();
-  std::shared_ptr<SceneManager> scenes = sceneManager();
 
   void setup() override {
-    scenes->registerScene("main", [this] {
-      return std::make_unique<MainScene>(res, scenes);
+    SceneManager::instance().registerScene("main", [this] {
+      return std::make_unique<MainScene>(res);
     });
 
-    scenes->registerScene("other", [this] {
-      return std::make_unique<OtherScene>(res, scenes);
+    SceneManager::instance().registerScene("other", [this] {
+      return std::make_unique<OtherScene>(res);
     });
 
-    scenes->setActive("main");
+    SceneManager::instance().setActive("main");
   }
 };
 

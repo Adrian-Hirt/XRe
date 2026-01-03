@@ -66,7 +66,7 @@ void Controller::computeSceneInteractions() {
   m_root_node.updateTransformation();
 
   // Check if any of our controllers is grabbing a grabbable node
-  for (SceneNode *current_node : SceneNode::getGrabbableInstances()) {
+  for (SceneNode *current_node : SceneManager::instance().getGrabbableNodeInstances()) {
     // Skip this if we already are grabbing this node with another controller or a hand
     if (current_node->m_grabbed) {
       continue;
@@ -115,8 +115,8 @@ std::optional<glm::vec3> Controller::updateIntersectionSphereAndComputePossibleT
   // Reset line length
   m_aim_line_render_length = s_line_intersection_far_threshold;
 
-  float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(SceneNode::getGrabbableInstances());
-  float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(SceneNode::getTerrainInstances());
+  float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(SceneManager::instance().getGrabbableNodeInstances());
+  float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(SceneManager::instance().getTerrainInstances());
 
   if (m_intersection_sphere_node->isActive()) {
     float closest_intersection = std::min(closest_grabbable_aim_intersection, closest_terrain_aim_intersection);

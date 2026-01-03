@@ -29,7 +29,6 @@ public:
   virtual void updateSimulation(XrTime predicted_time);
 
   std::shared_ptr<ResourceManager> resourceManager();
-  std::shared_ptr<SceneManager> sceneManager();
 
 private:
   // Handlers
@@ -37,7 +36,4 @@ private:
 
   // Resource manager
   std::shared_ptr<ResourceManager> m_resource_manager;
-
-  // Scene manager
-  std::shared_ptr<SceneManager> m_scene_manager;
 };

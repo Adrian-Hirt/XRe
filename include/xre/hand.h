@@ -8,6 +8,7 @@
 #include <xre/model_factory.h>
 #include <xre/scene_node.h>
 #include <xre/material.h>
+#include <xre/scene_manager.h>
 
 // Other includes
 #include <memory>

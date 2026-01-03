@@ -1,5 +1,18 @@
 #include <xre/scene_manager.h>
 
+void SceneManager::init(std::shared_ptr<VulkanHandler> vulkan_handler) {
+  if (!s_instance) {
+    s_instance = std::unique_ptr<SceneManager>(new SceneManager(vulkan_handler));
+  }
+}
+
+SceneManager& SceneManager::instance() {
+  if (!s_instance) {
+    throw std::runtime_error("SceneManager not initialized!");
+  }
+  return *s_instance;
+}
+
 SceneManager::SceneManager(std::shared_ptr<VulkanHandler> vulkan_handler) {
   m_vulkan_handler = vulkan_handler;
 }
@@ -34,5 +47,27 @@ void SceneManager::updateSimulation(XrTime predicted_time) {
 void SceneManager::draw(RenderContext& ctx) {
   if (m_active_scene) {
     m_active_scene->draw(ctx);
+  }
+}
+
+void SceneManager::resetInteractionStates() {
+  if (m_active_scene) {
+    m_active_scene->resetInteractionStates();
+  }
+}
+
+std::unordered_set<SceneNode *> SceneManager::getGrabbableNodeInstances() {
+  if (m_active_scene) {
+    return m_active_scene->getGrabbableNodeInstances();
+  } else {
+    return {};
+  }
+}
+
+std::unordered_set<SceneNode *> SceneManager::getTerrainInstances() {
+  if (m_active_scene) {
+    return m_active_scene->getTerrainNodeInstances();
+  } else {
+    return {};
   }
 }
