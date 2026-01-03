@@ -4,10 +4,6 @@ project(XRe)
 # TODO: will need to make this work with ARM64 later.
 set(TARGET_ARCHITECTURE x64)
 
-# TODO: remove and fix warnings
-add_compile_options(-Wno-ignored-attributes)
-add_compile_options(-Wno-narrowing)
-
 set(CMAKE_CXX_STANDARD 20)
 
 # Enable Action bindings other than khr/simple_controller. Comment this out to only use
@@ -54,10 +50,6 @@ endif()
 
 # Needed to access the include folders from the individual apps
 SET(XRE_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/ext)
-
-# SET(ADDITIONAL_SRCFILES
-#   "${CMAKE_CURRENT_LIST_DIR}/ext/DirectXTex/WICTextureLoader11.cpp"
-# )
 
 set(SHADERS_FOLDER "\"${CMAKE_CURRENT_SOURCE_DIR}/shaders/\"" STRING "")
 set(DATA_FOLDER "\"${CMAKE_CURRENT_SOURCE_DIR}/data/\"" STRING "")
