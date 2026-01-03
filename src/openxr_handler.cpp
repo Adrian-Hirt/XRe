@@ -44,8 +44,9 @@ bool OpenXrHandler::initializeOpenxr() {
   // Setup requested extensions
   //------------------------------------------------------------------------------------------------------
   std::vector<const char *> requested_extensions = {
-      XR_KHR_VULKAN_ENABLE_EXTENSION_NAME, XR_EXT_HAND_TRACKING_EXTENSION_NAME
-      // XR_EXT_HAND_INTERACTION_EXTENSION_NAME // Not supported on Quest at the moment it seems
+    XR_KHR_VULKAN_ENABLE_EXTENSION_NAME,
+    XR_EXT_HAND_TRACKING_EXTENSION_NAME
+    // XR_EXT_HAND_INTERACTION_EXTENSION_NAME // Not supported on Quest at the moment it seems
   };
 
   //------------------------------------------------------------------------------------------------------
@@ -81,8 +82,12 @@ bool OpenXrHandler::initializeOpenxr() {
     }
 
     if (!found_extension) {
-      std::cout << "Did not find requested extension " << extension << std::endl;
-      return false;
+      if (strcmp(XR_EXT_HAND_TRACKING_EXTENSION_NAME, extension) == 0) {
+        std::cout << "Hand tracking not supported, app will run without hand tracking" << std::endl;
+      } else {
+        std::cout << "Did not find requested extension " << extension << std::endl;
+        return false;
+      }
     }
   }
 
