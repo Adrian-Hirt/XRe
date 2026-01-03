@@ -5,6 +5,7 @@
 #include <xre/structs.h>
 #include <xre/model.h>
 #include <xre/vulkan_handler.h>
+#include <xre/scene_node.h>
 
 // Other includes
 #include <memory>
@@ -13,7 +14,7 @@
 class Text {
 public:
   Text(const std::string sentence, std::shared_ptr<VulkanHandler> vulkan_handler, bool stick_to_hud);
-  std::shared_ptr<Model> getModel();
+  std::shared_ptr<SceneNode> getSceneNode();
 
 private:
   // Using the extendes ASCII charset for now, which has 224 characters (skipping control character)
@@ -32,4 +33,7 @@ private:
 
   std::shared_ptr<VulkanHandler> m_vulkan_handler;
   std::shared_ptr<Model> m_model;
+
+  // Scene node for the text
+  std::shared_ptr<SceneNode> m_scene_node;
 };

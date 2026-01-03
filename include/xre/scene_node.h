@@ -12,8 +12,11 @@
 #include <unordered_set>
 #include <memory>
 
-// Forward declaration
+// Forward declarations
 class Scene;
+class Line;
+class Text;
+class Button;
 
 class SceneNode {
 public:
@@ -22,6 +25,9 @@ public:
   ~SceneNode();
 
   void addChildNode(std::shared_ptr<SceneNode> child);
+  void addChildNode(std::shared_ptr<Line> child);
+  void addChildNode(std::shared_ptr<Text> child);
+  void addChildNode(std::shared_ptr<Button> child);
   void render(RenderContext &ctx);
   void updateTransformation();
   void setScene(Scene *scene);

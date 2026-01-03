@@ -1,9 +1,15 @@
 #include <xre/text.h>
 
 Text::Text(const std::string sentence, std::shared_ptr<VulkanHandler> vulkan_handler, bool stick_to_hud) {
+  // Store some members
   m_vulkan_handler = vulkan_handler;
   m_stick_to_hud = stick_to_hud;
+
+  // Build the meshes and model
   buildMeshesFromSentence(sentence);
+
+  // Setup the scene node
+  m_scene_node = std::make_shared<SceneNode>(m_model);
 }
 
 TextChar Text::computeTextureOffsets(int letter) {
@@ -91,4 +97,7 @@ void Text::buildMeshesFromSentence(const std::string sentence) {
   m_model = std::make_shared<Model>(meshes, glm::vec3(1.0f, 0.0f, 0.0f), material);
 }
 
-std::shared_ptr<Model> Text::getModel() { return m_model; }
+std::shared_ptr<SceneNode> Text::getSceneNode() {
+  return m_scene_node;
+}
+

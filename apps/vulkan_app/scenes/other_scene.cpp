@@ -30,10 +30,10 @@ void OtherScene::onActivate() {
 
   // Setup scene graph
   root_node->addChildNode(floor_node);
-  root_node->addChildNode(button->getRootNode());
+  root_node->addChildNode(button);
 
   // Update initial transforms
-  button->getRootNode()->setPosition({-1.0f, 1.3f, 0.0f});
+  button->getSceneNode()->setPosition({-1.0f, 1.3f, 0.0f});
 
   floor_node->setIsTerrain(true);
 

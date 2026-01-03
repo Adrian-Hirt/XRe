@@ -16,7 +16,7 @@ Button::Button(Scene* scene, std::shared_ptr<Material> material, bool disable_on
   scene->addButton(this);
 }
 
-std::shared_ptr<SceneNode> Button::getRootNode() {
+std::shared_ptr<SceneNode> Button::getSceneNode() {
   return m_root_node;
 }
 

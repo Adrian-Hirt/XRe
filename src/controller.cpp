@@ -12,11 +12,13 @@ Controller::Controller(std::shared_ptr<Material> material, std::shared_ptr<Vulka
   m_intersection_sphere_node = std::make_shared<SceneNode>(m_aim_indicator_sphere);
   m_intersection_sphere_node->scale(0.05f, 0.05f, 0.05f);
 
-  m_root_node.addChildNode(m_model_node);
-  m_root_node.addChildNode(m_intersection_sphere_node);
-
   // Create the line for the aim direction
   m_aim_line = std::make_shared<Line>(0.003f, 2.0f, glm::vec3(1.0f, 0.0f, 0.0f), material, vulkan_handler);
+
+  // Setup the scene nodes
+  m_root_node.addChildNode(m_model_node);
+  m_root_node.addChildNode(m_intersection_sphere_node);
+  m_root_node.addChildNode(m_aim_line);
 }
 
 void Controller::render(RenderContext &ctx) {
@@ -34,7 +36,6 @@ void Controller::render(RenderContext &ctx) {
   }
 
   m_root_node.render(ctx);
-  m_aim_line->render(ctx);
 }
 
 void Controller::updatePosition(glm::vec3 current_origin) {
@@ -89,7 +90,7 @@ void Controller::computeSceneInteractions() {
   // Check if any of the buttons are activated
   for (Button *button : SceneManager::instance().getButtonInstances()) {
     // Get the scene node of the button
-    auto scene_node = button->getRootNode();
+    auto scene_node = button->getSceneNode();
     
     // Skip if the other controller already intersects
     if (scene_node->m_intersected_in_current_frame) {

@@ -33,7 +33,6 @@ void MainScene::onActivate() {
   sphere1_node = node(sphere1);
   sphere2_node = node(sphere2);
   cube_node = node(cube);
-  text_node = node(text->getModel());
   quad_node = node(quad);
 
   button = m_resource_manager->button(
@@ -60,9 +59,10 @@ void MainScene::onActivate() {
   root_node->addChildNode(sphere1_node);
   root_node->addChildNode(sphere2_node);
   root_node->addChildNode(cube_node);
-  root_node->addChildNode(text_node);
+  root_node->addChildNode(text);
   root_node->addChildNode(quad_node);
-  root_node->addChildNode(button->getRootNode());
+  root_node->addChildNode(button);
+  root_node->addChildNode(line);
 
   // Update initial transforms
   cube1_node->setScale(0.1f, 0.1f, 0.1f);
@@ -74,10 +74,10 @@ void MainScene::onActivate() {
   sphere2_node->setPosition(5.0f, 0.0f, -4.0f);
   cube_node->scale(2.0f, 0.5f, 2.0f);
   cube_node->setPosition(4.0f, 0.5f, 4.0f);
-  button->getRootNode()->setPosition({1.0f, 1.3f, 0.0f});
+  button->getSceneNode()->setPosition({1.0f, 1.3f, 0.0f});
 
-  text_node->scale(0.2f, 0.2f, 0.2f);
-  text_node->translate(0.0f, 0.2f, 0.0f);
+  text->getSceneNode()->scale(0.2f, 0.2f, 0.2f);
+  text->getSceneNode()->translate(0.0f, 0.2f, 0.0f);
 
   quad_node->translate(0.8f, 0.8f, 0.0f);
   quad_node->scale(0.1f, 0.1f, 0.1f);
@@ -97,8 +97,6 @@ void MainScene::draw(RenderContext &ctx) {
   } else {
     cube1->resetColor();
   }
-
-  line->render(ctx);
 }
 
 void MainScene::updateSimulation(XrTime predicted_time) {

@@ -15,7 +15,7 @@
 class Button {
 public:
   Button(Scene* scene, std::shared_ptr<Material> material, bool disable_on_trigger, std::function<void()>trigger_callback, std::shared_ptr<VulkanHandler> vulkan_handler);
-  std::shared_ptr<SceneNode> getRootNode();
+  std::shared_ptr<SceneNode> getSceneNode();
   void trigger();
   bool isEnabled();
 

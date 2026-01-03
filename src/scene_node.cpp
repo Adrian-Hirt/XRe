@@ -1,5 +1,8 @@
 #include <xre/scene_node.h>
 #include <xre/scene.h>
+#include <xre/line.h>
+#include <xre/text.h>
+#include <xre/button.h>
 
 SceneNode::SceneNode() {
   m_parent = NULL;
@@ -18,6 +21,18 @@ SceneNode::~SceneNode() { m_children.clear(); }
 void SceneNode::addChildNode(std::shared_ptr<SceneNode> child) {
   m_children.push_back(child);
   child->m_parent = this;
+}
+
+void SceneNode::addChildNode(std::shared_ptr<Line> child) {
+  addChildNode(child->getSceneNode());
+}
+
+void SceneNode::addChildNode(std::shared_ptr<Text> child) {
+  addChildNode(child->getSceneNode());
+}
+
+void SceneNode::addChildNode(std::shared_ptr<Button> child) {
+  addChildNode(child->getSceneNode());
 }
 
 void SceneNode::render(RenderContext &ctx) {

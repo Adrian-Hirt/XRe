@@ -4,19 +4,13 @@ Line::Line(float thickness, float length, glm::vec3 color, std::shared_ptr<Mater
            std::shared_ptr<VulkanHandler> vulkan_handler) {
   m_line_color = color;
   m_model = ModelFactory::createCube(m_line_color, material, vulkan_handler);
-  m_scene_node = SceneNode(m_model);
-  m_scene_node.setScale({thickness, thickness, length});
-  m_scene_node.setPosition({0.0f, 1.0f, 0.0f});
+  m_scene_node = std::make_shared<SceneNode>(m_model);
+  m_scene_node->setScale({thickness, thickness, length});
+  m_scene_node->setPosition({0.0f, 1.0f, 0.0f});
 }
 
-void Line::render(RenderContext &ctx) {
-  m_scene_node.updateTransformation();
-  m_scene_node.render(ctx);
-}
-
-void Line::render(RenderContext &ctx, float length_to_render) {
-  m_scene_node.updateTransformation();
-  m_scene_node.render(ctx);
+std::shared_ptr<SceneNode> Line::getSceneNode() {
+  return m_scene_node;
 }
 
 void Line::updateAimLineFromControllerPose(glm::vec3 controller_position, glm::quat controller_orientation, float length) {
@@ -27,20 +21,20 @@ void Line::updateAimLineFromControllerPose(glm::vec3 controller_position, glm::q
   // Compute rotation to align cube's +Z axis with dir
   glm::vec3 cube_forward(0.0f, 0.0f, 1.0f);
   glm::quat rotation = glm::rotation(cube_forward, normalized_direction);
-  m_scene_node.setRotation(rotation);
+  m_scene_node->setRotation(rotation);
 
   // Compute offset for cube center: move forward by the length
   glm::vec3 cube_center = controller_position + normalized_direction * length;
-  m_scene_node.setPosition(cube_center);
+  m_scene_node->setPosition(cube_center);
 
   // Update fields
   m_line_start = controller_position;
   m_line_direction = normalized_direction;
 
   // Update Z scale for the length
-  glm::vec3 scale = m_scene_node.getScale();
+  glm::vec3 scale = m_scene_node->getScale();
   scale.z = length;
-  m_scene_node.setScale(scale);
+  m_scene_node->setScale(scale);
 }
 
 glm::vec3 Line::getLineStart() { return m_line_start; }

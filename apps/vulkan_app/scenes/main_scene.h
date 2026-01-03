@@ -41,7 +41,6 @@ private:
   std::shared_ptr<SceneNode> sphere1_node;
   std::shared_ptr<SceneNode> sphere2_node;
   std::shared_ptr<SceneNode> cube_node;
-  std::shared_ptr<SceneNode> text_node;
   std::shared_ptr<SceneNode> quad_node;
 
   std::shared_ptr<Button> button;
