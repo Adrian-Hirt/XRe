@@ -1,4 +1,6 @@
 #include <xre/scene.h>
+#include <xre/scene_manager.h>
+#include <xre/resource_manager.h>
 
 std::shared_ptr<SceneNode> Scene::node() {
   auto scene_node = std::make_shared<SceneNode>();
@@ -57,4 +59,32 @@ void Scene::resetInteractionStates() {
     current_node->m_intersected_in_current_frame = false;
     current_node->m_grabbed = false;
   }
+}
+
+void Scene::addButton(Button* button) {
+  m_button_instances.insert(button);
+}
+
+void Scene::processButtonInteractions() {
+  for (auto button : getButtonInstances()) {
+    button->processInteractions();
+  }
+}
+
+void Scene::resetButtonInteractions() {
+  for (auto button : m_button_instances) {
+    button->resetInteractionState();
+  }
+}
+
+std::unordered_set<Button *> Scene::getButtonInstances() {
+  std::unordered_set<Button *> result;
+
+  for (Button *button : m_button_instances) {
+    if (button->isEnabled()) {
+      result.insert(button);
+    }
+  }
+
+  return result;
 }

@@ -802,7 +802,7 @@ void OpenXrHandler::renderFrame(std::function<void(RenderContext &)> draw_callba
 
   // Reset the interaction tracking booleans on the grabbable SceneNodes
   SceneManager::instance().resetInteractionStates();
-  Button::resetInteractionStates();
+  SceneManager::instance().resetButtonInteractions();
 
   // As both might have a value, we arbitrarily decide to give the right controller
   // precedende. Later, we might map the teleport action to a single controller anyway,
@@ -833,7 +833,7 @@ void OpenXrHandler::renderFrame(std::function<void(RenderContext &)> draw_callba
   }
 
   // Process button triggers
-  Button::processButtonTriggers();
+  SceneManager::instance().processButtonInteractions();
 
   //------------------------------------------------------------------------------------------------------
   // Update simulation

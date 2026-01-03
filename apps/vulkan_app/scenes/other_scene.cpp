@@ -1,5 +1,4 @@
 #include "other_scene.h"
-#include <xre/scene_manager.h>
 
 void OtherScene::onActivate() {
   // --------------------------------------------------------------------
@@ -12,10 +11,11 @@ void OtherScene::onActivate() {
 
   floor = m_resource_manager->plane(10, texture_material);
 
-  root_node = std::make_shared<SceneNode>();
-  floor_node = std::make_shared<SceneNode>(floor);
+  root_node = node();
+  floor_node = node(floor);
 
   button = m_resource_manager->button(
+    this,
     basic_material,
     true,
     [this]() {

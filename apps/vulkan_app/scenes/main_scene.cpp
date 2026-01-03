@@ -1,5 +1,4 @@
 #include "main_scene.h"
-#include <xre/scene_manager.h>
 
 void MainScene::onActivate() {
   // --------------------------------------------------------------------
@@ -27,17 +26,18 @@ void MainScene::onActivate() {
   // Create some text with some valid and some invalid characters
   text = m_resource_manager->text("This is a sample text :) カタカナ", true);
 
-  root_node = std::make_shared<SceneNode>();
-  floor_node = std::make_shared<SceneNode>(floor);
+  root_node = node();
+  floor_node = node(floor);
   cube1_node = node(cube1);
-  cube2_node = std::make_shared<SceneNode>(cube2);
-  sphere1_node = std::make_shared<SceneNode>(sphere1);
-  sphere2_node = std::make_shared<SceneNode>(sphere2);
-  cube_node = std::make_shared<SceneNode>(cube);
-  text_node = std::make_shared<SceneNode>(text->getModel());
-  quad_node = std::make_shared<SceneNode>(quad);
+  cube2_node = node(cube2);
+  sphere1_node = node(sphere1);
+  sphere2_node = node(sphere2);
+  cube_node = node(cube);
+  text_node = node(text->getModel());
+  quad_node = node(quad);
 
   button = m_resource_manager->button(
+    this,
     basic_material,
     true,
     [this]() {

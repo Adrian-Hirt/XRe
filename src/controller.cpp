@@ -87,8 +87,7 @@ void Controller::computeSceneInteractions() {
   }
 
   // Check if any of the buttons are activated
-  // TODO: this only works for a single controller active
-  for (Button *button : Button::getInstances()) {
+  for (Button *button : SceneManager::instance().getButtonInstances()) {
     // Get the scene node of the button
     auto scene_node = button->getRootNode();
     

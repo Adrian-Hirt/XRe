@@ -2,6 +2,8 @@
 
 // Include scene base class
 #include <xre/scene.h>
+#include <xre/scene_manager.h>
+#include <xre/resource_manager.h>
 
 class OtherScene : public Scene {
 public:

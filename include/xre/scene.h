@@ -7,14 +7,14 @@
 #include <xre/scene_node.h>
 #include <xre/material.h>
 #include <xre/texture.h>
-#include <xre/resource_manager.h>
-#include <xre/button.h>
 
 // Other includes
 #include <memory>
 
-// Forward declaration
+// Forward declarations
 class SceneManager;
+class Button;
+class ResourceManager;
 
 class Scene {
 public:
@@ -40,6 +40,12 @@ public:
   std::unordered_set<SceneNode *> getTerrainNodeInstances();
   void resetInteractionStates();
 
+  std::unordered_set<Button *> getButtonInstances();
+  void processButtonInteractions();
+  void resetButtonInteractions();
+  
+  void addButton(Button * button);
+
 protected:
   // Keep track of resource manager to create resources such as models or materials
   std::shared_ptr<ResourceManager> m_resource_manager;
@@ -49,4 +55,7 @@ protected:
 
   // Set of all scene nodes belonging to this scene we marked as terrain (i.e. can teleport there)
   std::unordered_set<SceneNode *> m_terrain_scene_nodes;
+
+  // Set of all buttons in the scene
+  std::unordered_set<Button *> m_button_instances;
 };

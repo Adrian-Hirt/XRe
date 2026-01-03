@@ -37,6 +37,9 @@ public:
   void resetInteractionStates();
   std::unordered_set<SceneNode *> getGrabbableNodeInstances();
   std::unordered_set<SceneNode *> getTerrainInstances();
+  std::unordered_set<Button *> getButtonInstances();
+  void processButtonInteractions();
+  void resetButtonInteractions();
 private:
   std::unordered_map<std::string, SceneFactory> m_scene_factories;
   std::unique_ptr<Scene> m_active_scene = nullptr;

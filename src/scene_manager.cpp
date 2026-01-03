@@ -27,14 +27,19 @@ void SceneManager::setActive(const std::string& name) {
     Utils::exitWithMessage("Scene not registered: " + name);
   }
 
-  // Deactivate old scene
-  if (m_active_scene) {
-    m_active_scene->onDeactivate();
+  // Keep old scene alive until we finish deactivation
+  std::unique_ptr<Scene> old_scene = std::move(m_active_scene);
+
+  // Create new scene
+  m_active_scene = found_scene->second();
+
+  // Deactivate old scene safely
+  if (old_scene) {
+    old_scene->onDeactivate();
     m_vulkan_handler->resetDescriptorPool();
   }
 
-  // Create fresh instance and activate it
-  m_active_scene = found_scene->second();
+  // Activate new scene
   m_active_scene->onActivate();
 }
 
@@ -67,6 +72,26 @@ std::unordered_set<SceneNode *> SceneManager::getGrabbableNodeInstances() {
 std::unordered_set<SceneNode *> SceneManager::getTerrainInstances() {
   if (m_active_scene) {
     return m_active_scene->getTerrainNodeInstances();
+  } else {
+    return {};
+  }
+}
+
+void SceneManager::processButtonInteractions() {
+  if (m_active_scene) {
+    m_active_scene->processButtonInteractions();
+  }
+}
+
+void SceneManager::resetButtonInteractions() {
+  if (m_active_scene) {
+    m_active_scene->resetButtonInteractions();
+  }
+}
+
+std::unordered_set<Button *> SceneManager::getButtonInstances() {
+  if (m_active_scene) {
+    return m_active_scene->getButtonInstances();
   } else {
     return {};
   }
