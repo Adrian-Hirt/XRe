@@ -81,7 +81,7 @@ private:
 
   // Uniform buffers
   Buffer *m_uniform_buffer = nullptr;
-  Buffer *m_global_uniform_buffer = nullptr;
+  Buffer *m_per_frame_uniform_buffer = nullptr;
 
   // Vertex and index buffers
   Buffer *m_vertex_buffer = nullptr;
@@ -92,8 +92,8 @@ private:
   VkDescriptorPool m_scene_descriptor_pool; // Pool used by a scene for materials, can be reset between scenes
   VkDescriptorPool m_persistent_descriptor_pool; // Pool used by multiple scene, e.g. for controller materials, must not be reset
 
-  VkDescriptorSetLayout m_global_descriptor_set_layout = nullptr;
-  VkDescriptorSet m_global_descriptor_set = nullptr;
+  VkDescriptorSetLayout m_per_frame_descriptor_set_layout = nullptr;
+  VkDescriptorSet m_per_frame_descriptor_set = nullptr;
 
   // Layout of the graphics pipeline (holds `uniform` values in shaders)
   VkPipelineLayout m_pipeline_layout = nullptr;

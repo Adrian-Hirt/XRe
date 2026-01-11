@@ -6,7 +6,7 @@ void main() {
   vec4 pos = modelUBO.world * vec4(inPosition, 1.0);
 
   // Transform to clip space
-  gl_Position = globalUBO.view_projection * pos;
+  gl_Position = perFrameUBO.view_projection * pos;
 
   // Set color to color of the model
   color = modelUBO.color;

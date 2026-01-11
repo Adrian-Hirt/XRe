@@ -20,7 +20,7 @@ public:
   void loadData(std::vector<Vertex> input);
   void loadData(std::vector<uint16_t> input);
   void loadData(ModelUniformBufferObject input, VkDeviceSize offset);
-  void loadData(GlobalUniformBufferObject input);
+  void loadData(PerFrameUniformBufferObject input);
   void loadData(stbi_uc *input);
 
 private:

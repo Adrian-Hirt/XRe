@@ -64,8 +64,8 @@ void Buffer::loadData(ModelUniformBufferObject input, VkDeviceSize offset) {
   unmap();
 }
 
-// Method to load data for the global UBO into a buffer
-void Buffer::loadData(GlobalUniformBufferObject input) {
+// Method to load data for the per frame UBO into a buffer
+void Buffer::loadData(PerFrameUniformBufferObject input) {
   void *data = map();
   memcpy(data, &input, sizeof(input));
   unmap();

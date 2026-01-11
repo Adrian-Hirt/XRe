@@ -1,9 +1,9 @@
-layout(set = 0, binding = 0) uniform GlobalUniformBufferObject {
+layout(set = 0, binding = 0) uniform PerFrameUniformBufferObject {
   mat4 view_projection;
   vec3 light_vector;
   vec3 light_color;
   vec3 ambient_color;
-} globalUBO;
+} perFrameUBO;
 
 layout(set = 1, binding = 0) uniform ModelUniformBufferObject {
   mat4 world;
