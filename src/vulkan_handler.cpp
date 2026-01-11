@@ -306,9 +306,6 @@ void VulkanHandler::setupRenderer() {
   //------------------------------------------------------------------------------------------------------
   // Uniform buffer
   //------------------------------------------------------------------------------------------------------
-  // Create uniform buffer
-  m_uniform_buffer = createUniformBuffer();
-
   // Create per frame uniform buffer
   m_per_frame_uniform_buffer = new Buffer(m_device, m_physical_device, sizeof(PerFrameUniformBufferObject), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 

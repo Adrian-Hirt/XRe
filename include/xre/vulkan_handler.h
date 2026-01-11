@@ -80,7 +80,6 @@ private:
   VkQueue m_graphics_queue = nullptr;
 
   // Uniform buffers
-  Buffer *m_uniform_buffer = nullptr;
   Buffer *m_per_frame_uniform_buffer = nullptr;
 
   // Vertex and index buffers
