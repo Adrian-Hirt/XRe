@@ -8,7 +8,7 @@ Material::Material(const std::string &vert_path, const std::string &frag_path, b
   m_graphics_pipeline = m_vulkan_handler->createGraphicsPipeline(vert_path, frag_path);
 
   // Create uniform buffer
-  m_uniform_buffer = new Buffer(
+  m_uniform_buffer = std::make_unique<Buffer>(
     m_vulkan_handler->getLogicalDevice(),
     m_vulkan_handler->getPhysicalDevice(), 
     m_vulkan_handler->getAlignedSize() * MAX_MODELS_PER_MATERIAL,
@@ -28,7 +28,7 @@ Material::Material(const std::string &vert_path, const std::string &frag_path, s
   m_graphics_pipeline = m_vulkan_handler->createGraphicsPipeline(vert_path, frag_path);
 
   // Create uniform buffer
-  m_uniform_buffer = new Buffer(
+  m_uniform_buffer = std::make_unique<Buffer>(
     m_vulkan_handler->getLogicalDevice(),
     m_vulkan_handler->getPhysicalDevice(), 
     m_vulkan_handler->getAlignedSize() * MAX_MODELS_PER_MATERIAL,
@@ -40,7 +40,7 @@ Material::Material(const std::string &vert_path, const std::string &frag_path, s
       m_vulkan_handler->allocateDescriptorSet(m_uniform_buffer, texture->getTextureImageView(), texture->getTextureSampler(), persist_between_scenes);
 }
 
-Buffer *Material::getUniformBuffer() { return m_uniform_buffer; }
+Buffer *Material::getUniformBuffer() { return m_uniform_buffer.get(); }
 
 VkDescriptorSet Material::getDescriptorset() { return m_descriptor_set; }
 

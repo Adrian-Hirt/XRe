@@ -460,7 +460,7 @@ VkDeviceSize VulkanHandler::getAlignedSize() {
   return m_aligned_size;
 }
 
-VkDescriptorSet VulkanHandler::allocateDescriptorSet(Buffer *material_uniform_buffer, VkImageView texture_image_view,
+VkDescriptorSet VulkanHandler::allocateDescriptorSet(std::unique_ptr<Buffer> &material_uniform_buffer, VkImageView texture_image_view,
                                                      VkSampler texture_sampler, bool use_persistent_pool) {
   VkDescriptorSetAllocateInfo descriptor_set_allocate_info{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
   descriptor_set_allocate_info.descriptorSetCount = 1u;

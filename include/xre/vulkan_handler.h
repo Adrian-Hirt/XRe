@@ -23,6 +23,7 @@
 #include <string>
 #include <set>
 #include <functional>
+#include <memory>
 
 class VulkanHandler {
 public:
@@ -44,7 +45,7 @@ public:
   VkPipelineLayout createPipelineLayout();
   VkPipeline createGraphicsPipeline(const std::string &vert_path, const std::string &frag_path);
   void bindGraphicsPipeline(VkPipeline pipeline);
-  VkDescriptorSet allocateDescriptorSet(Buffer *material_uniform_buffer, VkImageView texture_image_view, VkSampler texture_sampler, bool use_persistent_pool);
+  VkDescriptorSet allocateDescriptorSet(std::unique_ptr<Buffer> &material_uniform_buffer, VkImageView texture_image_view, VkSampler texture_sampler, bool use_persistent_pool);
   void resetDescriptorPool();
 
   VkCommandBuffer beginSingleTimeCommands();

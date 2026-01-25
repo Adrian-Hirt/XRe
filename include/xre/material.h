@@ -33,7 +33,7 @@ private:
   VkPipeline m_graphics_pipeline;
 
   // Uniform buffer
-  Buffer *m_uniform_buffer = nullptr;
+  std::unique_ptr<Buffer> m_uniform_buffer = nullptr;
 
   // Descriptor set
   VkDescriptorSet m_descriptor_set = nullptr;
