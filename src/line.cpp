@@ -9,9 +9,7 @@ Line::Line(float thickness, float length, glm::vec3 color, std::shared_ptr<Mater
   m_scene_node->setPosition({0.0f, 1.0f, 0.0f});
 }
 
-std::shared_ptr<SceneNode> Line::getSceneNode() {
-  return m_scene_node;
-}
+std::shared_ptr<SceneNode> Line::getSceneNode() { return m_scene_node; }
 
 void Line::updateAimLineFromControllerPose(glm::vec3 controller_position, glm::quat controller_orientation, float length) {
   // Compute direction from OpenXR quaternion

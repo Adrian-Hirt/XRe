@@ -13,8 +13,7 @@ Model::Model(std::vector<Mesh> meshes, glm::vec3 color, std::shared_ptr<Material
   m_meshes = meshes;
   m_original_model_color = color;
   m_model_color = color;
-  // TODO: check that we haven't reached the max number of models
-  m_model_index = s_model_index++;
+  m_model_index = material->getNextModelIndex();
   m_material = material;
 }
 
@@ -22,7 +21,7 @@ Model::Model(const char *model_path, glm::vec3 color, std::shared_ptr<Material> 
   loadObj(model_path, vulkan_handler);
   m_model_color = color;
   m_original_model_color = color;
-  m_model_index = s_model_index++;
+  m_model_index = material->getNextModelIndex();
   m_material = material;
 }
 

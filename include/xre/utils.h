@@ -23,7 +23,7 @@
 
 namespace Utils {
 // Prints a message and then exits the application
-inline void exitWithMessage(const std::string& error_string) {
+inline void exitWithMessage(const std::string &error_string) {
   std::cout << error_string << std::endl;
   exit(EXIT_FAILURE);
 };

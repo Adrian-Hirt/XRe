@@ -91,7 +91,7 @@ void Controller::computeSceneInteractions() {
   for (Button *button : SceneManager::instance().getButtonInstances()) {
     // Get the scene node of the button
     auto scene_node = button->getSceneNode();
-    
+
     // Skip if the other controller already intersects
     if (scene_node->m_intersected_in_current_frame) {
       continue;
@@ -165,7 +165,7 @@ float Controller::computeAimIndicatorSpherePosition(std::unordered_set<SceneNode
     // if(current_node->intersects(m_aim_line.getLineStart(), m_aim_line.getLineDirection(), &intersection_distance)) {
     if (current_node->intersects(start, dir, &intersection_distance)) {
       if (intersection_distance > 0 && intersection_distance <= LINE_INTERSECTION_FAR_THRESHOLD &&
-          intersection_distance >=LINE_INTERSECTION_NEAR_THRESHOLD) {
+          intersection_distance >= LINE_INTERSECTION_NEAR_THRESHOLD) {
         m_intersection_sphere_node->setActive(true);
 
         if (closest_intersection_distance > intersection_distance) {

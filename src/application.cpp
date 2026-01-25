@@ -8,7 +8,7 @@ Application::Application(const char *application_name) {
   m_resource_manager = std::make_shared<ResourceManager>(m_open_xr_handler->m_vulkan_handler);
 
   // Initialize the scene manager, which is handled as a singleton
- SceneManager::init(m_open_xr_handler->m_vulkan_handler);
+  SceneManager::init(m_open_xr_handler->m_vulkan_handler);
 }
 
 Application::~Application() {};

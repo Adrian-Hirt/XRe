@@ -22,7 +22,7 @@ struct ModelUniformBufferObject {
   glm::vec3 color;
 };
 
-struct GlobalUniformBufferObject {
+struct PerFrameUniformBufferObject {
   glm::mat4 view_projection;
   glm::vec3 light_vector;
   glm::vec3 light_color;

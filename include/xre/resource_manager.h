@@ -47,7 +47,8 @@ public:
   std::shared_ptr<Text> text(std::string sentence, bool stick_to_hud);
 
   // Methods to create a button
-  std::shared_ptr<Button> button(Scene* scene, std::shared_ptr<Material> material, bool disable_on_trigger, std::function<void()> trigger_callback);
+  std::shared_ptr<Button> button(Scene *scene, std::shared_ptr<Material> material, bool disable_on_trigger,
+                                 std::function<void()> trigger_callback);
 
 private:
   std::shared_ptr<VulkanHandler> m_vulkan_handler;

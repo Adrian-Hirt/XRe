@@ -23,6 +23,7 @@
 #include <string>
 #include <set>
 #include <functional>
+#include <memory>
 
 class VulkanHandler {
 public:
@@ -39,18 +40,19 @@ public:
   VkRenderPass getRenderPass();
 
   static constexpr VkFormat USED_COLOR_FORMAT = VK_FORMAT_R8G8B8A8_SRGB;
-  static constexpr uint32_t MAX_MODELS_IN_SCENE = 256;
   static constexpr uint32_t MAX_DESCRIPTORS = 20; // TODO: we might need to be able to handle more materials
 
   VkPipelineLayout createPipelineLayout();
   VkPipeline createGraphicsPipeline(const std::string &vert_path, const std::string &frag_path);
   void bindGraphicsPipeline(VkPipeline pipeline);
-  Buffer *createUniformBuffer();
-  VkDescriptorSet allocateDescriptorSet(Buffer *material_uniform_buffer, VkImageView texture_image_view, VkSampler texture_sampler, bool use_persistent_pool);
+  VkDescriptorSet allocateDescriptorSet(std::unique_ptr<Buffer> &material_uniform_buffer, VkImageView texture_image_view,
+                                        VkSampler texture_sampler, bool use_persistent_pool);
   void resetDescriptorPool();
 
   VkCommandBuffer beginSingleTimeCommands();
   void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+
+  VkDeviceSize getAlignedSize();
 
 private:
   // -------------------------------------------
@@ -80,8 +82,7 @@ private:
   VkQueue m_graphics_queue = nullptr;
 
   // Uniform buffers
-  Buffer *m_uniform_buffer = nullptr;
-  Buffer *m_global_uniform_buffer = nullptr;
+  Buffer *m_per_frame_uniform_buffer = nullptr;
 
   // Vertex and index buffers
   Buffer *m_vertex_buffer = nullptr;
@@ -89,11 +90,11 @@ private:
 
   // Specifies the types of resources that are going to be accessed by the pipeline
   VkDescriptorSetLayout m_descriptor_set_layout = nullptr;
-  VkDescriptorPool m_scene_descriptor_pool; // Pool used by a scene for materials, can be reset between scenes
+  VkDescriptorPool m_scene_descriptor_pool;      // Pool used by a scene for materials, can be reset between scenes
   VkDescriptorPool m_persistent_descriptor_pool; // Pool used by multiple scene, e.g. for controller materials, must not be reset
 
-  VkDescriptorSetLayout m_global_descriptor_set_layout = nullptr;
-  VkDescriptorSet m_global_descriptor_set = nullptr;
+  VkDescriptorSetLayout m_per_frame_descriptor_set_layout = nullptr;
+  VkDescriptorSet m_per_frame_descriptor_set = nullptr;
 
   // Layout of the graphics pipeline (holds `uniform` values in shaders)
   VkPipelineLayout m_pipeline_layout = nullptr;

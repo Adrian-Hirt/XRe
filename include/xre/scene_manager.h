@@ -17,29 +17,30 @@ public:
   using SceneFactory = std::function<std::unique_ptr<Scene>()>;
 
   // Delete copy/move and default constructor
-  SceneManager(const SceneManager&) = delete;
-  SceneManager& operator=(const SceneManager&) = delete;
+  SceneManager(const SceneManager &) = delete;
+  SceneManager &operator=(const SceneManager &) = delete;
   SceneManager() = delete;
 
   // Singleton methods
   static void init(std::shared_ptr<VulkanHandler> vulkan_handler);
-  static SceneManager& instance();
+  static SceneManager &instance();
 
   // Method to register a new scene
   void registerScene(std::string name, SceneFactory factory);
 
   // Set a previously registered scene as the active scene
-  void setActive(const std::string& name);
+  void setActive(const std::string &name);
 
   // Will forward the calls to the active scene
   void updateSimulation(XrTime predicted_time);
-  void draw(RenderContext& ctx);
+  void draw(RenderContext &ctx);
   void resetInteractionStates();
   std::unordered_set<SceneNode *> getGrabbableNodeInstances();
   std::unordered_set<SceneNode *> getTerrainInstances();
   std::unordered_set<Button *> getButtonInstances();
   void processButtonInteractions();
   void resetButtonInteractions();
+
 private:
   std::unordered_map<std::string, SceneFactory> m_scene_factories;
   std::unique_ptr<Scene> m_active_scene = nullptr;
