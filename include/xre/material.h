@@ -25,6 +25,9 @@ public:
 private:
   static constexpr uint32_t MAX_MODELS_PER_MATERIAL = 256;
 
+  Material(const std::string &vert_path, const std::string &frag_path, VkImageView textureImageView, VkSampler textureImageSampler,
+                     bool persist_between_scenes, std::shared_ptr<VulkanHandler> vulkan_handler);
+
   // Keep track of the next index of the models into the buffer
   uint32_t m_current_model_index = 0;
 
