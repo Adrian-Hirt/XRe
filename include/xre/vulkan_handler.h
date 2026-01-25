@@ -45,7 +45,8 @@ public:
   VkPipelineLayout createPipelineLayout();
   VkPipeline createGraphicsPipeline(const std::string &vert_path, const std::string &frag_path);
   void bindGraphicsPipeline(VkPipeline pipeline);
-  VkDescriptorSet allocateDescriptorSet(std::unique_ptr<Buffer> &material_uniform_buffer, VkImageView texture_image_view, VkSampler texture_sampler, bool use_persistent_pool);
+  VkDescriptorSet allocateDescriptorSet(std::unique_ptr<Buffer> &material_uniform_buffer, VkImageView texture_image_view,
+                                        VkSampler texture_sampler, bool use_persistent_pool);
   void resetDescriptorPool();
 
   VkCommandBuffer beginSingleTimeCommands();
@@ -89,7 +90,7 @@ private:
 
   // Specifies the types of resources that are going to be accessed by the pipeline
   VkDescriptorSetLayout m_descriptor_set_layout = nullptr;
-  VkDescriptorPool m_scene_descriptor_pool; // Pool used by a scene for materials, can be reset between scenes
+  VkDescriptorPool m_scene_descriptor_pool;      // Pool used by a scene for materials, can be reset between scenes
   VkDescriptorPool m_persistent_descriptor_pool; // Pool used by multiple scene, e.g. for controller materials, must not be reset
 
   VkDescriptorSetLayout m_per_frame_descriptor_set_layout = nullptr;

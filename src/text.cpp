@@ -97,7 +97,4 @@ void Text::buildMeshesFromSentence(const std::string sentence) {
   m_model = std::make_shared<Model>(meshes, glm::vec3(1.0f, 0.0f, 0.0f), material);
 }
 
-std::shared_ptr<SceneNode> Text::getSceneNode() {
-  return m_scene_node;
-}
-
+std::shared_ptr<SceneNode> Text::getSceneNode() { return m_scene_node; }

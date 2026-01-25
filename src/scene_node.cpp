@@ -23,17 +23,11 @@ void SceneNode::addChildNode(std::shared_ptr<SceneNode> child) {
   child->m_parent = this;
 }
 
-void SceneNode::addChildNode(std::shared_ptr<Line> child) {
-  addChildNode(child->getSceneNode());
-}
+void SceneNode::addChildNode(std::shared_ptr<Line> child) { addChildNode(child->getSceneNode()); }
 
-void SceneNode::addChildNode(std::shared_ptr<Text> child) {
-  addChildNode(child->getSceneNode());
-}
+void SceneNode::addChildNode(std::shared_ptr<Text> child) { addChildNode(child->getSceneNode()); }
 
-void SceneNode::addChildNode(std::shared_ptr<Button> child) {
-  addChildNode(child->getSceneNode());
-}
+void SceneNode::addChildNode(std::shared_ptr<Button> child) { addChildNode(child->getSceneNode()); }
 
 void SceneNode::render(RenderContext &ctx) {
   if (!m_is_active) {
@@ -86,9 +80,7 @@ void SceneNode::updateTransformation() {
   m_transform_needs_update = false;
 }
 
-void SceneNode::setScene(Scene* scene) {
-  m_scene = scene;
-}
+void SceneNode::setScene(Scene *scene) { m_scene = scene; }
 
 void SceneNode::rotate(float roll, float pitch, float yaw) {
   auto rotation = glm::quat(glm::vec3(roll, pitch, yaw));

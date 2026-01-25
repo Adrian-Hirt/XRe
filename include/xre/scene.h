@@ -43,8 +43,8 @@ public:
   std::unordered_set<Button *> getButtonInstances();
   void processButtonInteractions();
   void resetButtonInteractions();
-  
-  void addButton(Button * button);
+
+  void addButton(Button *button);
 
 protected:
   // Keep track of resource manager to create resources such as models or materials

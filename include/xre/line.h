@@ -19,6 +19,7 @@ public:
   glm::vec3 getLineDirection();
 
   std::shared_ptr<SceneNode> getSceneNode();
+
 private:
   // Model for the line
   std::shared_ptr<Model> m_model;

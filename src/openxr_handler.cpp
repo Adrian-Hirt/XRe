@@ -44,9 +44,8 @@ bool OpenXrHandler::initializeOpenxr() {
   // Setup requested extensions
   //------------------------------------------------------------------------------------------------------
   std::vector<const char *> requested_extensions = {
-    XR_KHR_VULKAN_ENABLE_EXTENSION_NAME,
-    XR_EXT_HAND_TRACKING_EXTENSION_NAME
-    // XR_EXT_HAND_INTERACTION_EXTENSION_NAME // Not supported on Quest at the moment it seems
+      XR_KHR_VULKAN_ENABLE_EXTENSION_NAME, XR_EXT_HAND_TRACKING_EXTENSION_NAME
+      // XR_EXT_HAND_INTERACTION_EXTENSION_NAME // Not supported on Quest at the moment it seems
   };
 
   //------------------------------------------------------------------------------------------------------

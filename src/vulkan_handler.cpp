@@ -307,7 +307,8 @@ void VulkanHandler::setupRenderer() {
   // Uniform buffer
   //------------------------------------------------------------------------------------------------------
   // Create per frame uniform buffer
-  m_per_frame_uniform_buffer = new Buffer(m_device, m_physical_device, sizeof(PerFrameUniformBufferObject), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
+  m_per_frame_uniform_buffer =
+      new Buffer(m_device, m_physical_device, sizeof(PerFrameUniformBufferObject), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 
   //------------------------------------------------------------------------------------------------------
   // Descriptor set layouts
@@ -456,9 +457,7 @@ void VulkanHandler::setupRenderer() {
   Utils::checkVkResult(result, "Failed to create fence");
 }
 
-VkDeviceSize VulkanHandler::getAlignedSize() {
-  return m_aligned_size;
-}
+VkDeviceSize VulkanHandler::getAlignedSize() { return m_aligned_size; }
 
 VkDescriptorSet VulkanHandler::allocateDescriptorSet(std::unique_ptr<Buffer> &material_uniform_buffer, VkImageView texture_image_view,
                                                      VkSampler texture_sampler, bool use_persistent_pool) {
@@ -468,8 +467,7 @@ VkDescriptorSet VulkanHandler::allocateDescriptorSet(std::unique_ptr<Buffer> &ma
 
   if (use_persistent_pool) {
     descriptor_set_allocate_info.descriptorPool = m_persistent_descriptor_pool;
-  }
-  else {
+  } else {
     descriptor_set_allocate_info.descriptorPool = m_scene_descriptor_pool;
   }
 
@@ -674,7 +672,7 @@ VkPipeline VulkanHandler::createGraphicsPipeline(const std::string &vert_path, c
 VkPipelineLayout VulkanHandler::createPipelineLayout() {
   std::array<VkDescriptorSetLayout, 2> set_layouts = {
       m_per_frame_descriptor_set_layout, // set = 0
-      m_descriptor_set_layout         // set = 1 (local UBO)
+      m_descriptor_set_layout            // set = 1 (local UBO)
   };
 
   VkPipelineLayoutCreateInfo pipeline_layout_info{};
@@ -814,7 +812,8 @@ void VulkanHandler::renderFrame(glm::mat4 view, glm::mat4 projection, VkFramebuf
   m_per_frame_uniform_buffer->loadData(per_frame_uniform_buffer_object);
 
   // Bind global descriptor set (camera)
-  vkCmdBindDescriptorSets(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0, 1, &m_per_frame_descriptor_set, // set = 0
+  vkCmdBindDescriptorSets(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0, 1,
+                          &m_per_frame_descriptor_set, // set = 0
                           0, nullptr);
 
   // Draw scene
