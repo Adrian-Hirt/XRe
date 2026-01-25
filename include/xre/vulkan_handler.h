@@ -39,18 +39,18 @@ public:
   VkRenderPass getRenderPass();
 
   static constexpr VkFormat USED_COLOR_FORMAT = VK_FORMAT_R8G8B8A8_SRGB;
-  static constexpr uint32_t MAX_MODELS_IN_SCENE = 256;
   static constexpr uint32_t MAX_DESCRIPTORS = 20; // TODO: we might need to be able to handle more materials
 
   VkPipelineLayout createPipelineLayout();
   VkPipeline createGraphicsPipeline(const std::string &vert_path, const std::string &frag_path);
   void bindGraphicsPipeline(VkPipeline pipeline);
-  Buffer *createUniformBuffer();
   VkDescriptorSet allocateDescriptorSet(Buffer *material_uniform_buffer, VkImageView texture_image_view, VkSampler texture_sampler, bool use_persistent_pool);
   void resetDescriptorPool();
 
   VkCommandBuffer beginSingleTimeCommands();
   void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+
+  VkDeviceSize getAlignedSize();
 
 private:
   // -------------------------------------------

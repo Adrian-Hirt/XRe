@@ -456,9 +456,8 @@ void VulkanHandler::setupRenderer() {
   Utils::checkVkResult(result, "Failed to create fence");
 }
 
-Buffer *VulkanHandler::createUniformBuffer() {
-  // Create uniform buffer
-  return new Buffer(m_device, m_physical_device, m_aligned_size * MAX_MODELS_IN_SCENE, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
+VkDeviceSize VulkanHandler::getAlignedSize() {
+  return m_aligned_size;
 }
 
 VkDescriptorSet VulkanHandler::allocateDescriptorSet(Buffer *material_uniform_buffer, VkImageView texture_image_view,

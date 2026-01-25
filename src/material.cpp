@@ -8,7 +8,12 @@ Material::Material(const std::string &vert_path, const std::string &frag_path, b
   m_graphics_pipeline = m_vulkan_handler->createGraphicsPipeline(vert_path, frag_path);
 
   // Create uniform buffer
-  m_uniform_buffer = m_vulkan_handler->createUniformBuffer();
+  m_uniform_buffer = new Buffer(
+    m_vulkan_handler->getLogicalDevice(),
+    m_vulkan_handler->getPhysicalDevice(), 
+    m_vulkan_handler->getAlignedSize() * MAX_MODELS_PER_MATERIAL,
+    VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
+  );
 
   // Create descriptor set
   m_descriptor_set = m_vulkan_handler->allocateDescriptorSet(m_uniform_buffer, NULL, NULL, persist_between_scenes);
@@ -23,7 +28,12 @@ Material::Material(const std::string &vert_path, const std::string &frag_path, s
   m_graphics_pipeline = m_vulkan_handler->createGraphicsPipeline(vert_path, frag_path);
 
   // Create uniform buffer
-  m_uniform_buffer = m_vulkan_handler->createUniformBuffer();
+  m_uniform_buffer = new Buffer(
+    m_vulkan_handler->getLogicalDevice(),
+    m_vulkan_handler->getPhysicalDevice(), 
+    m_vulkan_handler->getAlignedSize() * MAX_MODELS_PER_MATERIAL,
+    VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
+  );
 
   // Create descriptor set
   m_descriptor_set =
@@ -35,3 +45,13 @@ Buffer *Material::getUniformBuffer() { return m_uniform_buffer; }
 VkDescriptorSet Material::getDescriptorset() { return m_descriptor_set; }
 
 void Material::bind() { m_vulkan_handler->bindGraphicsPipeline(m_graphics_pipeline); }
+
+uint32_t Material::getNextModelIndex() {
+  // Check that the current index would still be valid
+  if (m_current_model_index >= MAX_MODELS_PER_MATERIAL) {
+    Utils::exitWithMessage("Too many models on this material, max allowed is " + MAX_MODELS_PER_MATERIAL);
+  }
+
+  // Returns the current value and increases it
+  return m_current_model_index++;
+}

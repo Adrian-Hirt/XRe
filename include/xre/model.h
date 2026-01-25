@@ -36,10 +36,7 @@ public:
   void setInteractedState(bool interacted);
 
 private:
-  // Keep track of the global index of the model
-  inline static uint32_t s_model_index = 0;
-
-  // The index of the current model itself
+  // The index of the current model itself to index into the buffer of the material
   uint32_t m_model_index;
 
   // Vector holding all the meshes of this model
