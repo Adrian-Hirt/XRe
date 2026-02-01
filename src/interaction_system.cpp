@@ -2,10 +2,10 @@
 
 InteractionSystem::InteractionSystem(std::shared_ptr<Controller> left_controller, std::shared_ptr<Controller> right_controller,
                                      std::shared_ptr<Hand> left_hand, std::shared_ptr<Hand> right_hand) {
-  m_left_controller = left_controller;
-  m_right_controller = right_controller;
-  m_left_hand = left_hand;
-  m_right_hand = right_hand;
+  m_left_controller_state.input = left_controller;
+  m_right_controller_state.input = right_controller;
+  m_left_hand_state.input = left_hand;
+  m_right_hand_state.input = right_hand;
 }
 
 void InteractionSystem::beginFrame() {
@@ -16,15 +16,17 @@ void InteractionSystem::beginFrame() {
 
 void InteractionSystem::queryInteractions() {
   // Compute interactions for controllers
-  queryContollerInteractions(m_left_controller);
-  queryContollerInteractions(m_right_controller);
+  queryContollerInteractions(m_left_controller_state);
+  queryContollerInteractions(m_right_controller_state);
 
   // Compute interactions for hands
-  queryHandInteractions(m_left_hand);
-  queryHandInteractions(m_right_hand);
+  queryHandInteractions(m_left_hand_state);
+  queryHandInteractions(m_right_hand_state);
 }
 
-void InteractionSystem::queryContollerInteractions(std::shared_ptr<Controller> controller) {
+void InteractionSystem::queryContollerInteractions(InputState state) {
+  auto controller = std::get<std::shared_ptr<Controller>>(state.input);
+
   // Nothing to do if the controller is not active
   if (!controller || !controller->m_active) {
     return;
@@ -68,7 +70,9 @@ void InteractionSystem::queryContollerInteractions(std::shared_ptr<Controller> c
   }
 }
 
-void InteractionSystem::queryHandInteractions(std::shared_ptr<Hand> hand) {
+void InteractionSystem::queryHandInteractions(InputState state) {
+  auto hand = std::get<std::shared_ptr<Hand>>(state.input);
+
   // Nothing to do if the hand is not active or invalid pose
   if (!hand || !hand->m_active || !hand->isValid()) {
     return;
@@ -96,6 +100,22 @@ void InteractionSystem::queryHandInteractions(std::shared_ptr<Hand> hand) {
         current_node->setPosition(thumb_scene_node->getPosition());
         current_node->setRotation(thumb_scene_node->getRotation());
       }
+    }
+  }
+
+  // Check if any of the buttons are activated
+  for (Button *button : SceneManager::instance().getButtonInstances()) {
+    // Get the scene node of the button
+    auto scene_node = button->getSceneNode();
+
+    // Skip if the other controller already intersects
+    if (scene_node->m_intersected_in_current_frame) {
+      continue;
+    }
+
+    if (scene_node->intersects(thumb_scene_node) || scene_node->intersects(palm_scene_node)) {
+      // Keep track that we're intersecting with this model
+      scene_node->m_intersected_in_current_frame = true;
     }
   }
 
