@@ -11,14 +11,12 @@
 #include <vector>
 #include <variant>
 
-struct InteractionHit {
-  SceneNode* node;
-  float distance;
-};
+using Input = std::variant<std::shared_ptr<Controller>, std::shared_ptr<Hand>>;
 
 struct InputState {
-  std::variant<std::shared_ptr<Controller>, std::shared_ptr<Hand>> input;
-  std::vector<InteractionHit> hits;
+  Input input;
+  std::vector<SceneNode*> hits;
+  int priority;
 };
 
 class InteractionSystem {
@@ -39,6 +37,11 @@ private:
   InputState m_left_hand_state;
   InputState m_right_hand_state;
 
-  void queryContollerInteractions(InputState state);
-  void queryHandInteractions(InputState state);
+  // States ordered by priority
+  std::vector<std::reference_wrapper<InputState>> m_priority_ordered_states;
+
+  void queryContollerInteractions(InputState& state);
+  void queryHandInteractions(InputState& state);
+
+  std::unordered_map<SceneNode*, Input> resolveInteractions();
 };

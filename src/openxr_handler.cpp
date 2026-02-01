@@ -810,10 +810,8 @@ void OpenXrHandler::renderFrame(std::function<void(RenderContext &)> draw_callba
   // so maybe this will not be needed anymore.
   if (teleport_location_right.has_value()) {
     updateCurrentOriginForTeleport(teleport_location_right.value());
-    // TODO: update position of grabbed model if we're currently grabbing something with either hand
   } else if (teleport_location_left.has_value()) {
     updateCurrentOriginForTeleport(teleport_location_left.value());
-    // TODO: update position of grabbed model if we're currently grabbing something with either hand
   } else {
     // If not teleporting, we can update the position of the controllers
     m_left_controller->updatePosition(m_current_origin);
