@@ -27,6 +27,9 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
   // Instruct the handler to initialize the hand tracking (will not do anything
   // if hand tracking is not enabled).
   initializeHandTracking();
+
+  // Create the interaction system
+  m_interaction_system = std::make_unique<InteractionSystem>(m_left_controller, m_right_controller, m_left_hand, m_right_hand);
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -367,8 +370,8 @@ void OpenXrHandler::initializeOpenxrActions() {
   XrResult result;
 
   // Create controllers for left and right hands
-  m_left_controller = new Controller(m_interactions_material, m_vulkan_handler);
-  m_right_controller = new Controller(m_interactions_material, m_vulkan_handler);
+  m_left_controller = std::make_shared<Controller>(m_interactions_material, m_vulkan_handler);
+  m_right_controller = std::make_shared<Controller>(m_interactions_material, m_vulkan_handler);
 
   // Create the action set for the application. Currently, we're only using
   // a single action set for the whole application, later on we might add
@@ -658,7 +661,7 @@ void OpenXrHandler::pollOpenxrActions(XrTime predicted_time) {
   }
 }
 
-void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predicted_time) {
+void OpenXrHandler::updateControllerStates(std::shared_ptr<Controller> controller, XrTime predicted_time) {
   XrResult result;
 
   // Setup the struct to pass to the `xrLocateSpace` calls below.
@@ -722,7 +725,7 @@ void OpenXrHandler::updateControllerStates(Controller *controller, XrTime predic
   }
 }
 
-void OpenXrHandler::updateHandTrackingStates(Hand *hand, XrTime predicted_time) {
+void OpenXrHandler::updateHandTrackingStates(std::shared_ptr<Hand> hand, XrTime predicted_time) {
   XrResult result;
 
   // Return if the runtime does not support hand tracking
@@ -799,40 +802,33 @@ void OpenXrHandler::renderFrame(std::function<void(RenderContext &)> draw_callba
   teleport_location_left = m_left_controller->updateIntersectionSphereAndComputePossibleTeleport();
   teleport_location_right = m_right_controller->updateIntersectionSphereAndComputePossibleTeleport();
 
-  // Reset the interaction tracking booleans on the grabbable SceneNodes
-  SceneManager::instance().resetInteractionStates();
-  SceneManager::instance().resetButtonInteractions();
+  // Begin the frame in the interaction system
+  m_interaction_system->beginFrame();
 
   // As both might have a value, we arbitrarily decide to give the right controller
   // precedende. Later, we might map the teleport action to a single controller anyway,
   // so maybe this will not be needed anymore.
   if (teleport_location_right.has_value()) {
     updateCurrentOriginForTeleport(teleport_location_right.value());
-    // TODO: update position of grabbed model if we're currently grabbing something with either hand
   } else if (teleport_location_left.has_value()) {
     updateCurrentOriginForTeleport(teleport_location_left.value());
-    // TODO: update position of grabbed model if we're currently grabbing something with either hand
   } else {
-    // If not teleporting, we can update the position of the controller, as well as their interactions
-    // with the scene
+    // If not teleporting, we can update the position of the controllers
     m_left_controller->updatePosition(m_current_origin);
     m_right_controller->updatePosition(m_current_origin);
 
-    m_left_controller->computeSceneInteractions();
-    m_right_controller->computeSceneInteractions();
-
-    // Update the interactions with the scene and the hands, but only if the hands are enabled.
+    // Update the hands, but only if the hands are enabled.
     if (m_left_hand != nullptr && m_right_hand != nullptr) {
       m_left_hand->updatePosition(m_current_origin);
       m_right_hand->updatePosition(m_current_origin);
-
-      m_left_hand->computeSceneInteractions();
-      m_right_hand->computeSceneInteractions();
     }
-  }
 
-  // Process button triggers
-  SceneManager::instance().processButtonInteractions();
+    // Run the logic in interaction system to query the interactions
+    m_interaction_system->queryInteractions();
+
+    // And run the logic to handle interactions
+    m_interaction_system->processInteractions();
+  }
 
   //------------------------------------------------------------------------------------------------------
   // Update simulation
@@ -1006,10 +1002,10 @@ void OpenXrHandler::initializeHandTracking() {
     return;
   }
 
-  m_left_hand = new Hand(XR_HAND_LEFT_EXT, m_interactions_material, m_vulkan_handler);
-  m_right_hand = new Hand(XR_HAND_RIGHT_EXT, m_interactions_material, m_vulkan_handler);
+  m_left_hand = std::make_shared<Hand>(XR_HAND_LEFT_EXT, m_interactions_material, m_vulkan_handler);
+  m_right_hand = std::make_shared<Hand>(XR_HAND_RIGHT_EXT, m_interactions_material, m_vulkan_handler);
 
-  for (Hand *hand : {m_left_hand, m_right_hand}) {
+  for (auto hand : {m_left_hand, m_right_hand}) {
     XrHandTrackerCreateInfoEXT hand_tracker_create_info = {};
     hand_tracker_create_info.type = XR_TYPE_HAND_TRACKER_CREATE_INFO_EXT;
     hand_tracker_create_info.hand = hand->m_hand_identifier;

@@ -108,45 +108,25 @@ void Hand::updatePosition(glm::vec3 current_origin) {
   m_hand_root_node->updateTransformation();
 }
 
-void Hand::computeSceneInteractions() {
-  // Nothing to do if the hand is not active
-  if (!m_active) {
-    return;
-  }
-
-  // Nothing to do if either the thumb or the palm is not valid
+bool Hand::isValid() {
   bool thumb_valid = (m_joint_locations[XR_HAND_JOINT_THUMB_TIP_EXT].locationFlags & VALID_POSE_FLAGS) == VALID_POSE_FLAGS;
   bool palm_valid = (m_joint_locations[XR_HAND_JOINT_PALM_EXT].locationFlags & VALID_POSE_FLAGS) == VALID_POSE_FLAGS;
 
-  if (!thumb_valid || !palm_valid) {
-    return;
-  }
-
-  // Check if the hand is intersecting a grabbable node. To make it simpler for the moment, we only
-  // check intersection with the palm and the tip of the thumb (as for "grab", both the thumb and the
-  // center of the palm should intersect, and for "pinch", the tip of the thumb needs to intersect).
-  std::shared_ptr<SceneNode> thumb_scene_node = m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT];
-  std::shared_ptr<SceneNode> palm_scene_node = m_joint_nodes[XR_HAND_JOINT_PALM_EXT];
-
-  for (SceneNode *current_node : SceneManager::instance().getGrabbableNodeInstances()) {
-    // Skip this if we already are grabbing this node with another controller or a hand
-    if (current_node->m_grabbed) {
-      continue;
-    }
-
-    if (current_node->intersects(thumb_scene_node) || current_node->intersects(palm_scene_node)) {
-      // Keep track that we're intersecting with this model
-      current_node->m_intersected_in_current_frame = true;
-
-      // Also, if the hand is pinching, set the position and rotation of the model to that of the thumb
-      if (m_pinching) {
-        current_node->m_grabbed = true;
-        current_node->setPosition(m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT]->getPosition());
-        current_node->setRotation(m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT]->getRotation());
-      }
-    }
-  }
-
-  // TODO: If the hand is closed, we need to check for intersection with the central
-  // palm joint position, to determine whether the hand is grabbing something.
+  return thumb_valid && palm_valid;
 }
+
+std::shared_ptr<SceneNode> Hand::getThumbSceneNode() { return m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT]; }
+
+std::shared_ptr<SceneNode> Hand::getPalmSceneNode() { return m_joint_nodes[XR_HAND_JOINT_PALM_EXT]; }
+
+std::shared_ptr<SceneNode> Hand::getSceneNodeForSceneNodeUpdate() {
+  return m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT];
+}
+
+std::vector<std::shared_ptr<SceneNode>> Hand::getSceneNodeForInteractionQuery() {
+  return {
+    m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT],
+    m_joint_nodes[XR_HAND_JOINT_PALM_EXT]
+  };
+}
+

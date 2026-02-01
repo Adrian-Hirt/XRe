@@ -23,6 +23,7 @@
 #include <xre/hand.h>
 #include <xre/material.h>
 #include <xre/texture.h>
+#include <xre/interaction_system.h>
 
 // Other includes
 #include <iostream>
@@ -64,7 +65,6 @@ private:
   XrSystemProperties m_openxr_system_properties = {XR_TYPE_SYSTEM_PROPERTIES};
   XrSystemHandTrackingPropertiesEXT m_openxr_hand_tracking_system_properties = {XR_TYPE_SYSTEM_HAND_TRACKING_PROPERTIES_EXT};
 
-  // New:
   std::vector<XrCompositionLayerProjectionView> m_projection_views;
   std::vector<XrSwapchain> m_swapchains;
   std::vector<std::vector<RenderTarget *>> m_render_targets;
@@ -73,18 +73,18 @@ private:
   std::vector<glm::mat4> m_view_matrices;
   std::vector<glm::mat4> m_projection_matrices;
 
-  // // Pointers to ext functions we need to use
+  // Pointers to ext functions we need to use
   PFN_xrCreateHandTrackerEXT m_ext_xrCreateHandTrackerEXT;
   PFN_xrDestroyHandTrackerEXT m_ext_xrDestroyHandTrackerEXT;
   PFN_xrLocateHandJointsEXT m_ext_xrLocateHandJointsEXT;
 
   // Controllers
-  Controller *m_left_controller = NULL;
-  Controller *m_right_controller = NULL;
+  std::shared_ptr<Controller> m_left_controller = NULL;
+  std::shared_ptr<Controller> m_right_controller = NULL;
 
   // Hands
-  Hand *m_left_hand = NULL;
-  Hand *m_right_hand = NULL;
+  std::shared_ptr<Hand> m_left_hand = NULL;
+  std::shared_ptr<Hand> m_right_hand = NULL;
 
   // Actions
   XrActionSet m_default_action_set;
@@ -92,6 +92,9 @@ private:
   XrAction m_controller_aim_action;
   XrAction m_controller_grab_action;
   XrAction m_controller_teleport_action;
+
+  // Interaction system
+  std::unique_ptr<InteractionSystem> m_interaction_system = NULL;
 
   // For checking if the pose of a controller is valid
   const static XrSpaceLocationFlags VALID_POSE_FLAGS = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
@@ -110,9 +113,9 @@ private:
   void setupActionBindings();
   void suggestBindings(std::string interaction_profile, std::vector<XrActionSuggestedBinding> bindings);
   void pollOpenxrActions(XrTime predicted_time);
-  void updateControllerStates(Controller *controller, XrTime predicted_time);
+  void updateControllerStates(std::shared_ptr<Controller> controller, XrTime predicted_time);
   void renderInteractions(RenderContext &ctx);
-  void updateHandTrackingStates(Hand *hand, XrTime predicted_time);
+  void updateHandTrackingStates(std::shared_ptr<Hand> hand, XrTime predicted_time);
   void updateCurrentOriginForTeleport(glm::vec3 teleport_location);
   XrPath getXrPathFromString(std::string string);
 };
