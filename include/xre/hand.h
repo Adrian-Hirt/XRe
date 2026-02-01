@@ -9,11 +9,12 @@
 #include <xre/scene_node.h>
 #include <xre/material.h>
 #include <xre/scene_manager.h>
+#include <xre/input.h>
 
 // Other includes
 #include <memory>
 
-class Hand {
+class Hand : public Input {
 public:
   // Constructor
   Hand(XrHandEXT hand_identifier, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler);
@@ -24,18 +25,18 @@ public:
   // Update the position of the hand
   void updatePosition(glm::vec3 current_origin);
 
-  bool isValid();
+  bool isValid() override;
   void updateHandGrabAndPinchState();
 
   std::shared_ptr<SceneNode> getThumbSceneNode();
   std::shared_ptr<SceneNode> getPalmSceneNode();
 
+  std::shared_ptr<SceneNode> getSceneNodeForSceneNodeUpdate() override;
+  std::vector<std::shared_ptr<SceneNode>> getSceneNodeForInteractionQuery() override;
+
   XrHandTrackerEXT m_hand_tracker;
   XrHandJointLocationEXT m_joint_locations[XR_HAND_JOINT_COUNT_EXT];
   XrHandEXT m_hand_identifier;
-
-  bool m_active = false;
-  bool m_pinching = false;
 
 private:
   std::shared_ptr<SceneNode> m_hand_root_node;
