@@ -55,11 +55,6 @@ void InteractionSystem::queryControllerInteractions(InputState &state) {
 
   // Check if any of our controllers is grabbing a grabbable node
   for (SceneNode *current_node : SceneManager::instance().getGrabbableNodeInstances()) {
-    // Skip this if we already are grabbing this node with another controller or a hand
-    if (current_node->m_grabbed) {
-      continue;
-    }
-
     if (current_node->intersects(controller->m_model_node)) {
       state.hits.push_back(current_node);
     }
