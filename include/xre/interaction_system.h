@@ -15,7 +15,7 @@ using Input = std::variant<std::shared_ptr<Controller>, std::shared_ptr<Hand>>;
 
 struct InputState {
   Input input;
-  std::vector<SceneNode*> hits;
+  std::vector<SceneNode *> hits;
   int priority;
 };
 
@@ -40,8 +40,8 @@ private:
   // States ordered by priority
   std::vector<std::reference_wrapper<InputState>> m_priority_ordered_states;
 
-  void queryContollerInteractions(InputState& state);
-  void queryHandInteractions(InputState& state);
+  void queryControllerInteractions(InputState &state);
+  void queryHandInteractions(InputState &state);
 
-  std::unordered_map<SceneNode*, Input> resolveInteractions();
+  std::unordered_map<SceneNode *, Input> resolveInteractions();
 };

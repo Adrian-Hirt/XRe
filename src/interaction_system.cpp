@@ -37,15 +37,15 @@ void InteractionSystem::beginFrame() {
 
 void InteractionSystem::queryInteractions() {
   // Compute interactions for controllers
-  queryContollerInteractions(m_left_controller_state);
-  queryContollerInteractions(m_right_controller_state);
+  queryControllerInteractions(m_left_controller_state);
+  queryControllerInteractions(m_right_controller_state);
 
   // Compute interactions for hands
   queryHandInteractions(m_left_hand_state);
   queryHandInteractions(m_right_hand_state);
 }
 
-void InteractionSystem::queryContollerInteractions(InputState& state) {
+void InteractionSystem::queryControllerInteractions(InputState &state) {
   auto controller = std::get<std::shared_ptr<Controller>>(state.input);
 
   // Nothing to do if the controller is not active
@@ -76,7 +76,7 @@ void InteractionSystem::queryContollerInteractions(InputState& state) {
   }
 }
 
-void InteractionSystem::queryHandInteractions(InputState& state) {
+void InteractionSystem::queryHandInteractions(InputState &state) {
   auto hand = std::get<std::shared_ptr<Hand>>(state.input);
 
   // Nothing to do if the hand is not active or invalid pose
@@ -125,8 +125,7 @@ void InteractionSystem::processInteractions() {
         scene_node->setPosition((*controller)->m_model_node->getPosition());
         scene_node->setRotation((*controller)->m_model_node->getRotation());
       }
-    }
-    else if (auto hand = std::get_if<std::shared_ptr<Hand>>(&input)) {
+    } else if (auto hand = std::get_if<std::shared_ptr<Hand>>(&input)) {
       // If the hand is pinching, set the position and rotation of the model to that of the thumb
       if ((*hand)->m_pinching) {
         auto thumb_scene_node = (*hand)->getThumbSceneNode();
@@ -141,10 +140,10 @@ void InteractionSystem::processInteractions() {
   SceneManager::instance().processButtonInteractions();
 }
 
-std::unordered_map<SceneNode*, Input> InteractionSystem::resolveInteractions() {
-  std::unordered_map<SceneNode*, Input> result = {};
+std::unordered_map<SceneNode *, Input> InteractionSystem::resolveInteractions() {
+  std::unordered_map<SceneNode *, Input> result = {};
 
-  for(InputState& input_state : m_priority_ordered_states) {
+  for (InputState &input_state : m_priority_ordered_states) {
     for (auto hit : input_state.hits) {
       if (!result.contains(hit)) {
         result.emplace(hit, input_state.input);
@@ -154,4 +153,3 @@ std::unordered_map<SceneNode*, Input> InteractionSystem::resolveInteractions() {
 
   return result;
 }
-

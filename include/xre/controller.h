@@ -58,6 +58,7 @@ public:
 
   // Model node
   std::shared_ptr<SceneNode> m_model_node;
+
 private:
   // Threshold for showing the line intersection point
   static constexpr float LINE_INTERSECTION_FAR_THRESHOLD = 6.0f;
