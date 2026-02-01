@@ -115,10 +115,6 @@ bool Hand::isValid() {
   return thumb_valid && palm_valid;
 }
 
-std::shared_ptr<SceneNode> Hand::getThumbSceneNode() {
-  return m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT];
-}
+std::shared_ptr<SceneNode> Hand::getThumbSceneNode() { return m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT]; }
 
-std::shared_ptr<SceneNode> Hand::getPalmSceneNode() {
-  return m_joint_nodes[XR_HAND_JOINT_PALM_EXT];
-}
+std::shared_ptr<SceneNode> Hand::getPalmSceneNode() { return m_joint_nodes[XR_HAND_JOINT_PALM_EXT]; }

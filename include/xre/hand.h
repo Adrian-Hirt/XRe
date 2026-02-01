@@ -36,6 +36,7 @@ public:
 
   bool m_active = false;
   bool m_pinching = false;
+
 private:
   std::shared_ptr<SceneNode> m_hand_root_node;
   std::vector<std::shared_ptr<SceneNode>> m_joint_nodes;
