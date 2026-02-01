@@ -9,14 +9,15 @@
 // Other includes
 #include <memory>
 #include <vector>
+#include <variant>
 
 struct InteractionHit {
   SceneNode* node;
   float distance;
 };
 
-struct ControllerState {
-  std::shared_ptr<Controller> controller;
+struct InputState {
+  std::variant<std::shared_ptr<Controller>, std::shared_ptr<Hand>> input;
   std::vector<InteractionHit> hits;
 };
 
@@ -31,13 +32,13 @@ public:
 
 private:
   // Controllers
-  std::shared_ptr<Controller> m_left_controller = NULL;
-  std::shared_ptr<Controller> m_right_controller = NULL;
+  InputState m_left_controller_state;
+  InputState m_right_controller_state;
 
   // Hands
-  std::shared_ptr<Hand> m_left_hand = NULL;
-  std::shared_ptr<Hand> m_right_hand = NULL;
+  InputState m_left_hand_state;
+  InputState m_right_hand_state;
 
-  void queryContollerInteractions(std::shared_ptr<Controller> controller);
-  void queryHandInteractions(std::shared_ptr<Hand> hand);
+  void queryContollerInteractions(InputState state);
+  void queryHandInteractions(InputState state);
 };
