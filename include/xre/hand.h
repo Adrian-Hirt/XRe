@@ -24,22 +24,21 @@ public:
   // Update the position of the hand
   void updatePosition(glm::vec3 current_origin);
 
-  // Compute scene interactions of the hand
-  void computeSceneInteractions();
-
+  bool isValid();
   void updateHandGrabAndPinchState();
+
+  std::shared_ptr<SceneNode> getThumbSceneNode();
+  std::shared_ptr<SceneNode> getPalmSceneNode();
 
   XrHandTrackerEXT m_hand_tracker;
   XrHandJointLocationEXT m_joint_locations[XR_HAND_JOINT_COUNT_EXT];
   XrHandEXT m_hand_identifier;
 
   bool m_active = false;
-
+  bool m_pinching = false;
 private:
   std::shared_ptr<SceneNode> m_hand_root_node;
   std::vector<std::shared_ptr<SceneNode>> m_joint_nodes;
-
-  bool m_pinching = false;
 
   const static XrSpaceLocationFlags VALID_POSE_FLAGS = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
 

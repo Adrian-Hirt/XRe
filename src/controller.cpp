@@ -56,52 +56,9 @@ void Controller::updatePosition(glm::vec3 current_origin) {
 
   // Update the aim line
   m_aim_line->updateAimLineFromControllerPose(controller_position, Utils::toQuat(m_aim.orientation), m_aim_line_render_length);
-}
 
-void Controller::computeSceneInteractions() {
-  // Nothing to do if the controller is not active
-  if (!m_active) {
-    return;
-  }
-
+  // Update the root node
   m_root_node.updateTransformation();
-
-  // Check if any of our controllers is grabbing a grabbable node
-  for (SceneNode *current_node : SceneManager::instance().getGrabbableNodeInstances()) {
-    // Skip this if we already are grabbing this node with another controller or a hand
-    if (current_node->m_grabbed) {
-      continue;
-    }
-
-    if (current_node->intersects(m_model_node)) {
-      // Keep track that we're intersecting with this model
-      current_node->m_intersected_in_current_frame = true;
-
-      // Also, if the controller is grabbing, set the position and the rotation of the
-      // model to those of the controller
-      if (m_grabbing) {
-        current_node->m_grabbed = true;
-        current_node->setPosition(m_model_node->getPosition());
-        current_node->setRotation(m_model_node->getRotation());
-      }
-    }
-  }
-
-  // Check if any of the buttons are activated
-  for (Button *button : SceneManager::instance().getButtonInstances()) {
-    // Get the scene node of the button
-    auto scene_node = button->getSceneNode();
-
-    // Skip if the other controller already intersects
-    if (scene_node->m_intersected_in_current_frame) {
-      continue;
-    }
-
-    if (scene_node->intersects(m_model_node)) {
-      // Keep track that we're intersecting with this model
-      scene_node->m_intersected_in_current_frame = true;
-    }
-  }
 }
 
 std::optional<glm::vec3> Controller::updateIntersectionSphereAndComputePossibleTeleport() {
