@@ -32,9 +32,6 @@ public:
   // Update the position of the controller
   void updatePosition(glm::vec3 current_origin);
 
-  // Compute scene interactions of the controllers
-  void computeSceneInteractions();
-
   // Whether the controller is active or not
   bool m_active = false;
 
@@ -59,6 +56,8 @@ public:
   // Aim of the controller
   XrPosef m_aim;
 
+  // Model node
+  std::shared_ptr<SceneNode> m_model_node;
 private:
   // Threshold for showing the line intersection point
   static constexpr float LINE_INTERSECTION_FAR_THRESHOLD = 6.0f;
@@ -79,7 +78,6 @@ private:
 
   // Scene nodes
   SceneNode m_root_node;
-  std::shared_ptr<SceneNode> m_model_node;
   std::shared_ptr<SceneNode> m_intersection_sphere_node;
   std::shared_ptr<SceneNode> m_aim_line_node;
 
