@@ -1,6 +1,7 @@
 #include <xre/material.h>
 
-Material::Material(const std::string &vert_path, const std::string &frag_path, bool persist_between_scenes, std::shared_ptr<VulkanHandler> vulkan_handler) {
+Material::Material(const std::string &vert_path, const std::string &frag_path, bool persist_between_scenes,
+                   std::shared_ptr<VulkanHandler> vulkan_handler) {
   // Bind the vulkan handler
   m_vulkan_handler = vulkan_handler;
 
@@ -26,8 +27,8 @@ Material::Material(const std::string &vert_path, const std::string &frag_path, s
   m_uniform_buffer = m_vulkan_handler->createUniformBuffer();
 
   // Create descriptor set
-  m_descriptor_set =
-      m_vulkan_handler->allocateDescriptorSet(m_uniform_buffer, texture->getTextureImageView(), texture->getTextureSampler(), persist_between_scenes);
+  m_descriptor_set = m_vulkan_handler->allocateDescriptorSet(m_uniform_buffer, texture->getTextureImageView(), texture->getTextureSampler(),
+                                                             persist_between_scenes);
 }
 
 Buffer *Material::getUniformBuffer() { return m_uniform_buffer; }

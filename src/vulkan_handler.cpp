@@ -471,8 +471,7 @@ VkDescriptorSet VulkanHandler::allocateDescriptorSet(Buffer *material_uniform_bu
 
   if (use_persistent_pool) {
     descriptor_set_allocate_info.descriptorPool = m_persistent_descriptor_pool;
-  }
-  else {
+  } else {
     descriptor_set_allocate_info.descriptorPool = m_scene_descriptor_pool;
   }
 

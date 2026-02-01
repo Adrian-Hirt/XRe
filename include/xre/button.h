@@ -14,13 +14,15 @@
 
 class Button {
 public:
-  Button(Scene* scene, std::shared_ptr<Material> material, bool disable_on_trigger, std::function<void()>trigger_callback, std::shared_ptr<VulkanHandler> vulkan_handler);
+  Button(Scene *scene, std::shared_ptr<Material> material, bool disable_on_trigger, std::function<void()> trigger_callback,
+         std::shared_ptr<VulkanHandler> vulkan_handler);
   std::shared_ptr<SceneNode> getSceneNode();
   void trigger();
   bool isEnabled();
 
   void processInteractions();
-  void resetInteractionState();  
+  void resetInteractionState();
+
 private:
   // Model of the button
   std::shared_ptr<Model> m_model;

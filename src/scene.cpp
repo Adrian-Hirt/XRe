@@ -61,9 +61,7 @@ void Scene::resetInteractionStates() {
   }
 }
 
-void Scene::addButton(Button* button) {
-  m_button_instances.insert(button);
-}
+void Scene::addButton(Button *button) { m_button_instances.insert(button); }
 
 void Scene::processButtonInteractions() {
   for (auto button : getButtonInstances()) {

@@ -57,6 +57,7 @@ std::shared_ptr<Text> ResourceManager::text(std::string sentence, bool stick_to_
   return std::make_shared<Text>(sentence, m_vulkan_handler, stick_to_hud);
 }
 
-std::shared_ptr<Button> ResourceManager::button(Scene* scene, std::shared_ptr<Material> material, bool disable_on_trigger, std::function<void()> trigger_callback) {
+std::shared_ptr<Button> ResourceManager::button(Scene *scene, std::shared_ptr<Material> material, bool disable_on_trigger,
+                                                std::function<void()> trigger_callback) {
   return std::make_shared<Button>(scene, material, disable_on_trigger, std::move(trigger_callback), m_vulkan_handler);
 }
