@@ -27,6 +27,9 @@ OpenXrHandler::OpenXrHandler(const char *application_name) {
   // Instruct the handler to initialize the hand tracking (will not do anything
   // if hand tracking is not enabled).
   initializeHandTracking();
+
+  // Create the interaction system
+  m_interaction_system = InteractionSystem();
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -799,9 +802,8 @@ void OpenXrHandler::renderFrame(std::function<void(RenderContext &)> draw_callba
   teleport_location_left = m_left_controller->updateIntersectionSphereAndComputePossibleTeleport();
   teleport_location_right = m_right_controller->updateIntersectionSphereAndComputePossibleTeleport();
 
-  // Reset the interaction tracking booleans on the grabbable SceneNodes
-  SceneManager::instance().resetInteractionStates();
-  SceneManager::instance().resetButtonInteractions();
+  // Begin the frame in the interaction system
+  m_interaction_system.beginFrame();
 
   // As both might have a value, we arbitrarily decide to give the right controller
   // precedende. Later, we might map the teleport action to a single controller anyway,
