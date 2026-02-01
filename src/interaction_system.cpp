@@ -33,30 +33,36 @@ void InteractionSystem::beginFrame() {
   // Reset the interaction tracking booleans on the grabbable SceneNodes
   SceneManager::instance().resetInteractionStates();
   SceneManager::instance().resetButtonInteractions();
+
+  // Reset the hits
+  for (InputState &input_state : m_priority_ordered_states) {
+    input_state.hits = {};
+  }
 }
 
 void InteractionSystem::queryInteractions() {
   // Compute interactions for controllers
-  queryControllerInteractions(m_left_controller_state);
-  queryControllerInteractions(m_right_controller_state);
+  queryInputInteractions(m_left_controller_state);
+  queryInputInteractions(m_right_controller_state);
 
   // Compute interactions for hands
-  queryHandInteractions(m_left_hand_state);
-  queryHandInteractions(m_right_hand_state);
+  queryInputInteractions(m_left_hand_state);
+  queryInputInteractions(m_right_hand_state);
 }
 
-void InteractionSystem::queryControllerInteractions(InputState &state) {
-  auto controller = std::get<std::shared_ptr<Controller>>(state.input);
-
-  // Nothing to do if the controller is not active
-  if (!controller || !controller->m_active) {
+void InteractionSystem::queryInputInteractions(InputState &state) {
+  // Nothing to do if the input is not active or invalid
+  if (!state.input || !state.input->m_active || !state.input->isValid()) {
     return;
   }
 
-  // Check if any of our controllers is grabbing a grabbable node
-  for (SceneNode *current_node : SceneManager::instance().getGrabbableNodeInstances()) {
-    if (current_node->intersects(controller->m_model_node)) {
-      state.hits.push_back(current_node);
+  for (SceneNode *scene_node : SceneManager::instance().getGrabbableNodeInstances()) {
+    for (auto input_node_to_check : state.input->getSceneNodeForInteractionQuery()) {
+      if (scene_node->intersects(input_node_to_check)) {
+        // Keep track that we're intersecting with this model
+        state.hits.push_back(scene_node);
+        break;
+      }
     }
   }
 
@@ -65,41 +71,12 @@ void InteractionSystem::queryControllerInteractions(InputState &state) {
     // Get the scene node of the button
     auto scene_node = button->getSceneNode();
 
-    if (scene_node->intersects(controller->m_model_node)) {
-      state.hits.push_back(scene_node.get());
-    }
-  }
-}
-
-void InteractionSystem::queryHandInteractions(InputState &state) {
-  auto hand = std::get<std::shared_ptr<Hand>>(state.input);
-
-  // Nothing to do if the hand is not active or invalid pose
-  if (!hand || !hand->m_active || !hand->isValid()) {
-    return;
-  }
-
-  // Check if the hand is intersecting a grabbable node. To make it simpler for the moment, we only
-  // check intersection with the palm and the tip of the thumb (as for "grab", both the thumb and the
-  // center of the palm should intersect, and for "pinch", the tip of the thumb needs to intersect).
-  auto thumb_scene_node = hand->getThumbSceneNode();
-  auto palm_scene_node = hand->getThumbSceneNode();
-
-  for (SceneNode *current_node : SceneManager::instance().getGrabbableNodeInstances()) {
-    if (current_node->intersects(thumb_scene_node) || current_node->intersects(palm_scene_node)) {
-      // Keep track that we're intersecting with this model
-      state.hits.push_back(current_node);
-    }
-  }
-
-  // Check if any of the buttons are activated
-  for (Button *button : SceneManager::instance().getButtonInstances()) {
-    // Get the scene node of the button
-    auto scene_node = button->getSceneNode();
-
-    if (scene_node->intersects(thumb_scene_node) || scene_node->intersects(palm_scene_node)) {
-      // Keep track that we're intersecting with this model
-      state.hits.push_back(scene_node.get());
+    for (auto input_node_to_check : state.input->getSceneNodeForInteractionQuery()) {
+      if (scene_node->intersects(input_node_to_check)) {
+        // Keep track that we're intersecting with this model
+        state.hits.push_back(scene_node.get());
+        break;
+      }
     }
   }
 }
@@ -112,22 +89,10 @@ void InteractionSystem::processInteractions() {
   for (auto [scene_node, input] : resolved_hits) {
     scene_node->m_intersected_in_current_frame = true;
 
-    if (auto controller = std::get_if<std::shared_ptr<Controller>>(&input)) {
-      // If the controller is grabbing, set the position and the rotation of the
-      // model to those of the controller
-      if ((*controller)->m_grabbing) {
-        scene_node->m_grabbed = true;
-        scene_node->setPosition((*controller)->m_model_node->getPosition());
-        scene_node->setRotation((*controller)->m_model_node->getRotation());
-      }
-    } else if (auto hand = std::get_if<std::shared_ptr<Hand>>(&input)) {
-      // If the hand is pinching, set the position and rotation of the model to that of the thumb
-      if ((*hand)->m_pinching) {
-        auto thumb_scene_node = (*hand)->getThumbSceneNode();
-        scene_node->m_grabbed = true;
-        scene_node->setPosition(thumb_scene_node->getPosition());
-        scene_node->setRotation(thumb_scene_node->getRotation());
-      }
+    if (input->m_grabbing || input->m_pinching) {
+      scene_node->m_grabbed = true;
+      scene_node->setPosition(input->getSceneNodeForSceneNodeUpdate()->getPosition());
+      scene_node->setRotation(input->getSceneNodeForSceneNodeUpdate()->getRotation());
     }
   }
 
@@ -135,8 +100,8 @@ void InteractionSystem::processInteractions() {
   SceneManager::instance().processButtonInteractions();
 }
 
-std::unordered_map<SceneNode *, Input> InteractionSystem::resolveInteractions() {
-  std::unordered_map<SceneNode *, Input> result = {};
+std::unordered_map<SceneNode *, std::shared_ptr<Input>> InteractionSystem::resolveInteractions() {
+  std::unordered_map<SceneNode *, std::shared_ptr<Input>> result = {};
 
   for (InputState &input_state : m_priority_ordered_states) {
     for (auto hit : input_state.hits) {

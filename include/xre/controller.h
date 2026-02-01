@@ -17,8 +17,9 @@
 #include <xre/vulkan_handler.h>
 #include <xre/button.h>
 #include <xre/scene_manager.h>
+#include <xre/input.h>
 
-class Controller {
+class Controller : public Input {
 public:
   // Constructor
   Controller(std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler);
@@ -32,8 +33,8 @@ public:
   // Update the position of the controller
   void updatePosition(glm::vec3 current_origin);
 
-  // Whether the controller is active or not
-  bool m_active = false;
+  std::shared_ptr<SceneNode> getSceneNodeForSceneNodeUpdate() override;
+  std::vector<std::shared_ptr<SceneNode>> getSceneNodeForInteractionQuery() override;
 
   // Path for the controller, e.g. `/user/hand/left`
   XrPath m_controller_path;
@@ -43,9 +44,6 @@ public:
 
   // Space for the aim action
   XrSpace m_aim_space;
-
-  // Boolean for the grab action
-  bool m_grabbing = false;
 
   // Space for the teleport action
   bool m_teleporting_requested = false;

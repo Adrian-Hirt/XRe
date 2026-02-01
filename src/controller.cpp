@@ -134,3 +134,11 @@ float Controller::computeAimIndicatorSpherePosition(std::unordered_set<SceneNode
 
   return closest_intersection_distance;
 }
+
+std::shared_ptr<SceneNode> Controller::getSceneNodeForSceneNodeUpdate() {
+  return m_model_node;
+}
+
+std::vector<std::shared_ptr<SceneNode>> Controller::getSceneNodeForInteractionQuery() {
+  return { m_model_node };
+}
