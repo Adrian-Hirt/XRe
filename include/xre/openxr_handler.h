@@ -23,6 +23,7 @@
 #include <xre/hand.h>
 #include <xre/material.h>
 #include <xre/texture.h>
+#include <xre/interaction_system.h>
 
 // Other includes
 #include <iostream>
@@ -64,7 +65,6 @@ private:
   XrSystemProperties m_openxr_system_properties = {XR_TYPE_SYSTEM_PROPERTIES};
   XrSystemHandTrackingPropertiesEXT m_openxr_hand_tracking_system_properties = {XR_TYPE_SYSTEM_HAND_TRACKING_PROPERTIES_EXT};
 
-  // New:
   std::vector<XrCompositionLayerProjectionView> m_projection_views;
   std::vector<XrSwapchain> m_swapchains;
   std::vector<std::vector<RenderTarget *>> m_render_targets;
@@ -73,7 +73,7 @@ private:
   std::vector<glm::mat4> m_view_matrices;
   std::vector<glm::mat4> m_projection_matrices;
 
-  // // Pointers to ext functions we need to use
+  // Pointers to ext functions we need to use
   PFN_xrCreateHandTrackerEXT m_ext_xrCreateHandTrackerEXT;
   PFN_xrDestroyHandTrackerEXT m_ext_xrDestroyHandTrackerEXT;
   PFN_xrLocateHandJointsEXT m_ext_xrLocateHandJointsEXT;
@@ -92,6 +92,9 @@ private:
   XrAction m_controller_aim_action;
   XrAction m_controller_grab_action;
   XrAction m_controller_teleport_action;
+
+  // Interaction system
+  InteractionSystem m_interaction_system;
 
   // For checking if the pose of a controller is valid
   const static XrSpaceLocationFlags VALID_POSE_FLAGS = XR_SPACE_LOCATION_POSITION_VALID_BIT | XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
