@@ -14,7 +14,6 @@
 struct InputState {
   std::shared_ptr<Input> input;
   std::vector<SceneNode *> hits;
-  int priority;
 };
 
 class InteractionSystem {
