@@ -34,7 +34,6 @@ public:
   // Will forward the calls to the active scene
   void updateSimulation(XrTime predicted_time);
   void draw(RenderContext &ctx);
-  void resetInteractionStates();
   std::unordered_set<SceneNode *> getTerrainInstances();
   std::unordered_set<Button *> getButtonInstances();
   void processButtonInteractions();

@@ -14,7 +14,13 @@
 
 struct InputState {
   std::shared_ptr<Input> input;
+
+  // Nodes hit in the current frame
   std::vector<SceneNode *> hits;
+
+  // Node that was hovered / grabbed last frame
+  SceneNode* last_hovered_node = nullptr;
+  SceneNode* last_grabbed_node = nullptr;
 };
 
 class InteractionSystem {

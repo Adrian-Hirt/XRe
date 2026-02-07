@@ -51,12 +51,6 @@ void SceneManager::draw(RenderContext &ctx) {
   }
 }
 
-void SceneManager::resetInteractionStates() {
-  if (m_active_scene) {
-    m_active_scene->resetInteractionStates();
-  }
-}
-
 std::unordered_set<SceneNode *> SceneManager::getTerrainInstances() {
   if (m_active_scene) {
     return m_active_scene->getTerrainNodeInstances();

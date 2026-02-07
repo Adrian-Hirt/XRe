@@ -34,12 +34,6 @@ std::unordered_set<SceneNode *> Scene::getTerrainNodeInstances() {
   return result;
 }
 
-void Scene::resetInteractionStates() {
-  for (auto component : m_grabbable_components) {
-    component->getSceneNode()->m_intersected_in_current_frame = false;
-  }
-}
-
 void Scene::addButton(Button *button) { m_button_instances.insert(button); }
 
 void Scene::processButtonInteractions() {

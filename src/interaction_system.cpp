@@ -31,7 +31,6 @@ InteractionSystem::InteractionSystem(std::shared_ptr<Controller> left_controller
 
 void InteractionSystem::beginFrame() {
   // Reset the interaction tracking booleans on the grabbable SceneNodes
-  SceneManager::instance().resetInteractionStates();
   SceneManager::instance().resetButtonInteractions();
 
   // Reset the hits
@@ -83,18 +82,68 @@ void InteractionSystem::queryInputInteractions(InputState &state) {
 }
 
 void InteractionSystem::processInteractions() {
-  // First resolve the hits to the input that should act on it
-  auto resolved_hits = resolveInteractions();
+    auto resolvedHits = resolveInteractions();
 
-  // Then for the resolved hits, run the corresponding code
-  for (auto [scene_node, input] : resolved_hits) {
-    for (auto *component : scene_node->getComponents<InteractionComponent>()) {
-      component->onHoverBegin(*input);
+    for (InputState &state : m_priority_ordered_states) {
+      SceneNode* hovered_node = nullptr;
+      SceneNode* grabbed_node = nullptr;
 
-      if (input->m_grabbing || input->m_pinching) {
-        component->onGrabUpdate(*input);
+      // Determine which node this input will act on (priority first)
+      // TODO: make deterministic, such that we always pick the same node
+      for (auto hit : state.hits) {
+        hovered_node = hit;
+
+        // If input is grabbing/pinching, this is the grabbed node
+        if (state.input->m_grabbing || state.input->m_pinching) {
+          grabbed_node = hit;
+        }
+        break; // stop at first hit
       }
-    }
+
+      // Hover phase, if the new hovered node is not the
+      // previous hovered node
+      if (hovered_node != state.last_hovered_node) {
+        // End hover on previous
+        if (state.last_hovered_node) {
+          for (auto* component : state.last_hovered_node->getComponents<InteractionComponent>()) {
+            component->onHoverEnd(*state.input);
+          }
+        }
+        // Begin hover on new node
+        if (hovered_node) {
+          for (auto* component : hovered_node->getComponents<InteractionComponent>()) {
+            component->onHoverBegin(*state.input);
+          }
+        }
+      }
+
+      // Grab phase, if the new grabbed node is not the
+      // previous grabbed node
+      if (grabbed_node != state.last_grabbed_node) {
+        // End grab on previous
+        if (state.last_grabbed_node) {
+          for (auto* component : state.last_grabbed_node->getComponents<InteractionComponent>()) {
+            component->onGrabEnd(*state.input);
+          }
+        }
+        // Begin grab on new node
+        if (grabbed_node) {
+          for (auto* component : grabbed_node->getComponents<InteractionComponent>()) {
+            component->onGrabBegin(*state.input);
+          }
+        }
+      }
+
+      // Always run update grab on current node
+      if (grabbed_node) {
+        for (auto* component : grabbed_node->getComponents<InteractionComponent>()) {
+          component->onGrabUpdate(*state.input);
+        }
+      }
+
+      // Save for next frame
+      state.last_hovered_node = hovered_node;
+      state.last_grabbed_node = grabbed_node;
   }
 
   // // Process button triggers

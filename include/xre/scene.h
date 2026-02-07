@@ -37,7 +37,6 @@ public:
 
   void setNodeIsTerrain(SceneNode *node, bool is_terrain);
   std::unordered_set<SceneNode *> getTerrainNodeInstances();
-  void resetInteractionStates();
 
   std::unordered_set<Button *> getButtonInstances();
   void processButtonInteractions();
