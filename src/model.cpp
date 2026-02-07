@@ -176,3 +176,14 @@ void Model::printBouindingBoxes() {
 }
 
 void Model::setInteractedState(bool interacted) { m_interacted = interacted; }
+
+const std::vector<glm::vec3> Model::getVectorPositions() const {
+  std::vector<glm::vec3> result;
+
+  for (auto mesh : m_meshes) {
+    auto positions = mesh.getVectorPositions();
+    result.insert(result.end(), positions.begin(), positions.end());
+  }
+
+  return result;
+}

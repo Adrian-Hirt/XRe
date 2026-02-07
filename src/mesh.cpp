@@ -67,16 +67,16 @@ void Mesh::initialize(std::vector<Vertex> vertices, std::vector<uint16_t> indice
   m_index_buffer = new Buffer(device, physical_device, static_cast<VkDeviceSize>(index_size), VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
   m_index_buffer->loadData(indices);
 
+  // Store vertex positions
+  std::vector<glm::vec3> m_vertex_positions;
+
+  for (int i = 0; i < m_vertex_count; i++) {
+    m_vertex_positions.push_back(vertices[i].position);
+  }
+
   if (hasBoundingBox()) {
-    // Store vertex positions temporary
-    std::vector<glm::vec3> vertex_positions;
-
-    for (int i = 0; i < m_vertex_count; i++) {
-      vertex_positions.push_back(vertices[i].position);
-    }
-
     // Create the bounding box for this mesh
-    m_bounding_box = OOBB(vertex_positions);
+    m_bounding_box = OOBB(m_vertex_positions);
 
     // Store the vertices from the OOBB
     auto bounding_box_corners = m_bounding_box.getCorners();
@@ -101,4 +101,8 @@ void Mesh::initialize(std::vector<Vertex> vertices, std::vector<uint16_t> indice
         new Buffer(device, physical_device, static_cast<VkDeviceSize>(index_size), VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
     m_bounding_box_index_buffer->loadData(m_bounding_box.getLineIndices());
   }
+}
+
+const std::vector<glm::vec3> Mesh::getVectorPositions() const {
+  return m_vertex_positions;
 }

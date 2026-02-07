@@ -21,6 +21,7 @@ public:
   Mesh(std::vector<Vertex> vertices, std::vector<uint16_t> indices, std::shared_ptr<VulkanHandler> vulkan_handler);
 
   OOBB getObjectOrientedBoundingBox();
+  const std::vector<glm::vec3> getVectorPositions() const;
 private:
   void render(RenderContext &ctx);
   void renderBoundingBox(RenderContext &ctx);
@@ -34,6 +35,9 @@ private:
   // vertex and index buffers
   Buffer *m_vertex_buffer = nullptr;
   Buffer *m_index_buffer = nullptr;
+
+  // Vertex positions
+  std::vector<glm::vec3> m_vertex_positions;
 
   // Vertex and index buffer for bounding volumes, which mainly are used
   // for debugging purposes.

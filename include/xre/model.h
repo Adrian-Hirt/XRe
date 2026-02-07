@@ -35,6 +35,7 @@ public:
   // should have a slightly different color applied
   void setInteractedState(bool interacted);
 
+  const std::vector<glm::vec3> getVectorPositions() const;
 private:
   // The index of the current model itself to index into the buffer of the material
   uint32_t m_model_index;
