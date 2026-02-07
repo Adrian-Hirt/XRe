@@ -2,7 +2,6 @@
 
 // XRe includes
 #include <xre/openxr_handler.h>
-#include <xre/renderable.h>
 #include <xre/mesh.h>
 #include <xre/model.h>
 #include <xre/text.h>
