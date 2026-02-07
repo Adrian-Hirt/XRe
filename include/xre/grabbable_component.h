@@ -13,4 +13,6 @@ public:
   void onGrabEnd(Input &input) override;
 
   void onTrigger(Input &input) override;
+private:
+  Input* m_grabbing_input = nullptr;
 };
