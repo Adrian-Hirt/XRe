@@ -166,4 +166,3 @@ void SceneNode::addComponent(std::unique_ptr<Component> component) {
   m_scene->registerComponent(*component);
   m_components.push_back(std::move(component));
 }
-

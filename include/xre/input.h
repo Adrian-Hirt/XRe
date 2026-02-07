@@ -23,6 +23,6 @@ public:
   // Boolean for the pinch action, usually only
   // used for hands
   bool m_pinching = false;
-private:
 
+private:
 };

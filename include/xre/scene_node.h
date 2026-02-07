@@ -26,12 +26,12 @@ public:
   ~SceneNode();
 
   // No copying allowed
-  SceneNode(const SceneNode&) = delete;
-  SceneNode& operator=(const SceneNode&) = delete;
+  SceneNode(const SceneNode &) = delete;
+  SceneNode &operator=(const SceneNode &) = delete;
 
   // Allow moving
-  SceneNode(SceneNode&&) = default;
-  SceneNode& operator=(SceneNode&&) = default;
+  SceneNode(SceneNode &&) = default;
+  SceneNode &operator=(SceneNode &&) = default;
 
   void addChildNode(std::shared_ptr<SceneNode> child);
   void addChildNode(std::shared_ptr<Line> child);
@@ -80,11 +80,9 @@ public:
   // Attach a component
   void addComponent(std::unique_ptr<Component> component);
 
-  template<typename T>
-  T* getComponent();
+  template <typename T> T *getComponent();
 
-  template<typename T>
-  std::vector<T*> getComponents();
+  template <typename T> std::vector<T *> getComponents();
 
   bool m_grabbed = false;
   bool m_intersected_in_current_frame = false;

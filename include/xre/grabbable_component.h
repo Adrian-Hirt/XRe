@@ -5,12 +5,12 @@
 
 class GrabbableComponent : public InteractionComponent {
 public:
-  void onHoverBegin(Input& input) override;
-  void onHoverEnd(Input& input) override;
+  void onHoverBegin(Input &input) override;
+  void onHoverEnd(Input &input) override;
 
-  void onGrabBegin(Input& input) override;
-  void onGrabUpdate(Input& input) override;
-  void onGrabEnd(Input& input) override;
+  void onGrabBegin(Input &input) override;
+  void onGrabUpdate(Input &input) override;
+  void onGrabEnd(Input &input) override;
 
-  void onTrigger(Input& input) override;
+  void onTrigger(Input &input) override;
 };

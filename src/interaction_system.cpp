@@ -88,7 +88,7 @@ void InteractionSystem::processInteractions() {
 
   // Then for the resolved hits, run the corresponding code
   for (auto [scene_node, input] : resolved_hits) {
-    for (auto* component : scene_node->getComponents<InteractionComponent>()) {
+    for (auto *component : scene_node->getComponents<InteractionComponent>()) {
       component->onHoverBegin(*input);
 
       if (input->m_grabbing || input->m_pinching) {

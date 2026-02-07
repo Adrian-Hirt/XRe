@@ -73,8 +73,8 @@ std::optional<glm::vec3> Controller::updateIntersectionSphereAndComputePossibleT
   m_aim_line_render_length = LINE_INTERSECTION_FAR_THRESHOLD;
 
   // TODO: clean this up
-  std::unordered_set<SceneNode*> grabbable_scene_nodes;
-  for (auto* comp : SceneManager::instance().getGrabbableComponents()) {
+  std::unordered_set<SceneNode *> grabbable_scene_nodes;
+  for (auto *comp : SceneManager::instance().getGrabbableComponents()) {
     grabbable_scene_nodes.insert(comp->getSceneNode());
   }
 
@@ -141,10 +141,6 @@ float Controller::computeAimIndicatorSpherePosition(std::unordered_set<SceneNode
   return closest_intersection_distance;
 }
 
-std::shared_ptr<SceneNode> Controller::getSceneNodeForSceneNodeUpdate() {
-  return m_model_node;
-}
+std::shared_ptr<SceneNode> Controller::getSceneNodeForSceneNodeUpdate() { return m_model_node; }
 
-std::vector<std::shared_ptr<SceneNode>> Controller::getSceneNodeForInteractionQuery() {
-  return { m_model_node };
-}
+std::vector<std::shared_ptr<SceneNode>> Controller::getSceneNodeForInteractionQuery() { return {m_model_node}; }

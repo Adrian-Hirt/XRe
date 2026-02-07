@@ -119,14 +119,8 @@ std::shared_ptr<SceneNode> Hand::getThumbSceneNode() { return m_joint_nodes[XR_H
 
 std::shared_ptr<SceneNode> Hand::getPalmSceneNode() { return m_joint_nodes[XR_HAND_JOINT_PALM_EXT]; }
 
-std::shared_ptr<SceneNode> Hand::getSceneNodeForSceneNodeUpdate() {
-  return m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT];
-}
+std::shared_ptr<SceneNode> Hand::getSceneNodeForSceneNodeUpdate() { return m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT]; }
 
 std::vector<std::shared_ptr<SceneNode>> Hand::getSceneNodeForInteractionQuery() {
-  return {
-    m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT],
-    m_joint_nodes[XR_HAND_JOINT_PALM_EXT]
-  };
+  return {m_joint_nodes[XR_HAND_JOINT_THUMB_TIP_EXT], m_joint_nodes[XR_HAND_JOINT_PALM_EXT]};
 }
-

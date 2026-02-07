@@ -40,7 +40,7 @@ public:
   void processButtonInteractions();
   void resetButtonInteractions();
 
-  const std::vector<GrabbableComponent*>& getGrabbableComponents() const;
+  const std::vector<GrabbableComponent *> &getGrabbableComponents() const;
 
 private:
   std::unordered_map<std::string, SceneFactory> m_scene_factories;
