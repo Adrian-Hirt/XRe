@@ -3,6 +3,7 @@
 // XRe includes
 #include <xre/model.h>
 #include <xre/renderable.h>
+#include <xre/component.h>
 
 // GLM includes
 #include <glm/glm/vec3.hpp>
@@ -23,6 +24,14 @@ public:
   SceneNode();
   SceneNode(std::shared_ptr<Model> model);
   ~SceneNode();
+
+  // No copying allowed
+  SceneNode(const SceneNode&) = delete;
+  SceneNode& operator=(const SceneNode&) = delete;
+
+  // Allow moving
+  SceneNode(SceneNode&&) = default;
+  SceneNode& operator=(SceneNode&&) = default;
 
   void addChildNode(std::shared_ptr<SceneNode> child);
   void addChildNode(std::shared_ptr<Line> child);
@@ -69,6 +78,15 @@ public:
   // distance of the intersection point as an out parameter)
   bool intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance);
 
+  // Attach a component
+  void addComponent(std::unique_ptr<Component> component);
+
+  template<typename T>
+  T* getComponent();
+
+  template<typename T>
+  std::vector<T*> getComponents();
+
   bool m_grabbed = false;
   bool m_intersected_in_current_frame = false;
   bool m_was_intersected_in_previous_frame = false;
@@ -107,4 +125,10 @@ private:
 
   // Track whether the scene node is active or not
   bool m_is_active = true;
+
+  // Components attached to this scene node
+  std::vector<std::unique_ptr<Component>> m_components;
 };
+
+// Inline file include
+#include <xre/scene_node.inl>

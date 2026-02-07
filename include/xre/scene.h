@@ -7,6 +7,7 @@
 #include <xre/scene_node.h>
 #include <xre/material.h>
 #include <xre/texture.h>
+#include <xre/grabbable_component.h>
 
 // Other includes
 #include <memory>
@@ -46,12 +47,18 @@ public:
 
   void addButton(Button *button);
 
+  void registerComponent(Component& component);
+  void unregisterComponent(Component* component);
+
+  const std::vector<GrabbbableComponent*>& getGrabbableComponents() const;
+
 protected:
   // Keep track of resource manager to create resources such as models or materials
   std::shared_ptr<ResourceManager> m_resource_manager;
 
   // Set of all scene nodes belonging to this scene we marked as grabbable
   std::unordered_set<SceneNode *> m_grabbable_scene_nodes;
+  std::vector<GrabbbableComponent*> m_grabbable_components;
 
   // Set of all scene nodes belonging to this scene we marked as terrain (i.e. can teleport there)
   std::unordered_set<SceneNode *> m_terrain_scene_nodes;

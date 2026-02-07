@@ -5,6 +5,7 @@
 #include <xre/controller.h>
 #include <xre/hand.h>
 #include <xre/scene_node.h>
+#include <xre/interaction_component.h>
 
 // Other includes
 #include <memory>

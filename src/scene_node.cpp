@@ -166,3 +166,10 @@ bool SceneNode::intersects(std::shared_ptr<SceneNode> other) {
 bool SceneNode::intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance) {
   return m_model->intersects(line_start, line_direction, out_distance, m_world_transform);
 }
+
+void SceneNode::addComponent(std::unique_ptr<Component> component) {
+  component->onAttach(*this);
+  m_scene->registerComponent(*component);
+  m_components.push_back(std::move(component));
+}
+

@@ -56,7 +56,8 @@ void InteractionSystem::queryInputInteractions(InputState &state) {
     return;
   }
 
-  for (SceneNode *scene_node : SceneManager::instance().getGrabbableNodeInstances()) {
+  for (auto component : SceneManager::instance().getGrabbableComponents()) {
+    auto scene_node = component->getSceneNode();
     for (auto input_node_to_check : state.input->getSceneNodeForInteractionQuery()) {
       if (scene_node->intersects(input_node_to_check)) {
         // Keep track that we're intersecting with this model
@@ -87,17 +88,17 @@ void InteractionSystem::processInteractions() {
 
   // Then for the resolved hits, run the corresponding code
   for (auto [scene_node, input] : resolved_hits) {
-    scene_node->m_intersected_in_current_frame = true;
+    for (auto* component : scene_node->getComponents<InteractionComponent>()) {
+      component->onHoverBegin(*input);
 
-    if (input->m_grabbing || input->m_pinching) {
-      scene_node->m_grabbed = true;
-      scene_node->setPosition(input->getSceneNodeForSceneNodeUpdate()->getPosition());
-      scene_node->setRotation(input->getSceneNodeForSceneNodeUpdate()->getRotation());
+      if (input->m_grabbing || input->m_pinching) {
+        component->onGrabUpdate(*input);
+      }
     }
   }
 
-  // Process button triggers
-  SceneManager::instance().processButtonInteractions();
+  // // Process button triggers
+  // SceneManager::instance().processButtonInteractions();
 }
 
 std::unordered_map<SceneNode *, std::shared_ptr<Input>> InteractionSystem::resolveInteractions() {

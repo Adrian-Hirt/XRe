@@ -92,3 +92,12 @@ std::unordered_set<Button *> SceneManager::getButtonInstances() {
     return {};
   }
 }
+
+const std::vector<GrabbbableComponent*>& SceneManager::getGrabbableComponents() const {
+  if (m_active_scene) {
+    return m_active_scene->getGrabbableComponents();
+  } else {
+    static const std::vector<GrabbbableComponent*> empty;
+    return empty;
+  }
+}
