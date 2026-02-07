@@ -34,32 +34,6 @@ std::unordered_set<SceneNode *> Scene::getTerrainNodeInstances() {
   return result;
 }
 
-void Scene::addButton(Button *button) { m_button_instances.insert(button); }
-
-void Scene::processButtonInteractions() {
-  for (auto button : getButtonInstances()) {
-    button->processInteractions();
-  }
-}
-
-void Scene::resetButtonInteractions() {
-  for (auto button : m_button_instances) {
-    button->resetInteractionState();
-  }
-}
-
-std::unordered_set<Button *> Scene::getButtonInstances() {
-  std::unordered_set<Button *> result;
-
-  for (Button *button : m_button_instances) {
-    if (button->isEnabled()) {
-      result.insert(button);
-    }
-  }
-
-  return result;
-}
-
 void Scene::registerComponent(Component &component) {
   if (auto *grabbable = dynamic_cast<GrabbableComponent *>(&component)) {
     m_grabbable_components.push_back(grabbable);

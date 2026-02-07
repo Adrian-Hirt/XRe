@@ -35,9 +35,6 @@ public:
   void updateSimulation(XrTime predicted_time);
   void draw(RenderContext &ctx);
   std::unordered_set<SceneNode *> getTerrainInstances();
-  std::unordered_set<Button *> getButtonInstances();
-  void processButtonInteractions();
-  void resetButtonInteractions();
 
   const std::vector<GrabbableComponent *> &getGrabbableComponents() const;
   const std::vector<ButtonComponent *> &getButtonComponents() const;

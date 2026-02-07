@@ -59,26 +59,6 @@ std::unordered_set<SceneNode *> SceneManager::getTerrainInstances() {
   }
 }
 
-void SceneManager::processButtonInteractions() {
-  if (m_active_scene) {
-    m_active_scene->processButtonInteractions();
-  }
-}
-
-void SceneManager::resetButtonInteractions() {
-  if (m_active_scene) {
-    m_active_scene->resetButtonInteractions();
-  }
-}
-
-std::unordered_set<Button *> SceneManager::getButtonInstances() {
-  if (m_active_scene) {
-    return m_active_scene->getButtonInstances();
-  } else {
-    return {};
-  }
-}
-
 const std::vector<GrabbableComponent *> &SceneManager::getGrabbableComponents() const {
   if (m_active_scene) {
     return m_active_scene->getGrabbableComponents();

@@ -30,9 +30,6 @@ InteractionSystem::InteractionSystem(std::shared_ptr<Controller> left_controller
 }
 
 void InteractionSystem::beginFrame() {
-  // Reset the interaction tracking booleans on the grabbable SceneNodes
-  SceneManager::instance().resetButtonInteractions();
-
   // Reset the hits
   for (InputState &input_state : m_priority_ordered_states) {
     input_state.hits = {};

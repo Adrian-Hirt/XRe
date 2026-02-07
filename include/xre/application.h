@@ -10,7 +10,6 @@
 #include <xre/material.h>
 #include <xre/texture.h>
 #include <xre/resource_manager.h>
-#include <xre/button.h>
 #include <xre/scene.h>
 #include <xre/scene_manager.h>
 #include <xre/grabbable_component.h>

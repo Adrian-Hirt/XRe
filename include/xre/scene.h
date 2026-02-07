@@ -39,12 +39,6 @@ public:
   void setNodeIsTerrain(SceneNode *node, bool is_terrain);
   std::unordered_set<SceneNode *> getTerrainNodeInstances();
 
-  std::unordered_set<Button *> getButtonInstances();
-  void processButtonInteractions();
-  void resetButtonInteractions();
-
-  void addButton(Button *button);
-
   void registerComponent(Component &component);
   void unregisterComponent(Component &component);
 
