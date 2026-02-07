@@ -83,7 +83,16 @@ const std::vector<GrabbableComponent *> &SceneManager::getGrabbableComponents() 
   if (m_active_scene) {
     return m_active_scene->getGrabbableComponents();
   } else {
-    static const std::vector<GrabbableComponent *> empty;
-    return empty;
+    static const std::vector<GrabbableComponent *> empty_grabbable;
+    return empty_grabbable;
+  }
+}
+
+const std::vector<ButtonComponent *> &SceneManager::getButtonComponents() const {
+  if (m_active_scene) {
+    return m_active_scene->getButtonComponents();
+  } else {
+    static const std::vector<ButtonComponent *> empty_buttons;
+    return empty_buttons;
   }
 }

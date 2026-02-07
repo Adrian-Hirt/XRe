@@ -47,4 +47,10 @@ private:
   void queryInputInteractions(InputState &state);
 
   std::unordered_map<SceneNode *, std::shared_ptr<Input>> resolveInteractions();
+
+  template <typename T>
+  requires std::derived_from<T, InteractionComponent>
+  void processInteractionNodes(const std::vector<T*>& components, InputState &state);
 };
+
+#include <xre/interaction_system.inl>

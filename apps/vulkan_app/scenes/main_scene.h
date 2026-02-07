@@ -31,6 +31,7 @@ private:
   std::shared_ptr<Model> floor;
   std::shared_ptr<Model> cube;
   std::shared_ptr<Line> line;
+  std::shared_ptr<Model> button;
 
   std::shared_ptr<Text> text;
 
@@ -42,8 +43,7 @@ private:
   std::shared_ptr<SceneNode> sphere2_node;
   std::shared_ptr<SceneNode> cube_node;
   std::shared_ptr<SceneNode> quad_node;
-
-  std::shared_ptr<Button> button;
+  std::shared_ptr<SceneNode> button_node;
 
   XrTime last_time = 0;
   bool forward = true;

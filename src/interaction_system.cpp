@@ -55,30 +55,9 @@ void InteractionSystem::queryInputInteractions(InputState &state) {
     return;
   }
 
-  for (auto component : SceneManager::instance().getGrabbableComponents()) {
-    auto scene_node = component->getSceneNode();
-    for (auto input_node_to_check : state.input->getSceneNodeForInteractionQuery()) {
-      if (scene_node->intersects(input_node_to_check)) {
-        // Keep track that we're intersecting with this model
-        state.hits.push_back(scene_node);
-        break;
-      }
-    }
-  }
-
-  // Check if any of the buttons are activated
-  for (Button *button : SceneManager::instance().getButtonInstances()) {
-    // Get the scene node of the button
-    auto scene_node = button->getSceneNode();
-
-    for (auto input_node_to_check : state.input->getSceneNodeForInteractionQuery()) {
-      if (scene_node->intersects(input_node_to_check)) {
-        // Keep track that we're intersecting with this model
-        state.hits.push_back(scene_node.get());
-        break;
-      }
-    }
-  }
+  // Process the components
+  processInteractionNodes(SceneManager::instance().getGrabbableComponents(), state);
+  processInteractionNodes(SceneManager::instance().getButtonComponents(), state);
 }
 
 void InteractionSystem::processInteractions() {
@@ -145,9 +124,6 @@ void InteractionSystem::processInteractions() {
       state.last_hovered_node = hovered_node;
       state.last_grabbed_node = grabbed_node;
   }
-
-  // // Process button triggers
-  // SceneManager::instance().processButtonInteractions();
 }
 
 std::unordered_map<SceneNode *, std::shared_ptr<Input>> InteractionSystem::resolveInteractions() {

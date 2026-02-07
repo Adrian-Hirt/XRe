@@ -10,18 +10,19 @@ void OtherScene::onActivate() {
   texture_material = m_resource_manager->material(SHADERS_FOLDER "basic.vert.spv", SHADERS_FOLDER "texture.frag.spv", texture);
 
   floor = m_resource_manager->plane(10, texture_material);
+  button = m_resource_manager->cube(basic_material, {1.0f, 0.0f, 0.0f});
 
   root_node = node();
   floor_node = node(floor);
+  button_node = node(button);
 
-  button = m_resource_manager->button(
-    this,
-    basic_material,
-    true,
-    [this]() {
-      std::cout << "Switching to main" << std::endl;
+  button_node->addComponent(
+    std::make_unique<ButtonComponent>(
+      [this]() {
+        std::cout << "Switching to main" << std::endl;
       SceneManager::instance().setActive("main");
-    }
+      }
+    )
   );
 
   // --------------------------------------------------------------------
@@ -30,10 +31,11 @@ void OtherScene::onActivate() {
 
   // Setup scene graph
   root_node->addChildNode(floor_node);
-  root_node->addChildNode(button);
+  root_node->addChildNode(button_node);
 
   // Update initial transforms
-  button->getSceneNode()->setPosition({-1.0f, 1.3f, 0.0f});
+  button_node->setPosition({-1.0f, 1.3f, 0.0f});
+  button_node->scale(0.1f, 0.1f, 0.02f);
 
   floor_node->setIsTerrain(true);
 

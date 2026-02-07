@@ -22,5 +22,6 @@ private:
   std::shared_ptr<SceneNode> root_node;
   std::shared_ptr<SceneNode> floor_node;
 
-  std::shared_ptr<Button> button;
+  std::shared_ptr<Model> button;
+  std::shared_ptr<SceneNode> button_node;
 };

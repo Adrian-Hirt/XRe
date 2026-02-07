@@ -8,6 +8,7 @@
 #include <xre/material.h>
 #include <xre/texture.h>
 #include <xre/grabbable_component.h>
+#include <xre/button_component.h>
 
 // Other includes
 #include <memory>
@@ -45,9 +46,10 @@ public:
   void addButton(Button *button);
 
   void registerComponent(Component &component);
-  void unregisterComponent(Component *component);
+  void unregisterComponent(Component &component);
 
   const std::vector<GrabbableComponent *> &getGrabbableComponents() const;
+  const std::vector<ButtonComponent *> &getButtonComponents() const;
 
 protected:
   // Keep track of resource manager to create resources such as models or materials
@@ -61,4 +63,5 @@ protected:
 
   // Set of all buttons in the scene
   std::unordered_set<Button *> m_button_instances;
+  std::vector<ButtonComponent *> m_button_components;
 };

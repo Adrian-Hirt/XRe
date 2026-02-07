@@ -63,13 +63,19 @@ std::unordered_set<Button *> Scene::getButtonInstances() {
 void Scene::registerComponent(Component &component) {
   if (auto *grabbable = dynamic_cast<GrabbableComponent *>(&component)) {
     m_grabbable_components.push_back(grabbable);
+  } else if (auto *button = dynamic_cast<ButtonComponent *>(&component)) {
+    m_button_components.push_back(button);
   }
 }
 
-void Scene::unregisterComponent(Component *component) {
-  if (auto *grabbable = dynamic_cast<GrabbableComponent *>(component)) {
+void Scene::unregisterComponent(Component &component) {
+  if (auto *grabbable = dynamic_cast<GrabbableComponent *>(&component)) {
+    std::erase(m_grabbable_components, grabbable);
+  } else if (auto *button = dynamic_cast<ButtonComponent *>(&component)) {
     std::erase(m_grabbable_components, grabbable);
   }
 }
 
 const std::vector<GrabbableComponent *> &Scene::getGrabbableComponents() const { return m_grabbable_components; };
+
+const std::vector<ButtonComponent *> &Scene::getButtonComponents() const { return m_button_components; };

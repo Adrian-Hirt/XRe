@@ -22,6 +22,7 @@ void MainScene::onActivate() {
   floor = m_resource_manager->plane(10, texture_material);
   cube = m_resource_manager->cube(texture2_material);
   line = m_resource_manager->line(0.003f, 2.0f, material, {1.0f, 0.0f, 0.0f});
+  button = m_resource_manager->cube(material, {1.0f, 0.0f, 0.0f});
 
   // Create some text with some valid and some invalid characters
   text = m_resource_manager->text("This is a sample text :) カタカナ", true);
@@ -34,15 +35,15 @@ void MainScene::onActivate() {
   sphere2_node = node(sphere2);
   cube_node = node(cube);
   quad_node = node(quad);
+  button_node = node(button);
 
-  button = m_resource_manager->button(
-    this,
-    basic_material,
-    true,
-    [this]() {
-      std::cout << "Switching to other" << std::endl;
-      SceneManager::instance().setActive("other");
-    }
+  button_node->addComponent(
+    std::make_unique<ButtonComponent>(
+      [this]() {
+        std::cout << "Switching to other" << std::endl;
+        SceneManager::instance().setActive("other");
+      }
+    )
   );
 
   // --------------------------------------------------------------------
@@ -61,7 +62,7 @@ void MainScene::onActivate() {
   root_node->addChildNode(cube_node);
   root_node->addChildNode(text);
   root_node->addChildNode(quad_node);
-  root_node->addChildNode(button);
+  root_node->addChildNode(button_node);
   root_node->addChildNode(line);
 
   // Update initial transforms
@@ -74,7 +75,8 @@ void MainScene::onActivate() {
   sphere2_node->setPosition(5.0f, 0.0f, -4.0f);
   cube_node->scale(2.0f, 0.5f, 2.0f);
   cube_node->setPosition(4.0f, 0.5f, 4.0f);
-  button->getSceneNode()->setPosition({1.0f, 1.3f, 0.0f});
+  button_node->scale(0.1f, 0.1f, 0.02f);
+  button_node->setPosition({1.0f, 1.3f, 0.0f});
 
   text->getSceneNode()->scale(0.2f, 0.2f, 0.2f);
   text->getSceneNode()->translate(0.0f, 0.2f, 0.0f);

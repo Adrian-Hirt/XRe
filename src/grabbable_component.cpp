@@ -18,5 +18,3 @@ void GrabbableComponent::onGrabEnd(Input &input) {
   }
   m_grabbing_input = nullptr;
 }
-
-void GrabbableComponent::onTrigger(Input &input) {}
