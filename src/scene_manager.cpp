@@ -57,14 +57,6 @@ void SceneManager::resetInteractionStates() {
   }
 }
 
-std::unordered_set<SceneNode *> SceneManager::getGrabbableNodeInstances() {
-  if (m_active_scene) {
-    return m_active_scene->getGrabbableNodeInstances();
-  } else {
-    return {};
-  }
-}
-
 std::unordered_set<SceneNode *> SceneManager::getTerrainInstances() {
   if (m_active_scene) {
     return m_active_scene->getTerrainNodeInstances();

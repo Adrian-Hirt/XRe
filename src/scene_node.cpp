@@ -143,12 +143,6 @@ glm::vec3 SceneNode::getScale() { return m_scaling; }
 
 glm::vec3 SceneNode::getPosition() { return m_translation; }
 
-void SceneNode::setGrabbable(bool grabbable) {
-  if (m_scene) {
-    m_scene->setNodeGrabbable(this, grabbable);
-  }
-}
-
 void SceneNode::setIsTerrain(bool is_terrain) {
   if (m_scene) {
     m_scene->setNodeIsTerrain(this, is_terrain);

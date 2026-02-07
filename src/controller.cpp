@@ -72,7 +72,13 @@ std::optional<glm::vec3> Controller::updateIntersectionSphereAndComputePossibleT
   // Reset line length
   m_aim_line_render_length = LINE_INTERSECTION_FAR_THRESHOLD;
 
-  float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(SceneManager::instance().getGrabbableNodeInstances());
+  // TODO: clean this up
+  std::unordered_set<SceneNode*> grabbable_scene_nodes;
+  for (auto* comp : SceneManager::instance().getGrabbableComponents()) {
+    grabbable_scene_nodes.insert(comp->getSceneNode());
+  }
+
+  float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(grabbable_scene_nodes);
   float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(SceneManager::instance().getTerrainInstances());
 
   if (m_intersection_sphere_node->isActive()) {

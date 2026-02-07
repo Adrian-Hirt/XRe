@@ -35,8 +35,6 @@ public:
   std::shared_ptr<SceneNode> node();
   std::shared_ptr<SceneNode> node(std::shared_ptr<Model> model);
 
-  void setNodeGrabbable(SceneNode *node, bool grabbable);
-  std::unordered_set<SceneNode *> getGrabbableNodeInstances();
   void setNodeIsTerrain(SceneNode *node, bool is_terrain);
   std::unordered_set<SceneNode *> getTerrainNodeInstances();
   void resetInteractionStates();
@@ -56,8 +54,7 @@ protected:
   // Keep track of resource manager to create resources such as models or materials
   std::shared_ptr<ResourceManager> m_resource_manager;
 
-  // Set of all scene nodes belonging to this scene we marked as grabbable
-  std::unordered_set<SceneNode *> m_grabbable_scene_nodes;
+  // Set of all grabbable components in this scene
   std::vector<GrabbableComponent*> m_grabbable_components;
 
   // Set of all scene nodes belonging to this scene we marked as terrain (i.e. can teleport there)

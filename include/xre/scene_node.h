@@ -65,7 +65,6 @@ public:
   glm::vec3 getScale();
   glm::vec3 getPosition();
 
-  void setGrabbable(bool grabbable);
   void setIsTerrain(bool is_terrain);
 
   void setActive(bool is_active);
