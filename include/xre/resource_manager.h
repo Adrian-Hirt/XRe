@@ -44,6 +44,7 @@ public:
 
   // Methods to create text
   std::shared_ptr<Text> text(std::string sentence, bool stick_to_hud);
+
 private:
   std::shared_ptr<VulkanHandler> m_vulkan_handler;
 

@@ -18,6 +18,7 @@ public:
   void onGrabBegin(Input &input) override {};
   void onGrabUpdate(Input &input) override {};
   void onGrabEnd(Input &input) override {};
+
 private:
   // Callback when button is triggered
   std::function<void()> m_trigger_callback;

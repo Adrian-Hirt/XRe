@@ -19,8 +19,8 @@ struct InputState {
   std::vector<SceneNode *> hits;
 
   // Node that was hovered / grabbed last frame
-  SceneNode* last_hovered_node = nullptr;
-  SceneNode* last_grabbed_node = nullptr;
+  SceneNode *last_hovered_node = nullptr;
+  SceneNode *last_grabbed_node = nullptr;
 };
 
 class InteractionSystem {
@@ -49,8 +49,8 @@ private:
   std::unordered_map<SceneNode *, std::shared_ptr<Input>> resolveInteractions();
 
   template <typename T>
-  requires std::derived_from<T, InteractionComponent>
-  void processInteractionNodes(const std::vector<T*>& components, InputState &state);
+    requires std::derived_from<T, InteractionComponent>
+  void processInteractionNodes(const std::vector<T *> &components, InputState &state);
 };
 
 #include <xre/interaction_system.inl>

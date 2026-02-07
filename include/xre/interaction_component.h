@@ -14,6 +14,7 @@ public:
   virtual void onGrabEnd(Input &input) = 0;
 
   bool isHovered() { return m_hovered; }
+
 private:
   bool m_hovered = false;
 };

@@ -58,68 +58,68 @@ void InteractionSystem::queryInputInteractions(InputState &state) {
 }
 
 void InteractionSystem::processInteractions() {
-    auto resolvedHits = resolveInteractions();
+  auto resolvedHits = resolveInteractions();
 
-    for (InputState &state : m_priority_ordered_states) {
-      SceneNode* hovered_node = nullptr;
-      SceneNode* grabbed_node = nullptr;
+  for (InputState &state : m_priority_ordered_states) {
+    SceneNode *hovered_node = nullptr;
+    SceneNode *grabbed_node = nullptr;
 
-      // Determine which node this input will act on (priority first)
-      // TODO: make deterministic, such that we always pick the same node
-      for (auto hit : state.hits) {
-        hovered_node = hit;
+    // Determine which node this input will act on (priority first)
+    // TODO: make deterministic, such that we always pick the same node
+    for (auto hit : state.hits) {
+      hovered_node = hit;
 
-        // If input is grabbing/pinching, this is the grabbed node
-        if (state.input->m_grabbing || state.input->m_pinching) {
-          grabbed_node = hit;
-        }
-        break; // stop at first hit
+      // If input is grabbing/pinching, this is the grabbed node
+      if (state.input->m_grabbing || state.input->m_pinching) {
+        grabbed_node = hit;
       }
+      break; // stop at first hit
+    }
 
-      // Hover phase, if the new hovered node is not the
-      // previous hovered node
-      if (hovered_node != state.last_hovered_node) {
-        // End hover on previous
-        if (state.last_hovered_node) {
-          for (auto* component : state.last_hovered_node->getComponents<InteractionComponent>()) {
-            component->onHoverEnd(*state.input);
-          }
-        }
-        // Begin hover on new node
-        if (hovered_node) {
-          for (auto* component : hovered_node->getComponents<InteractionComponent>()) {
-            component->onHoverBegin(*state.input);
-          }
+    // Hover phase, if the new hovered node is not the
+    // previous hovered node
+    if (hovered_node != state.last_hovered_node) {
+      // End hover on previous
+      if (state.last_hovered_node) {
+        for (auto *component : state.last_hovered_node->getComponents<InteractionComponent>()) {
+          component->onHoverEnd(*state.input);
         }
       }
-
-      // Grab phase, if the new grabbed node is not the
-      // previous grabbed node
-      if (grabbed_node != state.last_grabbed_node) {
-        // End grab on previous
-        if (state.last_grabbed_node) {
-          for (auto* component : state.last_grabbed_node->getComponents<InteractionComponent>()) {
-            component->onGrabEnd(*state.input);
-          }
-        }
-        // Begin grab on new node
-        if (grabbed_node) {
-          for (auto* component : grabbed_node->getComponents<InteractionComponent>()) {
-            component->onGrabBegin(*state.input);
-          }
+      // Begin hover on new node
+      if (hovered_node) {
+        for (auto *component : hovered_node->getComponents<InteractionComponent>()) {
+          component->onHoverBegin(*state.input);
         }
       }
+    }
 
-      // Always run update grab on current node
+    // Grab phase, if the new grabbed node is not the
+    // previous grabbed node
+    if (grabbed_node != state.last_grabbed_node) {
+      // End grab on previous
+      if (state.last_grabbed_node) {
+        for (auto *component : state.last_grabbed_node->getComponents<InteractionComponent>()) {
+          component->onGrabEnd(*state.input);
+        }
+      }
+      // Begin grab on new node
       if (grabbed_node) {
-        for (auto* component : grabbed_node->getComponents<InteractionComponent>()) {
-          component->onGrabUpdate(*state.input);
+        for (auto *component : grabbed_node->getComponents<InteractionComponent>()) {
+          component->onGrabBegin(*state.input);
         }
       }
+    }
 
-      // Save for next frame
-      state.last_hovered_node = hovered_node;
-      state.last_grabbed_node = grabbed_node;
+    // Always run update grab on current node
+    if (grabbed_node) {
+      for (auto *component : grabbed_node->getComponents<InteractionComponent>()) {
+        component->onGrabUpdate(*state.input);
+      }
+    }
+
+    // Save for next frame
+    state.last_hovered_node = hovered_node;
+    state.last_grabbed_node = grabbed_node;
   }
 }
 
