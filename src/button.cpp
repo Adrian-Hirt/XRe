@@ -34,13 +34,15 @@ void Button::processInteractions() {
     return;
   }
 
-  if (m_root_node->m_intersected_in_current_frame && !m_root_node->m_was_intersected_in_previous_frame) {
-    trigger();
-  }
+  // if (m_root_node->m_intersected_in_current_frame && !m_root_node->m_was_intersected_in_previous_frame) {
+  //   trigger();
+  // }
 
-  m_root_node->m_was_intersected_in_previous_frame = m_root_node->m_intersected_in_current_frame;
+  // m_root_node->m_was_intersected_in_previous_frame = m_root_node->m_intersected_in_current_frame;
 }
 
-void Button::resetInteractionState() { m_root_node->m_intersected_in_current_frame = false; }
+void Button::resetInteractionState() { 
+  //m_root_node->m_intersected_in_current_frame = false;
+}
 
 bool Button::isEnabled() { return m_enabled; }

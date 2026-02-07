@@ -6,12 +6,16 @@
 
 class InteractionComponent : public Component {
 public:
-  virtual void onHoverBegin(Input &input) = 0;
-  virtual void onHoverEnd(Input &input) = 0;
+  virtual void onHoverBegin(Input &input) { m_hovered = true; }
+  virtual void onHoverEnd(Input &input) { m_hovered = false; }
 
   virtual void onGrabBegin(Input &input) = 0;
   virtual void onGrabUpdate(Input &input) = 0;
   virtual void onGrabEnd(Input &input) = 0;
 
   virtual void onTrigger(Input &input) = 0;
+
+  bool isHovered() { return m_hovered; }
+private:
+  bool m_hovered = false;
 };

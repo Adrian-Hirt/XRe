@@ -80,13 +80,9 @@ public:
   // Attach a component
   void addComponent(std::unique_ptr<Component> component);
 
+  // Methods to fetch single or multiple components for a given type
   template <typename T> T *getComponent();
-
   template <typename T> std::vector<T *> getComponents();
-
-  bool m_intersected_in_current_frame = false;
-  bool m_was_intersected_in_previous_frame = false;
-
 private:
   // Scene of the node (which might be null for nodes without a scene, e.g. controllers)
   Scene *m_scene;

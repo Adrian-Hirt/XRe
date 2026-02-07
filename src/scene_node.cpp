@@ -35,8 +35,16 @@ void SceneNode::render(RenderContext &ctx) {
   }
 
   if (m_model) {
+    bool hovered = false;
+    for (auto component : getComponents<InteractionComponent>()) {
+      if (component->isHovered()) {
+        hovered = true;
+        break;
+      }
+    }
+
     // Keep track if there is an interaction with the model
-    m_model->setInteractedState(m_intersected_in_current_frame);
+    m_model->setInteractedState(hovered);
 
     // And render the model
     m_model->render(ctx, m_world_transform);
