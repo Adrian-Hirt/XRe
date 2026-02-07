@@ -3,7 +3,7 @@
 // XRe includes
 #include <xre/interaction_component.h>
 
-class GrabbbableComponent : public InteractionComponent {
+class GrabbableComponent : public InteractionComponent {
 public:
   void onHoverBegin(Input& input) override;
   void onHoverEnd(Input& input) override;

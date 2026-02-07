@@ -93,11 +93,11 @@ std::unordered_set<Button *> SceneManager::getButtonInstances() {
   }
 }
 
-const std::vector<GrabbbableComponent*>& SceneManager::getGrabbableComponents() const {
+const std::vector<GrabbableComponent*>& SceneManager::getGrabbableComponents() const {
   if (m_active_scene) {
     return m_active_scene->getGrabbableComponents();
   } else {
-    static const std::vector<GrabbbableComponent*> empty;
+    static const std::vector<GrabbableComponent*> empty;
     return empty;
   }
 }

@@ -82,7 +82,7 @@ void MainScene::onActivate() {
   quad_node->translate(0.8f, 0.8f, 0.0f);
   quad_node->scale(0.1f, 0.1f, 0.1f);
 
-  cube1_node->addComponent(std::make_unique<GrabbbableComponent>());
+  cube1_node->addComponent(std::make_unique<GrabbableComponent>());
 
   cube1_node->setGrabbable(true);
   floor_node->setIsTerrain(true);
