@@ -36,7 +36,6 @@ std::unordered_set<SceneNode *> Scene::getTerrainNodeInstances() {
 
 void Scene::resetInteractionStates() {
   for (auto component : m_grabbable_components) {
-    component->getSceneNode()->m_grabbed = false;
     component->getSceneNode()->m_intersected_in_current_frame = false;
   }
 }

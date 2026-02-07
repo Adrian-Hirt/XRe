@@ -84,7 +84,6 @@ public:
 
   template <typename T> std::vector<T *> getComponents();
 
-  bool m_grabbed = false;
   bool m_intersected_in_current_frame = false;
   bool m_was_intersected_in_previous_frame = false;
 
