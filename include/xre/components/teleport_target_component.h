@@ -3,6 +3,4 @@
 // XRe includes
 #include <xre/components/component.h>
 
-class TeleportTargetComponent : public Component {
-
-};
+class TeleportTargetComponent : public Component {};

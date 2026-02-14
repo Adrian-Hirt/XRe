@@ -166,6 +166,4 @@ void SceneNode::addComponent(std::unique_ptr<Component> component) {
   m_components.push_back(std::move(component));
 }
 
-const glm::mat4 SceneNode::getWorldTransform() const {
-  return m_world_transform;
-}
+const glm::mat4 SceneNode::getWorldTransform() const { return m_world_transform; }

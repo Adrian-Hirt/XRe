@@ -15,9 +15,9 @@ public:
   ColliderComponent() = delete;
   ColliderComponent(std::vector<OOBB> bounding_boxes);
 
-  static std::unique_ptr<ColliderComponent> fromPointGroups(const std::vector<std::vector<glm::vec3>>& point_groups);
+  static std::unique_ptr<ColliderComponent> fromPointGroups(const std::vector<std::vector<glm::vec3>> &point_groups);
 
-  bool intersects(ColliderComponent* other);
+  bool intersects(ColliderComponent *other);
   bool intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance);
 
 private:

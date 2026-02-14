@@ -101,6 +101,4 @@ void Mesh::initialize(std::vector<Vertex> vertices, std::vector<uint16_t> indice
   }
 }
 
-const std::vector<glm::vec3> Mesh::getVectorPositions() const {
-  return m_vertex_positions;
-}
+const std::vector<glm::vec3> Mesh::getVectorPositions() const { return m_vertex_positions; }

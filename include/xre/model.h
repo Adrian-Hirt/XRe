@@ -36,6 +36,7 @@ public:
   void setInteractedState(bool interacted);
 
   const std::vector<std::vector<glm::vec3>> getVectorPositionsPerMesh() const;
+
 private:
   // The index of the current model itself to index into the buffer of the material
   uint32_t m_model_index;

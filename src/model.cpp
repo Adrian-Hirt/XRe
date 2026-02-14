@@ -180,7 +180,7 @@ const std::vector<std::vector<glm::vec3>> Model::getVectorPositionsPerMesh() con
   std::vector<std::vector<glm::vec3>> result;
   result.reserve(m_meshes.size());
 
-  for (const auto& mesh : m_meshes) {
+  for (const auto &mesh : m_meshes) {
     result.push_back(mesh->getVectorPositions());
   }
 

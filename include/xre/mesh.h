@@ -22,6 +22,7 @@ public:
 
   OOBB getObjectOrientedBoundingBox();
   const std::vector<glm::vec3> getVectorPositions() const;
+
 private:
   void render(RenderContext &ctx);
   void renderBoundingBox(RenderContext &ctx);
