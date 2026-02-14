@@ -51,14 +51,6 @@ void SceneManager::draw(RenderContext &ctx) {
   }
 }
 
-std::unordered_set<SceneNode *> SceneManager::getTerrainInstances() {
-  if (m_active_scene) {
-    return m_active_scene->getTerrainNodeInstances();
-  } else {
-    return {};
-  }
-}
-
 const std::vector<GrabbableComponent *> &SceneManager::getGrabbableComponents() const {
   if (m_active_scene) {
     return m_active_scene->getGrabbableComponents();

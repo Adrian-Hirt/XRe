@@ -92,9 +92,6 @@ void MainScene::onActivate() {
   floor_node->addComponent(ColliderComponent::fromPointGroups(floor->getVectorPositionsPerMesh()));
   cube_node->addComponent(ColliderComponent::fromPointGroups(cube->getVectorPositionsPerMesh()));
 
-  floor_node->setIsTerrain(true);
-  cube_node->setIsTerrain(true);
-
   cube2_node->addComponent(ColliderComponent::fromPointGroups(cube2->getVectorPositionsPerMesh()));
 
   cube1_collider = cube1_node->getComponent<ColliderComponent>();

@@ -14,26 +14,6 @@ std::shared_ptr<SceneNode> Scene::node(std::shared_ptr<Model> model) {
   return scene_node;
 }
 
-void Scene::setNodeIsTerrain(SceneNode *node, bool is_terrain) {
-  if (is_terrain) {
-    m_terrain_scene_nodes.insert(node);
-  } else {
-    m_terrain_scene_nodes.erase(node);
-  }
-}
-
-std::unordered_set<SceneNode *> Scene::getTerrainNodeInstances() {
-  std::unordered_set<SceneNode *> result;
-
-  for (SceneNode *current_node : m_terrain_scene_nodes) {
-    if (current_node->isActive()) {
-      result.insert(current_node);
-    }
-  }
-
-  return result;
-}
-
 void Scene::registerComponent(Component &component) {
   if (auto *grabbable = dynamic_cast<GrabbableComponent *>(&component)) {
     m_grabbable_components.push_back(grabbable);

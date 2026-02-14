@@ -38,9 +38,6 @@ public:
   std::shared_ptr<SceneNode> node();
   std::shared_ptr<SceneNode> node(std::shared_ptr<Model> model);
 
-  void setNodeIsTerrain(SceneNode *node, bool is_terrain);
-  std::unordered_set<SceneNode *> getTerrainNodeInstances();
-
   void registerComponent(Component &component);
   void unregisterComponent(Component &component);
 
@@ -57,9 +54,7 @@ protected:
 
   // Set of all scene nodes belonging to this scene we marked as terrain (i.e. can teleport there)
   std::vector<TeleportTargetComponent *> m_teleport_target_components;
-  std::unordered_set<SceneNode *> m_terrain_scene_nodes;
 
-  // Set of all buttons in the scene
-  std::unordered_set<Button *> m_button_instances;
+  // Set of all button components in the scene
   std::vector<ButtonComponent *> m_button_components;
 };

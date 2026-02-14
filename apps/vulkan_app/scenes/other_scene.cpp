@@ -37,7 +37,8 @@ void OtherScene::onActivate() {
   button_node->setPosition({-1.0f, 1.3f, 0.0f});
   button_node->scale(0.1f, 0.1f, 0.02f);
 
-  floor_node->setIsTerrain(true);
+  floor_node->addComponent(std::make_unique<TeleportTargetComponent>());
+  floor_node->addComponent(ColliderComponent::fromPointGroups(floor->getVectorPositionsPerMesh()));
 
   root_node->updateTransformation();
 }

@@ -148,12 +148,6 @@ glm::vec3 SceneNode::getScale() { return m_scaling; }
 
 glm::vec3 SceneNode::getPosition() { return m_translation; }
 
-void SceneNode::setIsTerrain(bool is_terrain) {
-  if (m_scene) {
-    m_scene->setNodeIsTerrain(this, is_terrain);
-  }
-}
-
 void SceneNode::setActive(bool is_active) { m_is_active = is_active; }
 
 bool SceneNode::isActive() { return m_is_active; }

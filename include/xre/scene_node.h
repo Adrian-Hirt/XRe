@@ -67,8 +67,6 @@ public:
   // Getter for world transform
   const glm::mat4 getWorldTransform() const;
 
-  void setIsTerrain(bool is_terrain);
-
   void setActive(bool is_active);
   bool isActive();
 

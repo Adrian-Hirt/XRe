@@ -34,7 +34,6 @@ public:
   // Will forward the calls to the active scene
   void updateSimulation(XrTime predicted_time);
   void draw(RenderContext &ctx);
-  std::unordered_set<SceneNode *> getTerrainInstances();
 
   const std::vector<GrabbableComponent *> &getGrabbableComponents() const;
   const std::vector<ButtonComponent *> &getButtonComponents() const;
