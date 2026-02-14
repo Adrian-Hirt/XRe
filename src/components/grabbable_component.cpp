@@ -1,4 +1,4 @@
-#include <xre/grabbable_component.h>
+#include <xre/components/grabbable_component.h>
 
 void GrabbableComponent::onGrabBegin(Input &input) { m_grabbing_input = &input; }
 

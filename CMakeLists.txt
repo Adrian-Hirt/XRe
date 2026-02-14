@@ -28,20 +28,20 @@ else()
   message(FATAL_ERROR "Vulkan not found")
 endif()
 
-FILE(GLOB SRCFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+FILE(GLOB_RECURSE SRCFILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
 # Setup clang format
 find_program(CLANG_FORMAT_EXE NAMES clang-format)
 if(CLANG_FORMAT_EXE)
   add_custom_target(
     clang_format
-    COMMAND ${CLANG_FORMAT_EXE} -i ${CMAKE_CURRENT_SOURCE_DIR}/include/xre/*.h ${SRCFILES}
+    COMMAND ${CLANG_FORMAT_EXE} -i ${CMAKE_CURRENT_SOURCE_DIR}/include/**/*.h ${SRCFILES}
     COMMENT "Running clang-format on all source files"
   )
 
   add_custom_target(
     clang_format_check
-    COMMAND ${CLANG_FORMAT_EXE} --dry-run --Werror ${CMAKE_CURRENT_SOURCE_DIR}/include/xre/*.h ${SRCFILES}
+    COMMAND ${CLANG_FORMAT_EXE} --dry-run --Werror ${CMAKE_CURRENT_SOURCE_DIR}/include/**/*.h ${SRCFILES}
     COMMENT "Checking clang-format style"
   )
 else()

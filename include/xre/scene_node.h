@@ -2,7 +2,7 @@
 
 // XRe includes
 #include <xre/model.h>
-#include <xre/component.h>
+#include <xre/components/component.h>
 
 // GLM includes
 #include <glm/glm/vec3.hpp>

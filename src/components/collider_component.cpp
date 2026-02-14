@@ -1,4 +1,4 @@
-#include <xre/collider_component.h>
+#include <xre/components/collider_component.h>
 #include <xre/scene_node.h>
 
 ColliderComponent::ColliderComponent(std::vector<OOBB> bounding_boxes) {

@@ -2,7 +2,7 @@
 
 // XRe includes
 #include <xre/object_oriented_bounding_box.h>
-#include <xre/component.h>
+#include <xre/components/component.h>
 
 // GLM includes
 #include <glm/glm/vec3.hpp>

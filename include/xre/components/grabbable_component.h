@@ -1,7 +1,7 @@
 #pragma once
 
 // XRe includes
-#include <xre/interaction_component.h>
+#include <xre/components/interaction_component.h>
 
 class GrabbableComponent : public InteractionComponent {
 public:

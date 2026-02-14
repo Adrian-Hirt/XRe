@@ -7,10 +7,10 @@
 #include <xre/scene_node.h>
 #include <xre/material.h>
 #include <xre/texture.h>
-#include <xre/grabbable_component.h>
-#include <xre/button_component.h>
-#include <xre/collider_component.h>
-#include <xre/teleport_target_component.h>
+#include <xre/components/grabbable_component.h>
+#include <xre/components/button_component.h>
+#include <xre/components/collider_component.h>
+#include <xre/components/teleport_target_component.h>
 
 // Other includes
 #include <memory>

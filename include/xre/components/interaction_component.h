@@ -1,7 +1,7 @@
 #pragma once
 
 // XRe includes
-#include <xre/component.h>
+#include <xre/components/component.h>
 #include <xre/input.h>
 
 class InteractionComponent : public Component {
