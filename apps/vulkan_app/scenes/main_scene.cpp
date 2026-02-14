@@ -86,6 +86,12 @@ void MainScene::onActivate() {
 
   cube1_node->addComponent(ColliderComponent::fromPointGroups(cube1->getVectorPositionsPerMesh()));
   cube1_node->addComponent(std::make_unique<GrabbableComponent>());
+
+  floor_node->addComponent(std::make_unique<TeleportTargetComponent>());
+  cube_node->addComponent(std::make_unique<TeleportTargetComponent>());
+  floor_node->addComponent(ColliderComponent::fromPointGroups(floor->getVectorPositionsPerMesh()));
+  cube_node->addComponent(ColliderComponent::fromPointGroups(cube->getVectorPositionsPerMesh()));
+
   floor_node->setIsTerrain(true);
   cube_node->setIsTerrain(true);
 

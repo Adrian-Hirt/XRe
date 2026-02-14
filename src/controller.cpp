@@ -81,9 +81,13 @@ std::optional<glm::vec3> Controller::updateIntersectionSphereAndComputePossibleT
     grabbable_scene_nodes.insert(comp->getSceneNode());
   }
 
+  std::unordered_set<SceneNode *> teleportable_scene_nodes;
+  for (auto *comp : SceneManager::instance().getTeleportTargetComponents()) {
+    teleportable_scene_nodes.insert(comp->getSceneNode());
+  }
+
   float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(grabbable_scene_nodes);
-  // float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(SceneManager::instance().getTerrainInstances());
-  float closest_terrain_aim_intersection = FLT_MAX;
+  float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(teleportable_scene_nodes);
 
   if (m_intersection_sphere_node->isActive()) {
     float closest_intersection = std::min(closest_grabbable_aim_intersection, closest_terrain_aim_intersection);

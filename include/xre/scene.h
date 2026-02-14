@@ -10,6 +10,7 @@
 #include <xre/grabbable_component.h>
 #include <xre/button_component.h>
 #include <xre/collider_component.h>
+#include <xre/teleport_target_component.h>
 
 // Other includes
 #include <memory>
@@ -45,6 +46,7 @@ public:
 
   const std::vector<GrabbableComponent *> &getGrabbableComponents() const;
   const std::vector<ButtonComponent *> &getButtonComponents() const;
+  const std::vector<TeleportTargetComponent *> &getTeleportTargetComponents() const;
 
 protected:
   // Keep track of resource manager to create resources such as models or materials
@@ -54,6 +56,7 @@ protected:
   std::vector<GrabbableComponent *> m_grabbable_components;
 
   // Set of all scene nodes belonging to this scene we marked as terrain (i.e. can teleport there)
+  std::vector<TeleportTargetComponent *> m_teleport_target_components;
   std::unordered_set<SceneNode *> m_terrain_scene_nodes;
 
   // Set of all buttons in the scene

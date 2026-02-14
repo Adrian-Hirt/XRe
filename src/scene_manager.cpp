@@ -68,6 +68,15 @@ const std::vector<GrabbableComponent *> &SceneManager::getGrabbableComponents() 
   }
 }
 
+const std::vector<TeleportTargetComponent *> &SceneManager::getTeleportTargetComponents() const {
+  if (m_active_scene) {
+    return m_active_scene->getTeleportTargetComponents();
+  } else {
+    static const std::vector<TeleportTargetComponent *> empty_teleport_targets;
+    return empty_teleport_targets;
+  }
+}
+
 const std::vector<ButtonComponent *> &SceneManager::getButtonComponents() const {
   if (m_active_scene) {
     return m_active_scene->getButtonComponents();

@@ -39,6 +39,8 @@ void Scene::registerComponent(Component &component) {
     m_grabbable_components.push_back(grabbable);
   } else if (auto *button = dynamic_cast<ButtonComponent *>(&component)) {
     m_button_components.push_back(button);
+  } else if (auto *teleport_target = dynamic_cast<TeleportTargetComponent *>(&component)) {
+    m_teleport_target_components.push_back(teleport_target);
   }
 }
 
@@ -47,9 +49,13 @@ void Scene::unregisterComponent(Component &component) {
     std::erase(m_grabbable_components, grabbable);
   } else if (auto *button = dynamic_cast<ButtonComponent *>(&component)) {
     std::erase(m_grabbable_components, grabbable);
+  } else if (auto *teleport_target = dynamic_cast<TeleportTargetComponent *>(&component)) {
+    std::erase(m_teleport_target_components, teleport_target);
   }
 }
 
 const std::vector<GrabbableComponent *> &Scene::getGrabbableComponents() const { return m_grabbable_components; };
 
 const std::vector<ButtonComponent *> &Scene::getButtonComponents() const { return m_button_components; };
+
+const std::vector<TeleportTargetComponent *> &Scene::getTeleportTargetComponents() const { return m_teleport_target_components; };

@@ -38,6 +38,7 @@ public:
 
   const std::vector<GrabbableComponent *> &getGrabbableComponents() const;
   const std::vector<ButtonComponent *> &getButtonComponents() const;
+  const std::vector<TeleportTargetComponent *> &getTeleportTargetComponents() const;
 
 private:
   std::unordered_map<std::string, SceneFactory> m_scene_factories;
