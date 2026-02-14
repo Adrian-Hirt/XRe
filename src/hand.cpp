@@ -12,6 +12,11 @@ Hand::Hand(XrHandEXT hand_identifier, std::shared_ptr<Material> material, std::s
     joint_node->setScale(0.005f, 0.005f, 0.005f);
     m_hand_root_node->addChildNode(joint_node);
     m_joint_nodes.push_back(joint_node);
+
+    // For thumb tip and palm nodes, add colliders
+    if (i == XR_HAND_JOINT_THUMB_TIP_EXT || i == XR_HAND_JOINT_PALM_EXT) {
+      joint_node->addComponent(ColliderComponent::fromPointGroups(joint_model->getVectorPositionsPerMesh()));
+    }
   }
 }
 

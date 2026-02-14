@@ -9,6 +9,7 @@
 #include <xre/texture.h>
 #include <xre/grabbable_component.h>
 #include <xre/button_component.h>
+#include <xre/collider_component.h>
 
 // Other includes
 #include <memory>

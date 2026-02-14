@@ -45,6 +45,9 @@ private:
   std::shared_ptr<SceneNode> quad_node;
   std::shared_ptr<SceneNode> button_node;
 
+  ColliderComponent* cube1_collider;
+  ColliderComponent* cube2_collider;
+
   XrTime last_time = 0;
   bool forward = true;
 };

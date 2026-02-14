@@ -64,6 +64,9 @@ public:
   glm::vec3 getScale();
   glm::vec3 getPosition();
 
+  // Getter for world transform
+  const glm::mat4 getWorldTransform() const;
+
   void setIsTerrain(bool is_terrain);
 
   void setActive(bool is_active);

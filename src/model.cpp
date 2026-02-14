@@ -9,7 +9,7 @@
 //  1) Vector of meshes for this model
 //  2) Color of the model
 //------------------------------------------------------------------------------------------------------
-Model::Model(std::vector<Mesh> meshes, glm::vec3 color, std::shared_ptr<Material> material) {
+Model::Model(std::vector<std::shared_ptr<Mesh>> meshes, glm::vec3 color, std::shared_ptr<Material> material) {
   m_meshes = meshes;
   m_original_model_color = color;
   m_model_color = color;
@@ -52,11 +52,11 @@ void Model::render(RenderContext &ctx, glm::mat4 scene_node_transform) {
   m_material->bind();
 
   // Render meshes of this model
-  for (Mesh mesh : m_meshes) {
-    mesh.render(ctx);
+  for (auto mesh : m_meshes) {
+    mesh->render(ctx);
 
     if (m_render_bounding_boxes) {
-      mesh.renderBoundingBox(ctx);
+      mesh->renderBoundingBox(ctx);
     }
   }
 }
@@ -135,8 +135,7 @@ void Model::loadObj(const char *model_path, std::shared_ptr<VulkanHandler> vulka
       index_offset += face_vertices_count;
     }
 
-    Mesh mesh = Mesh(mesh_vertices, mesh_indices, vulkan_handler);
-    m_meshes.push_back(mesh);
+    m_meshes.push_back(std::make_shared<Mesh>(mesh_vertices, mesh_indices, vulkan_handler));
   };
 }
 
@@ -146,9 +145,9 @@ void Model::loadObj(const char *model_path, std::shared_ptr<VulkanHandler> vulka
 // this should be enough.
 bool Model::intersects(std::shared_ptr<Model> other, glm::mat4 other_scene_node_transform, glm::mat4 scene_node_transform) {
   for (auto mesh : m_meshes) {
-    auto this_OOBB = mesh.getObjectOrientedBoundingBox().transformed(scene_node_transform);
+    auto this_OOBB = mesh->getObjectOrientedBoundingBox().transformed(scene_node_transform);
     for (auto other_mesh : other->m_meshes) {
-      auto other_OOBB = other_mesh.getObjectOrientedBoundingBox().transformed(other_scene_node_transform);
+      auto other_OOBB = other_mesh->getObjectOrientedBoundingBox().transformed(other_scene_node_transform);
       if (this_OOBB.intersects(other_OOBB)) {
         return true;
       }
@@ -160,7 +159,7 @@ bool Model::intersects(std::shared_ptr<Model> other, glm::mat4 other_scene_node_
 
 bool Model::intersects(const glm::vec3 &line_start, const glm::vec3 &line_direction, float *out_distance, glm::mat4 scene_node_transform) {
   for (auto mesh : m_meshes) {
-    auto this_OOBB = mesh.getObjectOrientedBoundingBox().transformed(scene_node_transform);
+    auto this_OOBB = mesh->getObjectOrientedBoundingBox().transformed(scene_node_transform);
     if (this_OOBB.intersects(line_start, line_direction, out_distance)) {
       return true;
     }
@@ -171,18 +170,18 @@ bool Model::intersects(const glm::vec3 &line_start, const glm::vec3 &line_direct
 
 void Model::printBouindingBoxes() {
   for (auto mesh : m_meshes) {
-    mesh.getObjectOrientedBoundingBox().print();
+    mesh->getObjectOrientedBoundingBox().print();
   }
 }
 
 void Model::setInteractedState(bool interacted) { m_interacted = interacted; }
 
-const std::vector<glm::vec3> Model::getVectorPositions() const {
-  std::vector<glm::vec3> result;
+const std::vector<std::vector<glm::vec3>> Model::getVectorPositionsPerMesh() const {
+  std::vector<std::vector<glm::vec3>> result;
+  result.reserve(m_meshes.size());
 
-  for (auto mesh : m_meshes) {
-    auto positions = mesh.getVectorPositions();
-    result.insert(result.end(), positions.begin(), positions.end());
+  for (const auto& mesh : m_meshes) {
+    result.push_back(mesh->getVectorPositions());
   }
 
   return result;

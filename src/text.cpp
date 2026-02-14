@@ -77,8 +77,8 @@ void Text::buildMeshesFromSentence(const std::string sentence) {
   }
 
   // Create the mesh
-  Mesh mesh = Mesh(vertices, indices, m_vulkan_handler);
-  std::vector<Mesh> meshes = {mesh};
+  auto mesh = std::make_shared<Mesh>(vertices, indices, m_vulkan_handler);
+  std::vector<std::shared_ptr<Mesh>> meshes = {mesh};
 
   // Create the texture and the material
   std::shared_ptr<Texture> texture = std::make_shared<Texture>(DATA_FOLDER "fonts/DejaVuSansMono128NoAA.png", m_vulkan_handler);

@@ -15,7 +15,7 @@
 
 class Model {
 public:
-  Model(std::vector<Mesh> meshes, glm::vec3 color, std::shared_ptr<Material> material);
+  Model(std::vector<std::shared_ptr<Mesh>> meshes, glm::vec3 color, std::shared_ptr<Material> material);
   Model(const char *model_path, glm::vec3 color, std::shared_ptr<Material> material, std::shared_ptr<VulkanHandler> vulkan_handler);
 
   // Set the color of the model
@@ -35,13 +35,13 @@ public:
   // should have a slightly different color applied
   void setInteractedState(bool interacted);
 
-  const std::vector<glm::vec3> getVectorPositions() const;
+  const std::vector<std::vector<glm::vec3>> getVectorPositionsPerMesh() const;
 private:
   // The index of the current model itself to index into the buffer of the material
   uint32_t m_model_index;
 
   // Vector holding all the meshes of this model
-  std::vector<Mesh> m_meshes;
+  std::vector<std::shared_ptr<Mesh>> m_meshes;
 
   // Color of the model, which will be applied to all meshes
   glm::vec3 m_model_color;

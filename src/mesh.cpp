@@ -68,8 +68,6 @@ void Mesh::initialize(std::vector<Vertex> vertices, std::vector<uint16_t> indice
   m_index_buffer->loadData(indices);
 
   // Store vertex positions
-  std::vector<glm::vec3> m_vertex_positions;
-
   for (int i = 0; i < m_vertex_count; i++) {
     m_vertex_positions.push_back(vertices[i].position);
   }

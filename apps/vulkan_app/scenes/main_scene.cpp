@@ -84,9 +84,15 @@ void MainScene::onActivate() {
   quad_node->translate(0.8f, 0.8f, 0.0f);
   quad_node->scale(0.1f, 0.1f, 0.1f);
 
+  cube1_node->addComponent(ColliderComponent::fromPointGroups(cube1->getVectorPositionsPerMesh()));
   cube1_node->addComponent(std::make_unique<GrabbableComponent>());
   floor_node->setIsTerrain(true);
   cube_node->setIsTerrain(true);
+
+  cube2_node->addComponent(ColliderComponent::fromPointGroups(cube2->getVectorPositionsPerMesh()));
+
+  cube1_collider = cube1_node->getComponent<ColliderComponent>();
+  cube2_collider = cube2_node->getComponent<ColliderComponent>();
 
   root_node->updateTransformation();
 }
@@ -94,7 +100,7 @@ void MainScene::onActivate() {
 void MainScene::draw(RenderContext &ctx) {
   root_node->render(ctx);
 
-  if (cube1_node->intersects(cube2_node)) {
+  if (cube1_collider->intersects(cube2_collider)) {
     cube1->setColor({1.0f, 0.0f, 0.0f});
   } else {
     cube1->resetColor();

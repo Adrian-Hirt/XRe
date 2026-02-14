@@ -19,6 +19,9 @@ Controller::Controller(std::shared_ptr<Material> material, std::shared_ptr<Vulka
   m_root_node.addChildNode(m_model_node);
   m_root_node.addChildNode(m_intersection_sphere_node);
   m_root_node.addChildNode(m_aim_line);
+
+  // Add the collider component
+  m_model_node->addComponent(ColliderComponent::fromPointGroups(m_model->getVectorPositionsPerMesh()));
 }
 
 void Controller::render(RenderContext &ctx) {
@@ -79,7 +82,8 @@ std::optional<glm::vec3> Controller::updateIntersectionSphereAndComputePossibleT
   }
 
   float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(grabbable_scene_nodes);
-  float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(SceneManager::instance().getTerrainInstances());
+  // float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(SceneManager::instance().getTerrainInstances());
+  float closest_terrain_aim_intersection = FLT_MAX;
 
   if (m_intersection_sphere_node->isActive()) {
     float closest_intersection = std::min(closest_grabbable_aim_intersection, closest_terrain_aim_intersection);
@@ -120,13 +124,18 @@ float Controller::computeAimIndicatorSpherePosition(std::unordered_set<SceneNode
   float closest_intersection_distance = LINE_INTERSECTION_FAR_THRESHOLD + 1;
 
   for (SceneNode *current_node : nodes) {
+    // Get the collider component of the node
+    auto collider_component = current_node->getComponent<ColliderComponent>();
+    if (collider_component == nullptr) {
+      continue;
+    }
+
     // Check if the node intersects the line of the controller
     float intersection_distance;
     glm::vec3 start = m_aim_line->getLineStart();
     glm::vec3 dir = m_aim_line->getLineDirection();
 
-    // if(current_node->intersects(m_aim_line.getLineStart(), m_aim_line.getLineDirection(), &intersection_distance)) {
-    if (current_node->intersects(start, dir, &intersection_distance)) {
+    if (collider_component->intersects(start, dir, &intersection_distance)) {
       if (intersection_distance > 0 && intersection_distance <= LINE_INTERSECTION_FAR_THRESHOLD &&
           intersection_distance >= LINE_INTERSECTION_NEAR_THRESHOLD) {
         m_intersection_sphere_node->setActive(true);
