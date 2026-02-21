@@ -26,9 +26,6 @@ public:
   // Render the controller
   void render(RenderContext &ctx);
 
-  // Check whether we want to teleport
-  std::optional<glm::vec3> updateIntersectionSphereAndComputePossibleTeleport();
-
   // Update the position of the controller
   void updatePosition(glm::vec3 current_origin);
 
@@ -44,9 +41,6 @@ public:
   // Space for the aim action
   XrSpace m_aim_space;
 
-  // Space for the teleport action
-  bool m_teleporting_requested = false;
-
   // Pose of the controller
   XrPosef m_pose;
 
@@ -56,11 +50,14 @@ public:
   // Model node
   std::shared_ptr<SceneNode> m_model_node;
 
-private:
-  // Threshold for showing the line intersection point
-  static constexpr float LINE_INTERSECTION_FAR_THRESHOLD = 6.0f;
-  static constexpr float LINE_INTERSECTION_NEAR_THRESHOLD = 0.1f;
+  // Get the aim line
+  std::shared_ptr<Line> getAimLine();
 
+  // Method to update controller aim and interaction sphere
+  void updateAimIndicators(float aim_line_length, std::optional<glm::vec3> aim_sphere_position, bool terrain_intersection);
+
+  inline bool hasAimLine() { return true; };
+private:
   // Model for the controller
   std::shared_ptr<Model> m_model;
 
@@ -78,6 +75,4 @@ private:
   SceneNode m_root_node;
   std::shared_ptr<SceneNode> m_intersection_sphere_node;
   std::shared_ptr<SceneNode> m_aim_line_node;
-
-  float computeAimIndicatorSpherePosition(std::unordered_set<SceneNode *> models);
 };

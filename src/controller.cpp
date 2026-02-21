@@ -64,96 +64,27 @@ void Controller::updatePosition(glm::vec3 current_origin) {
   m_root_node.updateTransformation();
 }
 
-std::optional<glm::vec3> Controller::updateIntersectionSphereAndComputePossibleTeleport() {
-  if (!m_active) {
-    return std::nullopt;
-  }
+void Controller::updateAimIndicators(float aim_line_length, std::optional<glm::vec3> aim_sphere_position, bool terrain_intersection) {
+  m_aim_line_render_length = aim_line_length;
 
-  // Reset state of the intersection sphere
-  m_intersection_sphere_node->setActive(false);
+  if (aim_sphere_position.has_value()) {
+    m_intersection_sphere_node->setActive(true);
+    m_intersection_sphere_node->setPosition(aim_sphere_position.value());
 
-  // Reset line length
-  m_aim_line_render_length = LINE_INTERSECTION_FAR_THRESHOLD;
-
-  // TODO: clean this up
-  std::unordered_set<SceneNode *> grabbable_scene_nodes;
-  for (auto *comp : SceneManager::instance().getGrabbableComponents()) {
-    grabbable_scene_nodes.insert(comp->getSceneNode());
-  }
-
-  std::unordered_set<SceneNode *> teleportable_scene_nodes;
-  for (auto *comp : SceneManager::instance().getTeleportTargetComponents()) {
-    teleportable_scene_nodes.insert(comp->getSceneNode());
-  }
-
-  float closest_grabbable_aim_intersection = computeAimIndicatorSpherePosition(grabbable_scene_nodes);
-  float closest_terrain_aim_intersection = computeAimIndicatorSpherePosition(teleportable_scene_nodes);
-
-  if (m_intersection_sphere_node->isActive()) {
-    float closest_intersection = std::min(closest_grabbable_aim_intersection, closest_terrain_aim_intersection);
-
-    // Set length of line to render, which needs to be the half of the closest intersection (due to how
-    // we render the line).
-    m_aim_line_render_length = closest_intersection / 2.0f;
-
-    // The direction vector has unit length, i.e. to stretch it to the required length, we
-    // simple multiply the vector with the length, which gives us a new vector.
-    glm::vec3 stretched_direction = m_aim_line->getLineDirection() * closest_intersection;
-
-    glm::vec3 sphere_position = m_aim_line->getLineStart();
-    sphere_position = sphere_position + stretched_direction;
-    m_intersection_sphere_node->setPosition(sphere_position);
-    m_aim_indicator_sphere->setColor({0.0f, 0.75f, 1.0f});
-
-    if (closest_terrain_aim_intersection < closest_grabbable_aim_intersection) {
-      // Paint the indicator spheres yellow if we can teleport to their location
+    if (terrain_intersection) {
       m_aim_indicator_sphere->setColor({1.0f, 1.0f, 0.0f});
-
-      // If a teleporting is requested and there is an intersection sphere rendered, we can
-      // check whether the target is a terrain, and if yes, teleport to that location.
-      if (m_teleporting_requested) {
-        return sphere_position;
-      }
+    } else {
+      m_aim_indicator_sphere->setColor({0.0f, 0.75f, 1.0f});
     }
+  } else {
+    m_intersection_sphere_node->setActive(false);
   }
-
-  return std::nullopt;
-}
-
-float Controller::computeAimIndicatorSpherePosition(std::unordered_set<SceneNode *> nodes) {
-  // As we only want to highlight the intersection with the closest model,
-  // we need to keep track of the smallest threshold. We probably should replace
-  // this later with sorting the elements by distance from the camera and then check in
-  // ascending distance, but for now this will have to do.
-  float closest_intersection_distance = LINE_INTERSECTION_FAR_THRESHOLD + 1;
-
-  for (SceneNode *current_node : nodes) {
-    // Get the collider component of the node
-    auto collider_component = current_node->getComponent<ColliderComponent>();
-    if (collider_component == nullptr) {
-      continue;
-    }
-
-    // Check if the node intersects the line of the controller
-    float intersection_distance;
-    glm::vec3 start = m_aim_line->getLineStart();
-    glm::vec3 dir = m_aim_line->getLineDirection();
-
-    if (collider_component->intersects(start, dir, &intersection_distance)) {
-      if (intersection_distance > 0 && intersection_distance <= LINE_INTERSECTION_FAR_THRESHOLD &&
-          intersection_distance >= LINE_INTERSECTION_NEAR_THRESHOLD) {
-        m_intersection_sphere_node->setActive(true);
-
-        if (closest_intersection_distance > intersection_distance) {
-          closest_intersection_distance = intersection_distance;
-        }
-      }
-    }
-  }
-
-  return closest_intersection_distance;
 }
 
 std::shared_ptr<SceneNode> Controller::getSceneNodeForSceneNodeUpdate() { return m_model_node; }
 
 std::vector<std::shared_ptr<SceneNode>> Controller::getSceneNodeForInteractionQuery() { return {m_model_node}; }
+
+std::shared_ptr<Line> Controller::getAimLine() {
+  return m_aim_line;
+};

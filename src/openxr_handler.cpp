@@ -798,20 +798,20 @@ void OpenXrHandler::renderFrame(std::function<void(RenderContext &)> draw_callba
   //------------------------------------------------------------------------------------------------------
   // Update the interactions of the controllers and hands with the scene
   //------------------------------------------------------------------------------------------------------
-  std::optional<glm::vec3> teleport_location_left, teleport_location_right;
-  teleport_location_left = m_left_controller->updateIntersectionSphereAndComputePossibleTeleport();
-  teleport_location_right = m_right_controller->updateIntersectionSphereAndComputePossibleTeleport();
-
   // Begin the frame in the interaction system
   m_interaction_system->beginFrame();
 
-  // As both might have a value, we arbitrarily decide to give the right controller
-  // precedende. Later, we might map the teleport action to a single controller anyway,
-  // so maybe this will not be needed anymore.
-  if (teleport_location_right.has_value()) {
-    updateCurrentOriginForTeleport(teleport_location_right.value());
-  } else if (teleport_location_left.has_value()) {
-    updateCurrentOriginForTeleport(teleport_location_left.value());
+  // Run the logic in interaction system to query the interactions
+  m_interaction_system->queryInteractions();
+
+  // And run the logic to handle interactions
+  m_interaction_system->processInteractions();
+
+  // Get the optional teleport location from the interaction system
+  auto teleport_location = m_interaction_system->getTeleportLocation();
+
+  if (teleport_location.has_value()) {
+    updateCurrentOriginForTeleport(teleport_location.value());
   } else {
     // If not teleporting, we can update the position of the controllers
     m_left_controller->updatePosition(m_current_origin);
@@ -822,12 +822,6 @@ void OpenXrHandler::renderFrame(std::function<void(RenderContext &)> draw_callba
       m_left_hand->updatePosition(m_current_origin);
       m_right_hand->updatePosition(m_current_origin);
     }
-
-    // Run the logic in interaction system to query the interactions
-    m_interaction_system->queryInteractions();
-
-    // And run the logic to handle interactions
-    m_interaction_system->processInteractions();
   }
 
   //------------------------------------------------------------------------------------------------------

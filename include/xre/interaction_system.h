@@ -5,7 +5,7 @@
 #include <xre/controller.h>
 #include <xre/hand.h>
 #include <xre/scene_node.h>
-#include <xre/components/interaction_component.h>
+#include <xre/components/component.h>
 
 // Other includes
 #include <memory>
@@ -21,6 +21,9 @@ struct InputState {
   // Node that was hovered / grabbed last frame
   SceneNode *last_hovered_node = nullptr;
   SceneNode *last_grabbed_node = nullptr;
+
+  // Teleport location requested by a given input
+  std::optional<glm::vec3> requested_teleport_location;
 };
 
 class InteractionSystem {
@@ -31,6 +34,7 @@ public:
   void beginFrame();
   void queryInteractions();
   void processInteractions();
+  std::optional<glm::vec3> getTeleportLocation();
 
 private:
   // Controllers
@@ -40,6 +44,10 @@ private:
   // Hands
   InputState m_left_hand_state;
   InputState m_right_hand_state;
+
+  // Threshold for showing the line intersection point
+  static constexpr float LINE_INTERSECTION_FAR_THRESHOLD = 6.0f;
+  static constexpr float LINE_INTERSECTION_NEAR_THRESHOLD = 0.1f;
 
   // States ordered by priority
   std::vector<std::reference_wrapper<InputState>> m_priority_ordered_states;
@@ -51,6 +59,8 @@ private:
   template <typename T>
     requires std::derived_from<T, InteractionComponent>
   void processInteractionNodes(const std::vector<T *> &components, InputState &state);
+  void processAimLineInteractions(InputState &state);
+  std::optional<float> computeAimIndicatorSphereDistance(std::unordered_set<SceneNode *> nodes, std::shared_ptr<Line> aim_line);
 };
 
 #include <xre/interaction_system.inl>

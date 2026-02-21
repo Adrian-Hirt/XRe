@@ -13,6 +13,9 @@ public:
   virtual std::vector<std::shared_ptr<SceneNode>> getSceneNodeForInteractionQuery() = 0;
 
   virtual inline bool isValid() { return true; };
+  virtual inline bool hasAimLine() { return false; };
+  virtual std::shared_ptr<Line> getAimLine() { return nullptr; };
+  virtual void updateAimIndicators(float aim_line_length, std::optional<glm::vec3> aim_sphere_position, bool terrain_intersection) {};
 
   // Whether the input is active or not
   bool m_active = false;
@@ -24,5 +27,6 @@ public:
   // used for hands
   bool m_pinching = false;
 
-private:
+  // Whether teleporting was requested or not
+  bool m_teleporting_requested = false;
 };
