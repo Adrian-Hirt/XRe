@@ -110,8 +110,9 @@ void InteractionSystem::processAimLineInteractions(InputState &state) {
 
     // if the closest terrain aim intersection is set, and either there is no closer grabbable intersection
     // or the closest grabbable intersection is farther away, we can trigger a teleport.
-    bool terrain_intersection = closest_terrain_aim_intersection.has_value() && (
-      !closest_grabbable_aim_intersection.has_value() || closest_terrain_aim_intersection.value() < closest_grabbable_aim_intersection.value());
+    bool terrain_intersection = closest_terrain_aim_intersection.has_value() &&
+                                (!closest_grabbable_aim_intersection.has_value() ||
+                                 closest_terrain_aim_intersection.value() < closest_grabbable_aim_intersection.value());
 
     // If a teleporting is requested and there is an intersection sphere rendered, we can
     // check whether the target is a terrain, and if yes, teleport to that location.
@@ -126,7 +127,8 @@ void InteractionSystem::processAimLineInteractions(InputState &state) {
   state.input->updateAimIndicators(LINE_INTERSECTION_FAR_THRESHOLD, std::nullopt, false);
 }
 
-std::optional<float> InteractionSystem::computeAimIndicatorSphereDistance(std::unordered_set<SceneNode *> nodes, std::shared_ptr<Line> aim_line) {
+std::optional<float> InteractionSystem::computeAimIndicatorSphereDistance(std::unordered_set<SceneNode *> nodes,
+                                                                          std::shared_ptr<Line> aim_line) {
   // As we only want to highlight the intersection with the closest model,
   // we need to keep track of the smallest threshold. We probably should replace
   // this later with sorting the elements by distance from the camera and then check in

@@ -47,9 +47,6 @@ public:
   // Aim of the controller
   XrPosef m_aim;
 
-  // Model node
-  std::shared_ptr<SceneNode> m_model_node;
-
   // Get the aim line
   std::shared_ptr<Line> getAimLine();
 
@@ -57,6 +54,7 @@ public:
   void updateAimIndicators(float aim_line_length, std::optional<glm::vec3> aim_sphere_position, bool terrain_intersection);
 
   inline bool hasAimLine() { return true; };
+
 private:
   // Model for the controller
   std::shared_ptr<Model> m_model;
@@ -73,6 +71,7 @@ private:
 
   // Scene nodes
   SceneNode m_root_node;
+  std::shared_ptr<SceneNode> m_model_node;
   std::shared_ptr<SceneNode> m_intersection_sphere_node;
   std::shared_ptr<SceneNode> m_aim_line_node;
 };

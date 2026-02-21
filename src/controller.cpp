@@ -85,6 +85,4 @@ std::shared_ptr<SceneNode> Controller::getSceneNodeForSceneNodeUpdate() { return
 
 std::vector<std::shared_ptr<SceneNode>> Controller::getSceneNodeForInteractionQuery() { return {m_model_node}; }
 
-std::shared_ptr<Line> Controller::getAimLine() {
-  return m_aim_line;
-};
+std::shared_ptr<Line> Controller::getAimLine() { return m_aim_line; };
